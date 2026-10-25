@@ -130,6 +130,21 @@ body {
   background: rgba(255, 255, 255, 0.15);
 }
 
+.btn-torrent {
+  background: rgba(59, 130, 246, 0.12);
+  color: #60a5fa !important;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  padding: 8px 16px;
+  font-size: 0.9rem;
+}
+
+.btn-torrent:hover {
+  background: rgba(59, 130, 246, 0.25);
+  border-color: #60a5fa;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+  transform: translateY(-1px);
+}
+
 .btn-outline {
   border: 1px solid var(--border-color);
   color: var(--text-main);
