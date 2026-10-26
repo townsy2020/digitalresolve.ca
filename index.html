@@ -19,10 +19,6 @@
         <span class="logo-accent">Digital</span>Resolve <span style="font-size: 0.75rem; color: #4ade80; background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3); padding: 2px 8px; border-radius: 6px; font-weight: 700; margin-left: 8px; letter-spacing: 0.5px;">HOMELAB DECK</span>
       </div>
       <nav class="nav-links">
-        <a href="#fleet">Cluster Nodes</a>
-        <a href="#services">Cloud Apps</a>
-        <a href="#ops">Ops Deck</a>
-        
         <!-- Torrents Dropdown -->
         <div class="dropdown">
           <a href="https://torrents.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn btn-torrent">
@@ -193,6 +189,131 @@
             </select>
             <button type="button" class="quick-drop-btn" onclick="submitQuickMagnet()">🚀 Start Remote Download</button>
           </div>
+        </div>
+
+        <!-- Homelab Interactive Control Matrix -->
+        <div class="control-matrix-card">
+          <div class="control-matrix-header">
+            <div class="control-matrix-title">
+              <span>⚡</span> Homelab Remote Control Matrix
+            </div>
+            <div style="font-size: 0.8rem; color: #8b949e;">
+              Direct Remote Telemetry &bull; Zero Lag Execution via Cloudflare Tunnel
+            </div>
+          </div>
+          <div class="control-actions-grid">
+            <button type="button" class="btn-control active-pause" onclick="sendControl('pause-all')">
+              <span>⏸</span> Pause All Swarms
+            </button>
+            <button type="button" class="btn-control active-resume" onclick="sendControl('resume-all')">
+              <span>▶</span> Resume All Swarms
+            </button>
+            <button type="button" class="btn-control active-eco" onclick="sendControl('eco-throttle')">
+              <span>🌙</span> Eco Throttle (500K)
+            </button>
+            <button type="button" class="btn-control" onclick="sendControl('unlimit')">
+              <span>🚀</span> Full Uncapped Speed
+            </button>
+            <button type="button" class="btn-control" style="color: #4ade80;" onclick="sendWol('desktop')">
+              <span>⚡</span> Wake Desktop PC
+            </button>
+            <button type="button" class="btn-control btn-sleep" onclick="sendSleep('desktop')">
+              <span>⏻</span> Sleep Desktop Standby
+            </button>
+            <button type="button" class="btn-control" style="color: #38bdf8;" onclick="sendControl('run-backup')">
+              <span>☁</span> Trigger Cloud Backup
+            </button>
+            <button type="button" class="btn-control" style="color: #c084fc;" onclick="sendControl('run-audit')">
+              <span>🛡️</span> Run Sentinel Audit
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Cluster Telemetry & Swarm Dials -->
+        <div class="homelab-stats-section">
+          <div class="stats-grid-row">
+            <!-- Swarm Activity Tile -->
+            <div class="stat-metric-card">
+              <div class="stat-card-header">
+                <span class="stat-card-title">Torrent Swarm (NUC)</span>
+                <span class="item-tag online" id="swarm-tag">216 Managed</span>
+              </div>
+              <div class="stat-big-val" id="stat-swarm-active">4 Active &bull; 212 Seed</div>
+              <div class="stat-subtext">
+                <span style="color: #38bdf8;" id="stat-dht">DHT: 333 Nodes</span> &bull; 
+                <span style="color: #34d399;" id="stat-vpn-ip">VPN: 23.234.103.246</span>
+              </div>
+            </div>
+
+            <!-- Bandwidth Meter Tile -->
+            <div class="stat-metric-card">
+              <div class="stat-card-header">
+                <span class="stat-card-title">Live Bandwidth</span>
+                <span class="item-tag" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa;" id="stat-throttle-tag">Unconstrained</span>
+              </div>
+              <div class="stat-big-val" id="stat-dl-speed" style="color: #60a5fa;">0 KB/s <span style="font-size: 0.9rem; color: #8b949e;">&darr;</span></div>
+              <div class="stat-subtext">
+                <span>Upload: <strong id="stat-up-speed" style="color: #c4b5fd;">0 KB/s</strong> &uarr;</span> &bull; 
+                <span style="color: #a5b4fc;">Dual Gigabit Routing</span>
+              </div>
+            </div>
+
+            <!-- NUC CPU & RAM Tile -->
+            <div class="stat-metric-card">
+              <div class="stat-card-header">
+                <span class="stat-card-title">Hardware Utilization</span>
+                <span class="item-tag online" id="stat-hw-tag">Nominal</span>
+              </div>
+              <div class="stat-big-val" id="stat-cpu-val" style="color: #4ade80;">4% <span style="font-size: 0.9rem; color: #8b949e;">CPU</span></div>
+              <div class="stat-subtext" id="stat-ram-sub">
+                Memory: 5.8 GB / 31.8 GB (18%) &bull; 0d 2h up
+              </div>
+            </div>
+
+            <!-- Storage Safeguard Tile -->
+            <div class="stat-metric-card">
+              <div class="stat-card-header">
+                <span class="stat-card-title">D: Drive Safeguard</span>
+                <span class="item-tag online">Safe (+476 GB)</span>
+              </div>
+              <div class="stat-big-val" id="stat-disk-free" style="color: #38bdf8;">496.1 GB <span style="font-size: 0.9rem; color: #8b949e;">Free</span></div>
+              <div class="stat-subtext">
+                <span>Total 1863 GB (73.4% Used)</span>
+              </div>
+              <!-- Multi-Segment Storage Bar -->
+              <div class="storage-segments-wrap">
+                <div class="storage-segments-bar">
+                  <div class="seg-movies" style="width: 28%;" title="Movies: 520 GB"></div>
+                  <div class="seg-tv" style="width: 22%;" title="TV Series: 410 GB"></div>
+                  <div class="seg-mixes" style="width: 23.4%;" title="Media Mixes: 437 GB"></div>
+                  <div class="seg-free" style="width: 26.6%;" title="Free Space: 496 GB"></div>
+                </div>
+                <div class="storage-legend">
+                  <span><span class="legend-dot seg-movies"></span> Movies (520 GB)</span>
+                  <span><span class="legend-dot seg-tv"></span> Series (410 GB)</span>
+                  <span><span class="legend-dot seg-mixes"></span> Mixes (437 GB)</span>
+                  <span><span class="legend-dot seg-free"></span> Free (496 GB)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Sentinel & Daemon Terminal Viewer -->
+        <div class="terminal-window">
+          <div class="terminal-header">
+            <div class="terminal-title-group">
+              <span class="pulse-dot"></span>
+              <span>Live Daemon Terminal &bull; Sentinel Audit Stream</span>
+            </div>
+            <div class="terminal-tabs">
+              <button type="button" class="terminal-tab active" id="tab-sentinel" onclick="loadLog('sentinel')">Sentinel Audit</button>
+              <button type="button" class="terminal-tab" id="tab-power" onclick="loadLog('power')">Power Optimizer</button>
+              <button type="button" class="terminal-tab" id="tab-report" onclick="loadLog('report')">Executive Briefing</button>
+              <button type="button" class="terminal-tab" onclick="reloadCurrentLog()" title="Refresh Log Stream">&#8635;</button>
+            </div>
+          </div>
+          <div class="terminal-body" id="terminal-content">Connecting to Sentinel daemon stream...</div>
         </div>
       </div>
     </section>
@@ -738,7 +859,115 @@
           document.querySelectorAll('.dropdown').forEach(dd => dd.classList.remove('is-open'));
         }
       });
+
+      // Start live stats & terminal stream
+      fetchClusterStats();
+      setInterval(fetchClusterStats, 4000);
+      loadLog('sentinel');
     });
+
+    // Remote Control Matrix Handler
+    function sendControl(action) {
+      showToast('loading', 'Executing Cluster Command...', `Action: ${action.toUpperCase()}`, 0);
+      fetch(`${GATEWAY}/api/control?action=${action}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.status === 'success') {
+            showToast('success', 'Command Executed', data.message || `Action ${action} succeeded.`);
+            fetchClusterStats();
+          } else {
+            showToast('error', 'Execution Error', data.message || `Failed to run ${action}.`);
+          }
+        })
+        .catch(err => {
+          showToast('error', 'Gateway Offline', `Could not reach ${GATEWAY}`);
+        });
+    }
+
+    // Live Cluster Stats & Swarm Poller
+    function fetchClusterStats() {
+      fetch(`${GATEWAY}/stats`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.status === 'success' && data.nuc) {
+            const nuc = data.nuc;
+            if (nuc.swarm) {
+              const sw = nuc.swarm;
+              const swAct = document.getElementById('stat-swarm-active');
+              const dht = document.getElementById('stat-dht');
+              const vpnIp = document.getElementById('stat-vpn-ip');
+              const dlSpd = document.getElementById('stat-dl-speed');
+              const upSpd = document.getElementById('stat-up-speed');
+              const throttleTag = document.getElementById('stat-throttle-tag');
+              const swTag = document.getElementById('swarm-tag');
+
+              if (swAct) swAct.textContent = `${sw.activeDl} Active \u2022 ${sw.totalTorrents - sw.activeDl} Seed`;
+              if (swTag) swTag.textContent = `${sw.totalTorrents} Managed`;
+              if (dht) dht.textContent = `DHT: ${sw.dhtNodes} Nodes`;
+              if (vpnIp && sw.vpnExitIp) vpnIp.textContent = `VPN: ${sw.vpnExitIp}`;
+              
+              const dlText = sw.dlSpeed >= 1048576 ? `${(sw.dlSpeed / 1048576).toFixed(1)} MB/s` : `${Math.round(sw.dlSpeed / 1024)} KB/s`;
+              const upText = sw.upSpeed >= 1048576 ? `${(sw.upSpeed / 1048576).toFixed(1)} MB/s` : `${Math.round(sw.upSpeed / 1024)} KB/s`;
+              if (dlSpd) dlSpd.innerHTML = `${dlText} <span style="font-size: 0.9rem; color: #8b949e;">&darr;</span>`;
+              if (upSpd) upSpd.textContent = upText;
+
+              if (throttleTag) {
+                if (sw.dlRateLimit > 0) {
+                  throttleTag.textContent = `Eco-Throttled (${Math.round(sw.dlRateLimit / 1024)} KB/s)`;
+                  throttleTag.style.background = 'rgba(245, 158, 11, 0.2)';
+                  throttleTag.style.color = '#fde047';
+                } else {
+                  throttleTag.textContent = 'Unconstrained';
+                  throttleTag.style.background = 'rgba(59, 130, 246, 0.2)';
+                  throttleTag.style.color = '#60a5fa';
+                }
+              }
+            }
+
+            const cpuVal = document.getElementById('stat-cpu-val');
+            const ramSub = document.getElementById('stat-ram-sub');
+            if (cpuVal && nuc.cpuLoad !== undefined) cpuVal.innerHTML = `${nuc.cpuLoad}% <span style="font-size: 0.9rem; color: #8b949e;">CPU</span>`;
+            if (ramSub && nuc.vitals) {
+              ramSub.textContent = `Memory: ${nuc.vitals.ramUsedGB} GB / ${nuc.vitals.ramTotalGB} GB (${nuc.vitals.ramPercent}%) \u2022 ${nuc.vitals.uptime} up`;
+            }
+
+            if (nuc.disk) {
+              const dFree = document.getElementById('stat-disk-free');
+              if (dFree) dFree.innerHTML = `${nuc.disk.freeGB} GB <span style="font-size: 0.9rem; color: #8b949e;">Free</span>`;
+            }
+          }
+        })
+        .catch(() => {});
+    }
+
+    // Terminal Log Streamer
+    let currentLogTab = 'sentinel';
+    function loadLog(name) {
+      currentLogTab = name;
+      ['sentinel', 'power', 'report'].forEach(t => {
+        const btn = document.getElementById(`tab-${t}`);
+        if (btn) btn.className = (t === name) ? 'terminal-tab active' : 'terminal-tab';
+      });
+
+      const body = document.getElementById('terminal-content');
+      if (body) body.textContent = `Streaming ${name} log entries...`;
+
+      fetch(`${GATEWAY}/api/logs?name=${name}`)
+        .then(r => r.json())
+        .then(data => {
+          if (body && data.lines) {
+            body.textContent = data.lines.join('\n');
+            body.scrollTop = body.scrollHeight;
+          }
+        })
+        .catch(() => {
+          if (body) body.textContent = `[Failed to fetch ${name} log from ${GATEWAY}]`;
+        });
+    }
+
+    function reloadCurrentLog() {
+      loadLog(currentLogTab);
+    }
 
     // Inline Quick Magnet Submission Handler
     function submitQuickMagnet() {
