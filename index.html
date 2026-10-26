@@ -67,30 +67,34 @@
             AGY Session <span class="dropdown-arrow">&#9662;</span>
           </button>
           <div class="dropdown-menu">
-            <button type="button" class="btn-action-item" onclick="openEmbeddedConsole()" style="margin-bottom: 6px;">
+            <button type="button" class="btn-action-item" onclick="openEmbeddedConsole()">
               <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
-              <span>Open Embedded Console</span>
+              <span>Open Embedded Console Live</span>
               <span class="item-tag online">Live</span>
             </button>
-            <button type="button" class="dropdown-item" onclick="launchAgySession('stream')" style="color: #93c5fd;">
-              <span class="dropdown-dot dot-1"></span> In-Page Stream Viewer
+            <button type="button" class="btn-action-item" onclick="launchAgySession('stream')">
+              <span class="dropdown-dot dot-1"></span>
+              <span>In-Page Stream Viewer</span>
             </button>
-            <button type="button" class="dropdown-item" onclick="openEmbeddedConsole()" style="color: #60a5fa; font-weight: 600; width: 100%; text-align: left; background: none; border: none; cursor: pointer;">
-              <span class="dropdown-dot dot-1"></span> Fullscreen AGY Console
-              <span class="item-tag" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa;">Active</span>
+            <button type="button" class="btn-action-item" onclick="openEmbeddedConsole(true)">
+              <span class="dropdown-dot dot-1"></span>
+              <span>Fullscreen AGY Console Active</span>
+              <span class="item-tag online">Active</span>
             </button>
-            <button type="button" class="dropdown-item" onclick="launchAgySession('app')" style="color: #4ade80;">
+            <button type="button" class="btn-action-item" onclick="launchAgySession('app')">
               <span class="dropdown-dot" style="background-color: #4ade80; box-shadow: 0 0 8px #4ade80;"></span>
-              <span>Launch Desktop App</span>
+              <span>Launch Desktop App CLI</span>
               <span class="item-tag">CLI</span>
             </button>
-            <button type="button" class="dropdown-item" onclick="launchAgySession('copy')" style="color: #cbd5e1;">
+            <button type="button" class="btn-action-item" onclick="launchAgySession('copy')">
               <span class="dropdown-dot dot-2"></span>
               <span>Copy Session ID (51f0adb8...)</span>
             </button>
             <div class="dropdown-divider"></div>
-            <button type="button" class="dropdown-item" onclick="launchAgySession('stream')" style="width: 100%; text-align: left; background: none; border: none; cursor: pointer; color: inherit;">
-              <span class="dropdown-dot dot-1"></span> Instance: Cory-Desktop (Online)
+            <button type="button" class="btn-action-item" onclick="checkStatus('desktop')">
+              <span class="dropdown-dot dot-1"></span>
+              <span>Instance: Cory-Desktop (Online)</span>
+              <span class="item-tag online" id="agy-node-ping">Ping &rarr;</span>
             </button>
           </div>
         </div>
@@ -121,12 +125,12 @@
               <span>Wake Both</span>
             </button>
             <div class="dropdown-divider"></div>
-            <button type="button" class="dropdown-item" onclick="checkStatus('nuc')">
+            <button type="button" class="btn-action-item" onclick="checkStatus('nuc')">
               <span class="dropdown-dot dot-2"></span>
               <span>Ping NUC</span>
               <span class="item-tag" id="latency-nuc">-- ms</span>
             </button>
-            <button type="button" class="dropdown-item" onclick="checkStatus('desktop')">
+            <button type="button" class="btn-action-item" onclick="checkStatus('desktop')">
               <span class="dropdown-dot dot-1"></span>
               <span>Ping Desktop</span>
               <span class="item-tag" id="latency-desktop">-- ms</span>
@@ -253,25 +257,25 @@
             <button type="button" class="btn-control active-sleep" onclick="sendSleep('desktop')">
               <span>ZZ</span> Sleep Desktop Standby
             </button>
-            <button type="button" class="btn-control" style="color: #38bdf8;" onclick="sendControl('run-backup')">
+            <button type="button" class="btn-control" onclick="sendControl('run-backup')">
               <span>BAK</span> Trigger Cloud Backup
             </button>
-            <button type="button" class="btn-control" style="color: #c084fc;" onclick="sendControl('run-audit')">
+            <button type="button" class="btn-control" onclick="sendControl('run-audit')">
               <span>RUN</span> Run Sentinel Audit
             </button>
-            <button type="button" class="btn-control" style="color: #fbbf24;" onclick="sendControl('run-update-computer')">
+            <button type="button" class="btn-control" onclick="sendControl('run-update-computer')">
               <span>&#128640;</span> Run Update-Computer
             </button>
-            <button type="button" class="btn-control" style="color: #34d399;" onclick="sendControl('clean-junk')">
+            <button type="button" class="btn-control" onclick="sendControl('clean-junk')">
               <span>&#129529;</span> Clean NUC Temp &amp; Junk
             </button>
-            <button type="button" class="btn-control" style="color: #f43f5e; border-color: rgba(244, 63, 94, 0.35);" onclick="confirmRebootNuc()" title="Strictly locked behind Microsoft 365 Entra ID SSO or Admin Passkey">
+            <button type="button" class="btn-control btn-reboot" onclick="confirmRebootNuc()" title="Strictly locked behind Microsoft 365 Entra ID SSO or Admin Passkey">
               <span>&#128260;</span> Reboot NUC Server
             </button>
-            <button type="button" class="btn-control" style="color: #60a5fa;" onclick="sendControl('run-speedtest')">
+            <button type="button" class="btn-control" id="btn-probe-speed" onclick="sendControl('run-speedtest')">
               <span>&#127760;</span> Probe Bell Speed
             </button>
-            <button type="button" class="btn-control" style="color: #a78bfa;" onclick="sendControl('restart-daemon&daemon=streamhub')">
+            <button type="button" class="btn-control" onclick="sendControl('restart-daemon&daemon=streamhub')">
               <span>&#127916;</span> Restart Watch Library
             </button>
           </div>
@@ -1352,6 +1356,12 @@
       });
 
       document.addEventListener('click', (e) => {
+        if (e.target.closest('.dropdown-menu button, .dropdown-menu a')) {
+          setTimeout(() => {
+            document.querySelectorAll('.dropdown').forEach(dd => dd.classList.remove('is-open'));
+          }, 80);
+          return;
+        }
         if (!e.target.closest('.dropdown')) {
           document.querySelectorAll('.dropdown').forEach(dd => dd.classList.remove('is-open'));
         }
@@ -1439,19 +1449,45 @@
     }
 
     function sendControl(action) {
-      showToast('loading', 'Executing Cluster Command...', `Action: ${action.toUpperCase()}`, 0);
+      const isSpeed = (action === 'run-speedtest');
+      const speedBtn = document.getElementById('btn-probe-speed');
+      if (isSpeed && speedBtn) {
+        speedBtn.disabled = true;
+        speedBtn.innerHTML = '<span>&#8987;</span> Probing Bell Fiber...';
+      }
+
+      showToast('loading', 'Executing Cluster Command...', isSpeed ? 'Probing Bell Gigabit connection & jitter...' : `Action: ${action.toUpperCase()}`, 0);
       fetch(`${GATEWAY}/api/control?action=${action}`)
         .then(r => r.json())
         .then(data => {
           if (data.status === 'success') {
-            showToast('success', 'Command Executed', data.message || `Action ${action} succeeded.`);
+            showToast('success', isSpeed ? 'Probe Initiated' : 'Command Executed', data.message || `Action ${action} succeeded.`);
             fetchClusterStats();
+            if (isSpeed) {
+              setTimeout(fetchISPHistory, 2500);
+              setTimeout(fetchISPHistory, 5500);
+              setTimeout(() => {
+                fetchISPHistory();
+                if (speedBtn) {
+                  speedBtn.disabled = false;
+                  speedBtn.innerHTML = '<span>&#127760;</span> Probe Bell Speed';
+                }
+              }, 8500);
+            }
           } else {
             showToast('error', 'Execution Error', data.message || `Failed to run ${action}.`);
+            if (isSpeed && speedBtn) {
+              speedBtn.disabled = false;
+              speedBtn.innerHTML = '<span>&#127760;</span> Probe Bell Speed';
+            }
           }
         })
         .catch(err => {
           showToast('error', 'Gateway Offline', `Could not reach ${GATEWAY}`);
+          if (isSpeed && speedBtn) {
+            speedBtn.disabled = false;
+            speedBtn.innerHTML = '<span>&#127760;</span> Probe Bell Speed';
+          }
         });
     }
 
@@ -1605,17 +1641,7 @@
     }
 
     function testISPNow() {
-      showToast('loading', 'Testing ISP Quality & Jitter...', 'Pinging 1.1.1.1 and 8.8.8.8 (8 packets)', 0);
-      fetch(`${GATEWAY}/api/control?action=run-audit`)
-        .then(() => {
-          setTimeout(() => {
-            fetchISPHistory();
-            showToast('success', 'ISP Test Completed', 'Diagnostics updated in history table.', 5000);
-          }, 3000);
-        })
-        .catch(() => {
-          showToast('error', 'Test Failed', `Could not reach ${GATEWAY}`, 4000);
-        });
+      sendControl('run-speedtest');
     }
 
     // Inline Quick Magnet Submission Handler
@@ -1898,11 +1924,15 @@
     let consoleAutoPollActive = true;
     const AGY_SESSION_ID = '51f0adb8-74d9-4ada-92d6-c532f19e0629';
 
-    function openEmbeddedConsole() {
+    function openEmbeddedConsole(fullscreen = false) {
       const modal = document.getElementById('agy-console-modal-overlay');
+      const win = document.getElementById('agy-console-window');
       if (modal) {
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
+      }
+      if (fullscreen && win && !win.classList.contains('fullscreen')) {
+        win.classList.add('fullscreen');
       }
       refreshAgyConsole();
       startConsoleAutoPoll();
@@ -2189,7 +2219,22 @@
       </div>
 
       <div class="changelog-body">
-        <!-- Version 2.4.2 (Current) -->
+        <!-- Version 2.4.4 (Current) -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag current">v2.4.4 &bull; Current</span>
+            <span class="ver-date">October 26, 2026</span>
+          </div>
+          <h4 class="ver-title">Unified Button Affordances, Instant Dropdowns &amp; StreamHub Previews</h4>
+          <ul class="ver-list">
+            <li><strong>Unified Button Affordances:</strong> Harmonized all interactive buttons, homelab deck controls, and dropdown action items with consistent tactile blue styling.</li>
+            <li><strong>Probe Bell Speed:</strong> Integrated direct probe action with active button state and synchronized polling to Bell Canada diagnostic metrics.</li>
+            <li><strong>Instant Dropdown Dismissal:</strong> Dropdown menus dismiss immediately when clicking embedded console, stream viewer, or node status actions.</li>
+            <li><strong>StreamHub Previews:</strong> Generated fast cached JPEG video snapshots on NUC so 100% of media cards display video previews.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.4.3 -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
             <span class="ver-tag current">v2.4.3 &bull; Current</span>
