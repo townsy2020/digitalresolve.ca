@@ -61,25 +61,31 @@
 
         <!-- AGY Session & Gemini CLI Dropdown -->
         <div class="dropdown">
-          <a href="conversation://51f0adb8-74d9-4ada-92d6-c532f19e0629" class="btn-nav" title="Direct access to active Antigravity session">
+          <button type="button" class="btn-nav" id="agy-btn" aria-haspopup="true">
             AGY Session <span class="dropdown-arrow">&#9662;</span>
-          </a>
+          </button>
           <div class="dropdown-menu">
-            <a href="conversation://51f0adb8-74d9-4ada-92d6-c532f19e0629" class="dropdown-item" style="color: #4ade80; font-weight: 700;">
-              <span class="dropdown-dot" style="background-color: #4ade80; box-shadow: 0 0 8px #4ade80;"></span> Open in AGY App (51f0adb8) &rarr;
+            <button type="button" class="btn-action-item" onclick="launchAgySession('stream')" style="margin-bottom: 6px;">
+              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+              <span>Live Terminal Stream</span>
+              <span class="item-tag online">Active</span>
+            </button>
+            <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="dropdown-item" style="color: #60a5fa; font-weight: 600;">
+              <span class="dropdown-dot dot-1"></span> Web Console (Remote Work)
+              <span class="item-tag" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa;">Cloud</span>
             </a>
-            <a href="javascript:void(0)" onclick="loadLog('agy'); document.getElementById('terminal-card').scrollIntoView({behavior:'smooth'});" class="dropdown-item" style="color: #38bdf8; font-weight: 600;">
-              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span> Live AGY Console Stream
-            </a>
+            <button type="button" class="dropdown-item" onclick="launchAgySession('app')" style="color: #4ade80;">
+              <span class="dropdown-dot" style="background-color: #4ade80; box-shadow: 0 0 8px #4ade80;"></span>
+              <span>Launch Desktop App</span>
+              <span class="item-tag">CLI</span>
+            </button>
+            <button type="button" class="dropdown-item" onclick="launchAgySession('copy')" style="color: #cbd5e1;">
+              <span class="dropdown-dot dot-2"></span>
+              <span>Copy Session ID (51f0adb8...)</span>
+            </button>
             <div class="dropdown-divider"></div>
             <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="dropdown-item">
-              <span class="dropdown-dot dot-1"></span> Antigravity Web Console
-            </a>
-            <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="dropdown-item">
-              <span class="dropdown-dot dot-1"></span> Desktop Agent (Cory-Desktop)
-            </a>
-            <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="dropdown-item">
-              <span class="dropdown-dot dot-2"></span> NUC Remote Bridge (Cory-NUC)
+              <span class="dropdown-dot dot-1"></span> Instance: Cory-Desktop (Online)
             </a>
           </div>
         </div>
@@ -875,17 +881,23 @@
 
         <div class="app-grid">
           <!-- Antigravity (AGY) Active Session Card -->
-          <a href="conversation://51f0adb8-74d9-4ada-92d6-c532f19e0629" class="app-card" style="border-color: rgba(59, 130, 246, 0.4); background: linear-gradient(135deg, rgba(13, 19, 33, 0.95), rgba(30, 58, 138, 0.25));">
+          <div class="app-card" style="border-color: rgba(59, 130, 246, 0.4); background: linear-gradient(135deg, rgba(13, 19, 33, 0.95), rgba(30, 58, 138, 0.25)); cursor: default;">
             <div>
               <div class="app-card-header">
-                <div class="app-icon" style="color: #60a5fa; border-color: rgba(96, 165, 250, 0.4); background: rgba(96, 165, 250, 0.15); font-weight: 700; font-size: 0.85rem;">PC</div>
+                <div class="app-icon" style="color: #60a5fa; border-color: rgba(59, 130, 246, 0.4); background: rgba(59, 130, 246, 0.15); font-weight: 700; font-size: 0.85rem;">AGY</div>
                 <span class="item-tag online" style="background: rgba(34, 197, 94, 0.2); color: #4ade80;">Active Session</span>
               </div>
               <div class="app-card-title">Antigravity (AGY) Live Session</div>
               <div class="app-card-desc">
-                Direct deep-link access and real-time execution stream of this active Antigravity coding and autonomous homelab orchestration session.
+                Direct remote access and real-time execution stream of this active Antigravity coding and autonomous homelab orchestration session. Protected by Microsoft 365 Entra ID SSO.
               </div>
             </div>
+            <div class="app-card-footer" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px;">
+              <button type="button" onclick="launchAgySession('stream')" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px;">Live Stream &rarr;</button>
+              <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px; color: #60a5fa !important;">Web Console &rarr;</a>
+              <button type="button" onclick="launchAgySession('app')" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px; color: #4ade80 !important;">Launch in App &rarr;</button>
+            </div>
+          </div>
             <div class="app-card-footer">
               <span class="app-port">ID: 51f0adb8-74d9...</span>
               <span class="app-btn-launch" style="color: #60a5fa;">Launch in App &rarr;</span>
@@ -1332,7 +1344,35 @@
     });
 
     // Remote Control Matrix Handler
-        // Send remote instruction / prompt to active AGY session
+            // Multi-modal AGY session launcher
+    function launchAgySession(target) {
+      const cid = '51f0adb8-74d9-4ada-92d6-c532f19e0629';
+      if (target === 'stream' || !target) {
+        loadLog('agy');
+        const term = document.getElementById('terminal-card');
+        if (term) term.scrollIntoView({ behavior: 'smooth' });
+        showToast('info', 'AGY Live Terminal', 'Streaming active session 51f0adb8...');
+      } else if (target === 'app') {
+        showToast('loading', 'Launching Antigravity App...', 'Connecting to conversation://51f0adb8-74d9...', 3000);
+        window.location.href = `conversation://${cid}`;
+        setTimeout(() => {
+          loadLog('agy');
+          const term = document.getElementById('terminal-card');
+          if (term) term.scrollIntoView({ behavior: 'smooth' });
+        }, 1200);
+      } else if (target === 'web') {
+        window.open('https://antigravity.google.com', '_blank');
+      } else if (target === 'copy') {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(cid);
+          showToast('success', 'Copied to Clipboard', `Session ID: ${cid}`);
+        } else {
+          prompt('Copy Conversation ID:', cid);
+        }
+      }
+    }
+
+    // Send remote instruction / prompt to active AGY session
     function sendAgyPrompt() {
       const input = document.getElementById('agy-prompt-input');
       const promptText = input ? input.value.trim() : '';
