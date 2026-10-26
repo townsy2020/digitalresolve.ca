@@ -25,7 +25,7 @@
         <!-- Torrents Dropdown -->
         <div class="dropdown">
           <a href="https://torrents.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn btn-torrent">
-            &#128640; Check Torrents <span class="dropdown-arrow">&#9662;</span>
+            Check Torrents <span class="dropdown-arrow">&#9662;</span>
           </a>
           <div class="dropdown-menu">
             <a href="https://torrents.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="dropdown-item">
@@ -40,7 +40,7 @@
         <!-- Gemini CLI Dropdown -->
         <div class="dropdown">
           <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="btn btn-gemini">
-            &#128187; Gemini CLI <span class="dropdown-arrow">&#9662;</span>
+            Gemini CLI <span class="dropdown-arrow">&#9662;</span>
           </a>
           <div class="dropdown-menu">
             <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="dropdown-item">
@@ -52,50 +52,36 @@
           </div>
         </div>
 
-        <!-- Wake on LAN & Reachability Dropdown -->
+        <!-- Wake on LAN Dropdown -->
         <div class="dropdown">
           <button type="button" class="btn btn-wol" id="wol-btn" aria-haspopup="true">
-            &#9889; Wake &amp; Reachability <span class="dropdown-arrow">&#9662;</span>
+            Wake on LAN <span class="dropdown-arrow">&#9662;</span>
           </button>
           <div class="dropdown-menu wol-dropdown">
-            <div class="dropdown-header-label">POWER CONTROL (WoL)</div>
             <button type="button" class="dropdown-item" onclick="sendWol('nuc')">
               <span class="dropdown-dot dot-wol-nuc" id="badge-nuc"></span>
-              <div class="dropdown-text">
-                <span class="device-title">Wake NUC</span>
-                <span class="device-mac">1C:69:7A:60:C7:0D &bull; 192.168.2.35</span>
-              </div>
+              <span>Wake NUC</span>
+              <span class="item-tag" id="status-tag-nuc">Checking...</span>
             </button>
             <button type="button" class="dropdown-item" onclick="sendWol('desktop')">
               <span class="dropdown-dot dot-wol-desktop" id="badge-desktop"></span>
-              <div class="dropdown-text">
-                <span class="device-title">Wake Desktop</span>
-                <span class="device-mac">70:85:C2:84:62:65 &bull; 192.168.2.62</span>
-              </div>
+              <span>Wake Desktop</span>
+              <span class="item-tag" id="status-tag-desktop">Checking...</span>
             </button>
             <button type="button" class="dropdown-item" onclick="sendWol('both')">
               <span class="dropdown-dot dot-wol-both"></span>
-              <div class="dropdown-text">
-                <span class="device-title">Wake Both</span>
-                <span class="device-mac">Desktop &bull; NUC (Subnet Broadcast)</span>
-              </div>
+              <span>Wake Both</span>
             </button>
-
             <div class="dropdown-divider"></div>
-            <div class="dropdown-header-label">STATUS &amp; PING CHECK</div>
             <button type="button" class="dropdown-item" onclick="checkStatus('nuc')">
-              <span class="ping-icon">&#128225;</span>
-              <div class="dropdown-text">
-                <span class="device-title">Ping NUC (torrents2)</span>
-                <span class="device-mac" id="status-subtext-nuc">Check LAN Ping &amp; DNS Record</span>
-              </div>
+              <span class="dropdown-dot dot-ping"></span>
+              <span>Ping NUC</span>
+              <span class="item-tag" id="latency-nuc">-- ms</span>
             </button>
             <button type="button" class="dropdown-item" onclick="checkStatus('desktop')">
-              <span class="ping-icon">&#128225;</span>
-              <div class="dropdown-text">
-                <span class="device-title">Ping Desktop (torrents)</span>
-                <span class="device-mac" id="status-subtext-desktop">Check LAN Ping &amp; DNS Record</span>
-              </div>
+              <span class="dropdown-dot dot-ping"></span>
+              <span>Ping Desktop</span>
+              <span class="item-tag" id="latency-desktop">-- ms</span>
             </button>
           </div>
         </div>
@@ -185,11 +171,11 @@
     </div>
   </footer>
 
-  <!-- Wake & Reachability Notification Toast -->
+  <!-- Notification Toast -->
   <div id="wol-toast" class="wol-toast" role="alert" aria-live="polite">
-    <span class="toast-icon" id="toast-icon">&#9889;</span>
+    <span class="toast-dot" id="toast-dot"></span>
     <div class="toast-content">
-      <span id="toast-message">Magic packet transmitted!</span>
+      <span id="toast-message" class="toast-title">Notification</span>
       <span id="toast-subtext" class="toast-subtext"></span>
     </div>
   </div>
@@ -199,18 +185,18 @@
     const devices = {
       desktop: { name: 'Desktop', mac: '70:85:C2:84:62:65', ip: '192.168.2.62', dns: 'torrents.digitalresolve.ca' },
       nuc:     { name: 'NUC',     mac: '1C:69:7A:60:C7:0D', ip: '192.168.2.35', dns: 'torrents2.digitalresolve.ca' },
-      both:    { name: 'Both (Desktop & NUC)', mac: 'Subnet Broadcast' }
+      both:    { name: 'Both Machines', mac: 'Subnet Broadcast' }
     };
 
     let pollInterval = null;
 
-    function showToast(icon, msg, subtext = '', duration = 6000) {
+    function showToast(statusType, msg, subtext = '', duration = 5000) {
       const toast = document.getElementById('wol-toast');
-      const iconEl = document.getElementById('toast-icon');
+      const dot = document.getElementById('toast-dot');
       const text = document.getElementById('toast-message');
       const sub = document.getElementById('toast-subtext');
       if (toast && text) {
-        iconEl.innerHTML = icon;
+        dot.className = `toast-dot ${statusType}`;
         text.textContent = msg;
         sub.textContent = subtext;
         toast.classList.add('show');
@@ -223,85 +209,88 @@
       }
     }
 
-    // Direct Status / Ping Check
     function checkStatus(target) {
       const dev = devices[target] || devices.nuc;
-      showToast('&#128225;', `Pinging ${dev.name}...`, `Testing LAN IP (${dev.ip}) and DNS (${dev.dns})`, 0);
+      showToast('loading', `Pinging ${dev.name}...`, `${dev.ip} &bull; ${dev.dns}`, 0);
 
       fetch(`${GATEWAY}/status?target=${target}`)
         .then(r => r.json())
         .then(data => {
           if (data.online) {
-            const dnsNote = data.dnsOnline ? 'Tunnel Connected' : 'Tunnel Standby';
-            showToast('&#128994;', `${dev.name} is ONLINE!`, `Ping: ${data.latencyMs} ms | LAN IP: ${data.ip} | DNS: ${data.dns} (${dnsNote})`, 7000);
-            updateBadge(target, true);
+            showToast('success', `${dev.name} is Online`, `${data.latencyMs} ms latency &bull; DNS connected`, 5000);
+            updateStatusUI(target, true, data.latencyMs);
           } else {
-            showToast('&#128308;', `${dev.name} is OFFLINE / Sleeping`, `No response to ICMP ping at ${data.ip}`, 7000);
-            updateBadge(target, false);
+            showToast('error', `${dev.name} is Offline`, `No ping response from ${data.ip}`, 5000);
+            updateStatusUI(target, false);
           }
         })
-        .catch(err => {
-          showToast('&#9888;', `Unable to query Gateway`, `Could not reach ${GATEWAY}`, 5000);
+        .catch(() => {
+          showToast('error', 'Gateway Offline', `Unable to query ${GATEWAY}`, 4000);
         });
     }
 
-    // Wake and Poll for Wake-up Reachability
     function sendWol(target) {
       clearInterval(pollInterval);
       const dev = devices[target] || devices.both;
-      showToast('&#9889;', `Sending Wake-on-LAN magic packet...`, `Target: ${dev.name} (${dev.mac})`, 0);
+      showToast('loading', `Transmitting Magic Packet...`, `Target: ${dev.name}`, 0);
 
       fetch(`${GATEWAY}/wake?target=${target}`)
         .then(r => r.json())
-        .then(data => {
-          showToast('&#128225;', `Magic packet broadcasted to subnet!`, `Target: ${dev.name}. Waiting for device to boot...`, 0);
+        .then(() => {
+          showToast('loading', `Magic Packet Broadcasted`, `Waiting for ${dev.name} to boot...`, 0);
 
           if (target === 'both') {
-            setTimeout(() => { checkStatus('nuc'); }, 12000);
+            setTimeout(() => { checkStatus('nuc'); checkStatus('desktop'); }, 12000);
             return;
           }
 
-          // Poll /status every 3 seconds for up to 35 seconds to confirm wake
           let attempts = 0;
           const maxAttempts = 12;
           pollInterval = setInterval(() => {
             attempts++;
             fetch(`${GATEWAY}/status?target=${target}`)
               .then(r => r.json())
-              .then(statusData => {
-                if (statusData.online) {
+              .then(data => {
+                if (data.online) {
                   clearInterval(pollInterval);
-                  showToast('&#128994;', `SUCCESS: ${dev.name} is AWAKE & ONLINE!`, `Ping: ${statusData.latencyMs} ms | IP: ${statusData.ip} | DNS: ${statusData.dns}`, 8000);
-                  updateBadge(target, true);
+                  showToast('success', `${dev.name} is Awake & Online!`, `${data.latencyMs} ms latency &bull; ${data.dns}`, 6000);
+                  updateStatusUI(target, true, data.latencyMs);
                 } else if (attempts >= maxAttempts) {
                   clearInterval(pollInterval);
-                  showToast('&#9888;', `${dev.name} has not responded yet`, `Machine may still be booting POST or verify BIOS Wake-on-LAN settings.`, 7000);
+                  showToast('error', `${dev.name} Not Responding`, 'Machine may still be booting POST.', 6000);
                 }
               })
               .catch(() => {});
           }, 3000);
         })
         .catch(() => {
-          showToast('&#128225;', `Magic packet transmitted to LAN`, `Target: ${dev.name} (${dev.mac})`, 5000);
+          showToast('error', 'Transmit Failed', `Could not reach ${GATEWAY}`, 5000);
         });
     }
 
-    function updateBadge(target, isOnline) {
-      const badge = document.getElementById(`badge-${target}`);
-      const sub = document.getElementById(`status-subtext-${target}`);
-      if (badge) {
-        badge.style.backgroundColor = isOnline ? '#22c55e' : '#ef4444';
-        badge.style.boxShadow = isOnline ? '0 0 10px #22c55e' : '0 0 10px #ef4444';
+    function updateStatusUI(target, isOnline, latencyMs = null) {
+      const dot = document.getElementById(`badge-${target}`);
+      const tag = document.getElementById(`status-tag-${target}`);
+      const lat = document.getElementById(`latency-${target}`);
+
+      if (dot) {
+        dot.style.backgroundColor = isOnline ? '#22c55e' : '#ef4444';
+        dot.style.boxShadow = isOnline ? '0 0 8px #22c55e' : '0 0 8px #ef4444';
       }
-      if (sub) {
-        sub.textContent = isOnline ? 'Online (Responding to Ping)' : 'Offline / Sleeping';
+      if (tag) {
+        tag.textContent = isOnline ? 'Online' : 'Offline';
+        tag.className = `item-tag ${isOnline ? 'online' : 'offline'}`;
+      }
+      if (lat && latencyMs !== null) {
+        lat.textContent = `${latencyMs} ms`;
+        lat.className = 'item-tag online';
       }
     }
 
-    // Auto-check statuses on load
+    // Check status on load
     window.addEventListener('DOMContentLoaded', () => {
-      fetch(`${GATEWAY}/status?target=nuc`).then(r => r.json()).then(d => updateBadge('nuc', d.online)).catch(()=>{});
-      fetch(`${GATEWAY}/status?target=desktop`).then(r => r.json()).then(d => updateBadge('desktop', d.online)).catch(()=>{});
+      fetch(`${GATEWAY}/status?target=nuc`).then(r => r.json()).then(d => updateStatusUI('nuc', d.online, d.latencyMs)).catch(()=>{});
+      fetch(`${GATEWAY}/status?target=desktop`).then(r => r.json()).then(d => updateStatusUI('desktop', d.online, d.latencyMs)).catch(()=>{});
     });
   </script>
 </body>
