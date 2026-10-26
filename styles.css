@@ -81,7 +81,8 @@ body {
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .nav-links a {
@@ -168,6 +169,110 @@ body {
   box-shadow: 0 0 18px rgba(168, 85, 247, 0.45);
   transform: translateY(-1px);
   color: #ffffff !important;
+}
+
+.btn-wol {
+  background: rgba(245, 158, 11, 0.12);
+  color: #fbbf24 !important;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.btn-wol:hover {
+  background: rgba(245, 158, 11, 0.25);
+  border-color: #fbbf24;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
+  transform: translateY(-1px);
+}
+
+.wol-dropdown {
+  min-width: 230px;
+}
+
+button.dropdown-item {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.dropdown-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.device-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.device-mac {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-family: monospace;
+  letter-spacing: 0.5px;
+}
+
+.dot-wol-desktop {
+  background-color: #38bdf8;
+  box-shadow: 0 0 8px #38bdf8;
+}
+
+.dot-wol-nuc {
+  background-color: #ec4899;
+  box-shadow: 0 0 8px #ec4899;
+}
+
+.dot-wol-both {
+  background-color: #fbbf24;
+  box-shadow: 0 0 8px #fbbf24;
+}
+
+/* Toast Notification */
+.wol-toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: rgba(15, 23, 42, 0.96);
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  border-radius: 10px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #f8fafc;
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(245, 158, 11, 0.3);
+  backdrop-filter: blur(12px);
+  z-index: 99999;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.wol-toast.show {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.toast-icon {
+  font-size: 1.25rem;
+  color: #fbbf24;
 }
 
 /* Dropdown */

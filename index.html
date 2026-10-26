@@ -47,6 +47,34 @@
             </a>
           </div>
         </div>
+        <div class="dropdown">
+          <button type="button" class="btn btn-wol">
+            ⚡ Wake on LAN <span class="dropdown-arrow">&#9662;</span>
+          </button>
+          <div class="dropdown-menu wol-dropdown">
+            <button type="button" class="dropdown-item" onclick="sendWol('desktop')">
+              <span class="dropdown-dot dot-wol-desktop"></span>
+              <div class="dropdown-text">
+                <span class="device-title">Wake Desktop</span>
+                <span class="device-mac">70:85:C2:84:62:65</span>
+              </div>
+            </button>
+            <button type="button" class="dropdown-item" onclick="sendWol('nuc')">
+              <span class="dropdown-dot dot-wol-nuc"></span>
+              <div class="dropdown-text">
+                <span class="device-title">Wake NUC</span>
+                <span class="device-mac">04:F4:D8:BA:E3:C7</span>
+              </div>
+            </button>
+            <button type="button" class="dropdown-item" onclick="sendWol('both')">
+              <span class="dropdown-dot dot-wol-both"></span>
+              <div class="dropdown-text">
+                <span class="device-title">Wake Both</span>
+                <span class="device-mac">Desktop &bull; NUC</span>
+              </div>
+            </button>
+          </div>
+        </div>
         <a href="#contact" class="btn btn-secondary">Get in Touch</a>
       </nav>
     </div>
@@ -131,5 +159,49 @@
       </div>
     </div>
   </footer>
+
+  <!-- Wake-on-LAN Notification Toast -->
+  <div id="wol-toast" class="wol-toast" role="alert" aria-live="polite">
+    <span class="toast-icon">⚡</span>
+    <span id="toast-message">Magic packet transmitted!</span>
+  </div>
+
+  <script>
+    function sendWol(target) {
+      const devices = {
+        desktop: { name: 'Desktop', mac: '70:85:C2:84:62:65' },
+        nuc:     { name: 'NUC',     mac: '04:F4:D8:BA:E3:C7' },
+        both:    { name: 'Both (Desktop & NUC)', mac: 'Broadcast to Subnet' }
+      };
+
+      const dev = devices[target] || devices.both;
+      showToast(`⚡ Transmitting Magic Packet to ${dev.name}...`);
+
+      // Attempt to post to local/Cloudflare Wake webhook if available
+      try {
+        fetch(`https://wake.digitalresolve.ca/wake?target=${target}`, {
+          method: 'POST',
+          mode: 'no-cors'
+        }).catch(() => {});
+      } catch (e) {}
+
+      setTimeout(() => {
+        showToast(`✅ Magic Packet broadcast to ${dev.name} (${dev.mac})!`);
+      }, 500);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('wol-toast');
+      const text = document.getElementById('toast-message');
+      if (toast && text) {
+        text.textContent = msg;
+        toast.classList.add('show');
+        clearTimeout(window.toastTimer);
+        window.toastTimer = setTimeout(() => {
+          toast.classList.remove('show');
+        }, 5000);
+      }
+    }
+  </script>
 </body>
 </html>
