@@ -16,8 +16,9 @@
   
   <header class="header">
     <div class="container nav-container">
-      <div class="logo">
-        <span class="logo-accent">Digital</span>Resolve <span style="font-size: 0.75rem; color: #4ade80; background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3); padding: 2px 8px; border-radius: 6px; font-weight: 700; margin-left: 8px; letter-spacing: 0.5px;">HOMELAB DECK</span>
+      <a href="#deck" class="logo" title="DigitalResolve Homelab Deck">
+        <span class="logo-text-group"><span class="logo-accent">Digital</span>Resolve</span>
+        <span class="logo-deck-badge">HOMELAB DECK</span>
       </div>
       <nav class="nav-links">
         <a href="#deck" class="btn-nav">DECK</a>
@@ -74,10 +75,10 @@
             <button type="button" class="dropdown-item" onclick="launchAgySession('stream')" style="color: #93c5fd;">
               <span class="dropdown-dot dot-1"></span> In-Page Stream Viewer
             </button>
-            <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="dropdown-item" style="color: #60a5fa; font-weight: 600;">
-              <span class="dropdown-dot dot-1"></span> Web Console (Remote Work)
-              <span class="item-tag" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa;">Cloud</span>
-            </a>
+            <button type="button" class="dropdown-item" onclick="openEmbeddedConsole()" style="color: #60a5fa; font-weight: 600; width: 100%; text-align: left; background: none; border: none; cursor: pointer;">
+              <span class="dropdown-dot dot-1"></span> Fullscreen AGY Console
+              <span class="item-tag" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa;">Active</span>
+            </button>
             <button type="button" class="dropdown-item" onclick="launchAgySession('app')" style="color: #4ade80;">
               <span class="dropdown-dot" style="background-color: #4ade80; box-shadow: 0 0 8px #4ade80;"></span>
               <span>Launch Desktop App</span>
@@ -88,9 +89,9 @@
               <span>Copy Session ID (51f0adb8...)</span>
             </button>
             <div class="dropdown-divider"></div>
-            <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="dropdown-item">
+            <button type="button" class="dropdown-item" onclick="launchAgySession('stream')" style="width: 100%; text-align: left; background: none; border: none; cursor: pointer; color: inherit;">
               <span class="dropdown-dot dot-1"></span> Instance: Cory-Desktop (Online)
-            </a>
+            </button>
           </div>
         </div>
 
@@ -367,7 +368,7 @@
             <input type="text" id="agy-prompt-input" placeholder="Transmit instruction / prompt to this active AGY session (M365 SSO Guarded)..." style="flex: 1; min-width: 250px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 10px 14px; color: #f8fafc; font-family: monospace; font-size: 0.88rem;" onkeydown="if(event.key==='Enter') sendAgyPrompt()" />
             <button type="button" class="btn-nav" style="border-color: #3b82f6; background: rgba(59, 130, 246, 0.25); color: #fff;" onclick="sendAgyPrompt()">Send to Agent &rarr;</button>
             <button type="button" class="btn-nav" style="border-color: #38bdf8; background: rgba(56, 189, 248, 0.2); color: #38bdf8;" onclick="openEmbeddedConsole()">Expand Console &nearr;</button>
-            <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="btn-nav" style="border-color: #10b981; background: rgba(16, 185, 129, 0.15); color: #6ee7b7;" title="Open Cory-Desktop in Antigravity Web Console">Web Console &rarr;</a>
+            <button type="button" class="btn-nav" style="border-color: #10b981; background: rgba(16, 185, 129, 0.15); color: #6ee7b7;" onclick="openEmbeddedConsole()" title="Expand Fullscreen Live Session Console">Live Session &nearr;</button>
           </div>
         </div>
 
@@ -904,9 +905,9 @@
               <button type="button" onclick="openEmbeddedConsole()" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 12px; background: rgba(59, 130, 246, 0.25); border-color: #3b82f6; color: #93c5fd; font-weight: 600;">
                 <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span> Embedded Console &rarr;
               </button>
-              <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px; color: #60a5fa !important;">
-                Web Console &rarr;
-              </a>
+              <button type="button" onclick="openEmbeddedConsole()" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px; color: #60a5fa !important;">
+                Live Stream &nearr;
+              </button>
               <button type="button" onclick="launchAgySession('app')" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px; color: #4ade80 !important;">
                 Launch in App &rarr;
               </button>
@@ -988,7 +989,7 @@
           </a>
 
           <!-- Gemini CLI / Antigravity Harness -->
-          <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="app-card">
+          <div class="app-card" onclick="openEmbeddedConsole()" style="cursor: pointer;" title="Open Active Antigravity Live Console">
             <div>
               <div class="app-card-header">
                 <div class="app-icon" style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.15); font-weight: 700; font-size: 0.85rem;">WOL</div>
@@ -1364,6 +1365,21 @@
       setInterval(fetchISPHistory, 15000);
       renderUptimeMatrix();
       setInterval(renderUptimeMatrix, 60000);
+      // Auto-stream inline terminal every 3s
+      setInterval(() => {
+        if (currentLogTab) {
+          fetch(${GATEWAY}/api/logs?name=)
+            .then(r => r.json())
+            .then(data => {
+              const body = document.getElementById('terminal-content');
+              if (body && data && data.lines) {
+                const isAtBottom = body.scrollHeight - body.scrollTop - body.clientHeight < 80;
+                body.textContent = data.lines.join('\n');
+                if (isAtBottom) body.scrollTop = body.scrollHeight;
+              }
+            }).catch(() => {});
+        }
+      }, 3000);
     });
 
     // Remote Control Matrix Handler
@@ -1384,7 +1400,7 @@
           if (term) term.scrollIntoView({ behavior: 'smooth' });
         }, 1200);
       } else if (target === 'web') {
-        window.open('https://antigravity.google.com', '_blank');
+        openEmbeddedConsole();
       } else if (target === 'copy') {
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(cid);
@@ -2107,7 +2123,7 @@
         <div class="meta-item"><span class="meta-lbl">Node:</span> <span class="meta-val">Cory-Desktop (192.168.2.62)</span></div>
         <div class="meta-item"><span class="meta-lbl">Auth Gateway:</span> <span class="meta-val">wake.digitalresolve.ca (M365 Entra ID SSO)</span></div>
         <div class="meta-actions">
-          <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="meta-link-btn" title="Open Google Antigravity Web Console">Google Web Console &nearr;</a>
+          <button type="button" class="meta-link-btn" onclick="refreshAgyConsole()" title="Force Refresh Stream">Refresh Stream &#x21bb;</button>
           <button type="button" class="meta-link-btn" onclick="launchAgySession('app')" title="Launch in Local AGY App">Open in App &nearr;</button>
           <button type="button" class="meta-link-btn" onclick="launchAgySession('copy')" title="Copy ID">Copy CID</button>
         </div>
