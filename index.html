@@ -1053,7 +1053,7 @@
       <div class="footer-meta" style="display: flex; align-items: center; gap: 16px;">
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;">v2.4.2</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;">v2.4.3</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
         <div class="footer-links">
@@ -1368,7 +1368,7 @@
       // Auto-stream inline terminal every 3s
       setInterval(() => {
         if (currentLogTab) {
-          fetch(${GATEWAY}/api/logs?name=)
+          fetch(`${GATEWAY}/api/logs?name=${currentLogTab}`)
             .then(r => r.json())
             .then(data => {
               const body = document.getElementById('terminal-content');
@@ -2169,7 +2169,22 @@
         <!-- Version 2.4.2 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.4.2 &bull; Current</span>
+            <span class="ver-tag current">v2.4.3 &bull; Current</span>
+            <span class="ver-date">October 26, 2026</span>
+          </div>
+          <h4 class="ver-title">Real-Time In-Page Terminal Stream &amp; Header Fluid Scaling</h4>
+          <ul class="ver-list">
+            <li><strong>Inline Live Stream Poller Fix:</strong> Repaired template string interpolation in DOMContentLoaded poller; terminal entries now stream immediately on page load without getting stuck.</li>
+            <li><strong>Header &amp; Deck Scaling:</strong> Fluid <code>.logo-deck-badge</code> and multi-tier responsive media queries prevent wrapping or clipping on mobile and narrow tablet views.</li>
+            <li><strong>StreamHub Recovery &amp; Remux:</strong> Revived port 8088 service behind M365 SSO, remuxed complete 3 Body Problem Season 1 to faststart MP4, and added VLC/download player controls.</li>
+            <li><strong>In-Memory Cache Layer:</strong> Added 2.5s caching in <code>wol-listener.ps1</code> for instantaneous sub-millisecond API responses under concurrent polling.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.4.2 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.4.2</span>
             <span class="ver-date">October 26, 2026</span>
           </div>
           <h4 class="ver-title">Live Embedded AGY Terminal Console &amp; Apex Redirection</h4>
