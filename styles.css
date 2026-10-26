@@ -309,6 +309,24 @@ button.dropdown-item {
   box-shadow: 0 0 6px rgba(100, 116, 139, 0.5);
 }
 
+.dot-sleep {
+  background-color: #818cf8;
+  box-shadow: 0 0 8px #818cf8;
+}
+
+.btn-sleep {
+  background: rgba(99, 102, 241, 0.1) !important;
+  border-color: rgba(99, 102, 241, 0.3) !important;
+  color: #a5b4fc !important;
+}
+
+.btn-sleep:hover {
+  background: rgba(99, 102, 241, 0.22) !important;
+  border-color: #a5b4fc !important;
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.35) !important;
+  color: #ffffff !important;
+}
+
 /* Toast Notification */
 .wol-toast {
   position: fixed;

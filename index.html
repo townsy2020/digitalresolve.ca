@@ -30,6 +30,7 @@
           <div class="dropdown-menu torrent-dropdown">
             <a href="https://torrents.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="dropdown-item">
               <span class="dropdown-dot dot-1"></span> Torrents (Desktop)
+              <span class="item-tag" id="desktop-speed-tag">Idle</span>
             </a>
             <a href="https://torrents2.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="dropdown-item">
               <span class="dropdown-dot dot-2"></span> Torrents (NUC)
@@ -44,7 +45,7 @@
               <div class="disk-bar-bg">
                 <div class="disk-bar-fill" id="nuc-disk-bar" style="width: 0%;"></div>
               </div>
-              <div class="disk-subtext" id="nuc-disk-sub">Querying drive via WMI...</div>
+              <div class="disk-subtext" id="nuc-disk-sub">Querying drive &amp; speeds...</div>
             </div>
           </div>
         </div>
@@ -64,7 +65,7 @@
           </div>
         </div>
 
-        <!-- Wake on LAN Dropdown -->
+        <!-- Wake on LAN & Power Dropdown -->
         <div class="dropdown">
           <button type="button" class="btn btn-torrent" id="wol-btn" aria-haspopup="true">
             Wake on LAN <span class="dropdown-arrow">&#9662;</span>
@@ -83,6 +84,11 @@
             <button type="button" class="btn-action-item" onclick="sendWol('both')">
               <span class="dropdown-dot dot-1"></span>
               <span>Wake Both</span>
+            </button>
+            <button type="button" class="btn-action-item btn-sleep" onclick="sendSleep('nuc')">
+              <span class="dropdown-dot dot-sleep"></span>
+              <span>Sleep NUC</span>
+              <span class="item-tag">Standby</span>
             </button>
             <div class="dropdown-divider"></div>
             <button type="button" class="dropdown-item" onclick="checkStatus('nuc')">
@@ -282,7 +288,45 @@
         });
     }
 
-    function updateStatusUI(target, isOnline, latencyMs = null, disk = null) {
+    function sendSleep(target) {
+      clearInterval(pollInterval);
+      const dev = devices[target] || devices.nuc;
+      showToast('loading', `Entering Sleep Mode...`, `Dispatching suspend signal to ${dev.name}`, 0);
+
+      fetch(`${GATEWAY}/sleep?target=${target}`)
+        .then(r => r.json())
+        .then(() => {
+          showToast('loading', `Sleep Signal Dispatched`, `Waiting for ${dev.name} to enter standby...`, 0);
+
+          let attempts = 0;
+          const maxAttempts = 10;
+          pollInterval = setInterval(() => {
+            attempts++;
+            fetch(`${GATEWAY}/status?target=${target}`)
+              .then(r => r.json())
+              .then(data => {
+                if (!data.online) {
+                  clearInterval(pollInterval);
+                  showToast('success', `${dev.name} is now Asleep`, 'System in low-power standby mode.', 6000);
+                  updateStatusUI(target, false);
+                } else if (attempts >= maxAttempts) {
+                  clearInterval(pollInterval);
+                  showToast('error', `Sleep Signal Dispatched`, `${dev.name} may still be finalizing background tasks.`, 5000);
+                }
+              })
+              .catch(() => {
+                clearInterval(pollInterval);
+                showToast('success', `${dev.name} is now Asleep`, 'Device offline / in standby.', 6000);
+                updateStatusUI(target, false);
+              });
+          }, 2500);
+        })
+        .catch(() => {
+          showToast('error', 'Sleep Command Failed', `Unable to reach ${GATEWAY}`, 5000);
+        });
+    }
+
+    function updateStatusUI(target, isOnline, latencyMs = null, disk = null, torrent = null) {
       const dot = document.getElementById(`badge-${target}`);
       const tag = document.getElementById(`status-tag-${target}`);
       const lat = document.getElementById(`latency-${target}`);
@@ -304,6 +348,23 @@
         lat.className = 'item-tag online';
       }
 
+      // Update Torrent Speeds
+      if (torrent) {
+        if (target === 'desktop') {
+          const dTag = document.getElementById('desktop-speed-tag');
+          if (dTag) {
+            dTag.textContent = torrent.dlSpeed > 0 ? `\u2B07 ${torrent.dlSpeedText}` : 'Idle';
+            dTag.className = torrent.dlSpeed > 0 ? 'item-tag online' : 'item-tag';
+          }
+        } else if (target === 'nuc') {
+          const nTag = document.getElementById('nuc-disk-tag');
+          if (nTag && torrent.dlSpeed > 1024) {
+            nTag.textContent = `\u2B07 ${torrent.dlSpeedText}`;
+            nTag.className = 'item-tag online';
+          }
+        }
+      }
+
       // Update NUC D: drive widgets
       if (target === 'nuc' && disk) {
         const diskTag = document.getElementById('nuc-disk-tag');
@@ -311,7 +372,7 @@
         const diskBar = document.getElementById('nuc-disk-bar');
         const diskSub = document.getElementById('nuc-disk-sub');
 
-        if (diskTag) {
+        if (diskTag && (!torrent || torrent.dlSpeed <= 1024)) {
           diskTag.textContent = `D: ${Math.round(disk.freeGB)} GB free`;
           diskTag.className = disk.usedPercent > 85 ? 'item-tag offline' : 'item-tag online';
         }
@@ -326,16 +387,17 @@
             diskBar.classList.remove('warning');
           }
         }
+        const speedNote = (torrent && torrent.dlSpeed > 0) ? ` &bull; \u2B07 ${torrent.dlSpeedText}` : '';
         if (diskSub) {
-          diskSub.textContent = `${disk.usedGB} GB used of ${disk.totalGB} GB (${disk.usedPercent}%)`;
+          diskSub.innerHTML = `${disk.usedGB} GB used of ${disk.totalGB} GB (${disk.usedPercent}%)${speedNote}`;
         }
       }
     }
 
     // Check status on load
     window.addEventListener('DOMContentLoaded', () => {
-      fetch(`${GATEWAY}/status?target=nuc`).then(r => r.json()).then(d => updateStatusUI('nuc', d.online, d.latencyMs, d.disk)).catch(()=>{});
-      fetch(`${GATEWAY}/status?target=desktop`).then(r => r.json()).then(d => updateStatusUI('desktop', d.online, d.latencyMs, d.disk)).catch(()=>{});
+      fetch(`${GATEWAY}/status?target=nuc`).then(r => r.json()).then(d => updateStatusUI('nuc', d.online, d.latencyMs, d.disk, d.torrent)).catch(()=>{});
+      fetch(`${GATEWAY}/status?target=desktop`).then(r => r.json()).then(d => updateStatusUI('desktop', d.online, d.latencyMs, d.disk, d.torrent)).catch(()=>{});
     });
   </script>
 </body>
