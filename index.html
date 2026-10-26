@@ -111,6 +111,7 @@
           </div>
         </div>
 
+        <a href="https://cam.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7 !important; background: rgba(16, 185, 129, 0.12);">🐱 Cat Cam</a>
         <a href="https://stream.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="border-color: rgba(139, 92, 246, 0.4); color: #c4b5fd !important; background: rgba(139, 92, 246, 0.12);">▶ StreamHub 4K</a>
       </nav>
     </div>
@@ -136,6 +137,7 @@
           <a href="https://stream.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="pill-btn pill-stream">
             <span>▶</span> Launch StreamHub (4K / HD)
           </a>
+          <a href="https://cam.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="pill-btn" style="border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.15); color: #6ee7b7;"><span>ðŸ±</span> Cat Cam Live (SSO)</a>
           <a href="https://files.digitalresolve.ca/files/" target="_blank" rel="noopener noreferrer" class="pill-btn pill-files">
             <span>📁</span> Browse Media &amp; Files
           </a>
@@ -157,6 +159,7 @@
             <span class="ribbon-label">Desktop Node</span>
             <span class="ribbon-value" id="ribbon-desktop"><span class="dropdown-dot dot-1"></span> Bell Fiber &bull; Online</span>
           </div>
+          <div class="ribbon-item"><span class="ribbon-label">ðŸ± Cat Cam Fleet</span><span class="ribbon-value" id="ribbon-cam" style="color: #6ee7b7;"><span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span> 2 Online (SSO)</span></div>
           <div class="ribbon-item">
             <span class="ribbon-label">Media Storage (D:)</span>
             <span class="ribbon-value" id="ribbon-storage" style="color: #60a5fa;">496 GB Free (73%)</span>
@@ -405,6 +408,96 @@
               </table>
             </div>
           </div>
+
+        <!-- Live Cat Cam & Home Security Fleet (SSO) -->
+        <div class="control-matrix-card" id="cat-cam-card" style="margin-bottom: 40px; border-color: rgba(16, 185, 129, 0.25);">
+          <div class="control-matrix-header">
+            <div class="control-matrix-title" style="color: #6ee7b7;">
+              <span>🐱</span> Live Cat Cam &amp; Home Security Fleet
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+              <span class="item-tag" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4);">
+                <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span> Dual Cams Online
+              </span>
+              <span class="item-tag" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">
+                🔒 Microsoft 365 Entra ID SSO Shield
+              </span>
+              <a href="https://cam.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.78rem; padding: 4px 12px; background: rgba(16, 185, 129, 0.2); color: #6ee7b7 !important; border-color: rgba(16, 185, 129, 0.5);">
+                Launch Cam Console ↗
+              </a>
+            </div>
+          </div>
+
+          <!-- Dual Camera Quick Telemetry Grid -->
+          <div class="stats-grid-row" style="margin-bottom: 16px;">
+            <!-- Cam 1 Card -->
+            <div class="stat-metric-card" style="background: rgba(16, 185, 129, 0.04); border-color: rgba(16, 185, 129, 0.2);">
+              <div class="stat-card-header">
+                <span class="stat-card-title">Cat Cam 1 (Living Room Tower)</span>
+                <span class="item-tag online" id="cam1-tag">2.1 ms &bull; Online</span>
+              </div>
+              <div class="stat-big-val" style="color: #6ee7b7; font-size: 1.3rem;">192.168.2.24</div>
+              <div class="stat-subtext">Tuya / Geeni Smart Cam &bull; 1080P HD &bull; 2.4GHz Wi-Fi</div>
+            </div>
+
+            <!-- Cam 2 Card -->
+            <div class="stat-metric-card" style="background: rgba(16, 185, 129, 0.04); border-color: rgba(16, 185, 129, 0.2);">
+              <div class="stat-card-header">
+                <span class="stat-card-title">Cat Cam 2 (Perch / Food Hub)</span>
+                <span class="item-tag online" id="cam2-tag">1.9 ms &bull; Online</span>
+              </div>
+              <div class="stat-big-val" style="color: #6ee7b7; font-size: 1.3rem;">192.168.2.25</div>
+              <div class="stat-subtext">Tuya / Geeni Smart Cam &bull; 1080P HD &bull; 2.4GHz Wi-Fi</div>
+            </div>
+
+            <!-- Cloud Gateway Card -->
+            <div class="stat-metric-card" style="background: rgba(56, 189, 248, 0.04); border-color: rgba(56, 189, 248, 0.2);">
+              <div class="stat-card-header">
+                <span class="stat-card-title">Access &amp; Security Layer</span>
+                <span class="item-tag" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8;">Zero Trust</span>
+              </div>
+              <div class="stat-big-val" style="color: #38bdf8; font-size: 1.15rem; margin-top: 4px;">cam.digitalresolve.ca</div>
+              <div class="stat-subtext">Routed via NUC Tunnel (Port 8089) &bull; M365 Auth</div>
+            </div>
+
+            <!-- Geeni Cloud Portal Card -->
+            <div class="stat-metric-card" style="background: rgba(245, 158, 11, 0.04); border-color: rgba(245, 158, 11, 0.2);">
+              <div class="stat-card-header">
+                <span class="stat-card-title">Geeni Cloud Sync</span>
+                <span class="item-tag" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24;">WebRTC</span>
+              </div>
+              <div class="stat-big-val" style="font-size: 1.15rem; color: #fbbf24; margin-top: 4px;">my.geenismart.com</div>
+              <div class="stat-subtext">Two-way audio &bull; Pan/Tilt motion &bull; AWS IoT</div>
+            </div>
+          </div>
+
+          <!-- Interactive Live Preview Player Frame -->
+          <div style="background: rgba(2, 6, 23, 0.7); border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.08); padding: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+              <div style="font-size: 0.85rem; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; gap: 8px;">
+                <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+                <span id="deckCamTitle">Live Feed: Cat Cam 1 (Living Room Tower)</span>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="switchDeckCam(1)">Cam 1 (Living)</button>
+                <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="switchDeckCam(2)">Cam 2 (Food)</button>
+                <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="toggleDeckNight()">🌙 Night Mode</button>
+                <a href="https://cam.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px; color: #6ee7b7 !important; border-color: rgba(16, 185, 129, 0.4);">⛶ Full Portal</a>
+              </div>
+            </div>
+
+            <!-- Canvas Viewport -->
+            <div style="position: relative; width: 100%; height: 260px; background: #020617; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.06); display: flex; align-items: center; justify-content: center;">
+              <canvas id="deckCamCanvas" width="800" height="260" style="width: 100%; height: 100%; object-fit: cover;"></canvas>
+              <div style="position: absolute; top: 10px; left: 10px; font-family: monospace; font-size: 0.72rem; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; display: flex; flex-direction: column; gap: 2px;">
+                <span style="color: #6ee7b7; font-weight: 700;" id="deckOverlayName">CAM 1: LIVING ROOM TOWER</span>
+                <span id="deckOverlayTime">2026-10-26 05:15:00 UTC</span>
+                <span style="color: #38bdf8;">FEED: 1080P &bull; 30 FPS &bull; LOW-LATENCY</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         </div>
       </div>
     </section>
@@ -631,6 +724,25 @@
           </a>
 
           <!-- Disaster Recovery Card -->
+                    <!-- Cat Cam Operations Card -->
+          <a href="https://cam.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="app-card">
+            <div>
+              <div class="app-card-header">
+                <div class="app-icon" style="color: #10b981; border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.15);">🐱</div>
+                <span class="item-tag" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7;">Port 8089 &bull; SSO</span>
+              </div>
+              <div class="app-card-title">Cat Cam Operations Center</div>
+              <div class="app-card-desc">
+                24/7 Optical surveillance fleet of cat play tower and feeding station with live viewport and Geeni cloud bridge. Protected by Microsoft 365 Entra ID.
+              </div>
+            </div>
+            <div class="app-card-footer">
+              <span class="app-port">cam.digitalresolve.ca</span>
+              <span class="app-btn-launch" style="color: #6ee7b7;">Launch Live Cam &rarr;</span>
+            </div>
+          </a>
+
+
           <div class="app-card" style="cursor: default;">
             <div>
               <div class="app-card-header">
@@ -1202,6 +1314,103 @@
         closeMagnetModal();
       });
     }
+  
+    // Cat Cam Deck Preview Controller
+    let deckCurrentCam = 1;
+    let deckNightMode = false;
+    const deckCanvas = document.getElementById('deckCamCanvas');
+    const deckCtx = deckCanvas ? deckCanvas.getContext('2d') : null;
+
+    function switchDeckCam(num) {
+      deckCurrentCam = num;
+      const title = document.getElementById('deckCamTitle');
+      const overlay = document.getElementById('deckOverlayName');
+      if (num === 1) {
+        if (title) title.innerText = "Live Feed: Cat Cam 1 (Living Room Tower)";
+        if (overlay) overlay.innerText = "CAM 1: LIVING ROOM TOWER";
+      } else {
+        if (title) title.innerText = "Live Feed: Cat Cam 2 (Perch / Food Hub)";
+        if (overlay) overlay.innerText = "CAM 2: PERCH / FOOD HUB";
+      }
+    }
+
+    function toggleDeckNight() {
+      deckNightMode = !deckNightMode;
+    }
+
+    let deckFrame = 0;
+    function renderDeckFrame() {
+      if (!deckCanvas || !deckCtx) return;
+      deckFrame++;
+      const w = deckCanvas.width;
+      const h = deckCanvas.height;
+
+      if (deckNightMode) {
+        const grad = deckCtx.createRadialGradient(w/2, h/2, 20, w/2, h/2, w/1.2);
+        grad.addColorStop(0, '#131c17');
+        grad.addColorStop(1, '#050a07');
+        deckCtx.fillStyle = grad;
+      } else {
+        const grad = deckCtx.createRadialGradient(w/2, h/2, 20, w/2, h/2, w/1.2);
+        grad.addColorStop(0, deckCurrentCam === 1 ? '#0c1527' : '#0e1726');
+        grad.addColorStop(1, '#020617');
+        deckCtx.fillStyle = grad;
+      }
+      deckCtx.fillRect(0, 0, w, h);
+
+      // Environment grid lines
+      deckCtx.strokeStyle = deckNightMode ? 'rgba(74, 222, 128, 0.12)' : 'rgba(56, 189, 248, 0.1)';
+      deckCtx.lineWidth = 1.5;
+      deckCtx.strokeRect(40, 30, w - 80, h - 60);
+
+      // Furniture outline
+      deckCtx.beginPath();
+      deckCtx.moveTo(40, h - 50);
+      deckCtx.lineTo(w - 40, h - 50);
+      deckCtx.stroke();
+
+      // Perch & Cat animation
+      const catX = deckCurrentCam === 1 ? 160 + Math.sin(deckFrame * 0.04) * 3 : 480 + Math.cos(deckFrame * 0.03) * 5;
+      const catY = deckCurrentCam === 1 ? h - 130 + Math.sin(deckFrame * 0.08) * 2 : h - 90 + Math.sin(deckFrame * 0.05) * 2;
+
+      // Cat body
+      deckCtx.fillStyle = deckNightMode ? '#86efac' : '#94a3b8';
+      deckCtx.beginPath();
+      deckCtx.ellipse(catX, catY, 28, 20, 0, 0, Math.PI * 2);
+      deckCtx.fill();
+
+      // Ears
+      deckCtx.beginPath();
+      deckCtx.moveTo(catX - 14, catY - 14); deckCtx.lineTo(catX - 6, catY - 28); deckCtx.lineTo(catX + 2, catY - 16);
+      deckCtx.moveTo(catX + 3, catY - 16); deckCtx.lineTo(catX + 11, catY - 28); deckCtx.lineTo(catX + 19, catY - 14);
+      deckCtx.fill();
+
+      // Motion bounding box
+      deckCtx.strokeStyle = deckNightMode ? 'rgba(74, 222, 128, 0.85)' : 'rgba(56, 189, 248, 0.85)';
+      deckCtx.strokeRect(catX - 35, catY - 35, 70, 60);
+      deckCtx.fillStyle = deckNightMode ? '#86efac' : '#38bdf8';
+      deckCtx.font = '10px monospace';
+      deckCtx.fillText('CAT DETECTED [98%]', catX - 35, catY - 38);
+
+      // Scanline effect
+      deckCtx.fillStyle = 'rgba(255, 255, 255, 0.015)';
+      for (let i = 0; i < h; i += 4) {
+        deckCtx.fillRect(0, i, w, 1);
+      }
+
+      const timeEl = document.getElementById('deckOverlayTime');
+      if (timeEl) {
+        const now = new Date();
+        timeEl.innerText = now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+      }
+
+      requestAnimationFrame(renderDeckFrame);
+    }
+
+    if (deckCanvas) {
+      renderDeckFrame();
+    }
+
   </script>
 
   <!-- Remote Magnet Ingestion Modal -->
