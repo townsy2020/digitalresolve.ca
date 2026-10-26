@@ -188,6 +188,14 @@
                 <div class="disk-bar-fill" id="fleet-bar-nuc" style="width: 73.4%;"></div>
               </div>
               <div class="metric-row">
+                <span class="metric-name">Memory &amp; Uptime</span>
+                <span class="metric-val" id="fleet-vitals-nuc">5.7 GB / 31.8 GB (18%) &bull; 1h up</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-name">VPN Privacy Tunnel</span>
+                <span class="metric-val" id="fleet-vpn-nuc" style="font-size: 0.8rem; color: #34d399;">Mullvad Active</span>
+              </div>
+              <div class="metric-row">
                 <span class="metric-name">Live Active Services</span>
                 <span class="metric-val" style="font-size: 0.78rem;">qBittorrent &bull; FileBrowser &bull; WoL Gateway</span>
               </div>
@@ -419,7 +427,7 @@
         });
     }
 
-    function updateStatusUI(target, isOnline, latencyMs = null, disk = null, torrent = null) {
+    function updateStatusUI(target, isOnline, latencyMs = null, disk = null, torrent = null, vitals = null) {
       const dot = document.getElementById(`badge-${target}`);
       const tag = document.getElementById(`status-tag-${target}`);
       const lat = document.getElementById(`latency-${target}`);
@@ -501,18 +509,30 @@
       if (fLat && latencyMs !== null) {
         fLat.textContent = isOnline ? `${latencyMs} ms (LAN)` : 'Standby';
       }
-      if (target === 'nuc' && disk) {
-        const fStorage = document.getElementById('fleet-storage-nuc');
-        const fBar = document.getElementById('fleet-bar-nuc');
-        if (fStorage) fStorage.textContent = `${disk.freeGB} GB Free (${disk.usedPercent}%)`;
-        if (fBar) fBar.style.width = `${disk.usedPercent}%`;
+      if (target === 'nuc') {
+        if (disk) {
+          const fStorage = document.getElementById('fleet-storage-nuc');
+          const fBar = document.getElementById('fleet-bar-nuc');
+          if (fStorage) fStorage.textContent = `${disk.freeGB} GB Free (${disk.usedPercent}%)`;
+          if (fBar) fBar.style.width = `${disk.usedPercent}%`;
+        }
+        if (vitals) {
+          const fVitals = document.getElementById('fleet-vitals-nuc');
+          const fVpn = document.getElementById('fleet-vpn-nuc');
+          if (fVitals) {
+            fVitals.textContent = `${vitals.ramUsedGB} GB / ${vitals.ramTotalGB} GB (${vitals.ramPercent}%) \u2022 ${vitals.uptime} up`;
+          }
+          if (fVpn && vitals.vpn) {
+            fVpn.textContent = vitals.vpn;
+          }
+        }
       }
     }
 
     // Check status on load
     window.addEventListener('DOMContentLoaded', () => {
-      fetch(`${GATEWAY}/status?target=nuc`).then(r => r.json()).then(d => updateStatusUI('nuc', d.online, d.latencyMs, d.disk, d.torrent)).catch(()=>{});
-      fetch(`${GATEWAY}/status?target=desktop`).then(r => r.json()).then(d => updateStatusUI('desktop', d.online, d.latencyMs, d.disk, d.torrent)).catch(()=>{});
+      fetch(`${GATEWAY}/status?target=nuc`).then(r => r.json()).then(d => updateStatusUI('nuc', d.online, d.latencyMs, d.disk, d.torrent, d.vitals)).catch(()=>{});
+      fetch(`${GATEWAY}/status?target=desktop`).then(r => r.json()).then(d => updateStatusUI('desktop', d.online, d.latencyMs, d.disk, d.torrent, d.vitals)).catch(()=>{});
     });
   </script>
 </body>
