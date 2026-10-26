@@ -349,7 +349,14 @@
             <button class="terminal-tab" id="tab-report" onclick="loadLog('report')">Morning Briefing</button>
           </div>
           </div>
-          <div class="terminal-body" id="terminal-content">Connecting to Sentinel daemon stream...</div>
+          <div class="terminal-body" id="terminal-content">Connecting to active AGY session stream...</div>
+          
+          <!-- Remote Instruction Dispatcher for Active AGY Session -->
+          <div class="agy-remote-prompt-bar" id="agy-prompt-container" style="display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08); flex-wrap: wrap;">
+            <input type="text" id="agy-prompt-input" placeholder="Transmit instruction / prompt to this active AGY session (M365 SSO Guarded)..." style="flex: 1; min-width: 250px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 10px 14px; color: #f8fafc; font-family: monospace; font-size: 0.88rem;" onkeydown="if(event.key==='Enter') sendAgyPrompt()" />
+            <button type="button" class="btn-nav" style="border-color: #3b82f6; background: rgba(59, 130, 246, 0.25); color: #fff;" onclick="sendAgyPrompt()">Send to Agent &rarr;</button>
+            <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="btn-nav" style="border-color: #10b981; background: rgba(16, 185, 129, 0.15); color: #6ee7b7;" title="Open Cory-Desktop in Antigravity Web Console">Web Console &rarr;</a>
+          </div>
         </div>
 
         <!-- ISP Health, Jitter, Packet Loss & Throughput Monitor -->
@@ -1300,6 +1307,33 @@
     });
 
     // Remote Control Matrix Handler
+        // Send remote instruction / prompt to active AGY session
+    function sendAgyPrompt() {
+      const input = document.getElementById('agy-prompt-input');
+      const promptText = input ? input.value.trim() : '';
+      if (!promptText) return;
+
+      showToast('loading', 'Dispatching Prompt to AGY Session...', 'Session ID: 51f0adb8-74d9', 0);
+      fetch(`${GATEWAY}/api/agy/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: promptText })
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.status === 'success') {
+          if (input) input.value = '';
+          showToast('success', 'Prompt Delivered', 'Instruction queued for autonomous agent execution.');
+          setTimeout(() => loadLog('agy'), 1200);
+        } else {
+          showToast('error', 'Transmission Failed', data.message || 'Could not queue prompt.');
+        }
+      })
+      .catch(err => {
+        showToast('error', 'Gateway Offline', `Could not reach ${GATEWAY}`);
+      });
+    }
+
     function sendControl(action) {
       showToast('loading', 'Executing Cluster Command...', `Action: ${action.toUpperCase()}`, 0);
       fetch(`${GATEWAY}/api/control?action=${action}`)
