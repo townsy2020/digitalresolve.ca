@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -69,44 +69,44 @@
 
         <!-- AGY Session & Gemini CLI Dropdown -->
         <div class="dropdown">
-          <button type="button" class="btn-nav" id="agy-btn" aria-haspopup="true">
+          <button type="button" class="btn-nav" id="agy-btn" aria-haspopup="true" title="Toggle Antigravity Autonomous Agent Control Menu">
             AGY Menu <span class="dropdown-arrow">&#9662;</span>
           </button>
           <div class="dropdown-menu">
-            <button type="button" class="btn-action-item" onclick="openEmbeddedConsole()">
+            <button type="button" class="btn-action-item" onclick="openEmbeddedConsole()" title="Open Live Interactive Terminal for Active Session 51f0adb8">
               <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
               <span>Open This Very Session (51f0adb8)</span>
               <span class="item-tag online">Live</span>
             </button>
-            <button type="button" class="btn-action-item" onclick="launchAgySession('stream')">
+            <button type="button" class="btn-action-item" onclick="launchAgySession('stream')" title="View Live Antigravity Agent Transcript Stream">
               <span class="dropdown-dot dot-1"></span>
               <span>In-Page Stream Viewer</span>
             </button>
-            <button type="button" class="btn-action-item" onclick="openEmbeddedConsole(true)">
+            <button type="button" class="btn-action-item" onclick="openEmbeddedConsole(true)" title="Open Fullscreen Antigravity Command &amp; Telemetry Console">
               <span class="dropdown-dot dot-1"></span>
               <span>Fullscreen AGY Console Active</span>
               <span class="item-tag online">Active</span>
             </button>
-            <button type="button" class="btn-action-item" onclick="launchAgySession('app')">
+            <button type="button" class="btn-action-item" onclick="launchAgySession('app')" title="Launch Antigravity Native Desktop CLI via Windows Terminal">
               <span class="dropdown-dot" style="background-color: #4ade80; box-shadow: 0 0 8px #4ade80;"></span>
               <span>Launch Desktop App CLI</span>
               <span class="item-tag">CLI</span>
             </button>
-            <button type="button" class="btn-action-item" onclick="launchAgySession('copy')">
+            <button type="button" class="btn-action-item" onclick="launchAgySession('copy')" title="Copy Active Conversation ID to Clipboard">
               <span class="dropdown-dot dot-2"></span>
               <span>Copy Session ID (51f0adb8...)</span>
             </button>
             <div class="dropdown-divider"></div>
-            <button type="button" class="btn-action-item" onclick="startNewAgySession('desktop')" style="color: #93c5fd;">
+            <button type="button" class="btn-action-item" onclick="startNewAgySession('desktop')" title="Launch New AGY Session on Desktop (NetBIOS: DESKTOP) with --dangerously-skip-permissions" style="color: #93c5fd;">
               <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
               <span>+ New Session (Desktop): agy --dangerously-skip-permissions</span>
             </button>
-            <button type="button" class="btn-action-item" onclick="startNewAgySession('nuc')" style="color: #c4b5fd;">
+            <button type="button" class="btn-action-item" onclick="startNewAgySession('nuc')" title="Launch New AGY Session on NUC (NetBIOS: NUC) with --dangerously-skip-permissions" style="color: #c4b5fd;">
               <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 8px #a855f7;"></span>
               <span>+ New Session (NUC): agy --dangerously-skip-permissions</span>
             </button>
             <div class="dropdown-divider"></div>
-            <button type="button" class="btn-action-item" onclick="checkStatus('desktop')">
+            <button type="button" class="btn-action-item" onclick="checkStatus('desktop')" title="Query Live Status and Latency for Desktop (NetBIOS: DESKTOP)">
               <span class="dropdown-dot dot-1"></span>
               <span>Instance: Cory-Desktop (Online)</span>
               <span class="item-tag online" id="agy-node-ping">Ping &rarr;</span>
@@ -116,36 +116,36 @@
 
         <!-- Wake on LAN & Power Dropdown -->
         <div class="dropdown">
-          <button type="button" class="btn-nav" id="wol-btn" aria-haspopup="true">
+          <button type="button" class="btn-nav" id="wol-btn" aria-haspopup="true" title="Toggle Wake-on-LAN and Power Control Menu">
             Wake on LAN <span class="dropdown-arrow">&#9662;</span>
           </button>
           <div class="dropdown-menu">
-            <button type="button" class="btn-action-item" onclick="sendWol('desktop')">
+            <button type="button" class="btn-action-item" onclick="sendWol('desktop')" title="Send Wake-on-LAN Magic Packet to Desktop (NetBIOS: DESKTOP)">
               <span class="dropdown-dot dot-1" id="badge-desktop"></span>
               <span>Wake Desktop</span>
               <span class="item-tag" id="status-tag-desktop">Checking...</span>
             </button>
-            <button type="button" class="btn-action-item btn-sleep" onclick="sendSleep('desktop')">
+            <button type="button" class="btn-action-item btn-sleep" onclick="sendSleep('desktop')" title="Put Desktop PC (NetBIOS: DESKTOP) into Sleep Standby">
               <span class="dropdown-dot dot-sleep"></span>
               <span>Sleep Desktop</span>
               <span class="item-tag">Standby</span>
             </button>
-            <button type="button" class="btn-action-item" onclick="sendWol('nuc')">
+            <button type="button" class="btn-action-item" onclick="sendWol('nuc')" title="Send Wake-on-LAN Magic Packet to NUC Server (NetBIOS: NUC)">
               <span class="dropdown-dot dot-2" id="badge-nuc"></span>
               <span>Wake NUC</span>
               <span class="item-tag" id="status-tag-nuc">Checking...</span>
             </button>
-            <button type="button" class="btn-action-item" onclick="sendWol('both')">
+            <button type="button" class="btn-action-item" onclick="sendWol('both')" title="Broadcast Wake-on-LAN Magic Packets to Both Desktop and NUC">
               <span class="dropdown-dot dot-1"></span>
               <span>Wake Both</span>
             </button>
             <div class="dropdown-divider"></div>
-            <button type="button" class="btn-action-item" onclick="checkStatus('nuc')">
+            <button type="button" class="btn-action-item" onclick="checkStatus('nuc')" title="Query Live Status and Latency for NUC Server (NetBIOS: NUC)">
               <span class="dropdown-dot dot-2"></span>
               <span>Ping NUC</span>
               <span class="item-tag" id="latency-nuc">-- ms</span>
             </button>
-            <button type="button" class="btn-action-item" onclick="checkStatus('desktop')">
+            <button type="button" class="btn-action-item" onclick="checkStatus('desktop')" title="Query Live Status and Latency for Desktop (NetBIOS: DESKTOP)">
               <span class="dropdown-dot dot-1"></span>
               <span>Ping Desktop</span>
               <span class="item-tag" id="latency-desktop">-- ms</span>
@@ -190,7 +190,7 @@
           <a href="https://files.digitalresolve.ca/files/" target="_blank" rel="noopener noreferrer" class="pill-btn pill-files">
             <span>[FILES]</span> Browse Media &amp; Files
           </a>
-          <button type="button" onclick="openMagnetModal()" class="pill-btn pill-magnet">
+          <button type="button" onclick="openMagnetModal()" class="pill-btn pill-magnet" title="Open 1-Click Remote Magnet Ingestion Modal">
             <span>[+]</span> Quick-Drop Magnet
           </button>
           <a href="#fleet" class="pill-btn pill-outline">
@@ -239,7 +239,7 @@
               <option value="nuc">NUC Server (24/7 &bull; D:\Torrents)</option>
               <option value="desktop">Desktop Workstation</option>
             </select>
-            <button type="button" class="quick-drop-btn" onclick="submitQuickMagnet()">Start Remote Download</button>
+            <button type="button" class="quick-drop-btn" onclick="submitQuickMagnet()" title="Inject Torrent Magnet into NUC qBittorrent via Mullvad VPN">Start Remote Download</button>
           </div>
         </div>
 
@@ -254,43 +254,43 @@
             </div>
           </div>
           <div class="control-actions-grid">
-            <button type="button" class="btn-control active-pause" onclick="sendControl('pause-all')">
+            <button type="button" class="btn-control active-pause" onclick="sendControl('pause-all')" title="Pause All Active Torrent Downloads and Uploads on NUC Server">
               <span>||</span> Pause All Swarms
             </button>
-            <button type="button" class="btn-control active-resume" onclick="sendControl('resume-all')">
+            <button type="button" class="btn-control active-resume" onclick="sendControl('resume-all')" title="Resume All Torrent Downloads and Uploads on NUC Server">
               <span>&gt;</span> Resume All Swarms
             </button>
-            <button type="button" class="btn-control active-eco" onclick="sendControl('eco-throttle')">
+            <button type="button" class="btn-control active-eco" onclick="sendControl('eco-throttle')" title="Enable Eco Throttle (500 KB/s limit on NUC)">
               <span>ECO</span> Eco Throttle (500K)
             </button>
-            <button type="button" class="btn-control" onclick="sendControl('unlimit')">
+            <button type="button" class="btn-control" onclick="sendControl('unlimit')" title="Restore Full Unconstrained Bandwidth (Unlimited)">
               <span>MAX</span> Full Uncapped Speed
             </button>
-              <button type="button" class="btn-control active-wake" onclick="sendWol('desktop')">
+              <button type="button" class="btn-control active-wake" onclick="sendWol('desktop')" title="Send Wake-on-LAN Packet to Desktop (NetBIOS: DESKTOP)">
               <span>ON</span> Wake Desktop PC
             </button>
-            <button type="button" class="btn-control active-sleep" onclick="sendSleep('desktop')">
+            <button type="button" class="btn-control active-sleep" onclick="sendSleep('desktop')" title="Put Desktop PC (NetBIOS: DESKTOP) into Sleep Standby">
               <span>ZZ</span> Sleep Desktop Standby
             </button>
-            <button type="button" class="btn-control" onclick="sendControl('run-backup')">
+            <button type="button" class="btn-control" onclick="sendControl('run-backup')" title="Trigger Cloud Disaster Recovery Backup to OneDrive">
               <span>BAK</span> Trigger Cloud Backup
             </button>
-            <button type="button" class="btn-control" onclick="sendControl('run-audit')">
+            <button type="button" class="btn-control" onclick="sendControl('run-audit')" title="Trigger Automated Sentinel Watchdog Health Audit">
               <span>RUN</span> Run Sentinel Audit
             </button>
-            <button type="button" class="btn-control" onclick="sendControl('run-update-computer')">
+            <button type="button" class="btn-control" onclick="sendControl('run-update-computer')" title="Execute System Updates &amp; Optimization Routine on NUC">
               <span>&#128640;</span> Run Update-Computer
             </button>
-            <button type="button" class="btn-control" onclick="sendControl('clean-junk')">
+            <button type="button" class="btn-control" onclick="sendControl('clean-junk')" title="Clean Temporary Files &amp; Cache on NUC Server">
               <span>&#129529;</span> Clean NUC Temp &amp; Junk
             </button>
             <button type="button" class="btn-control btn-reboot" onclick="confirmRebootNuc()" title="Strictly locked behind Microsoft 365 Entra ID SSO or Admin Passkey">
               <span>&#128260;</span> Reboot NUC Server
             </button>
-            <button type="button" class="btn-control" id="btn-probe-speed" onclick="sendControl('run-speedtest')">
+            <button type="button" class="btn-control" id="btn-probe-speed" onclick="sendControl('run-speedtest')" title="Probe Bell Canada Fiber Gigabit Throughput and Jitter">
               <span>&#127760;</span> Probe Bell Speed
             </button>
-            <button type="button" class="btn-control" onclick="sendControl('restart-daemon&daemon=streamhub')">
+            <button type="button" class="btn-control" onclick="sendControl('restart-daemon&daemon=streamhub')" title="Restart Watch Library StreamHub Service on Port 8088">
               <span>&#127916;</span> Restart Watch Library
             </button>
           </div>
@@ -374,10 +374,10 @@
               <span id="terminal-title-text">&#128274; Protected Live Terminal &bull; SSO Required</span>
             </div>
             <div class="terminal-tabs" id="terminal-tabs-group" style="display: none;">
-              <button class="terminal-tab active" id="tab-agy" onclick="loadLog('agy')">[AGY] Active Session (51f0adb8)</button>
-              <button class="terminal-tab" id="tab-sentinel" onclick="loadLog('sentinel')">Sentinel Watchdog</button>
-              <button class="terminal-tab" id="tab-power" onclick="loadLog('power')">Power Optimizer</button>
-              <button class="terminal-tab" id="tab-report" onclick="loadLog('report')">Morning Briefing</button>
+              <button type="button" class="terminal-tab active" id="tab-agy" onclick="loadLog('agy')" title="View Active Antigravity Autonomous Agent Stream (Session 51f0adb8)">[AGY] Active Session (51f0adb8)</button>
+              <button type="button" class="terminal-tab" id="tab-sentinel" onclick="loadLog('sentinel')" title="View Sentinel Watchdog Security &amp; Fleet Health Audit Log">Sentinel Watchdog</button>
+              <button type="button" class="terminal-tab" id="tab-power" onclick="loadLog('power')" title="View Smart Power Optimizer &amp; Dynamic Standby Log">Power Optimizer</button>
+              <button type="button" class="terminal-tab" id="tab-report" onclick="loadLog('report')" title="View Comprehensive Daily Homelab Morning Briefing">Morning Briefing</button>
               <button type="button" class="terminal-tab" onclick="startNewAgySession('desktop')" style="border-color: rgba(59, 130, 246, 0.4); color: #93c5fd; background: rgba(59, 130, 246, 0.1);" title="Launch New AGY Session on Desktop: agy --dangerously-skip-permissions">🚀 New: Desktop</button>
               <button type="button" class="terminal-tab" onclick="startNewAgySession('nuc')" style="border-color: rgba(167, 139, 250, 0.4); color: #c4b5fd; background: rgba(167, 139, 250, 0.1);" title="Launch New AGY Session on NUC: agy --dangerously-skip-permissions">🚀 New: NUC</button>
               <button type="button" class="terminal-tab" id="tab-lock-btn" onclick="lockSSO()" title="Lock SSO Session" style="border-color: rgba(239, 68, 68, 0.4); color: #fca5a5; display: none;">&#128274; Lock</button>
@@ -404,7 +404,7 @@
               
               <!-- One-Click Microsoft 365 Entra ID SSO Unlock Button -->
               <div style="display: flex; gap: 10px; width: 100%; max-width: 440px; margin-top: 6px;">
-                <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" style="flex: 1; padding: 10px 16px; font-size: 0.88rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 0 16px rgba(59, 130, 246, 0.35); cursor: pointer;">
+                <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" title="Authenticate with Microsoft 365 Entra ID SSO" style="flex: 1; padding: 10px 16px; font-size: 0.88rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 0 16px rgba(59, 130, 246, 0.35); cursor: pointer;">
                   <svg width="16" height="16" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;"><path d="M0 0h9.9v9.9H0z" fill="#f25022"/><path d="M11.1 0H21v9.9h-9.9z" fill="#7fba00"/><path d="M0 11.1h9.9V21H0z" fill="#00a4ef"/><path d="M11.1 11.1H21V21h-9.9z" fill="#ffb900"/></svg>
                   <span>Authenticate with Microsoft 365 SSO</span>
                 </button>
@@ -413,7 +413,7 @@
               <!-- PIN / Passkey Unlock Option -->
               <div style="display: flex; gap: 8px; width: 100%; max-width: 440px; margin-top: 4px;">
                 <input type="password" id="terminal-sso-pin" class="sso-pin-input" placeholder="Enter PIN or Passkey (e.g. 2026)..." style="flex: 1;" onkeydown="if(event.key==='Enter') unlockSSO('pin-terminal')" />
-                <button type="button" class="btn btn-secondary" onclick="unlockSSO('pin-terminal')" style="font-size: 0.84rem; padding: 8px 14px;">Unlock &rarr;</button>
+                <button type="button" class="btn btn-secondary" onclick="unlockSSO('pin-terminal')" title="Unlock Terminal with PIN or Passkey" style="font-size: 0.84rem; padding: 8px 14px;">Unlock &rarr;</button>
                 <button type="button" class="btn-nav" onclick="unlockSSO('passkey')" title="Fast Passkey / FIDO2 Unlock" style="font-size: 0.84rem; padding: 8px 12px; border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7;">Passkey &#128273;</button>
               </div>
             </div>
@@ -424,11 +424,11 @@
           
           <!-- Command Quick Chips (Inline Terminal) -->
           <div class="agy-inline-chips" id="agy-inline-chips" style="display: none; gap: 8px; margin-top: 10px; margin-bottom: 4px; flex-wrap: wrap;">
-            <button type="button" class="quick-chip" onclick="triggerInlineQuickChip(this, 'Check cluster health and uptime stats')">⚡ Cluster Health</button>
-            <button type="button" class="quick-chip" onclick="triggerInlineQuickChip(this, 'Run deep codebase audit')">🛡️ Code Audit</button>
-            <button type="button" class="quick-chip" onclick="triggerInlineQuickChip(this, 'Report ISP jitter, loss, and latency')">🌐 ISP Diagnostics</button>
-            <button type="button" class="quick-chip" onclick="triggerInlineQuickChip(this, 'Inspect Cat Cam feeds')">🐱 Cat Cam Status</button>
-            <button type="button" class="quick-chip" onclick="triggerInlineQuickChip(this, 'Review current git branch and changes')">🌿 Git Status</button>
+            <button type="button" class="quick-chip" onclick="triggerInlineQuickChip(this, 'Check cluster health and uptime stats')" title="Query Cluster Health &amp; Uptime Stats">&#9889; Cluster Health</button>
+            <button type="button" class="quick-chip" onclick="triggerInlineQuickChip(this, 'Run deep codebase audit')" title="Execute Deep Codebase Security &amp; Health Audit">&#128737;&#65039; Code Audit</button>
+            <button type="button" class="quick-chip" onclick="triggerInlineQuickChip(this, 'Report ISP jitter, loss, and latency')" title="Report Bell Canada Gigabit Jitter, Packet Loss, and Latency">&#127760; ISP Diagnostics</button>
+            <button type="button" class="quick-chip" onclick="triggerInlineQuickChip(this, 'Inspect Cat Cam feeds')" title="Inspect Live Cat Cam Optical Feeds">&#128049; Cat Cam Status</button>
+            <button type="button" class="quick-chip" onclick="triggerInlineQuickChip(this, 'Review current git branch and changes')" title="Review Current Git Branch &amp; Uncommitted Worktree Changes">&#127807; Git Status</button>
             <button type="button" class="quick-chip" onclick="startNewAgySession('desktop')" style="border-color: #38bdf8; background: rgba(56, 189, 248, 0.2); color: #93c5fd;" title="Launch New AGY Session on Desktop: agy --dangerously-skip-permissions">🚀 New: Desktop</button>
             <button type="button" class="quick-chip" onclick="startNewAgySession('nuc')" style="border-color: #a78bfa; background: rgba(167, 139, 250, 0.2); color: #c4b5fd;" title="Launch New AGY Session on NUC: agy --dangerously-skip-permissions">🚀 New: NUC</button>
           </div>
@@ -436,7 +436,7 @@
           <!-- Remote Instruction Dispatcher for Active AGY Session -->
           <div class="agy-remote-prompt-bar" id="agy-prompt-container" style="display: none; gap: 8px; margin-top: 8px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.08); flex-wrap: wrap;">
             <input type="text" id="agy-prompt-input" placeholder="Transmit instruction / prompt to this active AGY session (M365 SSO Guarded)..." style="flex: 1; min-width: 250px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 10px 14px; color: #f8fafc; font-family: monospace; font-size: 0.88rem;" onkeydown="if(event.key==='Enter') sendAgyPrompt()" />
-            <button type="button" class="btn-nav" style="border-color: #3b82f6; background: rgba(59, 130, 246, 0.25); color: #fff;" onclick="sendAgyPrompt()">Send to Agent &rarr;</button>
+            <button type="button" class="btn-nav" style="border-color: #3b82f6; background: rgba(59, 130, 246, 0.25); color: #fff;" onclick="sendAgyPrompt()" title="Queue Prompt to Active Antigravity Autonomous Session">Send to Agent &rarr;</button>
             <button type="button" class="btn-nav" style="border-color: #10b981; background: rgba(16, 185, 129, 0.25); color: #a7f3d0; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 0 10px rgba(16, 185, 129, 0.25);" onclick="openEmbeddedConsole()" title="Pop out Fullscreen Interactive Console for this session">🖥️ Pop Out Fullscreen Console (51f0adb8) &nearr;</button>
           </div>
         </div>
@@ -449,7 +449,7 @@
             </div>
             <div style="display: flex; gap: 10px; align-items: center;">
               <span class="item-tag online" id="isp-grade-tag">Grade: A+ (Ultra Stable)</span>
-              <button type="button" class="btn btn-secondary" id="btn-probe-now" style="font-size: 0.78rem; padding: 4px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 600;" onclick="testISPNow()">Probe Now</button>
+              <button type="button" class="btn btn-secondary" id="btn-probe-now" title="Probe Bell Canada Gigabit Fiber Diagnostics Now" style="font-size: 0.78rem; padding: 4px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 600;" onclick="testISPNow()">Probe Now</button>
             </div>
           </div>
 
@@ -600,9 +600,9 @@
                 <span id="deckCamTitle">Live Feed: Cat Cam 1 (Living Room Tower)</span>
               </div>
               <div style="display: flex; gap: 8px;">
-                <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="switchDeckCam(1)">Cam 1 (Living)</button>
-                <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="switchDeckCam(2)">Cam 2 (Food)</button>
-                <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="toggleDeckNight()">Night Mode</button>
+                <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="switchDeckCam(1)" title="Switch Deck Feed to Cat Cam 1 (Living Room)">Cam 1 (Living)</button>
+                <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="switchDeckCam(2)" title="Switch Deck Feed to Cat Cam 2 (Perch / Food)">Cam 2 (Food)</button>
+                <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="toggleDeckNight()" title="Toggle Low-Light Night Vision Simulation">Night Mode</button>
         <a href="https://cam.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px; color: #6ee7b7 !important; border-color: rgba(16, 185, 129, 0.4);">Full Portal &rarr;</a>
               </div>
             </div>
@@ -906,8 +906,8 @@
               </div>
             </div>
             <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; gap: 8px; flex-wrap: wrap;">
-              <button type="button" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; color: #4ade80 !important;" onclick="sendWol('desktop')">Wake PC</button>
-              <button type="button" class="btn btn-secondary btn-sleep" style="font-size: 0.8rem; padding: 6px 12px;" onclick="sendSleep('desktop')">Sleep PC</button>
+              <button type="button" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; color: #4ade80 !important;" onclick="sendWol('desktop')" title="Send Wake-on-LAN Packet to Desktop (NetBIOS: DESKTOP)">Wake PC</button>
+              <button type="button" class="btn btn-secondary btn-sleep" style="font-size: 0.8rem; padding: 6px 12px;" onclick="sendSleep('desktop')" title="Put Desktop PC (NetBIOS: DESKTOP) into Sleep Standby">Sleep PC</button>
               <a href="https://torrents.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px;">qBittorrent</a>
             </div>
           </div>
@@ -971,7 +971,7 @@
               </div>
             </div>
             <div class="app-card-footer" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
-              <button type="button" onclick="openEmbeddedConsole()" class="btn-nav" style="font-size: 0.82rem; height: 32px; padding: 4px 14px; background: rgba(16, 185, 129, 0.25); border-color: #10b981; color: #a7f3d0; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+              <button type="button" onclick="openEmbeddedConsole()" class="btn-nav" title="Open Live Interactive Terminal for Active Session 51f0adb8" style="font-size: 0.82rem; height: 32px; padding: 4px 14px; background: rgba(16, 185, 129, 0.25); border-color: #10b981; color: #a7f3d0; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
                 <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span> Open This Session (51f0adb8) &rarr;
               </button>
               <button type="button" onclick="startNewAgySession('desktop')" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px; color: #93c5fd !important; border-color: rgba(59, 130, 246, 0.4);" title="Start New AGY Session on Desktop: agy --dangerously-skip-permissions">
@@ -980,7 +980,7 @@
               <button type="button" onclick="startNewAgySession('nuc')" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px; color: #c4b5fd !important; border-color: rgba(167, 139, 250, 0.4);" title="Start New AGY Session on NUC: agy --dangerously-skip-permissions">
                 + New: NUC &rarr;
               </button>
-              <button type="button" onclick="launchAgySession('app')" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px; color: #60a5fa !important;">
+              <button type="button" onclick="launchAgySession('app')" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px; color: #60a5fa !important;" title="Launch Antigravity Native Desktop CLI via Windows Terminal">
                 Desktop App &nearr;
               </button>
               <button type="button" onclick="launchAgySession('copy')" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 8px; color: #94a3b8 !important;" title="Copy Session ID">
@@ -2450,7 +2450,7 @@
     <div class="magnet-modal">
       <div class="magnet-header">
         <div class="magnet-title">[+] Remote Torrent / Magnet Drop</div>
-        <button class="magnet-close" onclick="closeMagnetModal()">&times;</button>
+        <button type="button" class="magnet-close" onclick="closeMagnetModal()" title="Close Remote Magnet Modal">&times;</button>
       </div>
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.5;">
         Inject any torrent or magnet link into your home server. Traffic is downloaded through Mullvad WireGuard VPN and auto-unpacked.
@@ -2466,7 +2466,7 @@
           <span>Desktop Workstation</span>
         </label>
       </div>
-      <button class="magnet-submit-btn" id="magnet-submit-btn" onclick="submitMagnet()">Start Remote Download</button>
+      <button type="button" class="magnet-submit-btn" id="magnet-submit-btn" onclick="submitMagnet()" title="Inject Torrent Magnet into qBittorrent via Mullvad VPN">Start Remote Download</button>
     </div>
   </div>
   <!-- Embedded Antigravity (AGY) Interactive Terminal Console Modal -->
@@ -2488,7 +2488,7 @@
           <button type="button" class="btn-console-act" onclick="startNewAgySession('nuc')" style="color: #c084fc; border-color: rgba(192, 132, 252, 0.4);" title="Start New AGY Session on NUC with agy --dangerously-skip-permissions">🚀 New: NUC</button>
           <button type="button" class="btn-console-act" onclick="toggleConsoleAutoPoll()" id="btn-console-poll" title="Toggle 2s Live Auto-Polling">Auto-Stream: ON</button>
           <button type="button" class="btn-console-act" onclick="refreshAgyConsole()" title="Refresh Now">&#x21bb;</button>
-          <button type="button" class="btn-console-act" onclick="closeAgyConsole()">&times;</button>
+          <button type="button" class="btn-console-act" onclick="closeAgyConsole()" title="Close Fullscreen Terminal Console">&times;</button>
         </div>
       </div>
 
@@ -2522,7 +2522,7 @@
           
           <!-- One-Click Microsoft 365 Entra ID SSO Unlock Button -->
           <div style="display: flex; gap: 10px; width: 100%; max-width: 440px; margin-top: 6px;">
-            <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" style="flex: 1; padding: 12px 18px; font-size: 0.92rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 0 16px rgba(59, 130, 246, 0.35); cursor: pointer;">
+            <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" title="Authenticate with Microsoft 365 Entra ID SSO" style="flex: 1; padding: 12px 18px; font-size: 0.92rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 0 16px rgba(59, 130, 246, 0.35); cursor: pointer;">
               <svg width="18" height="18" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;"><path d="M0 0h9.9v9.9H0z" fill="#f25022"/><path d="M11.1 0H21v9.9h-9.9z" fill="#7fba00"/><path d="M0 11.1h9.9V21H0z" fill="#00a4ef"/><path d="M11.1 11.1H21V21h-9.9z" fill="#ffb900"/></svg>
               <span>Authenticate with Microsoft 365 SSO</span>
             </button>
@@ -2531,7 +2531,7 @@
           <!-- PIN / Passkey Unlock Option -->
           <div style="display: flex; gap: 8px; width: 100%; max-width: 440px; margin-top: 4px;">
             <input type="password" id="modal-sso-pin" class="sso-pin-input" placeholder="Enter PIN or Passkey (e.g. 2026)..." style="flex: 1;" onkeydown="if(event.key==='Enter') unlockSSO('pin-modal')" />
-            <button type="button" class="btn btn-secondary" onclick="unlockSSO('pin-modal')" style="font-size: 0.88rem; padding: 8px 16px;">Unlock &rarr;</button>
+            <button type="button" class="btn btn-secondary" onclick="unlockSSO('pin-modal')" title="Unlock Terminal with PIN or Passkey" style="font-size: 0.88rem; padding: 8px 16px;">Unlock &rarr;</button>
             <button type="button" class="btn-nav" onclick="unlockSSO('passkey')" title="Fast Passkey / FIDO2 Unlock" style="font-size: 0.88rem; padding: 8px 14px; border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7;">Passkey &#128273;</button>
           </div>
         </div>
@@ -2545,11 +2545,11 @@
 
       <!-- Command Quick Chips -->
       <div class="agy-quick-chips" id="agy-quick-chips" style="display: none;">
-        <button type="button" class="quick-chip" onclick="triggerQuickChip(this, 'Check cluster health and uptime stats')">⚡ Cluster Health</button>
-        <button type="button" class="quick-chip" onclick="triggerQuickChip(this, 'Run deep codebase audit')">🛡️ Code Audit</button>
-        <button type="button" class="quick-chip" onclick="triggerQuickChip(this, 'Report ISP jitter, loss, and latency')">🌐 ISP Diagnostics</button>
-        <button type="button" class="quick-chip" onclick="triggerQuickChip(this, 'Inspect Cat Cam feeds')">🐱 Cat Cam Status</button>
-        <button type="button" class="quick-chip" onclick="triggerQuickChip(this, 'Review current git branch and changes')">🌿 Git Status</button>
+        <button type="button" class="quick-chip" onclick="triggerQuickChip(this, 'Check cluster health and uptime stats')" title="Query Cluster Health &amp; Uptime Stats">&#9889; Cluster Health</button>
+        <button type="button" class="quick-chip" onclick="triggerQuickChip(this, 'Run deep codebase audit')" title="Execute Deep Codebase Security &amp; Health Audit">&#128737;&#65039; Code Audit</button>
+        <button type="button" class="quick-chip" onclick="triggerQuickChip(this, 'Report ISP jitter, loss, and latency')" title="Report Bell Canada Gigabit Jitter, Packet Loss, and Latency">&#127760; ISP Diagnostics</button>
+        <button type="button" class="quick-chip" onclick="triggerQuickChip(this, 'Inspect Cat Cam feeds')" title="Inspect Live Cat Cam Optical Feeds">&#128049; Cat Cam Status</button>
+        <button type="button" class="quick-chip" onclick="triggerQuickChip(this, 'Review current git branch and changes')" title="Review Current Git Branch &amp; Uncommitted Worktree Changes">&#127807; Git Status</button>
         <button type="button" class="quick-chip" onclick="startNewAgySession('desktop')" style="border-color: #38bdf8; background: rgba(56, 189, 248, 0.2); color: #93c5fd;" title="Start New AGY Session on Desktop: agy --dangerously-skip-permissions">🚀 New: Desktop</button>
         <button type="button" class="quick-chip" onclick="startNewAgySession('nuc')" style="border-color: #a78bfa; background: rgba(167, 139, 250, 0.2); color: #c4b5fd;" title="Start New AGY Session on NUC: agy --dangerously-skip-permissions">🚀 New: NUC</button>
       </div>
@@ -2560,7 +2560,7 @@
           <span style="color: #4ade80;">agy</span><span style="color: #94a3b8;">@</span><span style="color: #38bdf8;">digitalresolve</span><span style="color: #f8fafc;">:</span><span style="color: #a78bfa;">~</span><span style="color: #4ade80;">$</span>
         </div>
         <input type="text" id="agy-modal-input" class="agy-modal-input" placeholder="Type prompt or command to transmit to active AGY agent..." onkeydown="if(event.key==='Enter') sendConsolePrompt()" autocomplete="off" spellcheck="false" />
-        <button type="button" class="agy-send-btn" id="agy-modal-send-btn" onclick="sendConsolePrompt()">Execute &crarr;</button>
+        <button type="button" class="agy-send-btn" id="agy-modal-send-btn" onclick="sendConsolePrompt()" title="Execute Prompt in Active AGY Autonomous Session">Execute &crarr;</button>
       </div>
     </div>
   </div>
@@ -2572,7 +2572,7 @@
           <span class="pulse-dot"></span>
           <span class="changelog-title">Digital Resolve System Changelog &amp; Release History</span>
         </div>
-        <button type="button" class="changelog-close" onclick="closeChangelogModal()">&times;</button>
+        <button type="button" class="changelog-close" onclick="closeChangelogModal()" title="Close Changelog Modal">&times;</button>
       </div>
 
       <div class="changelog-body">

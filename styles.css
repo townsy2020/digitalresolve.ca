@@ -151,12 +151,21 @@ body {
   background: #3b82f6;
   color: #fff;
   border: 1px solid #3b82f6;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-primary:hover {
   background: #2563eb;
   border-color: #2563eb;
   transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+}
+
+.btn-primary:active {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.2);
 }
 
 .btn-secondary {
@@ -218,11 +227,54 @@ body {
   color: #ffffff !important;
 }
 
+/* Universal Button Active States & Tactile Feedback */
+.btn:active,
+.btn-primary:active,
+.btn-secondary:active,
 .btn-nav:active,
 .btn-torrent:active,
 .btn-gemini:active,
-.btn-wol:active {
-  transform: translateY(0);
+.btn-wol:active,
+.btn-control:active,
+.btn-action-item:active,
+.btn-console-act:active,
+.terminal-tab:active,
+.quick-chip:active,
+.quick-drop-btn:active,
+.pill-btn:active,
+.pill-magnet:active,
+.magnet-submit-btn:active,
+.magnet-close:active,
+.changelog-close:active,
+.meta-link-btn:active,
+.agy-send-btn:active,
+.version-badge-btn:active {
+  transform: translateY(1px) scale(0.98) !important;
+  transition: transform 0.05s ease, box-shadow 0.05s ease !important;
+}
+
+/* Accessible Focus Ring for Keyboard Navigation */
+button:focus-visible,
+.btn:focus-visible,
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.btn-nav:focus-visible,
+.btn-torrent:focus-visible,
+.btn-gemini:focus-visible,
+.btn-wol:focus-visible,
+.btn-control:focus-visible,
+.btn-action-item:focus-visible,
+.btn-console-act:focus-visible,
+.terminal-tab:focus-visible,
+.quick-chip:focus-visible,
+.quick-drop-btn:focus-visible,
+.pill-btn:focus-visible,
+.magnet-submit-btn:focus-visible,
+.agy-send-btn:focus-visible,
+.meta-link-btn:focus-visible {
+  outline: 2px solid #38bdf8 !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.5) !important;
 }
 
 .wol-dropdown {
