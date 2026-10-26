@@ -27,13 +27,25 @@
           <a href="https://torrents.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn btn-torrent">
             Check Torrents <span class="dropdown-arrow">&#9662;</span>
           </a>
-          <div class="dropdown-menu">
+          <div class="dropdown-menu torrent-dropdown">
             <a href="https://torrents.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="dropdown-item">
               <span class="dropdown-dot dot-1"></span> Torrents (Desktop)
             </a>
             <a href="https://torrents2.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="dropdown-item">
               <span class="dropdown-dot dot-2"></span> Torrents (NUC)
+              <span class="item-tag" id="nuc-disk-tag">D: -- GB free</span>
             </a>
+            <div class="dropdown-divider"></div>
+            <div class="disk-widget" id="nuc-disk-widget">
+              <div class="disk-widget-header">
+                <span class="disk-label">NUC Storage (D:)</span>
+                <span class="disk-val" id="nuc-disk-val">Checking...</span>
+              </div>
+              <div class="disk-bar-bg">
+                <div class="disk-bar-fill" id="nuc-disk-bar" style="width: 0%;"></div>
+              </div>
+              <div class="disk-subtext" id="nuc-disk-sub">Querying drive via WMI...</div>
+            </div>
           </div>
         </div>
 
@@ -217,8 +229,9 @@
         .then(r => r.json())
         .then(data => {
           if (data.online) {
-            showToast('success', `${dev.name} is Online`, `${data.latencyMs} ms latency &bull; DNS connected`, 5000);
-            updateStatusUI(target, true, data.latencyMs);
+            const diskSub = (data.disk && data.disk.drive) ? ` &bull; D: ${data.disk.freeGB} GB free (${data.disk.usedPercent}% used)` : '';
+            showToast('success', `${dev.name} is Online`, `${data.latencyMs} ms latency${diskSub}`, 6000);
+            updateStatusUI(target, true, data.latencyMs, data.disk);
           } else {
             showToast('error', `${dev.name} is Offline`, `No ping response from ${data.ip}`, 5000);
             updateStatusUI(target, false);
@@ -253,8 +266,9 @@
               .then(data => {
                 if (data.online) {
                   clearInterval(pollInterval);
-                  showToast('success', `${dev.name} is Awake & Online!`, `${data.latencyMs} ms latency &bull; ${data.dns}`, 6000);
-                  updateStatusUI(target, true, data.latencyMs);
+                  const diskSub = (data.disk && data.disk.drive) ? ` &bull; D: ${data.disk.freeGB} GB free` : '';
+                  showToast('success', `${dev.name} is Awake & Online!`, `${data.latencyMs} ms latency${diskSub}`, 6000);
+                  updateStatusUI(target, true, data.latencyMs, data.disk);
                 } else if (attempts >= maxAttempts) {
                   clearInterval(pollInterval);
                   showToast('error', `${dev.name} Not Responding`, 'Machine may still be booting POST.', 6000);
@@ -268,7 +282,7 @@
         });
     }
 
-    function updateStatusUI(target, isOnline, latencyMs = null) {
+    function updateStatusUI(target, isOnline, latencyMs = null, disk = null) {
       const dot = document.getElementById(`badge-${target}`);
       const tag = document.getElementById(`status-tag-${target}`);
       const lat = document.getElementById(`latency-${target}`);
@@ -282,15 +296,46 @@
         tag.className = `item-tag ${isOnline ? 'online' : 'offline'}`;
       }
       if (lat && latencyMs !== null) {
-        lat.textContent = `${latencyMs} ms`;
+        if (disk && disk.freeGB) {
+          lat.textContent = `${latencyMs} ms \u2022 D: ${Math.round(disk.freeGB)} GB`;
+        } else {
+          lat.textContent = `${latencyMs} ms`;
+        }
         lat.className = 'item-tag online';
+      }
+
+      // Update NUC D: drive widgets
+      if (target === 'nuc' && disk) {
+        const diskTag = document.getElementById('nuc-disk-tag');
+        const diskVal = document.getElementById('nuc-disk-val');
+        const diskBar = document.getElementById('nuc-disk-bar');
+        const diskSub = document.getElementById('nuc-disk-sub');
+
+        if (diskTag) {
+          diskTag.textContent = `D: ${Math.round(disk.freeGB)} GB free`;
+          diskTag.className = disk.usedPercent > 85 ? 'item-tag offline' : 'item-tag online';
+        }
+        if (diskVal) {
+          diskVal.textContent = `${disk.freeGB} GB Free`;
+        }
+        if (diskBar) {
+          diskBar.style.width = `${disk.usedPercent}%`;
+          if (disk.usedPercent > 85) {
+            diskBar.classList.add('warning');
+          } else {
+            diskBar.classList.remove('warning');
+          }
+        }
+        if (diskSub) {
+          diskSub.textContent = `${disk.usedGB} GB used of ${disk.totalGB} GB (${disk.usedPercent}%)`;
+        }
       }
     }
 
     // Check status on load
     window.addEventListener('DOMContentLoaded', () => {
-      fetch(`${GATEWAY}/status?target=nuc`).then(r => r.json()).then(d => updateStatusUI('nuc', d.online, d.latencyMs)).catch(()=>{});
-      fetch(`${GATEWAY}/status?target=desktop`).then(r => r.json()).then(d => updateStatusUI('desktop', d.online, d.latencyMs)).catch(()=>{});
+      fetch(`${GATEWAY}/status?target=nuc`).then(r => r.json()).then(d => updateStatusUI('nuc', d.online, d.latencyMs, d.disk)).catch(()=>{});
+      fetch(`${GATEWAY}/status?target=desktop`).then(r => r.json()).then(d => updateStatusUI('desktop', d.online, d.latencyMs, d.disk)).catch(()=>{});
     });
   </script>
 </body>
