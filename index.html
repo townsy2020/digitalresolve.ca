@@ -36,6 +36,9 @@
               <span class="dropdown-dot dot-2"></span> Torrents (NUC)
               <span class="item-tag" id="nuc-disk-tag">D: -- GB free</span>
             </a>
+            <a href="https://files.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="dropdown-item">
+              <span class="dropdown-dot dot-2"></span> Browse Media &amp; Files (NUC)
+            </a>
             <div class="dropdown-divider"></div>
             <div class="disk-widget" id="nuc-disk-widget">
               <div class="disk-widget-header">
@@ -149,6 +152,96 @@
             <div class="card-icon">&#128269;</div>
             <h3>Technical Advisory</h3>
             <p>Clear, actionable technical guidance to help you choose the right tools and build lasting solutions.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="fleet" class="fleet-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Telemetry</span>
+          <h2>Infrastructure &amp; Fleet Status</h2>
+          <p>Real-time operational health of my 24/7 home server and cloud-connected systems.</p>
+        </div>
+
+        <div class="fleet-grid">
+          <!-- NUC Server Card -->
+          <div class="fleet-card">
+            <div class="fleet-card-header">
+              <div class="fleet-title-group">
+                <span class="dropdown-dot dot-2" id="fleet-dot-nuc"></span>
+                <span class="fleet-title">NUC Home Server</span>
+              </div>
+              <span class="item-tag online" id="fleet-badge-nuc">24/7 Server</span>
+            </div>
+            <div class="fleet-metrics">
+              <div class="metric-row">
+                <span class="metric-name">Network Latency</span>
+                <span class="metric-val" id="fleet-latency-nuc">0 ms (LAN)</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-name">D: Drive Storage</span>
+                <span class="metric-val" id="fleet-storage-nuc">496.3 GB Free (73%)</span>
+              </div>
+              <div class="disk-bar-bg">
+                <div class="disk-bar-fill" id="fleet-bar-nuc" style="width: 73.4%;"></div>
+              </div>
+              <div class="metric-row">
+                <span class="metric-name">Live Active Services</span>
+                <span class="metric-val" style="font-size: 0.78rem;">qBittorrent &bull; FileBrowser &bull; WoL Gateway</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Desktop Workstation Card -->
+          <div class="fleet-card">
+            <div class="fleet-card-header">
+              <div class="fleet-title-group">
+                <span class="dropdown-dot dot-1" id="fleet-dot-desktop"></span>
+                <span class="fleet-title">Desktop Workstation</span>
+              </div>
+              <span class="item-tag online" id="fleet-badge-desktop">Online</span>
+            </div>
+            <div class="fleet-metrics">
+              <div class="metric-row">
+                <span class="metric-name">Network Latency</span>
+                <span class="metric-val" id="fleet-latency-desktop">0 ms (LAN)</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-name">Power Management</span>
+                <span class="metric-val">Remote Wake-on-LAN &bull; Sleep</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-name">Live Active Services</span>
+                <span class="metric-val" style="font-size: 0.78rem;">qBittorrent (8080) &bull; Cloudflare Tunnel</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cloudflare Zero Trust Card -->
+          <div class="fleet-card">
+            <div class="fleet-card-header">
+              <div class="fleet-title-group">
+                <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+                <span class="fleet-title">Cloudflare Edge &amp; Security</span>
+              </div>
+              <span class="item-tag online">Protected</span>
+            </div>
+            <div class="fleet-metrics">
+              <div class="metric-row">
+                <span class="metric-name">Active Tunnels</span>
+                <span class="metric-val">Dual Encrypted Tunnels</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-name">Identity Provider</span>
+                <span class="metric-val">Microsoft 365 Entra ID SSO</span>
+              </div>
+              <div class="metric-row">
+                <span class="metric-name">Perimeter Security</span>
+                <span class="metric-val">Geo-Shield &bull; 0 Open Ports</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -391,6 +484,28 @@
         if (diskSub) {
           diskSub.innerHTML = `${disk.usedGB} GB used of ${disk.totalGB} GB (${disk.usedPercent}%)${speedNote}`;
         }
+      }
+
+      // Update Fleet Cards
+      const fDot = document.getElementById(`fleet-dot-${target}`);
+      const fBadge = document.getElementById(`fleet-badge-${target}`);
+      const fLat = document.getElementById(`fleet-latency-${target}`);
+      if (fDot) {
+        fDot.style.backgroundColor = isOnline ? '#22c55e' : '#ef4444';
+        fDot.style.boxShadow = isOnline ? '0 0 8px #22c55e' : '0 0 8px #ef4444';
+      }
+      if (fBadge) {
+        fBadge.textContent = isOnline ? (target === 'nuc' ? '24/7 Server' : 'Online') : 'Standby / Sleeping';
+        fBadge.className = isOnline ? 'item-tag online' : 'item-tag offline';
+      }
+      if (fLat && latencyMs !== null) {
+        fLat.textContent = isOnline ? `${latencyMs} ms (LAN)` : 'Standby';
+      }
+      if (target === 'nuc' && disk) {
+        const fStorage = document.getElementById('fleet-storage-nuc');
+        const fBar = document.getElementById('fleet-bar-nuc');
+        if (fStorage) fStorage.textContent = `${disk.freeGB} GB Free (${disk.usedPercent}%)`;
+        if (fBar) fBar.style.width = `${disk.usedPercent}%`;
       }
     }
 
