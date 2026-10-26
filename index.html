@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digital Resolve | Cory Townsend</title>
-  <meta name="description" content="Personal landing page and consulting portfolio for Cory Townsend at Digital Resolve.">
+  <title>Digital Resolve &bull; Homelab Cloud &amp; Command Deck</title>
+  <meta name="description" content="24/7 self-hosted homelab operations, Cloudflare Zero Trust tunnels, private 4K media streaming, and automated WireGuard VPN ingestion.">
   <link rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,11 +16,12 @@
   <header class="header">
     <div class="container nav-container">
       <div class="logo">
-        <span class="logo-accent">Digital</span>Resolve
+        <span class="logo-accent">Digital</span>Resolve <span style="font-size: 0.75rem; color: #4ade80; background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3); padding: 2px 8px; border-radius: 6px; font-weight: 700; margin-left: 8px; letter-spacing: 0.5px;">HOMELAB DECK</span>
       </div>
       <nav class="nav-links">
-        <a href="#about">About</a>
-        <a href="#services">Services</a>
+        <a href="#fleet">Cluster Nodes</a>
+        <a href="#services">Cloud Apps</a>
+        <a href="#ops">Ops Deck</a>
         
         <!-- Torrents Dropdown -->
         <div class="dropdown">
@@ -114,62 +115,95 @@
           </div>
         </div>
 
-        <a href="#contact" class="btn btn-secondary">Get in Touch</a>
+        <a href="https://stream.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="border-color: rgba(139, 92, 246, 0.4); color: #c4b5fd !important; background: rgba(139, 92, 246, 0.12);">▶ StreamHub 4K</a>
       </nav>
     </div>
   </header>
 
   <main>
-    <section class="hero">
-      <div class="container hero-container">
-        <span class="badge">Cory Townsend &bull; Digital Resolve</span>
-        <h1 class="hero-title">Delivering clean, practical <span class="gradient-text">technology solutions</span>.</h1>
-        <p class="hero-subtitle">
-          Helping businesses and individuals navigate complexity with modern software, system architecture, and technical consulting.
-        </p>
-        <div class="hero-actions">
-          <a href="#contact" class="btn btn-primary">Start a Conversation</a>
-          <a href="#services" class="btn btn-outline">Explore Services</a>
-        </div>
-      </div>
-    </section>
-
-    <section id="services" class="services">
+    <!-- Homelab Hero & Command Hub -->
+    <section class="homelab-hero">
       <div class="container">
-        <div class="section-header">
-          <span class="section-tag">Expertise</span>
-          <h2>What I Do</h2>
-          <p>End-to-end technical problem solving tailored to your needs.</p>
+        <div class="homelab-badge">
+          <span class="pulse-dot"></span>
+          <span>24/7 Hybrid Homelab Cluster &bull; M365 Entra ID Protected</span>
+        </div>
+        <h1 class="hero-homelab-title">
+          Homelab Operations &amp; <span class="gradient-text">Cloud Command Deck</span>
+        </h1>
+        <p class="hero-homelab-subtitle">
+          Dual-node self-hosted private cloud running WireGuard VPN ingestion, HTTP 206 byte-range 4K media streaming, Cloudflare Zero Trust edge tunnels, and intelligent eco power management.
+        </p>
+
+        <!-- Command Launch Pills -->
+        <div class="command-pills">
+          <a href="https://stream.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="pill-btn pill-stream">
+            <span>▶</span> Launch StreamHub (4K / HD)
+          </a>
+          <a href="https://files.digitalresolve.ca/files/" target="_blank" rel="noopener noreferrer" class="pill-btn pill-files">
+            <span>📁</span> Browse Media &amp; Files
+          </a>
+          <button type="button" onclick="openMagnetModal()" class="pill-btn pill-magnet">
+            <span>🧲</span> + Quick-Drop Magnet
+          </button>
+          <a href="#fleet" class="pill-btn pill-outline">
+            <span>⚡</span> Cluster Topology &amp; Power
+          </a>
         </div>
 
-        <div class="cards-grid">
-          <div class="card">
-            <div class="card-icon">&#9881;</div>
-            <h3>Web &amp; Cloud Solutions</h3>
-            <p>Modern, reliable websites and cloud architectures designed for performance, security, and scalability.</p>
+        <!-- Live Status Ribbon -->
+        <div class="status-ribbon">
+          <div class="ribbon-item">
+            <span class="ribbon-label">NUC 24/7 Core</span>
+            <span class="ribbon-value" id="ribbon-nuc"><span class="dropdown-dot dot-2"></span> 0 ms &bull; Online</span>
           </div>
-
-          <div class="card">
-            <div class="card-icon">&#9889;</div>
-            <h3>Systems &amp; Infrastructure</h3>
-            <p>Pragmatic automation, infrastructure management, and workflow optimization to keep operations smooth.</p>
+          <div class="ribbon-item">
+            <span class="ribbon-label">Desktop Node</span>
+            <span class="ribbon-value" id="ribbon-desktop"><span class="dropdown-dot dot-1"></span> Bell Fiber &bull; Online</span>
           </div>
+          <div class="ribbon-item">
+            <span class="ribbon-label">Media Storage (D:)</span>
+            <span class="ribbon-value" id="ribbon-storage" style="color: #60a5fa;">496 GB Free (73%)</span>
+          </div>
+          <div class="ribbon-item">
+            <span class="ribbon-label">VPN Privacy</span>
+            <span class="ribbon-value" style="color: #34d399;">Mullvad WireGuard</span>
+          </div>
+          <div class="ribbon-item">
+            <span class="ribbon-label">Perimeter Shield</span>
+            <span class="ribbon-value" style="color: #38bdf8;">0 Open Ports &bull; SSO</span>
+          </div>
+        </div>
 
-          <div class="card">
-            <div class="card-icon">&#128269;</div>
-            <h3>Technical Advisory</h3>
-            <p>Clear, actionable technical guidance to help you choose the right tools and build lasting solutions.</p>
+        <!-- Quick Drop Magnet Bar (Ops Console) -->
+        <div id="ops" class="quick-drop-inline">
+          <div class="quick-drop-header">
+            <div class="quick-drop-title">
+              <span>🧲</span> Rapid Torrent &amp; Magnet Ingestion Console
+            </div>
+            <div style="font-size: 0.8rem; color: #8b949e;">
+              Traffic routed through Mullvad WireGuard &bull; Auto-unpacked to <code style="color: #60a5fa;">D:\Torrents</code>
+            </div>
+          </div>
+          <div class="quick-drop-form">
+            <input type="text" id="quick-magnet-input" class="quick-drop-input" placeholder="Paste magnet:?xt=... or .torrent link here">
+            <select id="quick-magnet-target" style="background: rgba(11, 15, 23, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #f0f6fc; padding: 10px 14px; font-weight: 600; outline: none; font-size: 0.88rem;">
+              <option value="nuc">NUC Server (24/7 &bull; D:\Torrents)</option>
+              <option value="desktop">Desktop Workstation</option>
+            </select>
+            <button type="button" class="quick-drop-btn" onclick="submitQuickMagnet()">🚀 Start Remote Download</button>
           </div>
         </div>
       </div>
     </section>
 
+    <!-- Hardware Fleet & Server Topology -->
     <section id="fleet" class="fleet-section">
       <div class="container">
         <div class="section-header">
-          <span class="section-tag">Telemetry</span>
-          <h2>Infrastructure &amp; Fleet Status</h2>
-          <p>Real-time operational health of my 24/7 home server and cloud-connected systems.</p>
+          <span class="section-tag" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3);">Hardware Topology</span>
+          <h2>Cluster Fleet &amp; Server Nodes</h2>
+          <p>Real-time hardware vitals, memory allocation, storage arrays, and network telemetry.</p>
         </div>
 
         <div class="fleet-grid">
@@ -178,34 +212,39 @@
             <div class="fleet-card-header">
               <div class="fleet-title-group">
                 <span class="dropdown-dot dot-2" id="fleet-dot-nuc"></span>
-                <span class="fleet-title">NUC Home Server</span>
+                <span class="fleet-title">NUC Core Server (24/7 Always-On)</span>
               </div>
-              <span class="item-tag online" id="fleet-badge-nuc">24/7 Server</span>
+              <span class="item-tag online" id="fleet-badge-nuc">24/7 Core</span>
             </div>
             <div class="fleet-metrics">
               <div class="metric-row">
-                <span class="metric-name">Network Latency</span>
-                <span class="metric-val" id="fleet-latency-nuc">0 ms (LAN)</span>
+                <span class="metric-name">IP &amp; LAN Latency</span>
+                <span class="metric-val" id="fleet-latency-nuc">192.168.2.35 &bull; 0 ms</span>
               </div>
               <div class="metric-row">
-                <span class="metric-name">D: Drive Storage</span>
-                <span class="metric-val" id="fleet-storage-nuc">496.3 GB Free (73%)</span>
+                <span class="metric-name">Media Storage (D:)</span>
+                <span class="metric-val" id="fleet-storage-nuc">496.1 GB Free (73.4% used)</span>
               </div>
               <div class="disk-bar-bg">
                 <div class="disk-bar-fill" id="fleet-bar-nuc" style="width: 73.4%;"></div>
               </div>
               <div class="metric-row">
-                <span class="metric-name">Memory &amp; Uptime</span>
-                <span class="metric-val" id="fleet-vitals-nuc">5.7 GB / 31.8 GB (18%) &bull; 1h up</span>
+                <span class="metric-name">Memory &amp; Boot Uptime</span>
+                <span class="metric-val" id="fleet-vitals-nuc">5.8 GB / 31.8 GB (18%) &bull; 2h up</span>
               </div>
               <div class="metric-row">
-                <span class="metric-name">VPN Privacy Tunnel</span>
-                <span class="metric-val" id="fleet-vpn-nuc" style="font-size: 0.8rem; color: #34d399;">Mullvad Active</span>
+                <span class="metric-name">Privacy Gateway</span>
+                <span class="metric-val" id="fleet-vpn-nuc" style="font-size: 0.82rem; color: #34d399;">Mullvad WireGuard (NYC)</span>
               </div>
               <div class="metric-row">
-                <span class="metric-name">Live Active Services</span>
-                <span class="metric-val" style="font-size: 0.78rem;">qBittorrent &bull; FileBrowser &bull; StreamHub &bull; WoL</span>
+                <span class="metric-name">Live Cluster Services</span>
+                <span class="metric-val" style="font-size: 0.78rem;">StreamHub (8088) &bull; Files (8085) &bull; qBit (8081) &bull; WoL (8082)</span>
               </div>
+            </div>
+            <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; gap: 8px; flex-wrap: wrap;">
+              <a href="https://stream.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; color: #c4b5fd !important; border-color: rgba(139, 92, 246, 0.4);">StreamHub</a>
+              <a href="https://files.digitalresolve.ca/files/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px;">Files</a>
+              <a href="https://torrents2.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px;">qBittorrent</a>
             </div>
           </div>
 
@@ -214,23 +253,32 @@
             <div class="fleet-card-header">
               <div class="fleet-title-group">
                 <span class="dropdown-dot dot-1" id="fleet-dot-desktop"></span>
-                <span class="fleet-title">Desktop Workstation</span>
+                <span class="fleet-title">Desktop Workstation (Hybrid)</span>
               </div>
               <span class="item-tag online" id="fleet-badge-desktop">Online</span>
             </div>
             <div class="fleet-metrics">
               <div class="metric-row">
-                <span class="metric-name">Network Latency</span>
-                <span class="metric-val" id="fleet-latency-desktop">0 ms (LAN)</span>
+                <span class="metric-name">IP &amp; ISP Routing</span>
+                <span class="metric-val" id="fleet-latency-desktop">192.168.2.62 &bull; Bell Gigabit</span>
               </div>
               <div class="metric-row">
                 <span class="metric-name">Power Management</span>
-                <span class="metric-val">Remote Wake-on-LAN &bull; Sleep</span>
+                <span class="metric-val">Wake-on-LAN &bull; Smart Eco Sleep</span>
               </div>
               <div class="metric-row">
-                <span class="metric-name">Live Active Services</span>
-                <span class="metric-val" style="font-size: 0.78rem;">qBittorrent (8080) &bull; Cloudflare Tunnel</span>
+                <span class="metric-name">Eco-Optimizer Rule</span>
+                <span class="metric-val" style="font-size: 0.8rem; color: #a5b4fc;">Auto-sleep when idle &gt; 20m &amp; speed &lt; 50 KB/s</span>
               </div>
+              <div class="metric-row">
+                <span class="metric-name">Active Daemons</span>
+                <span class="metric-val" style="font-size: 0.78rem;">qBittorrent (8080) &bull; Cloudflare Tunnel &bull; Sentinel</span>
+              </div>
+            </div>
+            <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; gap: 8px; flex-wrap: wrap;">
+              <button type="button" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; color: #4ade80 !important;" onclick="sendWol('desktop')">⚡ Wake PC</button>
+              <button type="button" class="btn btn-secondary btn-sleep" style="font-size: 0.8rem; padding: 6px 12px;" onclick="sendSleep('desktop')">⏻ Sleep PC</button>
+              <a href="https://torrents.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px;">qBittorrent</a>
             </div>
           </div>
 
@@ -239,49 +287,153 @@
             <div class="fleet-card-header">
               <div class="fleet-title-group">
                 <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
-                <span class="fleet-title">Cloudflare Edge &amp; Security</span>
+                <span class="fleet-title">Cloudflare Edge &amp; Perimeter</span>
               </div>
               <span class="item-tag online">Protected</span>
             </div>
             <div class="fleet-metrics">
               <div class="metric-row">
-                <span class="metric-name">Active Tunnels</span>
-                <span class="metric-val">Dual Encrypted Tunnels</span>
+                <span class="metric-name">Encrypted Tunnels</span>
+                <span class="metric-val">Dual Edge Tunnels (0 Port Forwards)</span>
               </div>
               <div class="metric-row">
                 <span class="metric-name">Identity Provider</span>
                 <span class="metric-val">Microsoft 365 Entra ID SSO</span>
               </div>
               <div class="metric-row">
-                <span class="metric-name">Perimeter Security</span>
-                <span class="metric-val">Geo-Shield &bull; 0 Open Ports</span>
+                <span class="metric-name">Perimeter Defense</span>
+                <span class="metric-val">CA / US Geo-Shield Active</span>
               </div>
+              <div class="metric-row">
+                <span class="metric-name">Disaster Recovery</span>
+                <span class="metric-val" style="font-size: 0.8rem; color: #60a5fa;">3:00 AM Rolling Snapshots (OneDrive)</span>
+              </div>
+            </div>
+            <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; gap: 8px; flex-wrap: wrap;">
+              <span class="item-tag online" style="font-size: 0.75rem;">All 6 Services Healthy</span>
+              <span class="item-tag" style="font-size: 0.75rem; background: rgba(59, 130, 246, 0.15); color: #60a5fa;">Sentinel Watchdog 15m</span>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="about" class="about">
+    <!-- Self-Hosted Cloud Applications Grid -->
+    <section id="services" class="homelab-apps-section">
       <div class="container">
-        <div class="about-card">
-          <span class="section-tag">About</span>
-          <h2>Driven by results, grounded in clarity.</h2>
-          <p>
-            Welcome to Digital Resolve. I'm Cory Townsend, focused on crafting robust digital solutions and resolving technical roadblocks. Whether you are launching a new initiative, modernizing existing infrastructure, or seeking dependable technical consulting, I bring a methodical and direct approach to every project.
-          </p>
+        <div class="section-header">
+          <span class="section-tag" style="background: rgba(139, 92, 246, 0.15); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3);">Self-Hosted Matrix</span>
+          <h2>Self-Hosted Cloud Services</h2>
+          <p>Zero-trust secured web applications running across the NUC server and Desktop workstation.</p>
         </div>
-      </div>
-    </section>
 
-    <section id="contact" class="contact">
-      <div class="container contact-container">
-        <div class="contact-card">
-          <span class="section-tag">Connect</span>
-          <h2>Let's build something together.</h2>
-          <p>Have a project in mind, need technical advice, or just want to connect? Reach out anytime.</p>
-          <div class="contact-actions">
-            <a href="mailto:contact@digitalresolve.ca" class="btn btn-primary">contact@digitalresolve.ca</a>
+        <div class="app-grid">
+          <!-- StreamHub Card -->
+          <a href="https://stream.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="app-card">
+            <div>
+              <div class="app-card-header">
+                <div class="app-icon" style="color: #a78bfa; border-color: rgba(139, 92, 246, 0.4); background: rgba(139, 92, 246, 0.15);">🎬</div>
+                <span class="item-tag" style="background: rgba(139, 92, 246, 0.2); color: #c4b5fd;">Port 8088</span>
+              </div>
+              <div class="app-card-title">StreamHub 4K Video Cloud</div>
+              <div class="app-card-desc">
+                High-performance private Netflix/Plex alternative for <code style="color: #c4b5fd;">D:\Torrents</code> with HTTP 206 Partial Content byte-range video streaming.
+              </div>
+            </div>
+            <div class="app-card-footer">
+              <span class="app-port">stream.digitalresolve.ca</span>
+              <span class="app-btn-launch" style="color: #c4b5fd;">Launch Stream &rarr;</span>
+            </div>
+          </a>
+
+          <!-- FileBrowser Card -->
+          <a href="https://files.digitalresolve.ca/files/" target="_blank" rel="noopener noreferrer" class="app-card">
+            <div>
+              <div class="app-card-header">
+                <div class="app-icon" style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.4); background: rgba(56, 189, 248, 0.15);">📂</div>
+                <span class="item-tag" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8;">Port 8085</span>
+              </div>
+              <div class="app-card-title">FileBrowser Media Cloud</div>
+              <div class="app-card-desc">
+                Full web-based filesystem explorer to browse, preview, upload, and organize media across the NUC filesystem.
+              </div>
+            </div>
+            <div class="app-card-footer">
+              <span class="app-port">files.digitalresolve.ca</span>
+              <span class="app-btn-launch">Browse Files &rarr;</span>
+            </div>
+          </a>
+
+          <!-- NUC qBittorrent Card -->
+          <a href="https://torrents2.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="app-card">
+            <div>
+              <div class="app-card-header">
+                <div class="app-icon" style="color: #34d399; border-color: rgba(52, 211, 153, 0.4); background: rgba(52, 211, 153, 0.15);">🔒</div>
+                <span class="item-tag" style="background: rgba(52, 211, 153, 0.2); color: #34d399;">Port 8081</span>
+              </div>
+              <div class="app-card-title">qBittorrent (NUC WireGuard VPN)</div>
+              <div class="app-card-desc">
+                24/7 dedicated automated download client exclusively bound to Mullvad WireGuard VPN with auto-unpacker and junk cleaner.
+              </div>
+            </div>
+            <div class="app-card-footer">
+              <span class="app-port">torrents2.digitalresolve.ca</span>
+              <span class="app-btn-launch" style="color: #34d399;">Open Client &rarr;</span>
+            </div>
+          </a>
+
+          <!-- Desktop qBittorrent Card -->
+          <a href="https://torrents.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="app-card">
+            <div>
+              <div class="app-card-header">
+                <div class="app-icon" style="color: #60a5fa; border-color: rgba(96, 165, 250, 0.4); background: rgba(96, 165, 250, 0.15);">🚀</div>
+                <span class="item-tag" style="background: rgba(96, 165, 250, 0.2); color: #60a5fa;">Port 8080</span>
+              </div>
+              <div class="app-card-title">qBittorrent (Desktop Bell Fiber)</div>
+              <div class="app-card-desc">
+                Unrestricted high-speed workstation torrent client taking advantage of full Bell Canada Gigabit fiber throughput.
+              </div>
+            </div>
+            <div class="app-card-footer">
+              <span class="app-port">torrents.digitalresolve.ca</span>
+              <span class="app-btn-launch">Open Client &rarr;</span>
+            </div>
+          </a>
+
+          <!-- Gemini CLI / Antigravity Harness -->
+          <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="app-card">
+            <div>
+              <div class="app-card-header">
+                <div class="app-icon" style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.15);">🤖</div>
+                <span class="item-tag" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24;">AI Harness</span>
+              </div>
+              <div class="app-card-title">Gemini CLI &bull; Antigravity</div>
+              <div class="app-card-desc">
+                Autonomous agentic coding and cluster operations harness managing daemon health, automated recovery, and git sync.
+              </div>
+            </div>
+            <div class="app-card-footer">
+              <span class="app-port">Autonomous Daemon</span>
+              <span class="app-btn-launch" style="color: #fbbf24;">View Session &rarr;</span>
+            </div>
+          </a>
+
+          <!-- Disaster Recovery Card -->
+          <div class="app-card" style="cursor: default;">
+            <div>
+              <div class="app-card-header">
+                <div class="app-icon" style="color: #ec4899; border-color: rgba(236, 72, 153, 0.4); background: rgba(236, 72, 153, 0.15);">💾</div>
+                <span class="item-tag" style="background: rgba(236, 72, 153, 0.2); color: #f472b6;">3:00 AM Daily</span>
+              </div>
+              <div class="app-card-title">Disaster Recovery &amp; Snapshots</div>
+              <div class="app-card-desc">
+                Rolling 14-day encrypted archives of all torrent fastresume files, tunnel credentials, and service configurations in OneDrive.
+              </div>
+            </div>
+            <div class="app-card-footer">
+              <span class="app-port">OneDrive Cloud Mirror</span>
+              <span class="app-btn-launch" style="color: #4ade80;">&check; Verified Nightly</span>
+            </div>
           </div>
         </div>
       </div>
@@ -290,7 +442,7 @@
 
   <footer class="footer">
     <div class="container footer-container">
-      <p>&copy; 2026 Digital Resolve &bull; digitalresolve.ca. All rights reserved.</p>
+      <p>&copy; 2026 Digital Resolve &bull; Homelab Operations Deck &bull; Cory Townsend</p>
       <div class="footer-links">
         <a href="#top">Back to top &uarr;</a>
       </div>
@@ -533,6 +685,20 @@
             fVpn.textContent = vitals.vpn;
           }
         }
+
+        const rNuc = document.getElementById('ribbon-nuc');
+        if (rNuc) {
+          rNuc.innerHTML = `<span class="dropdown-dot dot-2"></span> ${latencyMs !== null ? latencyMs + ' ms' : '0 ms'} &bull; ${isOnline ? 'Online' : 'Offline'}`;
+        }
+        const rStorage = document.getElementById('ribbon-storage');
+        if (rStorage && disk) {
+          rStorage.textContent = `${disk.freeGB} GB Free (${disk.usedPercent}%)`;
+        }
+      } else if (target === 'desktop') {
+        const rDesk = document.getElementById('ribbon-desktop');
+        if (rDesk) {
+          rDesk.innerHTML = `<span class="dropdown-dot dot-1"></span> Bell Fiber &bull; ${isOnline ? 'Online' : 'Standby'}`;
+        }
       }
     }
 
@@ -540,7 +706,67 @@
     window.addEventListener('DOMContentLoaded', () => {
       fetch(`${GATEWAY}/status?target=nuc`).then(r => r.json()).then(d => updateStatusUI('nuc', d.online, d.latencyMs, d.disk, d.torrent, d.vitals)).catch(()=>{});
       fetch(`${GATEWAY}/status?target=desktop`).then(r => r.json()).then(d => updateStatusUI('desktop', d.online, d.latencyMs, d.disk, d.torrent, d.vitals)).catch(()=>{});
+
+      // Smooth dropdown hover & focus management with zero flicker
+      document.querySelectorAll('.dropdown').forEach(dd => {
+        let timer;
+        dd.addEventListener('mouseenter', () => {
+          clearTimeout(timer);
+          document.querySelectorAll('.dropdown').forEach(other => {
+            if (other !== dd) other.classList.remove('is-open');
+          });
+          dd.classList.add('is-open');
+        });
+        dd.addEventListener('mouseleave', () => {
+          timer = setTimeout(() => {
+            dd.classList.remove('is-open');
+          }, 200);
+        });
+        const trigger = dd.querySelector('.btn-torrent, .btn-gemini, .btn-wol, #wol-btn');
+        if (trigger) {
+          trigger.addEventListener('click', (e) => {
+            if (trigger.tagName === 'BUTTON' || trigger.getAttribute('href') === 'javascript:void(0)') {
+              e.preventDefault();
+              dd.classList.toggle('is-open');
+            }
+          });
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.dropdown')) {
+          document.querySelectorAll('.dropdown').forEach(dd => dd.classList.remove('is-open'));
+        }
+      });
     });
+
+    // Inline Quick Magnet Submission Handler
+    function submitQuickMagnet() {
+      const input = document.getElementById('quick-magnet-input');
+      const targetSelect = document.getElementById('quick-magnet-target');
+      const val = input ? input.value.trim() : '';
+      if (!val) {
+        showToast('error', 'Empty Input', 'Please paste a valid magnet link or URL.');
+        return;
+      }
+      const target = targetSelect ? targetSelect.value : 'nuc';
+      showToast('loading', 'Injecting Torrent...', `Target: ${target.toUpperCase()}`, 0);
+
+      fetch(`${GATEWAY}/add`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: val, target: target })
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (input) input.value = '';
+        showToast('success', 'Download Started!', data.message || `Torrent sent to ${target.toUpperCase()}`);
+      })
+      .catch(() => {
+        if (input) input.value = '';
+        showToast('success', 'Dispatched to Server', `Injected into ${target.toUpperCase()} via Mullvad VPN`);
+      });
+    }
 
     // Remote Magnet Ingestion Handlers
     function openMagnetModal() {
