@@ -254,6 +254,16 @@ body {
   box-shadow: 0 0 8px #a855f7;
 }
 
+.dropdown-dot.dot-gemini-desktop {
+  background-color: #38bdf8;
+  box-shadow: 0 0 8px #38bdf8;
+}
+
+.dropdown-dot.dot-gemini-nuc {
+  background-color: #ec4899;
+  box-shadow: 0 0 8px #ec4899;
+}
+
 .btn-outline {
   border: 1px solid var(--border-color);
   color: var(--text-main);
