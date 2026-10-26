@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="canonical" href="https://digitalresolve.ca/" />
 </head>
 <body>
   <div class="background-glow"></div>
@@ -1046,10 +1047,17 @@
   </main>
 
   <footer class="footer">
-    <div class="container footer-container">
+    <div class="container footer-container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
       <p>&copy; 2026 Digital Resolve &bull; Homelab Operations Deck &bull; Cory Townsend</p>
-      <div class="footer-links">
-        <a href="#top">Back to top &uarr;</a>
+      <div class="footer-meta" style="display: flex; align-items: center; gap: 16px;">
+        <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
+          <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;">v2.4.2</span>
+          <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
+        </button>
+        <div class="footer-links">
+          <a href="#top">Back to top &uarr;</a>
+        </div>
       </div>
     </div>
   </footer>
@@ -1064,6 +1072,10 @@
   </div>
 
   <script>
+    // Force canonical apex domain: redirect www.digitalresolve.ca to https://digitalresolve.ca
+    if (window.location.hostname === 'www.digitalresolve.ca') {
+      window.location.replace('https://digitalresolve.ca' + window.location.pathname + window.location.search + window.location.hash);
+    }
     const GATEWAY = 'https://wake.digitalresolve.ca';
     const devices = {
       desktop: { name: 'Desktop', mac: '70:85:C2:84:62:65', ip: '192.168.2.62', dns: 'torrents.digitalresolve.ca' },
@@ -1949,15 +1961,19 @@
             data.lines.forEach(line => {
               const div = document.createElement('div');
               div.className = 'agy-line';
-              if (line.includes('[USER_EXPLICIT]')) {
+              if (line.includes('[USER]') || line.includes('[USER_EXPLICIT]')) {
                 div.className += ' user';
-                div.textContent = line;
-              } else if (line.includes('[MODEL]')) {
+                div.innerHTML = `<span style="color:#38bdf8; font-weight:700;">[USER]</span> ${escapeHtml(line.replace(/\[\d\d:\d\d:\d\d\]\s*\[(USER|USER_EXPLICIT)\]\s*/, ''))}`;
+              } else if (line.includes('[AGENT]') || line.includes('[MODEL]')) {
                 div.className += ' model';
-                div.textContent = line;
-              } else if (line.includes('Tool Call')) {
+                div.innerHTML = `<span style="color:#60a5fa; font-weight:700;">[AGENT]</span> ${escapeHtml(line.replace(/\[\d\d:\d\d:\d\d\]\s*\[(AGENT|MODEL)\]\s*/, ''))}`;
+              } else if (line.includes('[TOOL]') || line.includes('Tool Call')) {
                 div.className += ' tool';
-                div.textContent = line;
+                div.innerHTML = `<span style="color:#fbbf24; font-weight:700;">[TOOL]</span> <span style="color:#cbd5e1;">${escapeHtml(line.replace(/\[\d\d:\d\d:\d\d\]\s*\[TOOL\]\s*/, ''))}</span>`;
+              } else if (line.includes('[OUTPUT]')) {
+                div.className += ' system';
+                div.style.color = '#94a3b8';
+                div.innerHTML = `<span style="color:#10b981; font-weight:600;">[OUTPUT]</span> ${escapeHtml(line.replace(/\[\d\d:\d\d:\d\d\]\s*\[OUTPUT\]\s*/, ''))}`;
               } else {
                 div.className += ' system';
                 div.textContent = line;
@@ -2033,6 +2049,10 @@
         closeAgyConsole();
       }
     });
+      function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
   </script>
 
   <!-- Remote Magnet Ingestion Modal -->
@@ -2115,6 +2135,89 @@
         </div>
         <input type="text" id="agy-modal-input" class="agy-modal-input" placeholder="Type prompt or command to transmit to active AGY agent..." onkeydown="if(event.key==='Enter') sendConsolePrompt()" autocomplete="off" spellcheck="false" />
         <button type="button" class="agy-send-btn" id="agy-modal-send-btn" onclick="sendConsolePrompt()">Execute &crarr;</button>
+      </div>
+    </div>
+  </div>
+  <!-- Comprehensive High-Level System Release Changelog Modal -->
+  <div id="changelog-modal-overlay" class="changelog-modal-overlay" onclick="closeChangelogModalOnBackdrop(event)">
+    <div class="changelog-modal">
+      <div class="changelog-header">
+        <div class="changelog-title-group">
+          <span class="pulse-dot"></span>
+          <span class="changelog-title">Digital Resolve System Changelog &amp; Release History</span>
+        </div>
+        <button type="button" class="changelog-close" onclick="closeChangelogModal()">&times;</button>
+      </div>
+
+      <div class="changelog-body">
+        <!-- Version 2.4.2 (Current) -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag current">v2.4.2 &bull; Current</span>
+            <span class="ver-date">October 26, 2026</span>
+          </div>
+          <h4 class="ver-title">Live Embedded AGY Terminal Console &amp; Apex Redirection</h4>
+          <ul class="ver-list">
+            <li><strong>Interactive Embedded Console:</strong> Full-screen in-browser terminal connected to active session (<code>51f0adb8-74d9</code>) with verbose turn streaming, command chip shortcuts, and 2.5s auto-polling.</li>
+            <li><strong>Bi-Directional NUC &harr; Desktop Proxy:</strong> Zero-latency background sync daemon and Entra ID SSO authorization for prompt injection.</li>
+            <li><strong>Apex Domain Enforcement:</strong> Seamless canonical routing ensuring <code>www.digitalresolve.ca</code> immediately redirects to <code>https://digitalresolve.ca</code>.</li>
+            <li><strong>Clickable Footer Versioning:</strong> Integrated system release changelog accessible directly from the operations deck.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.4.0 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.4.0</span>
+            <span class="ver-date">October 26, 2026</span>
+          </div>
+          <h4 class="ver-title">Multi-Modal AGY Sessions &amp; Geeni WebRTC Gateway</h4>
+          <ul class="ver-list">
+            <li><strong>Antigravity Multi-Modal Launcher:</strong> Support for Google Web Console (Cloud), native app protocol (<code>conversation://</code>), and live transcript viewing.</li>
+            <li><strong>Geeni Camera Gateway Fix:</strong> Replaced retired <code>my.geenismart.com</code> with verified live <code>camview.mygeeni.com</code> and local SSO stream <code>cam.digitalresolve.ca</code>.</li>
+            <li><strong>ISP Telemetry Fixes:</strong> Resolved undefined jitter and latency metrics in Bell Canada fiber optic diagnostic card.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.3.0 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.3.0</span>
+            <span class="ver-date">October 25, 2026</span>
+          </div>
+          <h4 class="ver-title">M365 Entra ID Reboot Shield &amp; SLA Status Legend</h4>
+          <ul class="ver-list">
+            <li><strong>Remote Reboot Protection:</strong> Shielded NUC power actions behind Microsoft 365 Entra ID SSO token authentication and admin PIN verification.</li>
+            <li><strong>SLA Uptime Matrix Legend:</strong> Added operational status guide for 100% Operational, Smart Eco Sleep, Maintenance, Outages, and Day Inspection.</li>
+            <li><strong>Watch Library Rebranding:</strong> Re-branded media streaming node to <em>Review &amp; Watch Library</em> for <code>D:\Torrents</code>.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.2.0 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.2.0</span>
+            <span class="ver-date">October 25, 2026</span>
+          </div>
+          <h4 class="ver-title">Autonomous ISP Diagnostics &amp; Self-Healing Sentinel</h4>
+          <ul class="ver-list">
+            <li><strong>ISP Health Engine:</strong> ICMP jitter analysis, Cloudflare edge latency variance, and automated speed telemetry.</li>
+            <li><strong>Self-Healing Sentinel Watchdog:</strong> Proactive HTTP probing across all edge endpoints with autonomous service restart.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.0.0 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.0.0</span>
+            <span class="ver-date">October 23, 2026</span>
+          </div>
+          <h4 class="ver-title">Dual-Node Hybrid Homelab Foundation</h4>
+          <ul class="ver-list">
+            <li><strong>Core Infrastructure:</strong> Unified 24/7 Intel NUC Server (<code>192.168.2.35</code>) and High-Power Desktop Workstation (<code>192.168.2.62</code>).</li>
+            <li><strong>Zero Trust Edge Tunnels:</strong> Cloudflare edge routing, WireGuard VPN ingestion, and Wake-on-LAN power state switching.</li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
