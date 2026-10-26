@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -65,10 +65,13 @@
             AGY Session <span class="dropdown-arrow">&#9662;</span>
           </button>
           <div class="dropdown-menu">
-            <button type="button" class="btn-action-item" onclick="launchAgySession('stream')" style="margin-bottom: 6px;">
+            <button type="button" class="btn-action-item" onclick="openEmbeddedConsole()" style="margin-bottom: 6px;">
               <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
-              <span>Live Terminal Stream</span>
-              <span class="item-tag online">Active</span>
+              <span>Open Embedded Console</span>
+              <span class="item-tag online">Live</span>
+            </button>
+            <button type="button" class="dropdown-item" onclick="launchAgySession('stream')" style="color: #93c5fd;">
+              <span class="dropdown-dot dot-1"></span> In-Page Stream Viewer
             </button>
             <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="dropdown-item" style="color: #60a5fa; font-weight: 600;">
               <span class="dropdown-dot dot-1"></span> Web Console (Remote Work)
@@ -153,9 +156,10 @@
 
         <!-- Command Launch Pills -->
         <div class="command-pills">
-          <a href="conversation://51f0adb8-74d9-4ada-92d6-c532f19e0629" class="pill-btn" style="border-color: rgba(59, 130, 246, 0.45); background: rgba(59, 130, 246, 0.18); color: #60a5fa;">
-            <span>[AGY]</span> Active AGY Session (51f0adb8) &rarr;
-          </a>
+          <button type="button" onclick="openEmbeddedConsole()" class="pill-btn" style="border-color: rgba(59, 130, 246, 0.55); background: rgba(59, 130, 246, 0.22); color: #93c5fd; cursor: pointer;">
+            <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+            <span>[AGY] Embedded Live Console (51f0adb8) &rarr;</span>
+          </button>
           <a href="https://stream.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="pill-btn pill-stream">
             <span>[PLAY]</span> Open Watch Library (HD / 4K)
           </a>
@@ -342,7 +346,7 @@
         </div>
 
         <!-- Live Sentinel & Daemon Terminal Viewer -->
-        <div class="terminal-window">
+        <div class="terminal-window" id="terminal-card">
           <div class="terminal-header">
             <div class="terminal-title-group">
               <span class="pulse-dot"></span>
@@ -361,6 +365,7 @@
           <div class="agy-remote-prompt-bar" id="agy-prompt-container" style="display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08); flex-wrap: wrap;">
             <input type="text" id="agy-prompt-input" placeholder="Transmit instruction / prompt to this active AGY session (M365 SSO Guarded)..." style="flex: 1; min-width: 250px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 10px 14px; color: #f8fafc; font-family: monospace; font-size: 0.88rem;" onkeydown="if(event.key==='Enter') sendAgyPrompt()" />
             <button type="button" class="btn-nav" style="border-color: #3b82f6; background: rgba(59, 130, 246, 0.25); color: #fff;" onclick="sendAgyPrompt()">Send to Agent &rarr;</button>
+            <button type="button" class="btn-nav" style="border-color: #38bdf8; background: rgba(56, 189, 248, 0.2); color: #38bdf8;" onclick="openEmbeddedConsole()">Expand Console &nearr;</button>
             <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="btn-nav" style="border-color: #10b981; background: rgba(16, 185, 129, 0.15); color: #6ee7b7;" title="Open Cory-Desktop in Antigravity Web Console">Web Console &rarr;</a>
           </div>
         </div>
@@ -894,17 +899,21 @@
                 Direct remote access and real-time execution stream of this active Antigravity coding and autonomous homelab orchestration session. Protected by Microsoft 365 Entra ID SSO.
               </div>
             </div>
-            <div class="app-card-footer" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px;">
-              <button type="button" onclick="launchAgySession('stream')" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px;">Live Stream &rarr;</button>
-              <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px; color: #60a5fa !important;">Web Console &rarr;</a>
-              <button type="button" onclick="launchAgySession('app')" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px; color: #4ade80 !important;">Launch in App &rarr;</button>
+            <div class="app-card-footer" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+              <button type="button" onclick="openEmbeddedConsole()" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 12px; background: rgba(59, 130, 246, 0.25); border-color: #3b82f6; color: #93c5fd; font-weight: 600;">
+                <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span> Embedded Console &rarr;
+              </button>
+              <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px; color: #60a5fa !important;">
+                Web Console &rarr;
+              </a>
+              <button type="button" onclick="launchAgySession('app')" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px; color: #4ade80 !important;">
+                Launch in App &rarr;
+              </button>
+              <button type="button" onclick="launchAgySession('copy')" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 8px; color: #94a3b8 !important;" title="Copy Session ID">
+                Copy ID
+              </button>
             </div>
           </div>
-            <div class="app-card-footer">
-              <span class="app-port">ID: 51f0adb8-74d9...</span>
-              <span class="app-btn-launch" style="color: #60a5fa;">Launch in App &rarr;</span>
-            </div>
-          </a>
           <!-- StreamHub Card -->
           <a href="https://stream.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="app-card">
             <div>
@@ -1854,6 +1863,176 @@
       }
     }
 
+      // ==========================================
+    // EMBEDDED AGY CONSOLE CONTROLLER
+    // ==========================================
+    let consoleAutoPollTimer = null;
+    let consoleAutoPollActive = true;
+    const AGY_SESSION_ID = '51f0adb8-74d9-4ada-92d6-c532f19e0629';
+
+    function openEmbeddedConsole() {
+      const modal = document.getElementById('agy-console-modal-overlay');
+      if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+      refreshAgyConsole();
+      startConsoleAutoPoll();
+      const input = document.getElementById('agy-modal-input');
+      if (input) setTimeout(() => input.focus(), 200);
+    }
+
+    function closeAgyConsole() {
+      const modal = document.getElementById('agy-console-modal-overlay');
+      if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+      stopConsoleAutoPoll();
+    }
+
+    function closeAgyConsoleOnBackdrop(event) {
+      if (event.target && event.target.id === 'agy-console-modal-overlay') {
+        closeAgyConsole();
+      }
+    }
+
+    function maximizeAgyConsole() {
+      const win = document.getElementById('agy-console-window');
+      if (win) win.classList.toggle('fullscreen');
+    }
+
+    function toggleConsoleAutoPoll() {
+      consoleAutoPollActive = !consoleAutoPollActive;
+      const btn = document.getElementById('btn-console-poll');
+      if (btn) {
+        btn.textContent = consoleAutoPollActive ? 'Auto-Stream: ON' : 'Auto-Stream: OFF';
+        btn.style.color = consoleAutoPollActive ? '#4ade80' : '#94a3b8';
+      }
+      if (consoleAutoPollActive) {
+        startConsoleAutoPoll();
+      } else {
+        stopConsoleAutoPoll();
+      }
+    }
+
+    function startConsoleAutoPoll() {
+      stopConsoleAutoPoll();
+      if (!consoleAutoPollActive) return;
+      consoleAutoPollTimer = setInterval(() => {
+        const modal = document.getElementById('agy-console-modal-overlay');
+        if (modal && modal.classList.contains('active')) {
+          refreshAgyConsole(true);
+        }
+      }, 2500);
+    }
+
+    function stopConsoleAutoPoll() {
+      if (consoleAutoPollTimer) {
+        clearInterval(consoleAutoPollTimer);
+        consoleAutoPollTimer = null;
+      }
+    }
+
+    function refreshAgyConsole(isSilent = false) {
+      const screen = document.getElementById('agy-console-screen');
+      const statusTag = document.getElementById('agy-console-status');
+      if (!isSilent && statusTag) statusTag.textContent = 'STREAMING...';
+
+      fetch(`${GATEWAY}/api/logs?name=agy`)
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.lines && screen) {
+            const isNearBottom = screen.scrollHeight - screen.scrollTop - screen.clientHeight < 80;
+            
+            screen.innerHTML = '';
+            data.lines.forEach(line => {
+              const div = document.createElement('div');
+              div.className = 'agy-line';
+              if (line.includes('[USER_EXPLICIT]')) {
+                div.className += ' user';
+                div.textContent = line;
+              } else if (line.includes('[MODEL]')) {
+                div.className += ' model';
+                div.textContent = line;
+              } else if (line.includes('Tool Call')) {
+                div.className += ' tool';
+                div.textContent = line;
+              } else {
+                div.className += ' system';
+                div.textContent = line;
+              }
+              screen.appendChild(div);
+            });
+
+            if (isNearBottom || !isSilent) {
+              screen.scrollTop = screen.scrollHeight;
+            }
+            if (statusTag) {
+              statusTag.textContent = 'ONLINE (Desktop :8082)';
+              statusTag.className = 'item-tag online';
+            }
+          }
+        })
+        .catch(err => {
+          if (statusTag) {
+            statusTag.textContent = 'RECONNECTING...';
+            statusTag.className = 'item-tag';
+          }
+        });
+    }
+
+    function setConsolePrompt(text) {
+      const input = document.getElementById('agy-modal-input');
+      if (input) {
+        input.value = text;
+        input.focus();
+      }
+    }
+
+    function sendConsolePrompt() {
+      const input = document.getElementById('agy-modal-input');
+      const text = input ? input.value.trim() : '';
+      if (!text) return;
+
+      const screen = document.getElementById('agy-console-screen');
+      if (screen) {
+        const userLine = document.createElement('div');
+        userLine.className = 'agy-line user';
+        const now = new Date().toLocaleTimeString('en-US', { hour12: false });
+        userLine.textContent = `[${now}] [USER_EXPLICIT] ${text}`;
+        screen.appendChild(userLine);
+        screen.scrollTop = screen.scrollHeight;
+      }
+
+      if (input) input.value = '';
+      showToast('loading', 'Dispatching Prompt to AGY Session...', 'Session ID: 51f0adb8-74d9', 1500);
+
+      fetch(`${GATEWAY}/api/agy/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: text, pin: 'admin' })
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.status === 'success') {
+          showToast('success', 'Prompt Delivered to AGY', 'Autonomous agent processing instruction...');
+          setTimeout(() => refreshAgyConsole(true), 1200);
+          setTimeout(() => refreshAgyConsole(true), 3000);
+        } else {
+          showToast('error', 'Transmission Failed', data.message || 'Could not queue prompt.');
+        }
+      })
+      .catch(err => {
+        showToast('error', 'Gateway Offline', `Could not reach ${GATEWAY}`);
+      });
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeAgyConsole();
+      }
+    });
   </script>
 
   <!-- Remote Magnet Ingestion Modal -->
@@ -1878,6 +2057,65 @@
         </label>
       </div>
       <button class="magnet-submit-btn" id="magnet-submit-btn" onclick="submitMagnet()">Start Remote Download</button>
+    </div>
+  </div>
+  <!-- Embedded Antigravity (AGY) Interactive Terminal Console Modal -->
+  <div id="agy-console-modal-overlay" class="agy-modal-overlay" onclick="closeAgyConsoleOnBackdrop(event)">
+    <div class="agy-console-window" id="agy-console-window">
+      <div class="agy-console-header">
+        <div class="agy-window-controls">
+          <span class="win-dot dot-close" onclick="closeAgyConsole()" title="Close"></span>
+          <span class="win-dot dot-min" onclick="closeAgyConsole()" title="Minimize"></span>
+          <span class="win-dot dot-max" onclick="maximizeAgyConsole()" title="Fullscreen"></span>
+        </div>
+        <div class="agy-console-title">
+          <span class="pulse-dot"></span>
+          <span>Antigravity (AGY) Live Autonomous Terminal &bull; <span class="mono" style="color: #60a5fa;">51f0adb8-74d9</span></span>
+        </div>
+        <div class="agy-console-header-actions">
+          <span class="item-tag online" id="agy-console-status">ONLINE (Desktop :8082)</span>
+          <button type="button" class="btn-console-act" onclick="toggleConsoleAutoPoll()" id="btn-console-poll" title="Toggle 2s Live Auto-Polling">Auto-Stream: ON</button>
+          <button type="button" class="btn-console-act" onclick="refreshAgyConsole()" title="Refresh Now">&#x21bb;</button>
+          <button type="button" class="btn-console-act" onclick="closeAgyConsole()">&times;</button>
+        </div>
+      </div>
+
+      <!-- Quick Session Bar -->
+      <div class="agy-session-meta-bar">
+        <div class="meta-item"><span class="meta-lbl">Agent:</span> <span class="meta-val">Antigravity CLI (agy)</span></div>
+        <div class="meta-item"><span class="meta-lbl">Session ID:</span> <span class="meta-val mono">51f0adb8-74d9-4ada-92d6-c532f19e0629</span></div>
+        <div class="meta-item"><span class="meta-lbl">Node:</span> <span class="meta-val">Cory-Desktop (192.168.2.62)</span></div>
+        <div class="meta-item"><span class="meta-lbl">Auth Gateway:</span> <span class="meta-val">wake.digitalresolve.ca (M365 Entra ID SSO)</span></div>
+        <div class="meta-actions">
+          <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="meta-link-btn" title="Open Google Antigravity Web Console">Google Web Console &nearr;</a>
+          <button type="button" class="meta-link-btn" onclick="launchAgySession('app')" title="Launch in Local AGY App">Open in App &nearr;</button>
+          <button type="button" class="meta-link-btn" onclick="launchAgySession('copy')" title="Copy ID">Copy CID</button>
+        </div>
+      </div>
+
+      <!-- Live Terminal Stream Output Screen -->
+      <div class="agy-console-screen" id="agy-console-screen">
+        <div class="agy-line system">[SYSTEM] Establishing encrypted tunnel to Cory-Desktop (Port 8082 via M365 SSO)...</div>
+        <div class="agy-line system">[SYSTEM] Connected to AGY conversation stream: 51f0adb8-74d9-4ada-92d6-c532f19e0629</div>
+      </div>
+
+      <!-- Command Quick Chips -->
+      <div class="agy-quick-chips">
+        <button type="button" class="quick-chip" onclick="setConsolePrompt('Check cluster health and uptime stats')">Cluster Health</button>
+        <button type="button" class="quick-chip" onclick="setConsolePrompt('Run deep codebase audit')">Code Audit</button>
+        <button type="button" class="quick-chip" onclick="setConsolePrompt('Report ISP jitter, loss, and latency')">ISP Diagnostics</button>
+        <button type="button" class="quick-chip" onclick="setConsolePrompt('Inspect Cat Cam feeds')">Cat Cam Status</button>
+        <button type="button" class="quick-chip" onclick="setConsolePrompt('Review current git branch and changes')">Git Status</button>
+      </div>
+
+      <!-- Interactive Shell Prompt Input Bar -->
+      <div class="agy-console-input-bar">
+        <div class="agy-prompt-label">
+          <span style="color: #4ade80;">agy</span><span style="color: #94a3b8;">@</span><span style="color: #38bdf8;">digitalresolve</span><span style="color: #f8fafc;">:</span><span style="color: #a78bfa;">~</span><span style="color: #4ade80;">$</span>
+        </div>
+        <input type="text" id="agy-modal-input" class="agy-modal-input" placeholder="Type prompt or command to transmit to active AGY agent..." onkeydown="if(event.key==='Enter') sendConsolePrompt()" autocomplete="off" spellcheck="false" />
+        <button type="button" class="agy-send-btn" id="agy-modal-send-btn" onclick="sendConsolePrompt()">Execute &crarr;</button>
+      </div>
     </div>
   </div>
 </body>
