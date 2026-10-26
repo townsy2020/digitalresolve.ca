@@ -195,7 +195,27 @@ body {
 }
 
 .wol-dropdown {
-  min-width: 230px;
+  min-width: 270px;
+}
+
+.dropdown-header-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  padding: 6px 12px 2px;
+  text-transform: uppercase;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 6px 4px;
+}
+
+.ping-icon {
+  font-size: 0.95rem;
+  line-height: 1;
 }
 
 button.dropdown-item {
@@ -228,11 +248,13 @@ button.dropdown-item {
 .dot-wol-desktop {
   background-color: #38bdf8;
   box-shadow: 0 0 8px #38bdf8;
+  transition: all 0.3s ease;
 }
 
 .dot-wol-nuc {
   background-color: #ec4899;
   box-shadow: 0 0 8px #ec4899;
+  transition: all 0.3s ease;
 }
 
 .dot-wol-both {
@@ -247,17 +269,18 @@ button.dropdown-item {
   right: 30px;
   background: rgba(15, 23, 42, 0.96);
   border: 1px solid rgba(245, 158, 11, 0.5);
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 14px 20px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   color: #f8fafc;
   font-size: 0.9rem;
   font-weight: 500;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(245, 158, 11, 0.3);
   backdrop-filter: blur(12px);
   z-index: 99999;
+  max-width: 420px;
   transform: translateY(100px);
   opacity: 0;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -270,9 +293,24 @@ button.dropdown-item {
   pointer-events: auto;
 }
 
+.toast-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.toast-subtext {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  font-family: monospace;
+}
+
 .toast-icon {
-  font-size: 1.25rem;
+  font-size: 1.4rem;
   color: #fbbf24;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Dropdown */
