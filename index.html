@@ -61,15 +61,21 @@
           </div>
         </div>
 
+        <!-- Direct 1-Click Active Session Terminal Button -->
+        <button type="button" class="btn-nav" onclick="openEmbeddedConsole()" style="background: rgba(16, 185, 129, 0.2); border-color: #10b981; color: #a7f3d0; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 0 10px rgba(16, 185, 129, 0.25);" title="Open live interactive terminal for this active session (51f0adb8)">
+          <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+          <span>Open Session (51f0adb8)</span>
+        </button>
+
         <!-- AGY Session & Gemini CLI Dropdown -->
         <div class="dropdown">
           <button type="button" class="btn-nav" id="agy-btn" aria-haspopup="true">
-            AGY Session <span class="dropdown-arrow">&#9662;</span>
+            AGY Menu <span class="dropdown-arrow">&#9662;</span>
           </button>
           <div class="dropdown-menu">
             <button type="button" class="btn-action-item" onclick="openEmbeddedConsole()">
               <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
-              <span>Open Embedded Console Live</span>
+              <span>Open This Very Session (51f0adb8)</span>
               <span class="item-tag online">Live</span>
             </button>
             <button type="button" class="btn-action-item" onclick="launchAgySession('stream')">
@@ -162,9 +168,9 @@
 
         <!-- Command Launch Pills -->
         <div class="command-pills">
-          <button type="button" onclick="openEmbeddedConsole()" class="pill-btn" style="border-color: rgba(59, 130, 246, 0.55); background: rgba(59, 130, 246, 0.22); color: #93c5fd; cursor: pointer;">
-            <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
-            <span>[AGY] Embedded Live Console (51f0adb8) &rarr;</span>
+          <button type="button" onclick="openEmbeddedConsole()" class="pill-btn" style="border-color: #3b82f6; background: rgba(59, 130, 246, 0.35); color: #ffffff; font-weight: 700; font-size: 0.92rem; padding: 10px 18px; box-shadow: 0 0 16px rgba(59, 130, 246, 0.4); cursor: pointer;" title="Open live interactive terminal for this active session (51f0adb8)">
+            <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 10px #10b981;"></span>
+            <span>▶ Open This Session Terminal (51f0adb8)</span>
           </button>
           <a href="https://stream.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="pill-btn pill-stream">
             <span>[PLAY]</span> Open Watch Library (HD / 4K)
@@ -418,8 +424,7 @@
           <div class="agy-remote-prompt-bar" id="agy-prompt-container" style="display: none; gap: 8px; margin-top: 8px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.08); flex-wrap: wrap;">
             <input type="text" id="agy-prompt-input" placeholder="Transmit instruction / prompt to this active AGY session (M365 SSO Guarded)..." style="flex: 1; min-width: 250px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 10px 14px; color: #f8fafc; font-family: monospace; font-size: 0.88rem;" onkeydown="if(event.key==='Enter') sendAgyPrompt()" />
             <button type="button" class="btn-nav" style="border-color: #3b82f6; background: rgba(59, 130, 246, 0.25); color: #fff;" onclick="sendAgyPrompt()">Send to Agent &rarr;</button>
-            <button type="button" class="btn-nav" style="border-color: #38bdf8; background: rgba(56, 189, 248, 0.2); color: #38bdf8;" onclick="openEmbeddedConsole()">Expand Console &nearr;</button>
-            <button type="button" class="btn-nav" style="border-color: #10b981; background: rgba(16, 185, 129, 0.15); color: #6ee7b7;" onclick="openEmbeddedConsole()" title="Expand Fullscreen Live Session Console">Live Session &nearr;</button>
+            <button type="button" class="btn-nav" style="border-color: #10b981; background: rgba(16, 185, 129, 0.25); color: #a7f3d0; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 0 10px rgba(16, 185, 129, 0.25);" onclick="openEmbeddedConsole()" title="Pop out Fullscreen Interactive Console for this session">🖥️ Pop Out Fullscreen Console (51f0adb8) &nearr;</button>
           </div>
         </div>
 
@@ -953,14 +958,11 @@
               </div>
             </div>
             <div class="app-card-footer" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
-              <button type="button" onclick="openEmbeddedConsole()" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 12px; background: rgba(59, 130, 246, 0.25); border-color: #3b82f6; color: #93c5fd; font-weight: 600;">
-                <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span> Embedded Console &rarr;
+              <button type="button" onclick="openEmbeddedConsole()" class="btn-nav" style="font-size: 0.82rem; height: 32px; padding: 4px 14px; background: rgba(16, 185, 129, 0.25); border-color: #10b981; color: #a7f3d0; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span> Open This Session (51f0adb8) &rarr;
               </button>
-              <button type="button" onclick="openEmbeddedConsole()" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px; color: #60a5fa !important;">
-                Live Stream &nearr;
-              </button>
-              <button type="button" onclick="launchAgySession('app')" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px; color: #4ade80 !important;">
-                Launch in App &rarr;
+              <button type="button" onclick="launchAgySession('app')" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px; color: #60a5fa !important;">
+                Desktop App &nearr;
               </button>
               <button type="button" onclick="launchAgySession('copy')" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 8px; color: #94a3b8 !important;" title="Copy Session ID">
                 Copy ID
