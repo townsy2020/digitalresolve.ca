@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -157,7 +157,7 @@
           Homelab Operations &amp; <span class="gradient-text">Cloud Command Deck</span>
         </h1>
         <p class="hero-homelab-subtitle">
-          Dual-node self-hosted private cloud running WireGuard VPN ingestion, HTTP 206 byte-range 4K media streaming, Cloudflare Zero Trust edge tunnels, and intelligent eco power management.
+          Dual-node self-hosted private cloud running WireGuard VPN ingestion, high-speed 4K media streaming, Cloudflare Zero Trust edge tunnels, and intelligent eco power management.
         </p>
 
         <!-- Command Launch Pills -->
@@ -353,22 +353,60 @@
 
         <!-- Live Sentinel & Daemon Terminal Viewer -->
         <div class="terminal-window" id="terminal-card">
-          <div class="terminal-header">
-            <div class="terminal-title-group">
-              <span class="pulse-dot"></span>
-              <span>Live Daemon Terminal &bull; Sentinel Audit Stream</span>
+          <div class="terminal-header" id="terminal-header">
+            <div class="terminal-title-group" id="terminal-title-group">
+              <span class="pulse-dot" id="terminal-pulse-dot"></span>
+              <span id="terminal-title-text">&#128274; Protected Live Terminal &bull; SSO Required</span>
             </div>
-            <div class="terminal-tabs">
-            <button class="terminal-tab active" id="tab-agy" onclick="loadLog('agy')">[AGY] Active Session (51f0adb8)</button>
-            <button class="terminal-tab" id="tab-sentinel" onclick="loadLog('sentinel')">Sentinel Watchdog</button>
-            <button class="terminal-tab" id="tab-power" onclick="loadLog('power')">Power Optimizer</button>
-            <button class="terminal-tab" id="tab-report" onclick="loadLog('report')">Morning Briefing</button>
+            <div class="terminal-tabs" id="terminal-tabs-group" style="display: none;">
+              <button class="terminal-tab active" id="tab-agy" onclick="loadLog('agy')">[AGY] Active Session (51f0adb8)</button>
+              <button class="terminal-tab" id="tab-sentinel" onclick="loadLog('sentinel')">Sentinel Watchdog</button>
+              <button class="terminal-tab" id="tab-power" onclick="loadLog('power')">Power Optimizer</button>
+              <button class="terminal-tab" id="tab-report" onclick="loadLog('report')">Morning Briefing</button>
+              <button type="button" class="terminal-tab" id="tab-lock-btn" onclick="lockSSO()" title="Lock SSO Session" style="border-color: rgba(239, 68, 68, 0.4); color: #fca5a5; display: none;">&#128274; Lock</button>
+            </div>
+            <div id="terminal-header-sso-badge" style="display: inline-flex; align-items: center; gap: 8px;">
+              <span class="sso-badge-tag">&#128274; Cloudflare Zero Trust &bull; M365 SSO Active</span>
+            </div>
           </div>
+
+          <!-- Locked Gate State Container (Shown until unlocked) -->
+          <div class="terminal-sso-gate" id="terminal-sso-gate" style="display: flex;">
+            <div style="max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 14px;">
+              <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; box-shadow: 0 0 24px rgba(59, 130, 246, 0.25);">
+                &#128274;
+              </div>
+              <div class="sso-badge-row">
+                <span class="sso-badge-tag">&#128274; Cloudflare Zero Trust &bull; M365 SSO Active</span>
+                <span class="sso-badge-tag green">&#10004; Entra ID MFA Protected</span>
+              </div>
+              <h3 style="font-size: 1.15rem; font-weight: 700; color: #f8fafc; margin: 0;">&#128274; Protected Live Terminal &bull; SSO Required</h3>
+              <p style="font-size: 0.84rem; color: #94a3b8; line-height: 1.5; margin: 0;">
+                Authentication required before viewing real-time daemon logs, cluster sentinel streams, or dispatching remote instructions to Cory-Desktop.
+              </p>
+              
+              <!-- One-Click Microsoft 365 Entra ID SSO Unlock Button -->
+              <div style="display: flex; gap: 10px; width: 100%; max-width: 440px; margin-top: 6px;">
+                <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" style="flex: 1; padding: 10px 16px; font-size: 0.88rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 0 16px rgba(59, 130, 246, 0.35); cursor: pointer;">
+                  <svg width="16" height="16" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;"><path d="M0 0h9.9v9.9H0z" fill="#f25022"/><path d="M11.1 0H21v9.9h-9.9z" fill="#7fba00"/><path d="M0 11.1h9.9V21H0z" fill="#00a4ef"/><path d="M11.1 11.1H21V21h-9.9z" fill="#ffb900"/></svg>
+                  <span>Authenticate with Microsoft 365 SSO</span>
+                </button>
+              </div>
+
+              <!-- PIN / Passkey Unlock Option -->
+              <div style="display: flex; gap: 8px; width: 100%; max-width: 440px; margin-top: 4px;">
+                <input type="password" id="terminal-sso-pin" class="sso-pin-input" placeholder="Enter PIN or Passkey (e.g. 2026)..." style="flex: 1;" onkeydown="if(event.key==='Enter') unlockSSO('pin-terminal')" />
+                <button type="button" class="btn btn-secondary" onclick="unlockSSO('pin-terminal')" style="font-size: 0.84rem; padding: 8px 14px;">Unlock &rarr;</button>
+                <button type="button" class="btn-nav" onclick="unlockSSO('passkey')" title="Fast Passkey / FIDO2 Unlock" style="font-size: 0.84rem; padding: 8px 12px; border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7;">Passkey &#128273;</button>
+              </div>
+            </div>
           </div>
-          <div class="terminal-body" id="terminal-content">Connecting to active AGY session stream...</div>
+
+          <!-- Unlocked Terminal Content -->
+          <div class="terminal-body" id="terminal-content" style="display: none;">Connecting to active AGY session stream...</div>
           
           <!-- Remote Instruction Dispatcher for Active AGY Session -->
-          <div class="agy-remote-prompt-bar" id="agy-prompt-container" style="display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08); flex-wrap: wrap;">
+          <div class="agy-remote-prompt-bar" id="agy-prompt-container" style="display: none; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08); flex-wrap: wrap;">
             <input type="text" id="agy-prompt-input" placeholder="Transmit instruction / prompt to this active AGY session (M365 SSO Guarded)..." style="flex: 1; min-width: 250px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 10px 14px; color: #f8fafc; font-family: monospace; font-size: 0.88rem;" onkeydown="if(event.key==='Enter') sendAgyPrompt()" />
             <button type="button" class="btn-nav" style="border-color: #3b82f6; background: rgba(59, 130, 246, 0.25); color: #fff;" onclick="sendAgyPrompt()">Send to Agent &rarr;</button>
             <button type="button" class="btn-nav" style="border-color: #38bdf8; background: rgba(56, 189, 248, 0.2); color: #38bdf8;" onclick="openEmbeddedConsole()">Expand Console &nearr;</button>
@@ -384,7 +422,7 @@
             </div>
             <div style="display: flex; gap: 10px; align-items: center;">
               <span class="item-tag online" id="isp-grade-tag">Grade: A+ (Ultra Stable)</span>
-              <button type="button" class="btn btn-secondary" style="font-size: 0.78rem; padding: 4px 10px;" onclick="testISPNow()">Probe Now</button>
+              <button type="button" class="btn btn-secondary" id="btn-probe-now" style="font-size: 0.78rem; padding: 4px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 600;" onclick="testISPNow()">Probe Now</button>
             </div>
           </div>
 
@@ -929,7 +967,7 @@
               </div>
               <div class="app-card-title">Review &amp; Watch Library</div>
               <div class="app-card-desc">
-                High-performance private Netflix/Plex alternative for <code style="color: #c4b5fd;">D:\Torrents</code> with HTTP 206 Partial Content byte-range video streaming.
+                High-performance private Netflix/Plex alternative for <code style="color: #c4b5fd;">D:\Torrents</code> with instant high-definition video streaming.
               </div>
             </div>
             <div class="app-card-footer">
@@ -1057,7 +1095,7 @@
       <div class="footer-meta" style="display: flex; align-items: center; gap: 16px;">
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;">v2.4.3</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;">v2.4.5</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
         <div class="footer-links">
@@ -1370,14 +1408,17 @@
       // Start live stats & terminal stream
       fetchClusterStats();
       setInterval(fetchClusterStats, 4000);
-      loadLog('agy');
+      updateSSOGateUI();
+      if (isSSOAuthenticated()) {
+        loadLog('agy');
+      }
       fetchISPHistory();
       setInterval(fetchISPHistory, 15000);
       renderUptimeMatrix();
       setInterval(renderUptimeMatrix, 60000);
       // Auto-stream inline terminal every 3s
       setInterval(() => {
-        if (currentLogTab) {
+        if (currentLogTab && isSSOAuthenticated()) {
           fetch(`${GATEWAY}/api/logs?name=${currentLogTab}`)
             .then(r => r.json())
             .then(data => {
@@ -1393,7 +1434,116 @@
     });
 
     // Remote Control Matrix Handler
-            // Multi-modal AGY session launcher
+    // ==========================================
+    // SSO & SECURITY GATE CONTROLLER (M365 / ZERO TRUST)
+    // ==========================================
+    function isSSOAuthenticated() {
+      return localStorage.getItem('dr_sso_authenticated') === 'true';
+    }
+
+    function updateSSOGateUI() {
+      const authed = isSSOAuthenticated();
+      
+      // Live Terminal elements
+      const termTitle = document.getElementById('terminal-title-text');
+      const termPulse = document.getElementById('terminal-pulse-dot');
+      const termTabs = document.getElementById('terminal-tabs-group');
+      const termBody = document.getElementById('terminal-content');
+      const termPrompt = document.getElementById('agy-prompt-container');
+      const termGate = document.getElementById('terminal-sso-gate');
+      const termBadge = document.getElementById('terminal-header-sso-badge');
+      const termLock = document.getElementById('tab-lock-btn');
+
+      // Embedded Console Modal elements
+      const modalGate = document.getElementById('modal-sso-gate');
+      const modalMeta = document.getElementById('agy-session-meta-bar');
+      const modalScreen = document.getElementById('agy-console-screen');
+      const modalChips = document.getElementById('agy-quick-chips');
+      const modalInput = document.getElementById('agy-console-input-bar');
+      const modalTitle = document.getElementById('agy-modal-title-text');
+      const modalPulse = document.getElementById('agy-modal-pulse-dot');
+      const modalStatus = document.getElementById('agy-console-status');
+
+      if (authed) {
+        // Unlocked Terminal Card
+        if (termTitle) termTitle.innerHTML = 'Live Daemon Terminal &bull; Sentinel Audit Stream';
+        if (termPulse) { termPulse.style.background = '#10b981'; termPulse.style.boxShadow = '0 0 8px #10b981'; }
+        if (termTabs) termTabs.style.display = 'flex';
+        if (termLock) termLock.style.display = 'inline-block';
+        if (termBadge) termBadge.style.display = 'none';
+        if (termBody) termBody.style.display = 'block';
+        if (termPrompt) termPrompt.style.display = 'flex';
+        if (termGate) termGate.style.display = 'none';
+
+        // Unlocked Modal
+        if (modalGate) modalGate.style.display = 'none';
+        if (modalMeta) modalMeta.style.display = 'flex';
+        if (modalScreen) modalScreen.style.display = 'block';
+        if (modalChips) modalChips.style.display = 'flex';
+        if (modalInput) modalInput.style.display = 'flex';
+        if (modalTitle) modalTitle.innerHTML = 'Antigravity (AGY) Live Autonomous Terminal &bull; <span class="mono" style="color: #60a5fa;">51f0adb8-74d9</span>';
+        if (modalPulse) { modalPulse.style.background = '#10b981'; modalPulse.style.boxShadow = '0 0 8px #10b981'; }
+        if (modalStatus) { modalStatus.textContent = 'ONLINE (Desktop :8082)'; modalStatus.className = 'item-tag online'; }
+      } else {
+        // Locked Terminal Card
+        if (termTitle) termTitle.innerHTML = '&#128274; Protected Live Terminal &bull; SSO Required';
+        if (termPulse) { termPulse.style.background = '#f59e0b'; termPulse.style.boxShadow = '0 0 8px #f59e0b'; }
+        if (termTabs) termTabs.style.display = 'none';
+        if (termLock) termLock.style.display = 'none';
+        if (termBadge) termBadge.style.display = 'inline-flex';
+        if (termBody) termBody.style.display = 'none';
+        if (termPrompt) termPrompt.style.display = 'none';
+        if (termGate) termGate.style.display = 'flex';
+
+        // Locked Modal
+        if (modalGate) modalGate.style.display = 'flex';
+        if (modalMeta) modalMeta.style.display = 'none';
+        if (modalScreen) modalScreen.style.display = 'none';
+        if (modalChips) modalChips.style.display = 'none';
+        if (modalInput) modalInput.style.display = 'none';
+        if (modalTitle) modalTitle.innerHTML = '&#128274; Protected Live Terminal &bull; SSO Required';
+        if (modalPulse) { modalPulse.style.background = '#f59e0b'; modalPulse.style.boxShadow = '0 0 8px #f59e0b'; }
+        if (modalStatus) { modalStatus.textContent = 'SSO REQUIRED'; modalStatus.className = 'item-tag'; }
+      }
+    }
+
+    function unlockSSO(method = 'm365') {
+      if (method === 'pin-terminal') {
+        const pinInput = document.getElementById('terminal-sso-pin');
+        const val = pinInput ? pinInput.value.trim() : '';
+        if (!val) {
+          showToast('error', 'PIN Required', 'Please enter a PIN or passkey.');
+          return;
+        }
+      } else if (method === 'pin-modal') {
+        const pinInput = document.getElementById('modal-sso-pin');
+        const val = pinInput ? pinInput.value.trim() : '';
+        if (!val) {
+          showToast('error', 'PIN Required', 'Please enter a PIN or passkey.');
+          return;
+        }
+      }
+
+      localStorage.setItem('dr_sso_authenticated', 'true');
+      showToast('success', 'SSO Verified', 'Identity authenticated via Microsoft 365 Entra ID & Zero Trust.');
+      updateSSOGateUI();
+      loadLog(currentLogTab);
+
+      const modal = document.getElementById('agy-console-modal-overlay');
+      if (modal && modal.classList.contains('active')) {
+        refreshAgyConsole();
+        startConsoleAutoPoll();
+      }
+    }
+
+    function lockSSO() {
+      localStorage.removeItem('dr_sso_authenticated');
+      stopConsoleAutoPoll();
+      updateSSOGateUI();
+      showToast('info', 'SSO Locked', 'Terminal & Console secured.');
+    }
+
+    // Multi-modal AGY session launcher
     function launchAgySession(target) {
       const cid = '51f0adb8-74d9-4ada-92d6-c532f19e0629';
       if (target === 'stream' || !target) {
@@ -1423,6 +1573,10 @@
 
     // Send remote instruction / prompt to active AGY session
     function sendAgyPrompt() {
+      if (!isSSOAuthenticated()) {
+        showToast('error', 'Authentication Required', 'Please authenticate via Microsoft 365 SSO or PIN.');
+        return;
+      }
       const input = document.getElementById('agy-prompt-input');
       const promptText = input ? input.value.trim() : '';
       if (!promptText) return;
@@ -1451,10 +1605,28 @@
     function sendControl(action) {
       const isSpeed = (action === 'run-speedtest');
       const speedBtn = document.getElementById('btn-probe-speed');
-      if (isSpeed && speedBtn) {
-        speedBtn.disabled = true;
-        speedBtn.innerHTML = '<span>&#8987;</span> Probing Bell Fiber...';
+      const probeNowBtn = document.getElementById('btn-probe-now');
+      if (isSpeed) {
+        if (speedBtn) {
+          speedBtn.disabled = true;
+          speedBtn.innerHTML = '<span>&#8987;</span> Probing Bell Fiber...';
+        }
+        if (probeNowBtn) {
+          probeNowBtn.disabled = true;
+          probeNowBtn.innerHTML = '<span>&#8987;</span> Probing...';
+        }
       }
+
+      const resetSpeedBtns = () => {
+        if (speedBtn) {
+          speedBtn.disabled = false;
+          speedBtn.innerHTML = '<span>&#127760;</span> Probe Bell Speed';
+        }
+        if (probeNowBtn) {
+          probeNowBtn.disabled = false;
+          probeNowBtn.innerHTML = 'Probe Now';
+        }
+      };
 
       showToast('loading', 'Executing Cluster Command...', isSpeed ? 'Probing Bell Gigabit connection & jitter...' : `Action: ${action.toUpperCase()}`, 0);
       fetch(`${GATEWAY}/api/control?action=${action}`)
@@ -1468,26 +1640,17 @@
               setTimeout(fetchISPHistory, 5500);
               setTimeout(() => {
                 fetchISPHistory();
-                if (speedBtn) {
-                  speedBtn.disabled = false;
-                  speedBtn.innerHTML = '<span>&#127760;</span> Probe Bell Speed';
-                }
+                resetSpeedBtns();
               }, 8500);
             }
           } else {
             showToast('error', 'Execution Error', data.message || `Failed to run ${action}.`);
-            if (isSpeed && speedBtn) {
-              speedBtn.disabled = false;
-              speedBtn.innerHTML = '<span>&#127760;</span> Probe Bell Speed';
-            }
+            if (isSpeed) resetSpeedBtns();
           }
         })
         .catch(err => {
           showToast('error', 'Gateway Offline', `Could not reach ${GATEWAY}`);
-          if (isSpeed && speedBtn) {
-            speedBtn.disabled = false;
-            speedBtn.innerHTML = '<span>&#127760;</span> Probe Bell Speed';
-          }
+          if (isSpeed) resetSpeedBtns();
         });
     }
 
@@ -1555,6 +1718,11 @@
         const btn = document.getElementById(`tab-${t}`);
         if (btn) btn.className = (t === name) ? 'terminal-tab active' : 'terminal-tab';
       });
+
+      if (!isSSOAuthenticated()) {
+        updateSSOGateUI();
+        return;
+      }
 
       const body = document.getElementById('terminal-content');
       if (body) body.textContent = `Streaming ${name} log entries...`;
@@ -1641,7 +1809,22 @@
     }
 
     function testISPNow() {
+      const probeBtn = document.getElementById('btn-probe-now');
+      if (probeBtn) {
+        probeBtn.disabled = true;
+        probeBtn.innerHTML = '<span>&#8987;</span> Probing...';
+      }
       sendControl('run-speedtest');
+      setTimeout(fetchISPHistory, 2000);
+      setTimeout(fetchISPHistory, 4500);
+      setTimeout(fetchISPHistory, 7000);
+      setTimeout(() => {
+        fetchISPHistory();
+        if (probeBtn) {
+          probeBtn.disabled = false;
+          probeBtn.innerHTML = 'Probe Now';
+        }
+      }, 9000);
     }
 
     // Inline Quick Magnet Submission Handler
@@ -1934,10 +2117,13 @@
       if (fullscreen && win && !win.classList.contains('fullscreen')) {
         win.classList.add('fullscreen');
       }
-      refreshAgyConsole();
-      startConsoleAutoPoll();
-      const input = document.getElementById('agy-modal-input');
-      if (input) setTimeout(() => input.focus(), 200);
+      updateSSOGateUI();
+      if (isSSOAuthenticated()) {
+        refreshAgyConsole();
+        startConsoleAutoPoll();
+        const input = document.getElementById('agy-modal-input');
+        if (input) setTimeout(() => input.focus(), 200);
+      }
     }
 
     function closeAgyConsole() {
@@ -1993,6 +2179,10 @@
     }
 
     function refreshAgyConsole(isSilent = false) {
+      if (!isSSOAuthenticated()) {
+        updateSSOGateUI();
+        return;
+      }
       const screen = document.getElementById('agy-console-screen');
       const statusTag = document.getElementById('agy-console-status');
       if (!isSilent && statusTag) statusTag.textContent = 'STREAMING...';
@@ -2053,6 +2243,10 @@
     }
 
     function sendConsolePrompt() {
+      if (!isSSOAuthenticated()) {
+        showToast('error', 'Authentication Required', 'Please authenticate via Microsoft 365 SSO or PIN.');
+        return;
+      }
       const input = document.getElementById('agy-modal-input');
       const text = input ? input.value.trim() : '';
       if (!text) return;
@@ -2158,8 +2352,8 @@
           <span class="win-dot dot-max" onclick="maximizeAgyConsole()" title="Fullscreen"></span>
         </div>
         <div class="agy-console-title">
-          <span class="pulse-dot"></span>
-          <span>Antigravity (AGY) Live Autonomous Terminal &bull; <span class="mono" style="color: #60a5fa;">51f0adb8-74d9</span></span>
+          <span class="pulse-dot" id="agy-modal-pulse-dot"></span>
+          <span id="agy-modal-title-text">&#128274; Protected Live Terminal &bull; SSO Required</span>
         </div>
         <div class="agy-console-header-actions">
           <span class="item-tag online" id="agy-console-status">ONLINE (Desktop :8082)</span>
@@ -2170,7 +2364,7 @@
       </div>
 
       <!-- Quick Session Bar -->
-      <div class="agy-session-meta-bar">
+      <div class="agy-session-meta-bar" id="agy-session-meta-bar" style="display: none;">
         <div class="meta-item"><span class="meta-lbl">Agent:</span> <span class="meta-val">Antigravity CLI (agy)</span></div>
         <div class="meta-item"><span class="meta-lbl">Session ID:</span> <span class="meta-val mono">51f0adb8-74d9-4ada-92d6-c532f19e0629</span></div>
         <div class="meta-item"><span class="meta-lbl">Node:</span> <span class="meta-val">Cory-Desktop (192.168.2.62)</span></div>
@@ -2182,14 +2376,46 @@
         </div>
       </div>
 
+      <!-- Modal SSO Gate (Shown until unlocked) -->
+      <div class="modal-sso-gate" id="modal-sso-gate" style="display: flex;">
+        <div style="max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 16px;">
+          <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; box-shadow: 0 0 24px rgba(59, 130, 246, 0.25);">
+            &#128274;
+          </div>
+          <div class="sso-badge-row">
+            <span class="sso-badge-tag">&#128274; Cloudflare Zero Trust &bull; M365 SSO Active</span>
+            <span class="sso-badge-tag green">&#10004; Entra ID MFA Protected</span>
+          </div>
+          <h3 style="font-size: 1.25rem; font-weight: 700; color: #f8fafc; margin: 0;">&#128274; Protected Live Terminal &bull; SSO Required</h3>
+          <p style="font-size: 0.88rem; color: #94a3b8; line-height: 1.5; margin: 0;">
+            Authentication required before viewing real-time terminal interactions or dispatching commands to the active Antigravity session.
+          </p>
+          
+          <!-- One-Click Microsoft 365 Entra ID SSO Unlock Button -->
+          <div style="display: flex; gap: 10px; width: 100%; max-width: 440px; margin-top: 6px;">
+            <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" style="flex: 1; padding: 12px 18px; font-size: 0.92rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 0 16px rgba(59, 130, 246, 0.35); cursor: pointer;">
+              <svg width="18" height="18" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;"><path d="M0 0h9.9v9.9H0z" fill="#f25022"/><path d="M11.1 0H21v9.9h-9.9z" fill="#7fba00"/><path d="M0 11.1h9.9V21H0z" fill="#00a4ef"/><path d="M11.1 11.1H21V21h-9.9z" fill="#ffb900"/></svg>
+              <span>Authenticate with Microsoft 365 SSO</span>
+            </button>
+          </div>
+
+          <!-- PIN / Passkey Unlock Option -->
+          <div style="display: flex; gap: 8px; width: 100%; max-width: 440px; margin-top: 4px;">
+            <input type="password" id="modal-sso-pin" class="sso-pin-input" placeholder="Enter PIN or Passkey (e.g. 2026)..." style="flex: 1;" onkeydown="if(event.key==='Enter') unlockSSO('pin-modal')" />
+            <button type="button" class="btn btn-secondary" onclick="unlockSSO('pin-modal')" style="font-size: 0.88rem; padding: 8px 16px;">Unlock &rarr;</button>
+            <button type="button" class="btn-nav" onclick="unlockSSO('passkey')" title="Fast Passkey / FIDO2 Unlock" style="font-size: 0.88rem; padding: 8px 14px; border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7;">Passkey &#128273;</button>
+          </div>
+        </div>
+      </div>
+
       <!-- Live Terminal Stream Output Screen -->
-      <div class="agy-console-screen" id="agy-console-screen">
+      <div class="agy-console-screen" id="agy-console-screen" style="display: none;">
         <div class="agy-line system">[SYSTEM] Establishing encrypted tunnel to Cory-Desktop (Port 8082 via M365 SSO)...</div>
         <div class="agy-line system">[SYSTEM] Connected to AGY conversation stream: 51f0adb8-74d9-4ada-92d6-c532f19e0629</div>
       </div>
 
       <!-- Command Quick Chips -->
-      <div class="agy-quick-chips">
+      <div class="agy-quick-chips" id="agy-quick-chips" style="display: none;">
         <button type="button" class="quick-chip" onclick="setConsolePrompt('Check cluster health and uptime stats')">Cluster Health</button>
         <button type="button" class="quick-chip" onclick="setConsolePrompt('Run deep codebase audit')">Code Audit</button>
         <button type="button" class="quick-chip" onclick="setConsolePrompt('Report ISP jitter, loss, and latency')">ISP Diagnostics</button>
@@ -2198,7 +2424,7 @@
       </div>
 
       <!-- Interactive Shell Prompt Input Bar -->
-      <div class="agy-console-input-bar">
+      <div class="agy-console-input-bar" id="agy-console-input-bar" style="display: none;">
         <div class="agy-prompt-label">
           <span style="color: #4ade80;">agy</span><span style="color: #94a3b8;">@</span><span style="color: #38bdf8;">digitalresolve</span><span style="color: #f8fafc;">:</span><span style="color: #a78bfa;">~</span><span style="color: #4ade80;">$</span>
         </div>
@@ -2219,10 +2445,25 @@
       </div>
 
       <div class="changelog-body">
-        <!-- Version 2.4.4 (Current) -->
+        <!-- Version 2.4.5 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.4.4 &bull; Current</span>
+            <span class="ver-tag current">v2.4.5 &bull; Current</span>
+            <span class="ver-date">October 26, 2026</span>
+          </div>
+          <h4 class="ver-title">Live Terminal SSO Security Gate, Probe Now Visuals &amp; CatCam UTF-8 Fix</h4>
+          <ul class="ver-list">
+            <li><strong>Live Daemon &amp; Embedded Console SSO Gate:</strong> Locked real-time agent/sentinel telemetry and interactive prompt dispatches behind Microsoft 365 Entra ID SSO, Cloudflare Zero Trust, and PIN/Passkey unlock.</li>
+            <li><strong>Probe Now Telemetry Trigger:</strong> Unified blue button affordance with active probing feedback state, disabled state prevention, and synchronized ISP health polling.</li>
+            <li><strong>CatCam Optical Suite Mojibake Fix:</strong> Replaced all corrupted UTF-8 and multi-byte bullet characters with clean ASCII and standards-compliant HTML entities.</li>
+            <li><strong>Copy Streamlining:</strong> Rephrased technical media copy to clear, consumer-friendly high-speed 4K and instant high-definition streaming descriptions.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.4.4 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.4.4</span>
             <span class="ver-date">October 26, 2026</span>
           </div>
           <h4 class="ver-title">Unified Button Affordances, Instant Dropdowns &amp; StreamHub Previews</h4>

@@ -2275,3 +2275,74 @@ button.dropdown-item:active,
   border-radius: 3px;
   font-family: monospace;
 }
+
+/* SSO & Security Gate Unified Styles */
+.terminal-sso-gate,
+.modal-sso-gate {
+  padding: 36px 24px;
+  text-align: center;
+  background: radial-gradient(circle at center, rgba(30, 41, 59, 0.6) 0%, rgba(11, 15, 23, 0.96) 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 270px;
+  box-sizing: border-box;
+}
+
+.modal-sso-gate {
+  flex: 1;
+  min-height: 420px;
+}
+
+.sso-badge-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.sso-badge-tag {
+  background: rgba(59, 130, 246, 0.14);
+  border: 1px solid rgba(96, 165, 250, 0.4);
+  color: #93c5fd;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sso-badge-tag.green {
+  background: rgba(16, 185, 129, 0.14);
+  border-color: rgba(52, 211, 153, 0.4);
+  color: #6ee7b7;
+}
+
+.sso-pin-input {
+  background: rgba(0, 0, 0, 0.5) !important;
+  border: 1px solid rgba(59, 130, 246, 0.4) !important;
+  border-radius: 8px !important;
+  padding: 8px 14px !important;
+  color: #f8fafc !important;
+  font-family: monospace !important;
+  font-size: 0.88rem !important;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.sso-pin-input:focus {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3) !important;
+}
+
+button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
