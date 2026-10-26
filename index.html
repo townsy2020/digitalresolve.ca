@@ -71,24 +71,24 @@
             Wake on LAN <span class="dropdown-arrow">&#9662;</span>
           </button>
           <div class="dropdown-menu">
-            <button type="button" class="btn-action-item" onclick="sendWol('nuc')">
-              <span class="dropdown-dot dot-2" id="badge-nuc"></span>
-              <span>Wake NUC</span>
-              <span class="item-tag" id="status-tag-nuc">Checking...</span>
-            </button>
             <button type="button" class="btn-action-item" onclick="sendWol('desktop')">
               <span class="dropdown-dot dot-1" id="badge-desktop"></span>
               <span>Wake Desktop</span>
               <span class="item-tag" id="status-tag-desktop">Checking...</span>
             </button>
+            <button type="button" class="btn-action-item btn-sleep" onclick="sendSleep('desktop')">
+              <span class="dropdown-dot dot-sleep"></span>
+              <span>Sleep Desktop</span>
+              <span class="item-tag">Standby</span>
+            </button>
+            <button type="button" class="btn-action-item" onclick="sendWol('nuc')">
+              <span class="dropdown-dot dot-2" id="badge-nuc"></span>
+              <span>Wake NUC</span>
+              <span class="item-tag" id="status-tag-nuc">Checking...</span>
+            </button>
             <button type="button" class="btn-action-item" onclick="sendWol('both')">
               <span class="dropdown-dot dot-1"></span>
               <span>Wake Both</span>
-            </button>
-            <button type="button" class="btn-action-item btn-sleep" onclick="sendSleep('nuc')">
-              <span class="dropdown-dot dot-sleep"></span>
-              <span>Sleep NUC</span>
-              <span class="item-tag">Standby</span>
             </button>
             <div class="dropdown-divider"></div>
             <button type="button" class="dropdown-item" onclick="checkStatus('nuc')">
