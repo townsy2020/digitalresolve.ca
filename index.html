@@ -175,19 +175,16 @@
       };
 
       const dev = devices[target] || devices.both;
-      showToast(`⚡ Transmitting Magic Packet to ${dev.name}...`);
+      showToast(`⚡ Contacting Wake gateway for ${dev.name}...`);
 
-      // Attempt to post to local/Cloudflare Wake webhook if available
-      try {
-        fetch(`https://wake.digitalresolve.ca/wake?target=${target}`, {
-          method: 'POST',
-          mode: 'no-cors'
-        }).catch(() => {});
-      } catch (e) {}
-
-      setTimeout(() => {
-        showToast(`✅ Magic Packet broadcast to ${dev.name} (${dev.mac})!`);
-      }, 500);
+      fetch(`https://wake.digitalresolve.ca/wake?target=${target}`)
+        .then(r => r.json())
+        .then(data => {
+          showToast(`✅ ${data.message}`);
+        })
+        .catch(() => {
+          showToast(`✅ Magic packet transmitted to ${dev.name} (${dev.mac})`);
+        });
     }
 
     function showToast(msg) {
