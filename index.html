@@ -405,8 +405,17 @@
           <!-- Unlocked Terminal Content -->
           <div class="terminal-body" id="terminal-content" style="display: none;">Connecting to active AGY session stream...</div>
           
+          <!-- Command Quick Chips (Inline Terminal) -->
+          <div class="agy-inline-chips" id="agy-inline-chips" style="display: none; gap: 8px; margin-top: 10px; margin-bottom: 4px; flex-wrap: wrap;">
+            <button type="button" class="quick-chip" onclick="triggerInlineQuickChip(this, 'Check cluster health and uptime stats')">⚡ Cluster Health</button>
+            <button type="button" class="quick-chip" onclick="triggerInlineQuickChip(this, 'Run deep codebase audit')">🛡️ Code Audit</button>
+            <button type="button" class="quick-chip" onclick="triggerInlineQuickChip(this, 'Report ISP jitter, loss, and latency')">🌐 ISP Diagnostics</button>
+            <button type="button" class="quick-chip" onclick="triggerInlineQuickChip(this, 'Inspect Cat Cam feeds')">🐱 Cat Cam Status</button>
+            <button type="button" class="quick-chip" onclick="triggerInlineQuickChip(this, 'Review current git branch and changes')">🌿 Git Status</button>
+          </div>
+
           <!-- Remote Instruction Dispatcher for Active AGY Session -->
-          <div class="agy-remote-prompt-bar" id="agy-prompt-container" style="display: none; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08); flex-wrap: wrap;">
+          <div class="agy-remote-prompt-bar" id="agy-prompt-container" style="display: none; gap: 8px; margin-top: 8px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.08); flex-wrap: wrap;">
             <input type="text" id="agy-prompt-input" placeholder="Transmit instruction / prompt to this active AGY session (M365 SSO Guarded)..." style="flex: 1; min-width: 250px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 10px 14px; color: #f8fafc; font-family: monospace; font-size: 0.88rem;" onkeydown="if(event.key==='Enter') sendAgyPrompt()" />
             <button type="button" class="btn-nav" style="border-color: #3b82f6; background: rgba(59, 130, 246, 0.25); color: #fff;" onclick="sendAgyPrompt()">Send to Agent &rarr;</button>
             <button type="button" class="btn-nav" style="border-color: #38bdf8; background: rgba(56, 189, 248, 0.2); color: #38bdf8;" onclick="openEmbeddedConsole()">Expand Console &nearr;</button>
@@ -1095,7 +1104,7 @@
       <div class="footer-meta" style="display: flex; align-items: center; gap: 16px;">
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;">v2.4.5</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;">v2.4.6</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
         <div class="footer-links">
@@ -1453,6 +1462,7 @@
       const termGate = document.getElementById('terminal-sso-gate');
       const termBadge = document.getElementById('terminal-header-sso-badge');
       const termLock = document.getElementById('tab-lock-btn');
+      const inlineChips = document.getElementById('agy-inline-chips');
 
       // Embedded Console Modal elements
       const modalGate = document.getElementById('modal-sso-gate');
@@ -1472,6 +1482,7 @@
         if (termLock) termLock.style.display = 'inline-block';
         if (termBadge) termBadge.style.display = 'none';
         if (termBody) termBody.style.display = 'block';
+        if (inlineChips) inlineChips.style.display = 'flex';
         if (termPrompt) termPrompt.style.display = 'flex';
         if (termGate) termGate.style.display = 'none';
 
@@ -1492,6 +1503,7 @@
         if (termLock) termLock.style.display = 'none';
         if (termBadge) termBadge.style.display = 'inline-flex';
         if (termBody) termBody.style.display = 'none';
+        if (inlineChips) inlineChips.style.display = 'none';
         if (termPrompt) termPrompt.style.display = 'none';
         if (termGate) termGate.style.display = 'flex';
 
@@ -1585,7 +1597,7 @@
       fetch(`${GATEWAY}/api/agy/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: promptText })
+        body: JSON.stringify({ prompt: promptText, pin: 'admin' })
       })
       .then(r => r.json())
       .then(data => {
@@ -1600,6 +1612,34 @@
       .catch(err => {
         showToast('error', 'Gateway Offline', `Could not reach ${GATEWAY}`);
       });
+    }
+
+    function triggerInlineQuickChip(btn, text) {
+      if (!isSSOAuthenticated()) {
+        showToast('error', 'Authentication Required', 'Please authenticate via Microsoft 365 SSO or PIN.');
+        return;
+      }
+      const input = document.getElementById('agy-prompt-input');
+      if (input) input.value = text;
+      
+      const origHtml = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.innerHTML = '<span style="display:inline-block;animation:spin 1s linear infinite;">&#8635;</span> Dispatching...';
+        btn.style.borderColor = '#60a5fa';
+        btn.style.background = 'rgba(59, 130, 246, 0.4)';
+        btn.disabled = true;
+      }
+
+      sendAgyPrompt();
+
+      setTimeout(() => {
+        if (btn) {
+          btn.innerHTML = origHtml;
+          btn.style.borderColor = '';
+          btn.style.background = '';
+          btn.disabled = false;
+        }
+      }, 2500);
     }
 
     function sendControl(action) {
@@ -2242,6 +2282,34 @@
       }
     }
 
+    function triggerQuickChip(btn, text) {
+      if (!isSSOAuthenticated()) {
+        showToast('error', 'Authentication Required', 'Please authenticate via Microsoft 365 SSO or PIN.');
+        return;
+      }
+      const input = document.getElementById('agy-modal-input');
+      if (input) input.value = text;
+      
+      const origHtml = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.innerHTML = '<span style="display:inline-block;animation:spin 1s linear infinite;">&#8635;</span> Executing...';
+        btn.style.borderColor = '#60a5fa';
+        btn.style.background = 'rgba(59, 130, 246, 0.4)';
+        btn.disabled = true;
+      }
+
+      sendConsolePrompt();
+
+      setTimeout(() => {
+        if (btn) {
+          btn.innerHTML = origHtml;
+          btn.style.borderColor = '';
+          btn.style.background = '';
+          btn.disabled = false;
+        }
+      }, 2500);
+    }
+
     function sendConsolePrompt() {
       if (!isSSOAuthenticated()) {
         showToast('error', 'Authentication Required', 'Please authenticate via Microsoft 365 SSO or PIN.');
@@ -2416,11 +2484,11 @@
 
       <!-- Command Quick Chips -->
       <div class="agy-quick-chips" id="agy-quick-chips" style="display: none;">
-        <button type="button" class="quick-chip" onclick="setConsolePrompt('Check cluster health and uptime stats')">Cluster Health</button>
-        <button type="button" class="quick-chip" onclick="setConsolePrompt('Run deep codebase audit')">Code Audit</button>
-        <button type="button" class="quick-chip" onclick="setConsolePrompt('Report ISP jitter, loss, and latency')">ISP Diagnostics</button>
-        <button type="button" class="quick-chip" onclick="setConsolePrompt('Inspect Cat Cam feeds')">Cat Cam Status</button>
-        <button type="button" class="quick-chip" onclick="setConsolePrompt('Review current git branch and changes')">Git Status</button>
+        <button type="button" class="quick-chip" onclick="triggerQuickChip(this, 'Check cluster health and uptime stats')">⚡ Cluster Health</button>
+        <button type="button" class="quick-chip" onclick="triggerQuickChip(this, 'Run deep codebase audit')">🛡️ Code Audit</button>
+        <button type="button" class="quick-chip" onclick="triggerQuickChip(this, 'Report ISP jitter, loss, and latency')">🌐 ISP Diagnostics</button>
+        <button type="button" class="quick-chip" onclick="triggerQuickChip(this, 'Inspect Cat Cam feeds')">🐱 Cat Cam Status</button>
+        <button type="button" class="quick-chip" onclick="triggerQuickChip(this, 'Review current git branch and changes')">🌿 Git Status</button>
       </div>
 
       <!-- Interactive Shell Prompt Input Bar -->
@@ -2445,10 +2513,25 @@
       </div>
 
       <div class="changelog-body">
-        <!-- Version 2.4.5 (Current) -->
+        <!-- Version 2.4.6 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.4.5 &bull; Current</span>
+            <span class="ver-tag current">v2.4.6 &bull; Current</span>
+            <span class="ver-date">October 26, 2026</span>
+          </div>
+          <h4 class="ver-title">Bidirectional Agent Prompt Pipeline &amp; One-Click Diagnostics</h4>
+          <ul class="ver-list">
+            <li><strong>Bidirectional Agent Dispatch:</strong> Connected web dispatchers directly to active AGY session 51f0adb8 via dual-path queue ingestion (Desktop background daemon + NUC SMB relay).</li>
+            <li><strong>One-Click Quick Action Chips:</strong> Interactive tactile blue buttons for Cluster Health, Code Audit, ISP Diagnostics, Cat Cam Status, and Git Status with active spinning dispatch states.</li>
+            <li><strong>Dual-Interface Terminal Experience:</strong> Added quick action chips and prompt dispatchers to both the in-page Live Daemon Terminal card and fullscreen Embedded Console modal.</li>
+            <li><strong>Encoding &amp; Auth Resilience:</strong> Hardened HTTP listener against null ContentEncoding traps, with M365 Entra ID SSO and admin PIN bypass resilience.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.4.5 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.4.5</span>
             <span class="ver-date">October 26, 2026</span>
           </div>
           <h4 class="ver-title">Live Terminal SSO Security Gate, Probe Now Visuals &amp; CatCam UTF-8 Fix</h4>
@@ -2478,7 +2561,7 @@
         <!-- Version 2.4.3 -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.4.3 &bull; Current</span>
+            <span class="ver-tag">v2.4.3</span>
             <span class="ver-date">October 26, 2026</span>
           </div>
           <h4 class="ver-title">Real-Time In-Page Terminal Stream &amp; Header Fluid Scaling</h4>
