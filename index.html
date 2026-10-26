@@ -39,7 +39,7 @@
               <span class="dropdown-dot dot-2"></span> Browse Media &amp; Files (NUC)
             </a>
             <a href="https://stream.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="dropdown-item" style="color: #a78bfa; font-weight: 600;">
-              <span class="dropdown-dot" style="background-color: #8b5cf6; box-shadow: 0 0 8px #8b5cf6;"></span> Stream Media (StreamHub)
+              <span class="dropdown-dot" style="background-color: #8b5cf6; box-shadow: 0 0 8px #8b5cf6;"></span> Browse &amp; Watch Media (Watch Library)
               <span class="item-tag" style="background: rgba(139, 92, 246, 0.2); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.4);">4K / HD</span>
             </a>
             <a href="javascript:void(0)" onclick="openMagnetModal()" class="dropdown-item" style="color: #60a5fa; font-weight: 600;">
@@ -125,7 +125,7 @@
 
         <a href="#uptime" class="btn-nav">Uptime &amp; SLA</a>
         <a href="https://cam.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn-nav">Cat Cam</a>
-        <a href="https://stream.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn-nav">StreamHub 4K</a>
+        <a href="https://stream.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn-nav">Watch Library</a>
       </nav>
     </div>
   </header>
@@ -151,7 +151,7 @@
             <span>[AGY]</span> Active AGY Session (51f0adb8) &rarr;
           </a>
           <a href="https://stream.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="pill-btn pill-stream">
-            <span>[PLAY]</span> Launch StreamHub (4K / HD)
+            <span>[PLAY]</span> Open Watch Library (HD / 4K)
           </a>
           <a href="https://cam.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="pill-btn" style="border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.15); color: #6ee7b7;">
             <span>[CAM]</span> Cat Cam Live (SSO)
@@ -216,7 +216,7 @@
         <div class="control-matrix-card">
           <div class="control-matrix-header">
             <div class="control-matrix-title">
-              <span>[CTRL]</span> Homelab Remote Control Matrix
+              <span>[CTRL]</span> Homelab Remote Control Matrix <span style="font-size: 0.72rem; color: #10b981; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); padding: 2px 8px; border-radius: 6px; margin-left: 8px; vertical-align: middle;">M365 ENTRA ID SSO GUARDED</span>
             </div>
             <div style="font-size: 0.8rem; color: #8b949e;">
               Direct Remote Telemetry &bull; Zero Lag Execution via Cloudflare Tunnel
@@ -253,14 +253,14 @@
             <button type="button" class="btn-control" style="color: #34d399;" onclick="sendControl('clean-junk')">
               <span>&#129529;</span> Clean NUC Temp &amp; Junk
             </button>
-            <button type="button" class="btn-control" style="color: #f43f5e;" onclick="confirmRebootNuc()">
+            <button type="button" class="btn-control" style="color: #f43f5e; border-color: rgba(244, 63, 94, 0.35);" onclick="confirmRebootNuc()" title="Strictly locked behind Microsoft 365 Entra ID SSO or Admin Passkey">
               <span>&#128260;</span> Reboot NUC Server
             </button>
             <button type="button" class="btn-control" style="color: #60a5fa;" onclick="sendControl('run-speedtest')">
               <span>&#127760;</span> Probe Bell Speed
             </button>
             <button type="button" class="btn-control" style="color: #a78bfa;" onclick="sendControl('restart-daemon&daemon=streamhub')">
-              <span>&#127916;</span> Restart StreamHub
+              <span>&#127916;</span> Restart Watch Library
             </button>
           </div>
         </div>
@@ -752,7 +752,7 @@
               </div>
               <div class="metric-row">
                 <span class="metric-name">Live Cluster Services</span>
-                <span class="metric-val" style="font-size: 0.78rem;">StreamHub (8088) &bull; Files (8085) &bull; qBit (8081) &bull; WoL (8082)</span>
+                <span class="metric-val" style="font-size: 0.78rem;">Watch Library (8088) &bull; Files (8085) &bull; qBit (8081) &bull; WoL (8082)</span>
               </div>
             </div>
             <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; gap: 8px; flex-wrap: wrap;">
@@ -866,7 +866,7 @@
                 <div class="app-icon" style="color: #a78bfa; border-color: rgba(139, 92, 246, 0.4); background: rgba(139, 92, 246, 0.15); font-weight: 700; font-size: 0.85rem;">4K</div>
                 <span class="item-tag" style="background: rgba(139, 92, 246, 0.2); color: #c4b5fd;">Port 8088</span>
               </div>
-              <div class="app-card-title">StreamHub 4K Video Cloud</div>
+              <div class="app-card-title">Review &amp; Watch Library</div>
               <div class="app-card-desc">
                 High-performance private Netflix/Plex alternative for <code style="color: #c4b5fd;">D:\Torrents</code> with HTTP 206 Partial Content byte-range video streaming.
               </div>
