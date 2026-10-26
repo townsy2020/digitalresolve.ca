@@ -148,6 +148,28 @@ body {
   transform: translateY(-1px);
 }
 
+.btn-gemini {
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.15), rgba(59, 130, 246, 0.15));
+  color: #c084fc !important;
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-gemini:hover {
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.32), rgba(59, 130, 246, 0.32));
+  border-color: #c084fc;
+  box-shadow: 0 0 18px rgba(168, 85, 247, 0.45);
+  transform: translateY(-1px);
+  color: #ffffff !important;
+}
+
 /* Dropdown */
 .dropdown {
   position: relative;
