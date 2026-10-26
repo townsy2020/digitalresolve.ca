@@ -39,47 +39,47 @@
 
         <!-- Gemini CLI Dropdown -->
         <div class="dropdown">
-          <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="btn btn-gemini">
+          <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="btn btn-torrent">
             Gemini CLI <span class="dropdown-arrow">&#9662;</span>
           </a>
           <div class="dropdown-menu">
             <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="dropdown-item">
-              <span class="dropdown-dot dot-gemini-desktop"></span> Desktop (Cory-Desktop)
+              <span class="dropdown-dot dot-1"></span> Desktop (Cory-Desktop)
             </a>
             <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="dropdown-item">
-              <span class="dropdown-dot dot-gemini-nuc"></span> NUC (Cory-NUC)
+              <span class="dropdown-dot dot-2"></span> NUC (Cory-NUC)
             </a>
           </div>
         </div>
 
         <!-- Wake on LAN Dropdown -->
         <div class="dropdown">
-          <button type="button" class="btn btn-wol" id="wol-btn" aria-haspopup="true">
+          <button type="button" class="btn btn-torrent" id="wol-btn" aria-haspopup="true">
             Wake on LAN <span class="dropdown-arrow">&#9662;</span>
           </button>
-          <div class="dropdown-menu wol-dropdown">
+          <div class="dropdown-menu">
             <button type="button" class="dropdown-item" onclick="sendWol('nuc')">
-              <span class="dropdown-dot dot-wol-nuc" id="badge-nuc"></span>
+              <span class="dropdown-dot dot-2" id="badge-nuc"></span>
               <span>Wake NUC</span>
               <span class="item-tag" id="status-tag-nuc">Checking...</span>
             </button>
             <button type="button" class="dropdown-item" onclick="sendWol('desktop')">
-              <span class="dropdown-dot dot-wol-desktop" id="badge-desktop"></span>
+              <span class="dropdown-dot dot-1" id="badge-desktop"></span>
               <span>Wake Desktop</span>
               <span class="item-tag" id="status-tag-desktop">Checking...</span>
             </button>
             <button type="button" class="dropdown-item" onclick="sendWol('both')">
-              <span class="dropdown-dot dot-wol-both"></span>
+              <span class="dropdown-dot dot-1"></span>
               <span>Wake Both</span>
             </button>
             <div class="dropdown-divider"></div>
             <button type="button" class="dropdown-item" onclick="checkStatus('nuc')">
-              <span class="dropdown-dot dot-ping"></span>
+              <span class="dropdown-dot dot-2"></span>
               <span>Ping NUC</span>
               <span class="item-tag" id="latency-nuc">-- ms</span>
             </button>
             <button type="button" class="dropdown-item" onclick="checkStatus('desktop')">
-              <span class="dropdown-dot dot-ping"></span>
+              <span class="dropdown-dot dot-1"></span>
               <span>Ping Desktop</span>
               <span class="item-tag" id="latency-desktop">-- ms</span>
             </button>
