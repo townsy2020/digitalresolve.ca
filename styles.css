@@ -166,7 +166,35 @@ body {
 .dropdown-divider {
   height: 1px;
   background: rgba(255, 255, 255, 0.08);
-  margin: 4px 6px;
+  margin: 6px 4px;
+}
+
+/* Action buttons inside dropdown (matching the Wake on LAN button style) */
+.btn-action-item {
+  background: rgba(59, 130, 246, 0.12) !important;
+  color: #60a5fa !important;
+  border: 1px solid rgba(59, 130, 246, 0.35) !important;
+  border-radius: 8px !important;
+  padding: 8px 12px !important;
+  margin-bottom: 5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.88rem;
+  transition: all 0.2s ease;
+}
+
+.btn-action-item:hover {
+  background: rgba(59, 130, 246, 0.25) !important;
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+  transform: translateY(-1px);
+  color: #ffffff !important;
 }
 
 .item-tag {
