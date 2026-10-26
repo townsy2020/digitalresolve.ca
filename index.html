@@ -19,7 +19,8 @@
         <span class="logo-accent">Digital</span>Resolve <span style="font-size: 0.75rem; color: #4ade80; background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3); padding: 2px 8px; border-radius: 6px; font-weight: 700; margin-left: 8px; letter-spacing: 0.5px;">HOMELAB DECK</span>
       </div>
       <nav class="nav-links">
-        <a href="#deck" class="btn-nav">&#9889; DECK</a>
+        <a href="#deck" class="btn-nav">DECK</a>
+
         <!-- Torrents Dropdown -->
         <div class="dropdown">
           <a href="https://torrents.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn-nav">
@@ -58,17 +59,27 @@
           </div>
         </div>
 
-        <!-- Gemini CLI Dropdown -->
+        <!-- AGY Session & Gemini CLI Dropdown -->
         <div class="dropdown">
-          <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="btn-nav">
-            Gemini CLI <span class="dropdown-arrow">&#9662;</span>
+          <a href="conversation://51f0adb8-74d9-4ada-92d6-c532f19e0629" class="btn-nav" title="Direct access to active Antigravity session">
+            AGY Session <span class="dropdown-arrow">&#9662;</span>
           </a>
           <div class="dropdown-menu">
+            <a href="conversation://51f0adb8-74d9-4ada-92d6-c532f19e0629" class="dropdown-item" style="color: #4ade80; font-weight: 700;">
+              <span class="dropdown-dot" style="background-color: #4ade80; box-shadow: 0 0 8px #4ade80;"></span> Open in AGY App (51f0adb8) &rarr;
+            </a>
+            <a href="javascript:void(0)" onclick="loadLog('agy'); document.getElementById('terminal-card').scrollIntoView({behavior:'smooth'});" class="dropdown-item" style="color: #38bdf8; font-weight: 600;">
+              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span> Live AGY Console Stream
+            </a>
+            <div class="dropdown-divider"></div>
             <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="dropdown-item">
-              <span class="dropdown-dot dot-1"></span> Desktop (Cory-Desktop)
+              <span class="dropdown-dot dot-1"></span> Antigravity Web Console
             </a>
             <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="dropdown-item">
-              <span class="dropdown-dot dot-2"></span> NUC (Cory-NUC)
+              <span class="dropdown-dot dot-1"></span> Desktop Agent (Cory-Desktop)
+            </a>
+            <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="dropdown-item">
+              <span class="dropdown-dot dot-2"></span> NUC Remote Bridge (Cory-NUC)
             </a>
           </div>
         </div>
@@ -112,9 +123,9 @@
           </div>
         </div>
 
-        <a href="#uptime" class="btn-nav">&#128200; Uptime &amp; SLA</a>
-        <a href="https://cam.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn-nav">&#128049; Cat Cam</a>
-        <a href="https://stream.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn-nav">&#9654; StreamHub 4K</a>
+        <a href="#uptime" class="btn-nav">Uptime &amp; SLA</a>
+        <a href="https://cam.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn-nav">Cat Cam</a>
+        <a href="https://stream.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn-nav">StreamHub 4K</a>
       </nav>
     </div>
   </header>
@@ -136,20 +147,23 @@
 
         <!-- Command Launch Pills -->
         <div class="command-pills">
+          <a href="conversation://51f0adb8-74d9-4ada-92d6-c532f19e0629" class="pill-btn" style="border-color: rgba(59, 130, 246, 0.45); background: rgba(59, 130, 246, 0.18); color: #60a5fa;">
+            <span>[AGY]</span> Active AGY Session (51f0adb8) &rarr;
+          </a>
           <a href="https://stream.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="pill-btn pill-stream">
-            <span>&#9654;</span> Launch StreamHub (4K / HD)
+            <span>[PLAY]</span> Launch StreamHub (4K / HD)
           </a>
           <a href="https://cam.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="pill-btn" style="border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.15); color: #6ee7b7;">
-            <span>&#128049;</span> Cat Cam Live (SSO)
+            <span>[CAM]</span> Cat Cam Live (SSO)
           </a>
           <a href="https://files.digitalresolve.ca/files/" target="_blank" rel="noopener noreferrer" class="pill-btn pill-files">
-            <span>&#128193;</span> Browse Media &amp; Files
+            <span>[FILES]</span> Browse Media &amp; Files
           </a>
           <button type="button" onclick="openMagnetModal()" class="pill-btn pill-magnet">
-            <span>&#129522;</span> + Quick-Drop Magnet
+            <span>[+]</span> Quick-Drop Magnet
           </button>
           <a href="#fleet" class="pill-btn pill-outline">
-            <span>&#9889;</span> Cluster Topology &amp; Power
+            <span>[CLUSTER]</span> Topology &amp; Power
           </a>
         </div>
 
@@ -163,7 +177,7 @@
             <span class="ribbon-label">Desktop Node</span>
             <span class="ribbon-value" id="ribbon-desktop"><span class="dropdown-dot dot-1"></span> Bell Fiber &bull; Online</span>
           </div>
-          <div class="ribbon-item"><span class="ribbon-label">&#128049; Cat Cam Fleet</span><span class="ribbon-value" id="ribbon-cam" style="color: #6ee7b7;"><span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span> 2 Online (SSO)</span></div>
+          <div class="ribbon-item"><span class="ribbon-label">Cat Cam Fleet</span><span class="ribbon-value" id="ribbon-cam" style="color: #6ee7b7;"><span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span> 2 Online (SSO)</span></div>
           <div class="ribbon-item">
             <span class="ribbon-label">Media Storage (D:)</span>
             <span class="ribbon-value" id="ribbon-storage" style="color: #60a5fa;">496 GB Free (73%)</span>
@@ -182,7 +196,7 @@
         <div id="ops" class="quick-drop-inline">
           <div class="quick-drop-header">
             <div class="quick-drop-title">
-              <span>🧲</span> Rapid Torrent &amp; Magnet Ingestion Console
+              <span>[+]</span> Rapid Torrent &amp; Magnet Ingestion Console
             </div>
             <div style="font-size: 0.8rem; color: #8b949e;">
               Traffic routed through Mullvad WireGuard &bull; Auto-unpacked to <code style="color: #60a5fa;">D:\Torrents</code>
@@ -194,7 +208,7 @@
               <option value="nuc">NUC Server (24/7 &bull; D:\Torrents)</option>
               <option value="desktop">Desktop Workstation</option>
             </select>
-            <button type="button" class="quick-drop-btn" onclick="submitQuickMagnet()">🚀 Start Remote Download</button>
+            <button type="button" class="quick-drop-btn" onclick="submitQuickMagnet()">Start Remote Download</button>
           </div>
         </div>
 
@@ -202,7 +216,7 @@
         <div class="control-matrix-card">
           <div class="control-matrix-header">
             <div class="control-matrix-title">
-              <span>⚡</span> Homelab Remote Control Matrix
+              <span>[CTRL]</span> Homelab Remote Control Matrix
             </div>
             <div style="font-size: 0.8rem; color: #8b949e;">
               Direct Remote Telemetry &bull; Zero Lag Execution via Cloudflare Tunnel
@@ -210,28 +224,28 @@
           </div>
           <div class="control-actions-grid">
             <button type="button" class="btn-control active-pause" onclick="sendControl('pause-all')">
-              <span>⏸</span> Pause All Swarms
+              <span>||</span> Pause All Swarms
             </button>
             <button type="button" class="btn-control active-resume" onclick="sendControl('resume-all')">
-              <span>▶</span> Resume All Swarms
+              <span>&gt;</span> Resume All Swarms
             </button>
             <button type="button" class="btn-control active-eco" onclick="sendControl('eco-throttle')">
-              <span>🌙</span> Eco Throttle (500K)
+              <span>ECO</span> Eco Throttle (500K)
             </button>
             <button type="button" class="btn-control" onclick="sendControl('unlimit')">
-              <span>🚀</span> Full Uncapped Speed
+              <span>MAX</span> Full Uncapped Speed
             </button>
-            <button type="button" class="btn-control" style="color: #4ade80;" onclick="sendWol('desktop')">
-              <span>⚡</span> Wake Desktop PC
+              <button type="button" class="btn-control active-wake" onclick="sendWol('desktop')">
+              <span>ON</span> Wake Desktop PC
             </button>
-            <button type="button" class="btn-control btn-sleep" onclick="sendSleep('desktop')">
-              <span>⏻</span> Sleep Desktop Standby
+            <button type="button" class="btn-control active-sleep" onclick="sendSleep('desktop')">
+              <span>ZZ</span> Sleep Desktop Standby
             </button>
             <button type="button" class="btn-control" style="color: #38bdf8;" onclick="sendControl('run-backup')">
-              <span>☁</span> Trigger Cloud Backup
+              <span>BAK</span> Trigger Cloud Backup
             </button>
             <button type="button" class="btn-control" style="color: #c084fc;" onclick="sendControl('run-audit')">
-              <span>🛡️</span> Run Sentinel Audit
+              <span>RUN</span> Run Sentinel Audit
             </button>
             <button type="button" class="btn-control" style="color: #fbbf24;" onclick="sendControl('run-update-computer')">
               <span>&#128640;</span> Run Update-Computer
@@ -329,11 +343,11 @@
               <span>Live Daemon Terminal &bull; Sentinel Audit Stream</span>
             </div>
             <div class="terminal-tabs">
-              <button type="button" class="terminal-tab active" id="tab-sentinel" onclick="loadLog('sentinel')">Sentinel Audit</button>
-              <button type="button" class="terminal-tab" id="tab-power" onclick="loadLog('power')">Power Optimizer</button>
-              <button type="button" class="terminal-tab" id="tab-report" onclick="loadLog('report')">Executive Briefing</button>
-              <button type="button" class="terminal-tab" onclick="reloadCurrentLog()" title="Refresh Log Stream">&#8635;</button>
-            </div>
+            <button class="terminal-tab active" id="tab-agy" onclick="loadLog('agy')">[AGY] Active Session (51f0adb8)</button>
+            <button class="terminal-tab" id="tab-sentinel" onclick="loadLog('sentinel')">Sentinel Watchdog</button>
+            <button class="terminal-tab" id="tab-power" onclick="loadLog('power')">Power Optimizer</button>
+            <button class="terminal-tab" id="tab-report" onclick="loadLog('report')">Morning Briefing</button>
+          </div>
           </div>
           <div class="terminal-body" id="terminal-content">Connecting to Sentinel daemon stream...</div>
         </div>
@@ -342,11 +356,11 @@
         <div class="control-matrix-card" id="isp-health-card" style="margin-bottom: 40px;">
           <div class="control-matrix-header">
             <div class="control-matrix-title">
-              <span>🌐</span> Bell Canada ISP Health &amp; Jitter Telemetry
+              <span>[ISP]</span> Bell Canada ISP Health &amp; Jitter Telemetry
             </div>
             <div style="display: flex; gap: 10px; align-items: center;">
               <span class="item-tag online" id="isp-grade-tag">Grade: A+ (Ultra Stable)</span>
-              <button type="button" class="btn btn-secondary" style="font-size: 0.78rem; padding: 4px 10px;" onclick="testISPNow()">⟳ Probe Now</button>
+              <button type="button" class="btn btn-secondary" style="font-size: 0.78rem; padding: 4px 10px;" onclick="testISPNow()">Probe Now</button>
             </div>
           </div>
 
@@ -429,17 +443,17 @@
         <div class="control-matrix-card" id="cat-cam-card" style="margin-bottom: 40px; border-color: rgba(16, 185, 129, 0.25);">
           <div class="control-matrix-header">
             <div class="control-matrix-title" style="color: #6ee7b7;">
-              <span>🐱</span> Live Cat Cam &amp; Home Security Fleet
+              <span>[CAM]</span> Live Cat Cam &amp; Home Security Fleet
             </div>
             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
               <span class="item-tag" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4);">
                 <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span> Dual Cams Online
               </span>
               <span class="item-tag" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">
-                🔒 Microsoft 365 Entra ID SSO Shield
+                Microsoft 365 Entra ID SSO Shield
               </span>
         <a href="https://cam.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.78rem; padding: 4px 12px; background: rgba(16, 185, 129, 0.2); color: #6ee7b7 !important; border-color: rgba(16, 185, 129, 0.5);">
-                Launch Cam Console ↗
+                Launch Cam Console &rarr;
               </a>
             </div>
           </div>
@@ -497,8 +511,8 @@
               <div style="display: flex; gap: 8px;">
                 <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="switchDeckCam(1)">Cam 1 (Living)</button>
                 <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="switchDeckCam(2)">Cam 2 (Food)</button>
-                <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="toggleDeckNight()">🌙 Night Mode</button>
-        <a href="https://cam.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px; color: #6ee7b7 !important; border-color: rgba(16, 185, 129, 0.4);">⛶ Full Portal</a>
+                <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="toggleDeckNight()">Night Mode</button>
+        <a href="https://cam.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px; color: #6ee7b7 !important; border-color: rgba(16, 185, 129, 0.4);">Full Portal &rarr;</a>
               </div>
             </div>
 
@@ -776,8 +790,8 @@
               </div>
             </div>
             <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; gap: 8px; flex-wrap: wrap;">
-              <button type="button" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; color: #4ade80 !important;" onclick="sendWol('desktop')">⚡ Wake PC</button>
-              <button type="button" class="btn btn-secondary btn-sleep" style="font-size: 0.8rem; padding: 6px 12px;" onclick="sendSleep('desktop')">⏻ Sleep PC</button>
+              <button type="button" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; color: #4ade80 !important;" onclick="sendWol('desktop')">Wake PC</button>
+              <button type="button" class="btn btn-secondary btn-sleep" style="font-size: 0.8rem; padding: 6px 12px;" onclick="sendSleep('desktop')">Sleep PC</button>
               <a href="https://torrents.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px;">qBittorrent</a>
             </div>
           </div>
@@ -828,11 +842,28 @@
         </div>
 
         <div class="app-grid">
+          <!-- Antigravity (AGY) Active Session Card -->
+          <a href="conversation://51f0adb8-74d9-4ada-92d6-c532f19e0629" class="app-card" style="border-color: rgba(59, 130, 246, 0.4); background: linear-gradient(135deg, rgba(13, 19, 33, 0.95), rgba(30, 58, 138, 0.25));">
+            <div>
+              <div class="app-card-header">
+                <div class="app-icon" style="color: #60a5fa; border-color: rgba(96, 165, 250, 0.4); background: rgba(96, 165, 250, 0.15); font-weight: 700; font-size: 0.85rem;">PC</div>
+                <span class="item-tag online" style="background: rgba(34, 197, 94, 0.2); color: #4ade80;">Active Session</span>
+              </div>
+              <div class="app-card-title">Antigravity (AGY) Live Session</div>
+              <div class="app-card-desc">
+                Direct deep-link access and real-time execution stream of this active Antigravity coding and autonomous homelab orchestration session.
+              </div>
+            </div>
+            <div class="app-card-footer">
+              <span class="app-port">ID: 51f0adb8-74d9...</span>
+              <span class="app-btn-launch" style="color: #60a5fa;">Launch in App &rarr;</span>
+            </div>
+          </a>
           <!-- StreamHub Card -->
           <a href="https://stream.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="app-card">
             <div>
               <div class="app-card-header">
-                <div class="app-icon" style="color: #a78bfa; border-color: rgba(139, 92, 246, 0.4); background: rgba(139, 92, 246, 0.15);">🎬</div>
+                <div class="app-icon" style="color: #a78bfa; border-color: rgba(139, 92, 246, 0.4); background: rgba(139, 92, 246, 0.15); font-weight: 700; font-size: 0.85rem;">4K</div>
                 <span class="item-tag" style="background: rgba(139, 92, 246, 0.2); color: #c4b5fd;">Port 8088</span>
               </div>
               <div class="app-card-title">StreamHub 4K Video Cloud</div>
@@ -850,7 +881,7 @@
           <a href="https://files.digitalresolve.ca/files/" target="_blank" rel="noopener noreferrer" class="app-card">
             <div>
               <div class="app-card-header">
-                <div class="app-icon" style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.4); background: rgba(56, 189, 248, 0.15);">📂</div>
+                <div class="app-icon" style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.4); background: rgba(56, 189, 248, 0.15); font-weight: 700; font-size: 0.85rem;">DIR</div>
                 <span class="item-tag" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8;">Port 8085</span>
               </div>
               <div class="app-card-title">FileBrowser Media Cloud</div>
@@ -868,7 +899,7 @@
           <a href="https://torrents2.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="app-card">
             <div>
               <div class="app-card-header">
-                <div class="app-icon" style="color: #34d399; border-color: rgba(52, 211, 153, 0.4); background: rgba(52, 211, 153, 0.15);">🔒</div>
+                <div class="app-icon" style="color: #34d399; border-color: rgba(52, 211, 153, 0.4); background: rgba(52, 211, 153, 0.15); font-weight: 700; font-size: 0.85rem;">NUC</div>
                 <span class="item-tag" style="background: rgba(52, 211, 153, 0.2); color: #34d399;">Port 8081</span>
               </div>
               <div class="app-card-title">qBittorrent (NUC WireGuard VPN)</div>
@@ -886,7 +917,7 @@
           <a href="https://torrents.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="app-card">
             <div>
               <div class="app-card-header">
-                <div class="app-icon" style="color: #60a5fa; border-color: rgba(96, 165, 250, 0.4); background: rgba(96, 165, 250, 0.15);">🚀</div>
+                <div class="app-icon" style="color: #60a5fa; border-color: rgba(96, 165, 250, 0.4); background: rgba(96, 165, 250, 0.15); font-weight: 700; font-size: 0.85rem;">PC</div>
                 <span class="item-tag" style="background: rgba(96, 165, 250, 0.2); color: #60a5fa;">Port 8080</span>
               </div>
               <div class="app-card-title">qBittorrent (Desktop Bell Fiber)</div>
@@ -904,7 +935,7 @@
           <a href="https://antigravity.google.com" target="_blank" rel="noopener noreferrer" class="app-card">
             <div>
               <div class="app-card-header">
-                <div class="app-icon" style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.15);">🤖</div>
+                <div class="app-icon" style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.15); font-weight: 700; font-size: 0.85rem;">WOL</div>
                 <span class="item-tag" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24;">AI Harness</span>
               </div>
               <div class="app-card-title">Gemini CLI &bull; Antigravity</div>
@@ -923,7 +954,7 @@
         <a href="https://cam.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="app-card">
             <div>
               <div class="app-card-header">
-                <div class="app-icon" style="color: #10b981; border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.15);">🐱</div>
+                <div class="app-icon" style="color: #10b981; border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.15); font-weight: 700; font-size: 0.85rem;">CAM</div>
                 <span class="item-tag" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7;">Port 8089 &bull; SSO</span>
               </div>
               <div class="app-card-title">Cat Cam Operations Center</div>
@@ -941,7 +972,7 @@
           <div class="app-card" style="cursor: default;">
             <div>
               <div class="app-card-header">
-                <div class="app-icon" style="color: #ec4899; border-color: rgba(236, 72, 153, 0.4); background: rgba(236, 72, 153, 0.15);">💾</div>
+                <div class="app-icon" style="color: #ec4899; border-color: rgba(236, 72, 153, 0.4); background: rgba(236, 72, 153, 0.15); font-weight: 700; font-size: 0.85rem;">BAK</div>
                 <span class="item-tag" style="background: rgba(236, 72, 153, 0.2); color: #f472b6;">3:00 AM Daily</span>
               </div>
               <div class="app-card-title">Disaster Recovery &amp; Snapshots</div>
@@ -1261,7 +1292,7 @@
       // Start live stats & terminal stream
       fetchClusterStats();
       setInterval(fetchClusterStats, 4000);
-      loadLog('sentinel');
+      loadLog('agy');
       fetchISPHistory();
       setInterval(fetchISPHistory, 15000);
       renderUptimeMatrix();
@@ -1343,10 +1374,10 @@
     }
 
     // Terminal Log Streamer
-    let currentLogTab = 'sentinel';
+    let currentLogTab = 'agy';
     function loadLog(name) {
       currentLogTab = name;
-      ['sentinel', 'power', 'report'].forEach(t => {
+      ['agy', 'sentinel', 'power', 'report'].forEach(t => {
         const btn = document.getElementById(`tab-${t}`);
         if (btn) btn.className = (t === name) ? 'terminal-tab active' : 'terminal-tab';
       });
@@ -1455,7 +1486,7 @@
       const targetSelect = document.getElementById('quick-magnet-target');
       const val = input ? input.value.trim() : '';
       if (!val) {
-        showToast('error', 'Empty Input', 'Please paste a valid magnet link or URL.');
+        showToast('error', 'Invalid URL', 'Please paste a valid magnet link or URL.');
         return;
       }
       const target = targetSelect ? targetSelect.value : 'nuc';
@@ -1496,7 +1527,7 @@
       const input = document.getElementById('magnet-input');
       const val = input ? input.value.trim() : '';
       if (!val) {
-        showToast('⚠️ Please paste a valid magnet link or URL.');
+        showToast('error', 'Invalid URL', 'Please paste a valid magnet link or URL.');
         return;
       }
       const targetRadios = document.getElementsByName('magnet-target');
@@ -1515,11 +1546,11 @@
       .then(data => {
         closeMagnetModal();
         if (input) input.value = '';
-        if (btn) { btn.disabled = false; btn.textContent = '🚀 Start Remote Download'; }
+        if (btn) { btn.disabled = false; btn.textContent = 'Start Remote Download'; }
         showToast(data.message || `Torrent sent to ${target.toUpperCase()}!`);
       })
       .catch(err => {
-        if (btn) { btn.disabled = false; btn.textContent = '🚀 Start Remote Download'; }
+        if (btn) { btn.disabled = false; btn.textContent = 'Start Remote Download'; }
         showToast(`Dispatched to ${target.toUpperCase()}!`);
         closeMagnetModal();
       });
@@ -1717,7 +1748,7 @@
 
     // Remote Actions Extension Handlers
     function confirmRebootNuc() {
-      if (confirm("⚠️ Are you sure you want to gracefully reboot the NUC Core Server?\n\nAll active torrents and daemons will be suspended cleanly and restarted automatically.")) {
+      if (confirm("Are you sure you want to gracefully reboot the NUC Core Server?\n\nAll active torrents and daemons will be suspended cleanly and restarted automatically.")) {
         sendControl('reboot-nuc');
       }
     }
@@ -1728,7 +1759,7 @@
   <div id="magnet-modal-overlay" class="magnet-modal-overlay" onclick="closeMagnetModalOnBackdrop(event)">
     <div class="magnet-modal">
       <div class="magnet-header">
-        <div class="magnet-title">🧲 Remote Torrent / Magnet Drop</div>
+        <div class="magnet-title">[+] Remote Torrent / Magnet Drop</div>
         <button class="magnet-close" onclick="closeMagnetModal()">&times;</button>
       </div>
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.5;">
@@ -1745,7 +1776,7 @@
           <span>Desktop Workstation</span>
         </label>
       </div>
-      <button class="magnet-submit-btn" id="magnet-submit-btn" onclick="submitMagnet()">🚀 Start Remote Download</button>
+      <button class="magnet-submit-btn" id="magnet-submit-btn" onclick="submitMagnet()">Start Remote Download</button>
     </div>
   </div>
 </body>
