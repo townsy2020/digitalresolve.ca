@@ -1151,8 +1151,8 @@
     }
     const GATEWAY = 'https://wake.digitalresolve.ca';
     const devices = {
-      desktop: { name: 'Desktop', mac: '70:85:C2:84:62:65', ip: '192.168.2.62', dns: 'torrents.digitalresolve.ca' },
-      nuc:     { name: 'NUC',     mac: '1C:69:7A:60:C7:0D', ip: '192.168.2.35', dns: 'torrents2.digitalresolve.ca' },
+      desktop: { name: 'Desktop', hostname: 'DESKTOP', mac: '70:85:C2:84:62:65', netbios: 'DESKTOP', dns: 'torrents.digitalresolve.ca' },
+      nuc:     { name: 'NUC',     hostname: 'NUC',     mac: '1C:69:7A:60:C7:0D', netbios: 'NUC',     dns: 'torrents2.digitalresolve.ca' },
       both:    { name: 'Both Machines', mac: 'Subnet Broadcast' }
     };
 
@@ -1548,6 +1548,7 @@
           showToast('error', 'PIN Required', 'Please enter a PIN or passkey.');
           return;
         }
+        localStorage.setItem('dr_sso_pin', val);
       } else if (method === 'pin-modal') {
         const pinInput = document.getElementById('modal-sso-pin');
         const val = pinInput ? pinInput.value.trim() : '';
@@ -1555,6 +1556,9 @@
           showToast('error', 'PIN Required', 'Please enter a PIN or passkey.');
           return;
         }
+        localStorage.setItem('dr_sso_pin', val);
+      } else if (method === 'passkey') {
+        localStorage.setItem('dr_sso_pin', '2026');
       }
 
       localStorage.setItem('dr_sso_authenticated', 'true');
@@ -1571,6 +1575,7 @@
 
     function lockSSO() {
       localStorage.removeItem('dr_sso_authenticated');
+      localStorage.removeItem('dr_sso_pin');
       stopConsoleAutoPoll();
       updateSSOGateUI();
       showToast('info', 'SSO Locked', 'Terminal & Console secured.');
@@ -1615,10 +1620,11 @@
       if (!promptText) return;
 
       showToast('loading', 'Dispatching Prompt to AGY Session...', 'Session ID: 51f0adb8-74d9', 0);
+      const ssoPin = localStorage.getItem('dr_sso_pin') || '';
       fetch(`${GATEWAY}/api/agy/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: promptText, pin: 'admin' })
+        body: JSON.stringify({ prompt: promptText, pin: ssoPin })
       })
       .then(r => r.json())
       .then(data => {
@@ -1669,12 +1675,13 @@
         return;
       }
       const hostLabel = target === 'nuc' ? 'NUC (Home Server)' : 'Desktop (Workstation)';
+      const ssoPin = localStorage.getItem('dr_sso_pin') || '';
       showToast('loading', `Starting Session on ${hostLabel}...`, 'Running: agy --dangerously-skip-permissions', 3000);
 
       fetch(`${GATEWAY}/api/agy/launch`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ target: target, pin: 'admin' })
+        body: JSON.stringify({ target: target, pin: ssoPin })
       })
       .then(r => r.json())
       .then(data => {
@@ -2383,10 +2390,11 @@
       if (input) input.value = '';
       showToast('loading', 'Dispatching Prompt to AGY Session...', 'Session ID: 51f0adb8-74d9', 1500);
 
+      const ssoPin = localStorage.getItem('dr_sso_pin') || '';
       fetch(`${GATEWAY}/api/agy/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: text, pin: 'admin' })
+        body: JSON.stringify({ prompt: text, pin: ssoPin })
       })
       .then(r => r.json())
       .then(data => {
@@ -2488,7 +2496,7 @@
       <div class="agy-session-meta-bar" id="agy-session-meta-bar" style="display: none;">
         <div class="meta-item"><span class="meta-lbl">Agent:</span> <span class="meta-val">Antigravity CLI (agy)</span></div>
         <div class="meta-item"><span class="meta-lbl">Session ID:</span> <span class="meta-val mono">51f0adb8-74d9-4ada-92d6-c532f19e0629</span></div>
-        <div class="meta-item"><span class="meta-lbl">Node:</span> <span class="meta-val">Cory-Desktop (192.168.2.62)</span></div>
+        <div class="meta-item"><span class="meta-lbl">Node:</span> <span class="meta-val">DESKTOP (NetBIOS)</span></div>
         <div class="meta-item"><span class="meta-lbl">Auth Gateway:</span> <span class="meta-val">wake.digitalresolve.ca (M365 Entra ID SSO)</span></div>
         <div class="meta-actions">
           <button type="button" class="meta-link-btn" onclick="refreshAgyConsole()" title="Force Refresh Stream">Refresh Stream &#x21bb;</button>
