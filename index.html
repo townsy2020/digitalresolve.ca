@@ -606,6 +606,31 @@
             </div>
           </div>
 
+          <!-- 90-Day Status Bar Matrix & Colour Legend -->
+          <div class="uptime-legend-bar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; padding: 12px 16px; background: rgba(13, 19, 33, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px;">
+            <div style="font-size: 0.82rem; font-weight: 700; color: #f0f6fc; display: flex; align-items: center; gap: 8px;">
+              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+              <span>90-Day Operational SLA Matrix</span>
+            </div>
+            <div class="uptime-legend-items" style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap; font-size: 0.78rem;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="display: inline-block; width: 14px; height: 10px; border-radius: 2px; background-color: #10b981;"></span>
+                <span style="color: #cbd5e1;"><strong>Green:</strong> 100% Operational (Active Compute)</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="display: inline-block; width: 14px; height: 10px; border-radius: 2px; background-color: #6366f1;"></span>
+                <span style="color: #cbd5e1;"><strong>Purple:</strong> Smart Eco Sleep (Low-Power WoL Standby)</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="display: inline-block; width: 14px; height: 10px; border-radius: 2px; background-color: #f59e0b;"></span>
+                <span style="color: #cbd5e1;"><strong>Amber:</strong> Throttled Maintenance</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="display: inline-block; width: 14px; height: 10px; border-radius: 2px; background-color: #ef4444;"></span>
+                <span style="color: #cbd5e1;"><strong>Red:</strong> Outage</span>
+              </div>
+            </div>
+          </div>
           <!-- 90-Day Status Bar Matrix -->
           <div class="uptime-matrix" id="uptimeMatrix">
             <!-- Tier 1: NUC -->
@@ -688,7 +713,7 @@
               <div class="uptime-scale">
                 <span>90 days ago</span>
                 <span>45 days ago</span>
-                <span>Today (WoL Ready)</span>
+                <span>Today (WoL Ready &bull; Smart Eco Sleep)</span>
               </div>
             </div>
 

@@ -1652,8 +1652,16 @@ button.dropdown-item {
   background-color: #6366f1;
 }
 
+.uptime-bar.standby:hover {
+  background-color: #818cf8 !important;
+}
+
 .uptime-bar.warn {
   background-color: #f59e0b;
+}
+
+.uptime-bar.down {
+  background-color: #ef4444;
 }
 
 .uptime-scale {
