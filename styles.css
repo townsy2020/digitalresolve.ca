@@ -131,32 +131,47 @@ body {
   background: rgba(255, 255, 255, 0.15);
 }
 
+.btn-nav,
 .btn-torrent,
 .btn-gemini,
 .btn-wol {
   background: rgba(59, 130, 246, 0.12);
   color: #60a5fa !important;
   border: 1px solid rgba(59, 130, 246, 0.35);
-  padding: 8px 16px;
-  font-size: 0.9rem;
+  padding: 8px 15px;
+  font-size: 0.88rem;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+  box-sizing: border-box;
+  height: 38px;
 }
 
+.btn-nav:hover,
 .btn-torrent:hover,
 .btn-gemini:hover,
 .btn-wol:hover {
   background: rgba(59, 130, 246, 0.25);
   border-color: #60a5fa;
-  box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.35);
   transform: translateY(-1px);
   color: #ffffff !important;
+}
+
+.btn-nav:active,
+.btn-torrent:active,
+.btn-gemini:active,
+.btn-wol:active {
+  transform: translateY(0);
 }
 
 .wol-dropdown {
