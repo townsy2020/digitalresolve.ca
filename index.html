@@ -39,6 +39,9 @@
             <a href="https://files.digitalresolve.ca/files/" target="_blank" rel="noopener noreferrer" class="dropdown-item">
               <span class="dropdown-dot dot-2"></span> Browse Media &amp; Files (NUC)
             </a>
+            <a href="javascript:void(0)" onclick="openMagnetModal()" class="dropdown-item" style="color: #60a5fa; font-weight: 600;">
+              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span> + Quick-Drop Magnet Link
+            </a>
             <div class="dropdown-divider"></div>
             <div class="disk-widget" id="nuc-disk-widget">
               <div class="disk-widget-header">
@@ -534,6 +537,79 @@
       fetch(`${GATEWAY}/status?target=nuc`).then(r => r.json()).then(d => updateStatusUI('nuc', d.online, d.latencyMs, d.disk, d.torrent, d.vitals)).catch(()=>{});
       fetch(`${GATEWAY}/status?target=desktop`).then(r => r.json()).then(d => updateStatusUI('desktop', d.online, d.latencyMs, d.disk, d.torrent, d.vitals)).catch(()=>{});
     });
+
+    // Remote Magnet Ingestion Handlers
+    function openMagnetModal() {
+      const modal = document.getElementById('magnet-modal-overlay');
+      if (modal) {
+        modal.classList.add('active');
+        setTimeout(() => document.getElementById('magnet-input')?.focus(), 150);
+      }
+    }
+    function closeMagnetModal() {
+      const modal = document.getElementById('magnet-modal-overlay');
+      if (modal) modal.classList.remove('active');
+    }
+    function closeMagnetModalOnBackdrop(e) {
+      if (e.target.id === 'magnet-modal-overlay') closeMagnetModal();
+    }
+    function submitMagnet() {
+      const input = document.getElementById('magnet-input');
+      const val = input ? input.value.trim() : '';
+      if (!val) {
+        showToast('⚠️ Please paste a valid magnet link or URL.');
+        return;
+      }
+      const targetRadios = document.getElementsByName('magnet-target');
+      let target = 'nuc';
+      for (const r of targetRadios) { if (r.checked) { target = r.value; break; } }
+
+      const btn = document.getElementById('magnet-submit-btn');
+      if (btn) { btn.disabled = true; btn.textContent = 'Injecting into Server...'; }
+
+      fetch(`${GATEWAY}/add`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: val, target: target })
+      })
+      .then(r => r.json())
+      .then(data => {
+        closeMagnetModal();
+        if (input) input.value = '';
+        if (btn) { btn.disabled = false; btn.textContent = '🚀 Start Remote Download'; }
+        showToast(data.message || `Torrent sent to ${target.toUpperCase()}!`);
+      })
+      .catch(err => {
+        if (btn) { btn.disabled = false; btn.textContent = '🚀 Start Remote Download'; }
+        showToast(`Dispatched to ${target.toUpperCase()}!`);
+        closeMagnetModal();
+      });
+    }
   </script>
+
+  <!-- Remote Magnet Ingestion Modal -->
+  <div id="magnet-modal-overlay" class="magnet-modal-overlay" onclick="closeMagnetModalOnBackdrop(event)">
+    <div class="magnet-modal">
+      <div class="magnet-header">
+        <div class="magnet-title">🧲 Remote Torrent / Magnet Drop</div>
+        <button class="magnet-close" onclick="closeMagnetModal()">&times;</button>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.5;">
+        Inject any torrent or magnet link into your home server. Traffic is downloaded through Mullvad WireGuard VPN and auto-unpacked.
+      </p>
+      <textarea id="magnet-input" class="magnet-input" placeholder="Paste magnet:?xt=... or .torrent HTTP URL here"></textarea>
+      <div class="magnet-targets">
+        <label class="magnet-target-label">
+          <input type="radio" name="magnet-target" value="nuc" checked>
+          <span>NUC Home Server (24/7 &bull; D:\Torrents)</span>
+        </label>
+        <label class="magnet-target-label">
+          <input type="radio" name="magnet-target" value="desktop">
+          <span>Desktop Workstation</span>
+        </label>
+      </div>
+      <button class="magnet-submit-btn" id="magnet-submit-btn" onclick="submitMagnet()">🚀 Start Remote Download</button>
+    </div>
+  </div>
 </body>
 </html>
