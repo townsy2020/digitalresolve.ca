@@ -2069,6 +2069,29 @@
       if (!str) return '';
       return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
+
+    // System Release Changelog Modal Controllers
+    function openChangelogModal() {
+      const modal = document.getElementById('changelog-modal-overlay');
+      if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeChangelogModal() {
+      const modal = document.getElementById('changelog-modal-overlay');
+      if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    }
+
+    function closeChangelogModalOnBackdrop(e) {
+      if (e.target && e.target.id === 'changelog-modal-overlay') {
+        closeChangelogModal();
+      }
+    }
   </script>
 
   <!-- Remote Magnet Ingestion Modal -->
