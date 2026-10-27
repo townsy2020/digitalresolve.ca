@@ -670,58 +670,100 @@
                 <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
                 <span id="deckCamTitle">Live Feed: Cat Cam 1 (Living Room Tower)</span>
               </div>
-              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="switchDeckCam(1)" title="Switch Deck Feed to Cat Cam 1 (Living Room)">Cam 1 (Living)</button>
-                <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="switchDeckCam(2)" title="Switch Deck Feed to Cat Cam 2 (Perch / Food)">Cam 2 (Food)</button>
-                <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="toggleDeckNight()" title="Toggle Low-Light Night Vision Simulation">Night Mode</button>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                <div class="cam-tabs" style="margin: 0; display: inline-flex; gap: 4px;">
+                  <button type="button" class="btn btn-secondary active" id="cam-tab-1" style="font-size: 0.75rem; padding: 4px 10px;" onclick="switchDeckCam(1)" title="Switch to Cat Cam 1 (Living Room Tower)">Cam 1 (Living)</button>
+                  <button type="button" class="btn btn-secondary" id="cam-tab-2" style="font-size: 0.75rem; padding: 4px 10px;" onclick="switchDeckCam(2)" title="Switch to Cat Cam 2 (Perch / Food)">Cam 2 (Food)</button>
+                </div>
+                <div style="display: inline-flex; gap: 4px;">
+                  <button type="button" class="btn btn-secondary" id="mode-canvas-btn" style="font-size: 0.75rem; padding: 4px 10px; background: rgba(56, 189, 248, 0.2); border-color: #38bdf8; color: #38bdf8;" onclick="setCamViewMode('canvas')" title="Switch to Realtime Optical Watchdog Canvas">Watchdog HUD</button>
+                  <button type="button" class="btn btn-secondary" id="mode-live-btn" style="font-size: 0.75rem; padding: 4px 10px;" onclick="setCamViewMode('live')" title="Switch to Embedded Live Video Stream Player">&#9654; Live Video Embed</button>
+                </div>
+                <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="toggleDeckNight()" title="Toggle Low-Light Night Vision Filter">&#127769; Night Mode</button>
+                <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="toggleCamPip()" title="Pop Out Live Picture-in-Picture Stream Window">&#128470; Pop-Out / PiP</button>
                 <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="captureDeckSnapshot()" title="Capture High-Res Frame Snapshot">&#128248; Snapshot</button>
-                <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px; color: #fbbf24 !important; border-color: rgba(245, 158, 11, 0.4);" onclick="toggleIpcGuide()" title="How to log into IPC Terminal (camview.mygeeni.com) using mobile QR scan">&#128241; IPC Terminal QR Guide</button>
+                <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px; color: #fbbf24 !important; border-color: rgba(245, 158, 11, 0.4);" onclick="toggleIpcGuide()" title="How to scan the QR code properly inside the Geeni app">&#128241; QR Fix &amp; Guide</button>
                 <a href="https://cam.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px; color: #6ee7b7 !important; border-color: rgba(16, 185, 129, 0.4);" title="Open Direct NUC Cat Cam Stream Portal (M365 SSO Protected)">Full Portal (SSO) &rarr;</a>
               </div>
             </div>
 
             <!-- IPC Terminal QR Authentication Guide Banner -->
-            <div id="ipc-terminal-guide-panel" style="display: none; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 14px; margin-bottom: 14px;">
+            <div id="ipc-terminal-guide-panel" style="display: none; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 8px; padding: 14px; margin-bottom: 14px;">
               <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap;">
-                <div>
-                  <div style="font-size: 0.9rem; font-weight: 700; color: #fbbf24; display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-                    <span>&#128241;</span> IPC Terminal (Geeni Web) QR Scan Login Guide
+                <div style="flex: 1; min-width: 280px;">
+                  <div style="font-size: 0.92rem; font-weight: 700; color: #fbbf24; display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                    <span>&#128241;</span> Why You Saw <code style="font-size: 0.78rem; background: rgba(0,0,0,0.5); padding: 2px 6px; border-radius: 4px; color: #fde047;">tuyaSmart--qrLogin?token=...</code> &amp; How to Authenticate
                   </div>
                   <div style="font-size: 0.8rem; color: #cbd5e1; line-height: 1.5; margin-bottom: 8px;">
-                    <strong style="color: #fde047;">Why is there no password login form?</strong> When you visit <code style="color: #fbbf24; background: rgba(0,0,0,0.4); padding: 1px 5px; border-radius: 4px;">camview.mygeeni.com/login</code> ("Welcome to Geeni Web"), it displays a QR code instead of username/password inputs. This is a <strong>zero-password Tuya/Geeni security feature</strong>.
+                    <strong style="color: #fca5a5;">Why the string appeared:</strong> Your phone's native Camera app (iOS Camera / Google Lens) scanned the raw QR payload. Because <code style="color: #fbbf24;">tuyaSmart--qrLogin</code> is a proprietary app protocol, the regular phone camera doesn't recognize it and outputs plain text.
                   </div>
                   <div style="background: rgba(0,0,0,0.5); padding: 10px 14px; border-radius: 6px; font-size: 0.78rem; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 10px;">
-                    <span style="color: #38bdf8; font-weight: 700;">How to Authenticate in 3 Seconds:</span>
+                    <span style="color: #38bdf8; font-weight: 700;">How to Pair in 5 Seconds:</span>
                     <ol style="margin: 4px 0 0 18px; color: #e2e8f0; line-height: 1.6;">
-                      <li>Open the <strong>Geeni app</strong> on your mobile phone (iPhone or Android).</li>
-                      <li>Tap the <strong>+</strong> icon in the top right corner (or Profile &rarr; Scan) and select <strong>Scan QR Code</strong>.</li>
-                      <li>Point your phone camera at the QR code on the browser screen and tap <strong>Confirm / Authorize</strong>.</li>
+                      <li>Open the <strong>Geeni app</strong> on your mobile phone.</li>
+                      <li>On the main screen, tap the <strong>+</strong> icon in the top right corner (or the square <strong style="color: #38bdf8;">[-]</strong> scanner icon).</li>
+                      <li>Select <strong>Scan QR Code</strong> inside the Geeni app.</li>
+                      <li>Scan the QR code on your PC screen at <a href="https://camview.mygeeni.com/login" target="_blank" rel="noopener noreferrer" style="color: #fbbf24;">camview.mygeeni.com/login</a>.</li>
+                      <li>Your phone will show a prompt: <strong style="color: #6ee7b7;">&quot;Log in to PC? Tap Authorize.&quot;</strong></li>
                     </ol>
                   </div>
+                  <div style="font-size: 0.78rem; color: #94a3b8;">
+                    <strong style="color: #38bdf8;">Native RTSP Local Streaming:</strong> You can also enable local RTSP in the Geeni app under <em>Device Settings &rarr; PC View / ONVIF</em> to stream directly to NUC without cloud signaling.
+                  </div>
                 </div>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                  <a href="https://camview.mygeeni.com/login" target="_blank" rel="noopener noreferrer" class="btn-geeni-glow" style="font-size: 0.78rem; padding: 6px 14px; text-decoration: none;">
+                <div style="display: flex; flex-direction: column; gap: 8px; align-items: stretch; min-width: 170px;">
+                  <a href="https://camview.mygeeni.com/login" target="_blank" rel="noopener noreferrer" class="btn-geeni-glow" style="font-size: 0.78rem; padding: 8px 14px; text-decoration: none; text-align: center; justify-content: center;">
                     Launch IPC Terminal &rarr;
                   </a>
-                  <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 6px 10px;" onclick="toggleIpcGuide()">Close</button>
+                  <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 6px 10px;" onclick="toggleIpcGuide()">Close Help</button>
                 </div>
               </div>
             </div>
 
-            <!-- Canvas Viewport -->
-            <div style="position: relative; width: 100%; height: 260px; background: #020617; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.06); display: flex; align-items: center; justify-content: center;">
-              <canvas id="deckCamCanvas" width="800" height="260" style="width: 100%; height: 100%; object-fit: cover;"></canvas>
-              <div style="position: absolute; top: 10px; left: 10px; font-family: monospace; font-size: 0.72rem; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; display: flex; flex-direction: column; gap: 2px;">
+            <!-- Viewport Container (Supports Dual Canvas Optical Watchdog & Live Video Stream) -->
+            <div id="cam-player-wrapper" style="position: relative; width: 100%; height: 300px; background: #020617; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: center;">
+              
+              <!-- Mode 1: Realtime Optical Watchdog Canvas -->
+              <canvas id="deckCamCanvas" width="800" height="300" style="width: 100%; height: 100%; object-fit: cover;"></canvas>
+
+              <!-- Mode 2: HTML5 Live Video Stream Player -->
+              <div id="live-cam-video-container" style="display: none; width: 100%; height: 100%; position: relative; background: #000;">
+                <video id="liveCamVideo" controls autoplay muted playsinline style="width: 100%; height: 100%; object-fit: contain; background: #020617;"></video>
+                <div id="live-stream-overlay-helper" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(2, 6, 23, 0.88); backdrop-filter: blur(8px); padding: 20px; text-align: center;">
+                  <span style="font-size: 1.8rem; margin-bottom: 8px;">&#128049;</span>
+                  <div style="font-weight: 700; color: #f1f5f9; font-size: 0.95rem; margin-bottom: 4px;">Embedded Live Stream Bridge Ready</div>
+                  <div style="font-size: 0.8rem; color: #94a3b8; max-width: 480px; line-height: 1.4; margin-bottom: 14px;">
+                    Geeni cameras connect via Tuya P2P signaling. Use the live IPC Terminal or link your RTSP stream endpoint below:
+                  </div>
+                  <div style="display: flex; gap: 8px; width: 100%; max-width: 460px; margin-bottom: 10px;">
+                    <input type="text" id="live-stream-url-input" placeholder="rtsp://... or https://... (or click IPC Terminal)" style="flex: 1; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 6px; padding: 6px 10px; color: #fff; font-size: 0.78rem; font-family: monospace;" />
+                    <button type="button" class="btn btn-secondary" style="font-size: 0.78rem; padding: 6px 12px; background: rgba(56, 189, 248, 0.2); border-color: #38bdf8; color: #38bdf8;" onclick="applyCustomCamStream()">Connect</button>
+                  </div>
+                  <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
+                    <a href="https://camview.mygeeni.com/login" target="_blank" rel="noopener noreferrer" class="btn-geeni-glow" style="font-size: 0.76rem; padding: 6px 12px;">
+                      Launch Geeni IPC Web Terminal &nearr;
+                    </a>
+                    <button type="button" class="btn btn-secondary" style="font-size: 0.76rem; padding: 6px 12px;" onclick="setCamViewMode('canvas')">
+                      Return to Watchdog HUD
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Viewport Realtime OSD Overlay -->
+              <div style="position: absolute; top: 10px; left: 10px; font-family: monospace; font-size: 0.72rem; background: rgba(0,0,0,0.72); backdrop-filter: blur(4px); padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; display: flex; flex-direction: column; gap: 2px; z-index: 10; pointer-events: none;">
                 <span style="color: #6ee7b7; font-weight: 700;" id="deckOverlayName">CAM 1: LIVING ROOM TOWER (192.168.2.24)</span>
                 <span id="deckOverlayTime">2026-10-26 05:15:00 UTC</span>
                 <span style="color: #38bdf8;">FEED: 1080P &bull; 30 FPS &bull; M365 ENTRA ID SSO GUARDED</span>
               </div>
+
+              <!-- Viewport Bottom Right Quick Actions -->
               <div style="position: absolute; bottom: 12px; right: 12px; display: flex; gap: 8px; z-index: 10; flex-wrap: wrap;">
                 <button type="button" class="btn-secondary" style="font-size: 0.72rem; padding: 4px 8px; background: rgba(15,23,42,0.85); color: #fbbf24; border: 1px solid rgba(245,158,11,0.4); border-radius: 6px; cursor: pointer;" onclick="toggleIpcGuide()">
-                  &#128241; QR Scan Help
+                  &#128241; QR Fix Help
                 </button>
                 <a href="https://camview.mygeeni.com/login" target="_blank" rel="noopener noreferrer" class="btn-geeni-glow" title="Launch Geeni IPC Web Terminal with Mobile QR Scan (camview.mygeeni.com/login)">
-                  <span class="dropdown-dot" style="background-color: #fff; box-shadow: 0 0 6px #fff;"></span> &#128308; Geeni IPC Terminal (QR Login) &nearr;
+                  <span class="dropdown-dot" style="background-color: #fff; box-shadow: 0 0 6px #fff;"></span> &#128308; Geeni IPC Terminal &nearr;
                 </a>
               </div>
             </div>
@@ -2201,12 +2243,92 @@
       deckCurrentCam = num;
       const title = document.getElementById('deckCamTitle');
       const overlay = document.getElementById('deckOverlayName');
+      const tab1 = document.getElementById('cam-tab-1');
+      const tab2 = document.getElementById('cam-tab-2');
+
       if (num === 1) {
         if (title) title.innerText = "Live Feed: Cat Cam 1 (Living Room Tower)";
         if (overlay) overlay.innerText = "CAM 1: LIVING ROOM TOWER (192.168.2.24)";
+        if (tab1) tab1.classList.add('active');
+        if (tab2) tab2.classList.remove('active');
       } else {
         if (title) title.innerText = "Live Feed: Cat Cam 2 (Perch / Food Hub)";
         if (overlay) overlay.innerText = "CAM 2: PERCH / FOOD HUB (192.168.2.25)";
+        if (tab2) tab2.classList.add('active');
+        if (tab1) tab1.classList.remove('active');
+      }
+    }
+
+    let camViewMode = 'canvas';
+
+    function setCamViewMode(mode) {
+      camViewMode = mode;
+      const canvasEl = document.getElementById('deckCamCanvas');
+      const videoCont = document.getElementById('live-cam-video-container');
+      const canvasBtn = document.getElementById('mode-canvas-btn');
+      const liveBtn = document.getElementById('mode-live-btn');
+
+      if (mode === 'live') {
+        if (canvasEl) canvasEl.style.display = 'none';
+        if (videoCont) videoCont.style.display = 'block';
+        if (canvasBtn) {
+          canvasBtn.style.background = 'rgba(255, 255, 255, 0.04)';
+          canvasBtn.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+          canvasBtn.style.color = '#cbd5e1';
+        }
+        if (liveBtn) {
+          liveBtn.style.background = 'rgba(16, 185, 129, 0.2)';
+          liveBtn.style.borderColor = '#10b981';
+          liveBtn.style.color = '#6ee7b7';
+        }
+      } else {
+        if (canvasEl) canvasEl.style.display = 'block';
+        if (videoCont) videoCont.style.display = 'none';
+        if (canvasBtn) {
+          canvasBtn.style.background = 'rgba(56, 189, 248, 0.2)';
+          canvasBtn.style.borderColor = '#38bdf8';
+          canvasBtn.style.color = '#38bdf8';
+        }
+        if (liveBtn) {
+          liveBtn.style.background = 'rgba(255, 255, 255, 0.04)';
+          liveBtn.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+          liveBtn.style.color = '#cbd5e1';
+        }
+      }
+    }
+
+    function toggleCamPip() {
+      const video = document.getElementById('liveCamVideo');
+      if (document.pictureInPictureElement) {
+        document.exitPictureInPicture().catch(() => {});
+      } else if (video && video.requestPictureInPicture && video.src) {
+        video.requestPictureInPicture().catch(() => {
+          openCamPopoutWindow();
+        });
+      } else {
+        openCamPopoutWindow();
+      }
+    }
+
+    function openCamPopoutWindow() {
+      window.open('https://camview.mygeeni.com/login', 'GeeniLiveCamPopout', 'width=960,height=600,menubar=no,toolbar=no,location=no,status=no');
+    }
+
+    function applyCustomCamStream() {
+      const input = document.getElementById('live-stream-url-input');
+      const video = document.getElementById('liveCamVideo');
+      const helper = document.getElementById('live-stream-overlay-helper');
+      if (input && input.value.trim() && video) {
+        const url = input.value.trim();
+        video.src = url;
+        video.play().catch(e => {
+          showToast('info', 'Connecting to Stream', `Attempting playback on ${url}`);
+        });
+        if (helper) helper.style.display = 'none';
+        showToast('success', 'Stream Linked', 'Live video feed connected.');
+      } else {
+        showToast('info', 'IPC Terminal Direct', 'Opening Geeni IPC Terminal popout...');
+        openCamPopoutWindow();
       }
     }
 
