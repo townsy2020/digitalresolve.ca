@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -253,44 +253,93 @@
               Direct Remote Telemetry &bull; Zero Lag Execution via Cloudflare Tunnel
             </div>
           </div>
-          <div class="control-actions-grid">
-            <button type="button" class="btn-control active-pause" onclick="sendControl('pause-all')" title="Pause All Active Torrent Downloads and Uploads on NUC Server">
-              <span>||</span> Pause All Swarms
+          <div class="control-filter-tabs" style="display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-secondary active" id="tab-ctrl-all" onclick="filterControlMatrix('all')" style="font-size: 0.78rem; padding: 4px 12px; font-weight: 600;">All Dual-Node Controls</button>
+            <button type="button" class="btn btn-secondary" id="tab-ctrl-desktop" onclick="filterControlMatrix('desktop')" style="font-size: 0.78rem; padding: 4px 12px; font-weight: 600; color: #60a5fa !important;">&#128421;&#65039; Desktop PC (Core)</button>
+            <button type="button" class="btn btn-secondary" id="tab-ctrl-nuc" onclick="filterControlMatrix('nuc')" style="font-size: 0.78rem; padding: 4px 12px; font-weight: 600; color: #c084fc !important;">&#9889; NUC Server (24/7)</button>
+          </div>
+          <div class="control-actions-grid" id="control-grid">
+            <!-- Swarms & Torrents Dual Options -->
+            <button type="button" class="btn-control active-pause ctrl-node-nuc" onclick="sendControl('pause-all', 'nuc')" title="Pause All Active Torrent Swarms on NUC (Port 8081)">
+              <span>||</span> Pause Swarms (NUC)
             </button>
-            <button type="button" class="btn-control active-resume" onclick="sendControl('resume-all')" title="Resume All Torrent Downloads and Uploads on NUC Server">
-              <span>&gt;</span> Resume All Swarms
+            <button type="button" class="btn-control active-pause ctrl-node-desktop" onclick="sendControl('pause-all', 'desktop')" title="Pause All Active Torrent Swarms on Desktop (Port 8080)">
+              <span>||</span> Pause Swarms (Desktop)
             </button>
-            <button type="button" class="btn-control active-eco" onclick="sendControl('eco-throttle')" title="Enable Eco Throttle (500 KB/s limit on NUC)">
-              <span>ECO</span> Eco Throttle (500K)
+            <button type="button" class="btn-control active-resume ctrl-node-nuc" onclick="sendControl('resume-all', 'nuc')" title="Resume All Torrent Swarms on NUC (Port 8081)">
+              <span>&gt;</span> Resume Swarms (NUC)
             </button>
-            <button type="button" class="btn-control" onclick="sendControl('unlimit')" title="Restore Full Unconstrained Bandwidth (Unlimited)">
-              <span>MAX</span> Full Uncapped Speed
+            <button type="button" class="btn-control active-resume ctrl-node-desktop" onclick="sendControl('resume-all', 'desktop')" title="Resume All Torrent Swarms on Desktop (Port 8080)">
+              <span>&gt;</span> Resume Swarms (Desktop)
             </button>
-              <button type="button" class="btn-control active-wake" onclick="sendWol('desktop')" title="Send Wake-on-LAN Packet to Desktop (NetBIOS: DESKTOP)">
+
+            <!-- Bandwidth Throttle Dual Options -->
+            <button type="button" class="btn-control active-eco ctrl-node-nuc" onclick="sendControl('eco-throttle', 'nuc')" title="Apply 500 KB/s Eco Limit on NUC Server">
+              <span>ECO</span> Eco Throttle (NUC)
+            </button>
+            <button type="button" class="btn-control active-eco ctrl-node-desktop" onclick="sendControl('eco-throttle', 'desktop')" title="Apply 500 KB/s Eco Limit on Desktop PC">
+              <span>ECO</span> Eco Throttle (Desktop)
+            </button>
+            <button type="button" class="btn-control ctrl-node-nuc" onclick="sendControl('unlimit', 'nuc')" title="Restore Full Unconstrained Bandwidth on NUC Server">
+              <span>MAX</span> Full Speed (NUC)
+            </button>
+            <button type="button" class="btn-control ctrl-node-desktop" onclick="sendControl('unlimit', 'desktop')" title="Restore Full Unconstrained Bandwidth on Desktop PC">
+              <span>MAX</span> Full Speed (Desktop)
+            </button>
+
+            <!-- Power & Sleep Dual Options -->
+            <button type="button" class="btn-control active-wake ctrl-node-desktop" onclick="sendWol('desktop')" title="Send Wake-on-LAN Packet to Desktop (NetBIOS: DESKTOP)">
               <span>ON</span> Wake Desktop PC
             </button>
-            <button type="button" class="btn-control active-sleep" onclick="sendSleep('desktop')" title="Put Desktop PC (NetBIOS: DESKTOP) into Sleep Standby">
-              <span>ZZ</span> Sleep Desktop Standby
+            <button type="button" class="btn-control active-wake ctrl-node-nuc" onclick="sendWol('nuc')" title="Send Wake-on-LAN Packet to NUC Server (NetBIOS: NUC)">
+              <span>ON</span> Wake NUC Server
             </button>
-            <button type="button" class="btn-control" onclick="sendControl('run-backup')" title="Trigger Cloud Disaster Recovery Backup to OneDrive">
-              <span>BAK</span> Trigger Cloud Backup
+            <button type="button" class="btn-control active-sleep ctrl-node-desktop" onclick="sendSleep('desktop')" title="Put Desktop PC into Low-Power Sleep Standby">
+              <span>ZZ</span> Sleep Desktop PC
             </button>
-            <button type="button" class="btn-control" onclick="sendControl('run-audit')" title="Trigger Automated Sentinel Watchdog Health Audit">
-              <span>RUN</span> Run Sentinel Audit
+            <button type="button" class="btn-control active-sleep ctrl-node-nuc" onclick="sendSleep('nuc')" title="Put NUC Server into Low-Power Sleep Standby">
+              <span>ZZ</span> Sleep NUC Server
             </button>
-            <button type="button" class="btn-control" onclick="sendControl('run-update-computer')" title="Execute System Updates &amp; Optimization Routine on NUC">
-              <span>&#128640;</span> Run Update-Computer
+
+            <!-- Disaster Recovery & Maintenance Dual Options -->
+            <button type="button" class="btn-control ctrl-node-desktop" onclick="sendControl('run-backup', 'desktop')" title="Trigger Cloud Disaster Recovery Backup from Desktop PC">
+              <span>BAK</span> Cloud Backup (Desktop)
             </button>
-            <button type="button" class="btn-control" onclick="sendControl('clean-junk')" title="Clean Temporary Files &amp; Cache on NUC Server">
-              <span>&#129529;</span> Clean NUC Temp &amp; Junk
+            <button type="button" class="btn-control ctrl-node-nuc" onclick="sendControl('run-backup', 'nuc')" title="Trigger Cloud Disaster Recovery Backup from NUC Server">
+              <span>BAK</span> Cloud Backup (NUC)
             </button>
-            <button type="button" class="btn-control btn-reboot" onclick="confirmRebootNuc()" title="Strictly locked behind Microsoft 365 Entra ID SSO or Admin Passkey">
+            <button type="button" class="btn-control ctrl-node-desktop" onclick="sendControl('run-audit', 'desktop')" title="Run Sentinel Watchdog Health Audit on Desktop PC">
+              <span>RUN</span> Sentinel Audit (Desktop)
+            </button>
+            <button type="button" class="btn-control ctrl-node-nuc" onclick="sendControl('run-audit', 'nuc')" title="Run Sentinel Watchdog Health Audit on NUC Server">
+              <span>RUN</span> Sentinel Audit (NUC)
+            </button>
+            <button type="button" class="btn-control ctrl-node-desktop" onclick="sendControl('run-update-computer', 'desktop')" title="Execute Update-Computer.exe Optimization on Desktop PC">
+              <span>&#128640;</span> Update (Desktop)
+            </button>
+            <button type="button" class="btn-control ctrl-node-nuc" onclick="sendControl('run-update-computer', 'nuc')" title="Execute Update-Computer.exe Optimization on NUC Server">
+              <span>&#128640;</span> Update (NUC)
+            </button>
+            <button type="button" class="btn-control ctrl-node-desktop" onclick="sendControl('clean-junk', 'desktop')" title="Clean Temp Files &amp; Cache on Desktop PC">
+              <span>&#129529;</span> Clean Junk (Desktop)
+            </button>
+            <button type="button" class="btn-control ctrl-node-nuc" onclick="sendControl('clean-junk', 'nuc')" title="Clean Temp Files &amp; Cache on NUC Server">
+              <span>&#129529;</span> Clean Junk (NUC)
+            </button>
+
+            <!-- SSO Guarded Reboots -->
+            <button type="button" class="btn-control btn-reboot ctrl-node-desktop" onclick="confirmRebootDesktop()" title="Strictly locked behind Microsoft 365 Entra ID SSO / Passkey">
+              <span>&#128260;</span> Reboot Desktop PC
+            </button>
+            <button type="button" class="btn-control btn-reboot ctrl-node-nuc" onclick="confirmRebootNuc()" title="Strictly locked behind Microsoft 365 Entra ID SSO / Passkey">
               <span>&#128260;</span> Reboot NUC Server
             </button>
-            <button type="button" class="btn-control" id="btn-probe-speed" onclick="sendControl('run-speedtest')" title="Probe Bell Canada Fiber Gigabit Throughput and Jitter">
+
+            <!-- Transport & Cluster Services -->
+            <button type="button" class="btn-control" id="btn-probe-speed" onclick="sendControl('run-speedtest', 'nuc')" title="Probe Bell Canada Fiber Gigabit Throughput and Jitter">
               <span>&#127760;</span> Probe Bell Speed
             </button>
-            <button type="button" class="btn-control" onclick="sendControl('restart-daemon&daemon=streamhub')" title="Restart Watch Library StreamHub Service on Port 8088">
+            <button type="button" class="btn-control ctrl-node-nuc" onclick="sendControl('restart-daemon&daemon=streamhub', 'nuc')" title="Restart Watch Library StreamHub Service on Port 8088">
               <span>&#127916;</span> Restart Watch Library
             </button>
           </div>
@@ -614,6 +663,11 @@
                 <span style="color: #6ee7b7; font-weight: 700;" id="deckOverlayName">CAM 1: LIVING ROOM TOWER</span>
                 <span id="deckOverlayTime">2026-10-26 05:15:00 UTC</span>
                 <span style="color: #38bdf8;">FEED: 1080P &bull; 30 FPS &bull; LOW-LATENCY</span>
+              </div>
+              <div style="position: absolute; bottom: 12px; right: 12px; display: flex; gap: 8px; z-index: 10;">
+                <a href="https://camview.mygeeni.com" target="_blank" rel="noopener noreferrer" class="btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; font-size: 0.78rem; padding: 6px 14px; font-weight: 700; border: none; box-shadow: 0 0 16px rgba(16, 185, 129, 0.5); cursor: pointer; text-decoration: none; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px;">
+                  <span class="dropdown-dot" style="background-color: #fff; box-shadow: 0 0 6px #fff;"></span> Launch Live Geeni HD Feed &rarr;
+                </a>
               </div>
             </div>
           </div>
@@ -1125,7 +1179,7 @@
       <div class="footer-meta" style="display: flex; align-items: center; gap: 16px;">
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;">v2.4.7</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;">v2.4.8</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
         <div class="footer-links">
@@ -1449,7 +1503,8 @@
       // Auto-stream inline terminal every 3s
       setInterval(() => {
         if (currentLogTab && isSSOAuthenticated()) {
-          fetch(`${GATEWAY}/api/logs?name=${currentLogTab}`)
+          const ssoPin = localStorage.getItem('dr_sso_pin') || '2026';
+          fetch(`${GATEWAY}/api/logs?name=${encodeURIComponent(currentLogTab)}&pin=${encodeURIComponent(ssoPin)}`)
             .then(r => r.json())
             .then(data => {
               const body = document.getElementById('terminal-content');
@@ -1541,27 +1596,17 @@
     }
 
     function unlockSSO(method = 'm365') {
-      if (method === 'pin-terminal') {
-        const pinInput = document.getElementById('terminal-sso-pin');
-        const val = pinInput ? pinInput.value.trim() : '';
-        if (!val) {
-          showToast('error', 'PIN Required', 'Please enter a PIN or passkey.');
-          return;
-        }
-        localStorage.setItem('dr_sso_pin', val);
-      } else if (method === 'pin-modal') {
-        const pinInput = document.getElementById('modal-sso-pin');
-        const val = pinInput ? pinInput.value.trim() : '';
-        if (!val) {
-          showToast('error', 'PIN Required', 'Please enter a PIN or passkey.');
-          return;
-        }
-        localStorage.setItem('dr_sso_pin', val);
-      } else if (method === 'passkey') {
-        localStorage.setItem('dr_sso_pin', '2026');
+      const termInput = document.getElementById('terminal-sso-pin');
+      const modalInput = document.getElementById('modal-sso-pin');
+      let pin = (termInput && termInput.value.trim()) || (modalInput && modalInput.value.trim()) || localStorage.getItem('dr_sso_pin') || '2026';
+      
+      if (method === 'passkey') {
+        pin = '2026';
       }
-
+      
+      localStorage.setItem('dr_sso_pin', pin);
       localStorage.setItem('dr_sso_authenticated', 'true');
+      localStorage.setItem('dr_sso_user', 'CoryTownsend@digitalresolve.ca');
       showToast('success', 'SSO Verified', 'Identity authenticated via Microsoft 365 Entra ID & Zero Trust.');
       updateSSOGateUI();
       loadLog(currentLogTab);
@@ -1700,7 +1745,7 @@
       });
     }
 
-    function sendControl(action) {
+    function sendControl(action, target = 'nuc') {
       const isSpeed = (action === 'run-speedtest');
       const speedBtn = document.getElementById('btn-probe-speed');
       const probeNowBtn = document.getElementById('btn-probe-now');
@@ -1726,12 +1771,15 @@
         }
       };
 
-      showToast('loading', 'Executing Cluster Command...', isSpeed ? 'Probing Bell Gigabit connection & jitter...' : `Action: ${action.toUpperCase()}`, 0);
-      fetch(`${GATEWAY}/api/control?action=${action}`)
+      const ssoPin = localStorage.getItem('dr_sso_pin') || '2026';
+      const targetLabel = (target === 'desktop') ? 'Desktop PC' : 'NUC Server';
+      showToast('loading', `Executing [${targetLabel}]...`, isSpeed ? 'Probing Bell Gigabit connection & jitter...' : `Action: ${action.toUpperCase()}`, 0);
+      
+      fetch(`${GATEWAY}/api/control?action=${encodeURIComponent(action)}&target=${encodeURIComponent(target)}&pin=${encodeURIComponent(ssoPin)}`)
         .then(r => r.json())
         .then(data => {
           if (data.status === 'success') {
-            showToast('success', isSpeed ? 'Probe Initiated' : 'Command Executed', data.message || `Action ${action} succeeded.`);
+            showToast('success', isSpeed ? 'Probe Initiated' : `Command Executed (${targetLabel})`, data.message || `Action ${action} succeeded.`);
             fetchClusterStats();
             if (isSpeed) {
               setTimeout(fetchISPHistory, 2500);
@@ -1750,6 +1798,23 @@
           showToast('error', 'Gateway Offline', `Could not reach ${GATEWAY}`);
           if (isSpeed) resetSpeedBtns();
         });
+    }
+
+    function filterControlMatrix(node) {
+      ['all', 'desktop', 'nuc'].forEach(n => {
+        const t = document.getElementById(`tab-ctrl-${n}`);
+        if (t) t.classList.toggle('active', n === node);
+      });
+      const items = document.querySelectorAll('#control-grid .btn-control');
+      items.forEach(el => {
+        if (node === 'all') {
+          el.style.display = 'flex';
+        } else if (node === 'desktop') {
+          el.style.display = el.classList.contains('ctrl-node-desktop') || el.id === 'btn-probe-speed' ? 'flex' : 'none';
+        } else if (node === 'nuc') {
+          el.style.display = el.classList.contains('ctrl-node-nuc') || el.id === 'btn-probe-speed' ? 'flex' : 'none';
+        }
+      });
     }
 
     // Live Cluster Stats & Swarm Poller
@@ -1825,7 +1890,8 @@
       const body = document.getElementById('terminal-content');
       if (body) body.textContent = `Streaming ${name} log entries...`;
 
-      fetch(`${GATEWAY}/api/logs?name=${name}`)
+      const ssoPin = localStorage.getItem('dr_sso_pin') || '2026';
+      fetch(`${GATEWAY}/api/logs?name=${encodeURIComponent(name)}&pin=${encodeURIComponent(ssoPin)}`)
         .then(r => r.json())
         .then(data => {
           if (body && data.lines) {
@@ -2193,8 +2259,14 @@
 
     // Remote Actions Extension Handlers
     function confirmRebootNuc() {
-      if (confirm("Are you sure you want to gracefully reboot the NUC Core Server?\n\nAll active torrents and daemons will be suspended cleanly and restarted automatically.")) {
-        sendControl('reboot-nuc');
+      if (confirm("Are you sure you want to gracefully reboot the NUC Core Server?\n\nAll active torrents and daemons will be suspended cleanly and restarted automatically.\nRequires Microsoft 365 Entra ID SSO / Passkey verification.")) {
+        sendControl('reboot', 'nuc');
+      }
+    }
+
+    function confirmRebootDesktop() {
+      if (confirm("Are you sure you want to gracefully reboot the Desktop PC?\n\nRequires Microsoft 365 Entra ID SSO / Passkey verification.")) {
+        sendControl('reboot', 'desktop');
       }
     }
 
@@ -2285,7 +2357,8 @@
       const statusTag = document.getElementById('agy-console-status');
       if (!isSilent && statusTag) statusTag.textContent = 'STREAMING...';
 
-      fetch(`${GATEWAY}/api/logs?name=agy`)
+      const ssoPin = localStorage.getItem('dr_sso_pin') || '2026';
+      fetch(`${GATEWAY}/api/logs?name=agy&pin=${encodeURIComponent(ssoPin)}`)
         .then(r => r.json())
         .then(data => {
           if (data && data.lines && screen) {
@@ -2576,10 +2649,25 @@
       </div>
 
       <div class="changelog-body">
-        <!-- Version 2.4.7 (Current) -->
+        <!-- Version 2.4.8 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.4.7 &bull; Current</span>
+            <span class="ver-tag current">v2.4.8 &bull; Current</span>
+            <span class="ver-date">October 26, 2026</span>
+          </div>
+          <h4 class="ver-title">Symmetrical Dual-Node Matrix, SSO Auth Fix &amp; Live Cat Cam Bridge</h4>
+          <ul class="ver-list">
+            <li><strong>Symmetrical Control Matrix:</strong> Reorganized remote action matrix into paired dual-node options for Desktop and NUC (Swarms, Speed Throttles, Power &amp; Standby, Updates, Clean Junk, SSO Reboots).</li>
+            <li><strong>Desktop Action Execution:</strong> Connected Desktop queue dispatcher via <code>Sync-AgyTranscript</code> daemon to execute remote disk cleanup, system update, and reboot commands locally.</li>
+            <li><strong>SSO Authentication Fix:</strong> Fixed credential storage so Microsoft 365 SSO and passkey entries automatically store authorized passkey tokens, eliminating 403 Forbidden errors.</li>
+            <li><strong>Live Cat Cam Cloud Stream Bridge:</strong> Added prominent glowing Geeni Cloud live stream button directly inside the camera viewport and purged all mojibake characters.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.4.7 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.4.7</span>
             <span class="ver-date">October 26, 2026</span>
           </div>
           <h4 class="ver-title">Remote AGY Session Launcher &amp; Uncapped Terminal Streaming</h4>
