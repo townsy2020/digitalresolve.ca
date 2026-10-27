@@ -1749,38 +1749,6 @@ button.dropdown-item:active,
   gap: 10px;
 }
 
-/* Cat Cam Live Stream Glowing Button */
-.btn-geeni-glow {
-  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important;
-  color: #ffffff !important;
-  font-size: 0.82rem !important;
-  font-weight: 700 !important;
-  padding: 6px 16px !important;
-  border-radius: 8px !important;
-  border: 1px solid rgba(239, 68, 68, 0.6) !important;
-  box-shadow: 0 0 16px rgba(239, 68, 68, 0.5), 0 2px 4px rgba(0, 0, 0, 0.4) !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  text-decoration: none !important;
-  cursor: pointer !important;
-  transition: all 0.25s ease !important;
-  animation: geeniPulse 2s infinite ease-in-out;
-}
-
-@keyframes geeniPulse {
-  0% { box-shadow: 0 0 12px rgba(239, 68, 68, 0.4); }
-  50% { box-shadow: 0 0 24px rgba(239, 68, 68, 0.8), 0 0 35px rgba(239, 68, 68, 0.3); }
-  100% { box-shadow: 0 0 12px rgba(239, 68, 68, 0.4); }
-}
-
-.btn-geeni-glow:hover {
-  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%) !important;
-  transform: translateY(-2px);
-  box-shadow: 0 0 28px rgba(239, 68, 68, 0.9) !important;
-  color: #ffffff !important;
-}
-
 /* Stats Metric Cards */
 .homelab-stats-section {
   margin-bottom: 40px;
