@@ -2408,6 +2408,25 @@ button.dropdown-item:active,
   transform: translateY(-1px);
 }
 
+/* Lines of Code Badge in Footer */
+.footer-loc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(168, 85, 247, 0.08);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  border-radius: 20px;
+  padding: 4px 12px;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.footer-loc-badge:hover {
+  background: rgba(168, 85, 247, 0.16);
+  border-color: rgba(168, 85, 247, 0.45);
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.2);
+}
+
 /* Changelog Modal */
 .changelog-modal-overlay {
   position: fixed;
@@ -3621,7 +3640,9 @@ html.desktop-layout body {
   }
 
   html:not(.desktop-layout) .version-badge-btn,
-  html.mobile-layout .version-badge-btn {
+  html.mobile-layout .version-badge-btn,
+  html:not(.desktop-layout) .footer-loc-badge,
+  html.mobile-layout .footer-loc-badge {
     min-height: 44px !important;
     padding: 10px 14px !important;
     display: inline-flex !important;

@@ -1201,7 +1201,7 @@
   <footer class="footer">
     <div class="container footer-container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
       <p>&copy; 2026 Digital Resolve &bull; Homelab Operations Deck &bull; Cory Townsend</p>
-      <div class="footer-meta" style="display: flex; align-items: center; gap: 16px;">
+      <div class="footer-meta" style="display: flex; align-items: center; flex-wrap: wrap; gap: 14px;">
         <button type="button" class="version-badge-btn layout-toggle-btn" id="layout-toggle-footer" onclick="toggleLayoutMode()" title="Switch layout mode (Mobile / Desktop)" aria-label="Toggle Layout Mode">
           <span class="layout-toggle-icon" id="layout-toggle-footer-icon">📱</span>
           <span class="layout-toggle-text" id="layout-toggle-footer-text">Mobile View</span>
@@ -1211,6 +1211,11 @@
           <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;">v2.5.0</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
+        <div class="footer-loc-badge" title="Project Codebase Scale: 7,048 Lines of Code (HTML: 3,271 lines &bull; CSS: 3,776 lines &bull; CNAME)">
+          <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">7,048</span>
+          <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
+        </div>
         <div class="footer-links">
           <a href="#top">Back to top &uarr;</a>
         </div>
@@ -3077,8 +3082,9 @@
             <span class="ver-tag current">v2.5.0 &bull; Current</span>
             <span class="ver-date">October 27, 2026</span>
           </div>
-          <h4 class="ver-title">Touch-First Adaptive Mobile Engine &amp; Persistent Layout Switcher</h4>
+          <h4 class="ver-title">Touch-First Adaptive Mobile Engine &amp; Multi-Model Telemetry</h4>
           <ul class="ver-list">
+            <li><strong>Multi-Model AI Telemetry &amp; Codebase Metrics:</strong> Integrated live multi-model token distribution percentages (Gemini Flash 68%, Argon 24%, Pro 8%) across header, ribbon, and modal decks, plus persistent Lines of Code (7,050+ LOC) counter at the footer.</li>
             <li><strong>Touch-First Mobile Engine:</strong> Integrated automated mobile device detection with fluid single-column card stacking, zero horizontal overflow across 360px-430px viewports, and compliant minimum 44px tap targets for all controls.</li>
             <li><strong>Persistent Layout Switcher:</strong> Added synchronized "Mobile View / Desktop View" manual toggle controls in header and footer, persisting user preference seamlessly in localStorage across sessions.</li>
             <li><strong>Touch-Optimized Navigation:</strong> Enhanced header with accessible slide-down mobile navigation drawer, inline dropdown accordions, and swipe-friendly horizontal chip scrolling.</li>
