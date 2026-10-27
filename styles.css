@@ -1674,6 +1674,8 @@ button.dropdown-item:active,
   padding: 12px 16px;
   margin-bottom: 20px;
   flex-wrap: wrap;
+  position: relative;
+  z-index: 50;
 }
 
 .ctrl-node-select {

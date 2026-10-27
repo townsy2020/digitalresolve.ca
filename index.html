@@ -256,12 +256,27 @@
 
           <!-- Top Target Node Selector Bar -->
           <div class="control-node-bar">
-            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-              <label for="ctrl-target-select" style="font-size: 0.82rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Target Node:</label>
-              <select id="ctrl-target-select" class="ctrl-node-select" onchange="onControlNodeChange(this.value)">
-                <option value="nuc" selected>&#9889; NUC Core Server (24/7 Always-On &bull; 192.168.2.35)</option>
-                <option value="desktop">&#128421;&#65039; Desktop PC (Core Workstation &bull; 192.168.2.62)</option>
-              </select>
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+              <span style="font-size: 0.82rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Target Node:</span>
+              <div class="dropdown">
+                <button type="button" class="btn-nav" id="target-node-btn" aria-haspopup="true" title="Switch Target Node between NUC Core Server and Desktop PC">
+                  <span class="dropdown-dot" id="target-node-btn-dot" style="background-color: #c084fc; box-shadow: 0 0 8px #c084fc;"></span>
+                  <span id="target-node-btn-label">&#9889; NUC Core Server (24/7 Always-On)</span>
+                  <span class="dropdown-arrow">&#9662;</span>
+                </button>
+                <div class="dropdown-menu">
+                  <button type="button" class="btn-action-item" onclick="selectControlNode('nuc')" title="Select NUC Core Server as Execution Target">
+                    <span class="dropdown-dot" style="background-color: #c084fc; box-shadow: 0 0 8px #c084fc;"></span>
+                    <span>&#9889; NUC Core Server (24/7 Always-On &bull; 192.168.2.35)</span>
+                    <span class="item-tag" style="background: rgba(192, 132, 252, 0.2); color: #c084fc;">Port 8081</span>
+                  </button>
+                  <button type="button" class="btn-action-item" onclick="selectControlNode('desktop')" title="Select Desktop PC as Execution Target">
+                    <span class="dropdown-dot dot-1"></span>
+                    <span>&#128421;&#65039; Desktop PC (Core Workstation &bull; 192.168.2.62)</span>
+                    <span class="item-tag online">Port 8080</span>
+                  </button>
+                </div>
+              </div>
             </div>
             <div id="ctrl-node-status-badge" class="ctrl-node-status-badge">
               <span class="dropdown-dot" id="ctrl-node-status-dot" style="background-color: #c084fc; box-shadow: 0 0 8px #c084fc;"></span>
@@ -1810,20 +1825,29 @@
 
     let currentControlTarget = 'nuc';
 
-    function onControlNodeChange(val) {
-      currentControlTarget = val || 'nuc';
+    function selectControlNode(target) {
+      currentControlTarget = target || 'nuc';
+      const label = document.getElementById('target-node-btn-label');
+      const btnDot = document.getElementById('target-node-btn-dot');
       const badge = document.getElementById('ctrl-node-status-badge');
       const dot = document.getElementById('ctrl-node-status-dot');
       const text = document.getElementById('ctrl-node-status-text');
-      
+      const select = document.getElementById('ctrl-target-select');
+      if (select) select.value = currentControlTarget;
+
       if (currentControlTarget === 'nuc') {
+        if (label) label.innerHTML = '&#9889; NUC Core Server (24/7 Always-On)';
+        if (btnDot) {
+          btnDot.style.backgroundColor = '#c084fc';
+          btnDot.style.boxShadow = '0 0 8px #c084fc';
+        }
         if (dot) {
           dot.style.backgroundColor = '#c084fc';
           dot.style.boxShadow = '0 0 8px #c084fc';
         }
         if (text) {
           text.style.color = '#e9d5ff';
-          text.textContent = 'Target: NUC Server (Port 8081)';
+          text.textContent = 'Active Target: NUC Server (Port 8081) \u2022 ONLINE';
         }
         if (badge) {
           badge.style.background = 'rgba(192, 132, 252, 0.15)';
@@ -1831,13 +1855,18 @@
         }
         showToast('info', 'Target Switched: NUC', 'Actions will target NUC Server (24/7 Always-On).');
       } else {
+        if (label) label.innerHTML = '&#128421;&#65039; Desktop PC (Core Workstation)';
+        if (btnDot) {
+          btnDot.style.backgroundColor = '#60a5fa';
+          btnDot.style.boxShadow = '0 0 8px #60a5fa';
+        }
         if (dot) {
           dot.style.backgroundColor = '#60a5fa';
           dot.style.boxShadow = '0 0 8px #60a5fa';
         }
         if (text) {
           text.style.color = '#93c5fd';
-          text.textContent = 'Target: Desktop PC (Port 8080)';
+          text.textContent = 'Active Target: Desktop PC (Port 8080) \u2022 ONLINE';
         }
         if (badge) {
           badge.style.background = 'rgba(96, 165, 250, 0.15)';
@@ -1845,6 +1874,11 @@
         }
         showToast('info', 'Target Switched: Desktop', 'Actions will target Desktop PC (Core Workstation).');
       }
+      document.querySelectorAll('.dropdown').forEach(dd => dd.classList.remove('is-open'));
+    }
+
+    function onControlNodeChange(val) {
+      selectControlNode(val);
     }
 
     function executeNodeAction(action) {
