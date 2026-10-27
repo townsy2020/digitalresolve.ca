@@ -14,12 +14,12 @@
 <body>
   <div class="background-glow"></div>
   
-  <header class="header">
+  <header class="header" id="top">
     <div class="container nav-container">
       <a href="#deck" class="logo" title="DigitalResolve Homelab Deck">
         <span class="logo-text-group"><span class="logo-accent">Digital</span>Resolve</span>
         <span class="logo-deck-badge">HOMELAB DECK</span>
-      </div>
+      </a>
       <nav class="nav-links">
         <a href="#deck" class="btn-nav">DECK</a>
 
@@ -1058,7 +1058,7 @@
           </a>
 
           <!-- Gemini CLI / Antigravity Harness -->
-          <div class="app-card" onclick="openEmbeddedConsole()" style="cursor: pointer;" title="Open Active Antigravity Live Console">
+          <div class="app-card" onclick="openEmbeddedConsole()" onkeydown="if(event.key==='Enter'||event.key===' ')openEmbeddedConsole()" role="button" tabindex="0" style="cursor: pointer;" title="Open Active Antigravity Live Console">
             <div>
               <div class="app-card-header">
                 <div class="app-icon" style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.15); font-weight: 700; font-size: 0.85rem;">WOL</div>
@@ -1073,7 +1073,7 @@
               <span class="app-port">Autonomous Daemon</span>
               <span class="app-btn-launch" style="color: #fbbf24;">View Session &rarr;</span>
             </div>
-          </a>
+          </div>
 
           <!-- Disaster Recovery Card -->
           <div class="app-card" style="cursor: default;">
@@ -1372,8 +1372,8 @@
 
     // Check status on load
     window.addEventListener('DOMContentLoaded', () => {
-      fetch(`${GATEWAY}/status?target=nuc`).then(r => r.json()).then(d => updateStatusUI('nuc', d.online, d.latencyMs, d.disk, d.torrent, d.vitals)).catch(()=>{});
-      fetch(`${GATEWAY}/status?target=desktop`).then(r => r.json()).then(d => updateStatusUI('desktop', d.online, d.latencyMs, d.disk, d.torrent, d.vitals)).catch(()=>{});
+      fetch(`${GATEWAY}/status?target=nuc`).then(r => r.json()).then(d => updateStatusUI('nuc', d.online, d.latencyMs, d.disk, d.torrent, d.vitals)).catch(() => updateStatusUI('nuc', false));
+      fetch(`${GATEWAY}/status?target=desktop`).then(r => r.json()).then(d => updateStatusUI('desktop', d.online, d.latencyMs, d.disk, d.torrent, d.vitals)).catch(() => updateStatusUI('desktop', false));
 
       // Smooth dropdown hover & focus management with zero flicker
       document.querySelectorAll('.dropdown').forEach(dd => {
@@ -2049,11 +2049,11 @@
         closeMagnetModal();
         if (input) input.value = '';
         if (btn) { btn.disabled = false; btn.textContent = 'Start Remote Download'; }
-        showToast(data.message || `Torrent sent to ${target.toUpperCase()}!`);
+        showToast('success', 'Download Started!', data.message || `Torrent sent to ${target.toUpperCase()}!`);
       })
       .catch(err => {
         if (btn) { btn.disabled = false; btn.textContent = 'Start Remote Download'; }
-        showToast(`Dispatched to ${target.toUpperCase()}!`);
+        showToast('success', 'Dispatched to Server', `Injected into ${target.toUpperCase()}!`);
         closeMagnetModal();
       });
     }
@@ -2451,7 +2451,10 @@
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        closeAgyConsole();
+        if (typeof closeAgyConsole === 'function') closeAgyConsole();
+        if (typeof closeChangelogModal === 'function') closeChangelogModal();
+        if (typeof closeMagnetModal === 'function') closeMagnetModal();
+        document.querySelectorAll('.dropdown.is-open').forEach(dd => dd.classList.remove('is-open'));
       }
     });
       function escapeHtml(str) {

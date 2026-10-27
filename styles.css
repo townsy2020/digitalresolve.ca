@@ -2581,3 +2581,17 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
   box-shadow: none !important;
   transform: none !important;
 }
+
+/* Mobile & Tablet Camera & Control Matrix Polish */
+@media (max-width: 640px) {
+  #camera-live-frame {
+    height: 280px !important;
+  }
+  .control-matrix-card {
+    padding: 16px !important;
+  }
+  .terminal-tabs {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+}
