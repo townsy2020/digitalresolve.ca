@@ -648,11 +648,12 @@
                 <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
                 <span id="deckCamTitle">Live Feed: Cat Cam 1 (Living Room Tower)</span>
               </div>
-              <div style="display: flex; gap: 8px;">
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                 <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="switchDeckCam(1)" title="Switch Deck Feed to Cat Cam 1 (Living Room)">Cam 1 (Living)</button>
                 <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="switchDeckCam(2)" title="Switch Deck Feed to Cat Cam 2 (Perch / Food)">Cam 2 (Food)</button>
                 <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="toggleDeckNight()" title="Toggle Low-Light Night Vision Simulation">Night Mode</button>
-        <a href="https://cam.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px; color: #6ee7b7 !important; border-color: rgba(16, 185, 129, 0.4);">Full Portal &rarr;</a>
+                <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="captureDeckSnapshot()" title="Capture High-Res Frame Snapshot">&#128248; Snapshot</button>
+                <a href="https://cam.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px; color: #6ee7b7 !important; border-color: rgba(16, 185, 129, 0.4);" title="Open Direct NUC Cat Cam Stream Portal">Full Portal &rarr;</a>
               </div>
             </div>
 
@@ -665,8 +666,8 @@
                 <span style="color: #38bdf8;">FEED: 1080P &bull; 30 FPS &bull; LOW-LATENCY</span>
               </div>
               <div style="position: absolute; bottom: 12px; right: 12px; display: flex; gap: 8px; z-index: 10;">
-                <a href="https://camview.mygeeni.com" target="_blank" rel="noopener noreferrer" class="btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; font-size: 0.78rem; padding: 6px 14px; font-weight: 700; border: none; box-shadow: 0 0 16px rgba(16, 185, 129, 0.5); cursor: pointer; text-decoration: none; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px;">
-                  <span class="dropdown-dot" style="background-color: #fff; box-shadow: 0 0 6px #fff;"></span> Launch Live Geeni HD Feed &rarr;
+                <a href="https://camview.mygeeni.com" target="_blank" rel="noopener noreferrer" class="btn-geeni-glow" title="Launch Live Cloud Stream on camview.mygeeni.com">
+                  <span class="dropdown-dot" style="background-color: #fff; box-shadow: 0 0 6px #fff;"></span> &#128308; Live Cloud Stream (camview.mygeeni.com) &nearr;
                 </a>
               </div>
             </div>
@@ -2090,6 +2091,23 @@
       deckNightMode = !deckNightMode;
     }
 
+    function captureDeckSnapshot() {
+      if (!deckCanvas) return;
+      try {
+        const dataUrl = deckCanvas.toDataURL('image/png');
+        const a = document.createElement('a');
+        const ts = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19);
+        a.href = dataUrl;
+        a.download = `CatCam-Snap-Cam${deckCurrentCam}-${ts}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast('success', 'Snapshot Captured', `Saved high-res frame from Cat Cam ${deckCurrentCam}.`);
+      } catch (e) {
+        showToast('error', 'Snapshot Error', e.message);
+      }
+    }
+
     let deckFrame = 0;
     function renderDeckFrame() {
       if (!deckCanvas || !deckCtx) return;
@@ -2143,6 +2161,21 @@
       deckCtx.fillStyle = deckNightMode ? '#86efac' : '#38bdf8';
       deckCtx.font = '10px monospace';
       deckCtx.fillText('CAT DETECTED [98%]', catX - 35, catY - 38);
+
+      // Moving Radar / Sweep Scanline
+      const scanY = (deckFrame * 2.2) % h;
+      const scanGrad = deckCtx.createLinearGradient(0, scanY - 30, 0, scanY);
+      scanGrad.addColorStop(0, 'rgba(16, 185, 129, 0)');
+      scanGrad.addColorStop(1, deckNightMode ? 'rgba(74, 222, 128, 0.25)' : 'rgba(56, 189, 248, 0.25)');
+      deckCtx.fillStyle = scanGrad;
+      deckCtx.fillRect(0, Math.max(0, scanY - 30), w, 30);
+
+      deckCtx.strokeStyle = deckNightMode ? 'rgba(74, 222, 128, 0.7)' : 'rgba(56, 189, 248, 0.7)';
+      deckCtx.lineWidth = 1.2;
+      deckCtx.beginPath();
+      deckCtx.moveTo(0, scanY);
+      deckCtx.lineTo(w, scanY);
+      deckCtx.stroke();
 
       // Scanline effect
       deckCtx.fillStyle = 'rgba(255, 255, 255, 0.015)';
