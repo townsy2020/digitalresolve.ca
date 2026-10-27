@@ -1036,18 +1036,22 @@ button.dropdown-item:active,
   inset: 0;
   background: rgba(13, 17, 23, 0.75);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   z-index: 1000;
-  display: flex;
+  display: none !important;
   align-items: center;
   justify-content: center;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.25s ease;
+  pointer-events: none;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
 }
 
 .magnet-modal-overlay.active {
+  display: flex !important;
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
 }
 
 .magnet-modal {
@@ -2085,18 +2089,21 @@ button.dropdown-item:active,
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   z-index: 10000;
-  display: flex;
+  display: none !important;
   align-items: center;
   justify-content: center;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.25s ease;
+  pointer-events: none;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
   padding: 16px;
 }
 
 .agy-modal-overlay.active {
+  display: flex !important;
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
 }
 
 .agy-console-window {
@@ -2435,18 +2442,21 @@ button.dropdown-item:active,
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   z-index: 10001;
-  display: flex;
+  display: none !important;
   align-items: center;
   justify-content: center;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.25s ease;
+  pointer-events: none;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
   padding: 16px;
 }
 
 .changelog-modal-overlay.active {
+  display: flex !important;
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
 }
 
 .changelog-modal {
@@ -2797,18 +2807,21 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   z-index: 10002;
-  display: flex;
+  display: none !important;
   align-items: center;
   justify-content: center;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.25s ease;
+  pointer-events: none;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
   padding: 16px;
 }
 
 .health-modal-overlay.active {
+  display: flex !important;
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
 }
 
 .health-modal-window {
