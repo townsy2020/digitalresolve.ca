@@ -676,8 +676,9 @@
                   <button type="button" class="btn btn-secondary" id="cam-tab-2" style="font-size: 0.75rem; padding: 4px 10px;" onclick="switchDeckCam(2)" title="Switch to Cat Cam 2 (Perch / Food)">Cam 2 (Food)</button>
                 </div>
                 <div style="display: inline-flex; gap: 4px;">
-                  <button type="button" class="btn btn-secondary" id="mode-canvas-btn" style="font-size: 0.75rem; padding: 4px 10px; background: rgba(56, 189, 248, 0.2); border-color: #38bdf8; color: #38bdf8;" onclick="setCamViewMode('canvas')" title="Switch to Realtime Optical Watchdog Canvas">Watchdog HUD</button>
-                  <button type="button" class="btn btn-secondary" id="mode-live-btn" style="font-size: 0.75rem; padding: 4px 10px;" onclick="setCamViewMode('live')" title="Switch to Embedded Live Video Stream Player">&#9654; Live Video Embed</button>
+                  <button type="button" class="btn btn-secondary active" id="mode-sso-btn" style="font-size: 0.75rem; padding: 4px 10px; background: rgba(16, 185, 129, 0.25); border-color: #10b981; color: #6ee7b7;" onclick="setCamViewMode('sso')" title="Embed Direct NUC Cat Cam Portal via Cloudflare SSO">&#128274; SSO Live Embed</button>
+                  <button type="button" class="btn btn-secondary" id="mode-canvas-btn" style="font-size: 0.75rem; padding: 4px 10px;" onclick="setCamViewMode('canvas')" title="Switch to Realtime Optical Watchdog Canvas">Watchdog HUD</button>
+                  <button type="button" class="btn btn-secondary" id="mode-live-btn" style="font-size: 0.75rem; padding: 4px 10px;" onclick="setCamViewMode('live')" title="Switch to Embedded Live Video Stream Player">&#9654; Video Player</button>
                 </div>
                 <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="toggleDeckNight()" title="Toggle Low-Light Night Vision Filter">&#127769; Night Mode</button>
                 <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="toggleCamPip()" title="Pop Out Live Picture-in-Picture Stream Window">&#128470; Pop-Out / PiP</button>
@@ -720,13 +721,16 @@
               </div>
             </div>
 
-            <!-- Viewport Container (Supports Dual Canvas Optical Watchdog & Live Video Stream) -->
-            <div id="cam-player-wrapper" style="position: relative; width: 100%; height: 300px; background: #020617; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: center;">
+            <!-- Viewport Container (Supports Dual Canvas Optical Watchdog, Embedded Live SSO Portal & Live Video Stream) -->
+            <div id="cam-player-wrapper" style="position: relative; width: 100%; height: 380px; background: #020617; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: center;">
               
-              <!-- Mode 1: Realtime Optical Watchdog Canvas -->
-              <canvas id="deckCamCanvas" width="800" height="300" style="width: 100%; height: 100%; object-fit: cover;"></canvas>
+              <!-- Mode 1: Embedded Direct SSO Portal Frame (Protected by M365 SSO) -->
+              <iframe id="sso-cam-iframe" src="https://cam.digitalresolve.ca/?embed=1" style="width: 100%; height: 100%; border: none; background: #020617; border-radius: 8px;" allow="autoplay; fullscreen; picture-in-picture" title="Cat Cam Direct NUC Console (SSO Protected)"></iframe>
 
-              <!-- Mode 2: HTML5 Live Video Stream Player -->
+              <!-- Mode 2: Realtime Optical Watchdog Canvas -->
+              <canvas id="deckCamCanvas" width="800" height="380" style="display: none; width: 100%; height: 100%; object-fit: cover;"></canvas>
+
+              <!-- Mode 3: HTML5 Live Video Stream Player -->
               <div id="live-cam-video-container" style="display: none; width: 100%; height: 100%; position: relative; background: #000;">
                 <video id="liveCamVideo" controls autoplay muted playsinline style="width: 100%; height: 100%; object-fit: contain; background: #020617;"></video>
                 <div id="live-stream-overlay-helper" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(2, 6, 23, 0.88); backdrop-filter: blur(8px); padding: 20px; text-align: center;">
@@ -746,15 +750,15 @@
                     <a href="https://home.google.com" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.76rem; padding: 6px 12px; color: #60a5fa !important; border-color: rgba(96, 165, 250, 0.4);" title="Open Google Home for Web to view linked Geeni cameras in your browser without scanning QR codes">
                       &#127968; Google Home Web &nearr;
                     </a>
-                    <button type="button" class="btn btn-secondary" style="font-size: 0.76rem; padding: 6px 12px;" onclick="setCamViewMode('canvas')">
-                      Return to Watchdog HUD
+                    <button type="button" class="btn btn-secondary" style="font-size: 0.76rem; padding: 6px 12px;" onclick="setCamViewMode('sso')">
+                      Return to SSO Live Embed
                     </button>
                   </div>
                 </div>
               </div>
 
               <!-- Viewport Realtime OSD Overlay -->
-              <div style="position: absolute; top: 10px; left: 10px; font-family: monospace; font-size: 0.72rem; background: rgba(0,0,0,0.72); backdrop-filter: blur(4px); padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; display: flex; flex-direction: column; gap: 2px; z-index: 10; pointer-events: none;">
+              <div id="cam-osd-overlay" style="display: none; position: absolute; top: 10px; left: 10px; font-family: monospace; font-size: 0.72rem; background: rgba(0,0,0,0.72); backdrop-filter: blur(4px); padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; flex-direction: column; gap: 2px; z-index: 10; pointer-events: none;">
                 <span style="color: #6ee7b7; font-weight: 700;" id="deckOverlayName">CAM 1: LIVING ROOM TOWER (192.168.2.24)</span>
                 <span id="deckOverlayTime">2026-10-26 05:15:00 UTC</span>
                 <span style="color: #38bdf8;">FEED: 1080P &bull; 30 FPS &bull; M365 ENTRA ID SSO GUARDED</span>
@@ -2262,40 +2266,56 @@
       }
     }
 
-    let camViewMode = 'canvas';
+    let camViewMode = 'sso';
 
     function setCamViewMode(mode) {
       camViewMode = mode;
+      const ssoIframe = document.getElementById('sso-cam-iframe');
       const canvasEl = document.getElementById('deckCamCanvas');
       const videoCont = document.getElementById('live-cam-video-container');
+      const ssoBtn = document.getElementById('mode-sso-btn');
       const canvasBtn = document.getElementById('mode-canvas-btn');
       const liveBtn = document.getElementById('mode-live-btn');
+      const osdOverlay = document.getElementById('cam-osd-overlay');
 
-      if (mode === 'live') {
+      // Reset button styles
+      [ssoBtn, canvasBtn, liveBtn].forEach(b => {
+        if (b) {
+          b.style.background = 'rgba(255, 255, 255, 0.04)';
+          b.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+          b.style.color = '#cbd5e1';
+        }
+      });
+
+      if (mode === 'sso') {
+        if (ssoIframe) ssoIframe.style.display = 'block';
+        if (canvasEl) canvasEl.style.display = 'none';
+        if (videoCont) videoCont.style.display = 'none';
+        if (osdOverlay) osdOverlay.style.display = 'none';
+        if (ssoBtn) {
+          ssoBtn.style.background = 'rgba(16, 185, 129, 0.25)';
+          ssoBtn.style.borderColor = '#10b981';
+          ssoBtn.style.color = '#6ee7b7';
+        }
+      } else if (mode === 'live') {
+        if (ssoIframe) ssoIframe.style.display = 'none';
         if (canvasEl) canvasEl.style.display = 'none';
         if (videoCont) videoCont.style.display = 'block';
-        if (canvasBtn) {
-          canvasBtn.style.background = 'rgba(255, 255, 255, 0.04)';
-          canvasBtn.style.borderColor = 'rgba(255, 255, 255, 0.15)';
-          canvasBtn.style.color = '#cbd5e1';
-        }
+        if (osdOverlay) osdOverlay.style.display = 'flex';
         if (liveBtn) {
-          liveBtn.style.background = 'rgba(16, 185, 129, 0.2)';
-          liveBtn.style.borderColor = '#10b981';
-          liveBtn.style.color = '#6ee7b7';
+          liveBtn.style.background = 'rgba(56, 189, 248, 0.25)';
+          liveBtn.style.borderColor = '#38bdf8';
+          liveBtn.style.color = '#93c5fd';
         }
       } else {
+        if (ssoIframe) ssoIframe.style.display = 'none';
         if (canvasEl) canvasEl.style.display = 'block';
         if (videoCont) videoCont.style.display = 'none';
+        if (osdOverlay) osdOverlay.style.display = 'flex';
         if (canvasBtn) {
-          canvasBtn.style.background = 'rgba(56, 189, 248, 0.2)';
-          canvasBtn.style.borderColor = '#38bdf8';
-          canvasBtn.style.color = '#38bdf8';
-        }
-        if (liveBtn) {
-          liveBtn.style.background = 'rgba(255, 255, 255, 0.04)';
-          liveBtn.style.borderColor = 'rgba(255, 255, 255, 0.15)';
-          liveBtn.style.color = '#cbd5e1';
+          canvasBtn.style.background = 'rgba(192, 132, 252, 0.25)';
+          canvasBtn.style.borderColor = '#c084fc';
+          canvasBtn.style.color = '#e9d5ff';
         }
       }
     }
