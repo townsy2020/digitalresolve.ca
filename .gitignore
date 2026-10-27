@@ -1,0 +1,5 @@
+.agents/
+*.ps1
+*.tmp
+__probe.html
+__harness.html

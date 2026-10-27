@@ -10,8 +10,34 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
   <link rel="preconnect" href="https://cam.digitalresolve.ca">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="canonical" href="https://digitalresolve.ca/" />
+  <script>
+    (function() {
+      try {
+        var stored = localStorage.getItem('dr_layout_mode');
+        var isMobile = false;
+        if (stored === 'mobile') {
+          isMobile = true;
+        } else if (stored === 'desktop') {
+          isMobile = false;
+        } else {
+          isMobile = (window.innerWidth <= 768) ||
+                     (window.matchMedia && window.matchMedia('(max-width: 768px)').matches) ||
+                     (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) ||
+                     /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+        var doc = document.documentElement;
+        if (isMobile) {
+          doc.setAttribute('data-layout-mode', 'mobile');
+          doc.classList.add('mobile-layout');
+        } else {
+          doc.setAttribute('data-layout-mode', 'desktop');
+          doc.classList.add('desktop-layout');
+        }
+      } catch(e) {}
+    })();
+  </script>
 </head>
 <body>
   <div class="background-glow"></div>
@@ -22,14 +48,23 @@
         <span class="logo-text-group"><span class="logo-accent">Digital</span>Resolve</span>
         <span class="logo-deck-badge">HOMELAB DECK</span>
       </a>
+      <div class="nav-mobile-actions">
+        <button type="button" class="btn-nav layout-toggle-btn" id="layout-toggle-nav" onclick="toggleLayoutMode()" title="Switch layout mode (Mobile / Desktop)" aria-label="Toggle Layout Mode">
+          <span class="layout-toggle-icon" id="layout-toggle-nav-icon">📱</span>
+          <span class="layout-toggle-text" id="layout-toggle-nav-text">Mobile View</span>
+        </button>
+        <button type="button" class="btn-nav nav-menu-toggle" id="nav-menu-toggle" onclick="toggleMobileNav()" aria-label="Toggle navigation menu" aria-expanded="false">
+          <span id="nav-toggle-icon">☰</span>
+        </button>
+      </div>
       <nav class="nav-links">
         <a href="#deck" class="btn-nav">DECK</a>
 
         <!-- Torrents Dropdown -->
         <div class="dropdown">
-          <a href="https://torrents.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn-nav">
+          <button type="button" class="btn-nav" id="torrents-menu-btn" aria-haspopup="true" aria-expanded="false" title="Open Torrents and Media Streaming Menu">
             Check Torrents <span class="dropdown-arrow">&#9662;</span>
-          </a>
+          </button>
           <div class="dropdown-menu torrent-dropdown">
             <a href="https://torrents.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="dropdown-item">
               <span class="dropdown-dot dot-1"></span> Torrents (Desktop)
@@ -232,7 +267,7 @@
             </div>
           </div>
           <div class="quick-drop-form">
-            <input type="text" id="quick-magnet-input" class="quick-drop-input" placeholder="Paste magnet:?xt=... or .torrent link here">
+            <input type="text" id="quick-magnet-input" class="quick-drop-input" aria-label="Magnet link or torrent URL" placeholder="Paste magnet:?xt=... or .torrent link here">
             <select id="quick-magnet-target" style="background: rgba(11, 15, 23, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #f0f6fc; padding: 10px 14px; font-weight: 600; outline: none; font-size: 0.88rem;">
               <option value="nuc">NUC Server (24/7 &bull; D:\Torrents)</option>
               <option value="desktop">Desktop Workstation</option>
@@ -357,7 +392,7 @@
                 <button type="button" class="btn-control" id="btn-probe-speed" onclick="sendControl('run-speedtest', 'nuc')" title="Probe Bell Canada Fiber Gigabit Throughput and Jitter">
                   <span>&#127760;</span> Probe Bell Gigabit Speed
                 </button>
-                <button type="button" class="btn-control" onclick="sendControl('restart-daemon&daemon=streamhub', 'nuc')" title="Restart Watch Library StreamHub Service on Port 8088">
+                <button type="button" class="btn-control" onclick="sendControl('restart-streamhub', 'nuc')" title="Restart Watch Library StreamHub Service on Port 8088">
                   <span>&#127916;</span> Restart Watch Library (StreamHub)
                 </button>
               </div>
@@ -474,14 +509,14 @@
               <!-- One-Click Microsoft 365 Entra ID SSO Unlock Button -->
               <div style="display: flex; gap: 10px; width: 100%; max-width: 440px; margin-top: 6px;">
                 <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" title="Authenticate with Microsoft 365 Entra ID SSO" style="flex: 1; padding: 10px 16px; font-size: 0.88rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 0 16px rgba(59, 130, 246, 0.35); cursor: pointer;">
-                  <svg width="16" height="16" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;"><path d="M0 0h9.9v9.9H0z" fill="#f25022"/><path d="M11.1 0H21v9.9h-9.9z" fill="#7fba00"/><path d="M0 11.1h9.9V21H0z" fill="#00a4ef"/><path d="M11.1 11.1H21V21h-9.9z" fill="#ffb900"/></svg>
+                  <svg width="16" height="16" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;" aria-hidden="true" focusable="false"><path d="M0 0h9.9v9.9H0z" fill="#f25022"/><path d="M11.1 0H21v9.9h-9.9z" fill="#7fba00"/><path d="M0 11.1h9.9V21H0z" fill="#00a4ef"/><path d="M11.1 11.1H21V21h-9.9z" fill="#ffb900"/></svg>
                   <span>Authenticate with Microsoft 365 SSO</span>
                 </button>
               </div>
 
               <!-- PIN / Passkey Unlock Option -->
               <div style="display: flex; gap: 8px; width: 100%; max-width: 440px; margin-top: 4px;">
-                <input type="password" id="terminal-sso-pin" class="sso-pin-input" placeholder="Enter PIN or Passkey (e.g. 2026)..." style="flex: 1;" onkeydown="if(event.key==='Enter') unlockSSO('pin-terminal')" />
+                <input type="password" id="terminal-sso-pin" class="sso-pin-input" aria-label="Terminal SSO PIN or passkey" placeholder="Enter PIN or Passkey (e.g. 2026)..." style="flex: 1;" onkeydown="if(event.key==='Enter') unlockSSO('pin-terminal')" />
                 <button type="button" class="btn btn-secondary" onclick="unlockSSO('pin-terminal')" title="Unlock Terminal with PIN or Passkey" style="font-size: 0.84rem; padding: 8px 14px;">Unlock &rarr;</button>
                 <button type="button" class="btn-nav" onclick="unlockSSO('passkey')" title="Fast Passkey / FIDO2 Unlock" style="font-size: 0.84rem; padding: 8px 12px; border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7;">Passkey &#128273;</button>
               </div>
@@ -503,7 +538,7 @@
 
           <!-- Remote Instruction Dispatcher for Active AGY Session -->
           <div class="agy-remote-prompt-bar" id="agy-prompt-container" style="display: none; gap: 8px; margin-top: 8px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.08); flex-wrap: wrap;">
-            <input type="text" id="agy-prompt-input" placeholder="Transmit instruction / prompt to this active AGY session (M365 SSO Guarded)..." style="flex: 1; min-width: 250px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 10px 14px; color: #f8fafc; font-family: monospace; font-size: 0.88rem;" onkeydown="if(event.key==='Enter') sendAgyPrompt()" />
+            <input type="text" id="agy-prompt-input" aria-label="Prompt for active AGY session" placeholder="Transmit instruction / prompt to this active AGY session (M365 SSO Guarded)..." style="flex: 1; min-width: 250px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 10px 14px; color: #f8fafc; font-family: monospace; font-size: 0.88rem;" onkeydown="if(event.key==='Enter') sendAgyPrompt()" />
             <button type="button" class="btn-nav" style="border-color: #3b82f6; background: rgba(59, 130, 246, 0.25); color: #fff;" onclick="sendAgyPrompt()" title="Queue Prompt to Active Antigravity Autonomous Session">Send to Agent &rarr;</button>
             <button type="button" class="btn-nav" style="border-color: #10b981; background: rgba(16, 185, 129, 0.25); color: #a7f3d0; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 0 10px rgba(16, 185, 129, 0.25);" onclick="openEmbeddedConsole()" title="Pop out Fullscreen Interactive Console for this session">🖥️ Pop Out Fullscreen Console (51f0adb8) &nearr;</button>
           </div>
@@ -610,6 +645,9 @@
                 <span class="item-tag" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">
                   Microsoft 365 Entra ID SSO
                 </span>
+                <a href="https://cam.digitalresolve.ca/ai.html?src=pennys_feeder" id="cam-direct-link" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.78rem; padding: 4px 12px; background: rgba(59, 130, 246, 0.2); color: #93c5fd !important; border-color: rgba(59, 130, 246, 0.5);" title="Open live camera feed in a new window to authenticate Cloudflare Access SSO">
+                  &#x2197; Open in New Window / Authenticate
+                </a>
                 <a href="https://cam.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.78rem; padding: 4px 12px; background: rgba(16, 185, 129, 0.2); color: #6ee7b7 !important; border-color: rgba(16, 185, 129, 0.5);" title="Open full streaming console in new tab">
                   Full Console &rarr;
                 </a>
@@ -617,8 +655,14 @@
             </div>
 
             <!-- Video Stream Container -->
-            <div style="background: #020617; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 12px;">
+            <div style="background: #020617; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 8px;">
               <iframe id="camera-live-frame" src="https://cam.digitalresolve.ca/ai.html?src=pennys_feeder" style="width: 100%; height: 440px; border: none; display: block;" allow="autoplay; fullscreen; picture-in-picture" title="Live Camera Feed"></iframe>
+            </div>
+            <div style="font-size: 0.76rem; color: #94a3b8; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+              <span>&#128274; Stream protected by Cloudflare Zero Trust &amp; M365 SSO.</span>
+              <a href="https://cam.digitalresolve.ca/ai.html?src=pennys_feeder" id="cam-helper-link" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: underline;">
+                Seeing "Firefox Can't Open This Page"? Click here to authenticate in new window &rarr;
+              </a>
             </div>
 
             <!-- Stream Switcher Toolbar -->
@@ -706,7 +750,7 @@
               </div>
             </div>
             <div style="position: relative; width: 100%; height: 80px;">
-              <canvas id="uptimeSparkline" width="960" height="80" style="width: 100%; height: 100%; display: block;"></canvas>
+              <canvas id="uptimeSparkline" width="960" height="80" role="img" aria-label="24-hour network latency graph" style="width: 100%; height: 100%; display: block;"></canvas>
             </div>
           </div>
 
@@ -1103,9 +1147,13 @@
     <div class="container footer-container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
       <p>&copy; 2026 Digital Resolve &bull; Homelab Operations Deck &bull; Cory Townsend</p>
       <div class="footer-meta" style="display: flex; align-items: center; gap: 16px;">
+        <button type="button" class="version-badge-btn layout-toggle-btn" id="layout-toggle-footer" onclick="toggleLayoutMode()" title="Switch layout mode (Mobile / Desktop)" aria-label="Toggle Layout Mode">
+          <span class="layout-toggle-icon" id="layout-toggle-footer-icon">📱</span>
+          <span class="layout-toggle-text" id="layout-toggle-footer-text">Mobile View</span>
+        </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;">v2.4.9</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;">v2.5.0</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
         <div class="footer-links">
@@ -1137,6 +1185,152 @@
     };
 
     let pollInterval = null;
+
+    /* Mobile Device Detection & Adaptive Layout Mode Switcher (dr_layout_mode) */
+    function detectMobileDevice() {
+      try {
+        return (window.innerWidth <= 768) ||
+               (window.matchMedia && window.matchMedia('(max-width: 768px)').matches) ||
+               (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) ||
+               /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      } catch (e) {
+        return window.innerWidth <= 768;
+      }
+    }
+
+    function getStoredLayoutMode() {
+      try {
+        return localStorage.getItem('dr_layout_mode');
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function updateLayoutToggleButtons(mode) {
+      const isMobile = mode === 'mobile';
+      // Button label shows the view you will switch TO (clearer than showing the current view)
+      const labelText = isMobile ? 'Desktop View' : 'Mobile View';
+      const icon = isMobile ? '🖥️' : '📱';
+      const currentModeText = isMobile ? 'Mobile' : 'Desktop';
+      const title = `Currently in ${currentModeText} View. Click to switch to ${labelText}.`;
+
+      const navBtn = document.getElementById('layout-toggle-nav');
+      const navText = document.getElementById('layout-toggle-nav-text');
+      const navIcon = document.getElementById('layout-toggle-nav-icon');
+      if (navBtn) {
+        navBtn.setAttribute('title', title);
+        navBtn.setAttribute('aria-label', title);
+      }
+      if (navText) navText.textContent = labelText;
+      if (navIcon) navIcon.textContent = icon;
+
+      const footerBtn = document.getElementById('layout-toggle-footer');
+      const footerText = document.getElementById('layout-toggle-footer-text');
+      const footerIcon = document.getElementById('layout-toggle-footer-icon');
+      if (footerBtn) {
+        footerBtn.setAttribute('title', title);
+        footerBtn.setAttribute('aria-label', title);
+      }
+      if (footerText) footerText.textContent = labelText;
+      if (footerIcon) footerIcon.textContent = icon;
+    }
+
+    function setLayoutMode(mode, savePreference = true) {
+      const html = document.documentElement;
+      const body = document.body;
+
+      if (mode === 'mobile') {
+        html.classList.remove('desktop-layout');
+        html.classList.add('mobile-layout');
+        html.setAttribute('data-layout-mode', 'mobile');
+        if (body) {
+          body.classList.remove('desktop-layout');
+          body.classList.add('mobile-layout');
+        }
+      } else {
+        html.classList.remove('mobile-layout');
+        html.classList.add('desktop-layout');
+        html.setAttribute('data-layout-mode', 'desktop');
+        if (body) {
+          body.classList.remove('mobile-layout');
+          body.classList.add('desktop-layout');
+        }
+      }
+
+      if (savePreference) {
+        try {
+          localStorage.setItem('dr_layout_mode', mode);
+        } catch (e) {}
+      }
+
+      updateLayoutToggleButtons(mode);
+    }
+
+    function toggleLayoutMode() {
+      const currentMode = document.documentElement.classList.contains('mobile-layout') ? 'mobile' : 'desktop';
+      const newMode = (currentMode === 'mobile') ? 'desktop' : 'mobile';
+      setLayoutMode(newMode, true);
+
+      if (typeof showToast === 'function') {
+        if (newMode === 'mobile') {
+          showToast('success', 'Mobile View Active', 'Touch-optimized layout & single-column cards enabled');
+        } else {
+          showToast('info', 'Desktop View Active', 'Full desktop layout enabled (pan/zoom on smaller displays)');
+        }
+      }
+    }
+
+    function initLayoutMode() {
+      const stored = getStoredLayoutMode();
+      let mode;
+      if (stored === 'mobile' || stored === 'desktop') {
+        mode = stored;
+      } else {
+        mode = detectMobileDevice() ? 'mobile' : 'desktop';
+      }
+      setLayoutMode(mode, false);
+
+      if (!stored) {
+        const mqHandler = () => {
+          if (!getStoredLayoutMode()) {
+            const isMob = detectMobileDevice();
+            setLayoutMode(isMob ? 'mobile' : 'desktop', false);
+          }
+        };
+        if (window.matchMedia) {
+          const mq = window.matchMedia('(max-width: 768px)');
+          if (mq.addEventListener) {
+            mq.addEventListener('change', mqHandler);
+          } else if (mq.addListener) {
+            mq.addListener(mqHandler);
+          }
+        }
+        window.addEventListener('resize', mqHandler);
+        window.addEventListener('orientationchange', mqHandler);
+      }
+    }
+
+    function toggleMobileNav() {
+      const navContainer = document.querySelector('.nav-container');
+      const toggleIcon = document.getElementById('nav-toggle-icon');
+      const menuToggle = document.getElementById('nav-menu-toggle');
+      if (!navContainer) return;
+
+      const isOpen = navContainer.classList.toggle('nav-open');
+      if (menuToggle) menuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      if (toggleIcon) toggleIcon.textContent = isOpen ? '✕' : '☰';
+    }
+
+    function closeMobileNav() {
+      const navContainer = document.querySelector('.nav-container');
+      const toggleIcon = document.getElementById('nav-toggle-icon');
+      const menuToggle = document.getElementById('nav-menu-toggle');
+      if (!navContainer) return;
+
+      navContainer.classList.remove('nav-open');
+      if (menuToggle) menuToggle.setAttribute('aria-expanded', 'false');
+      if (toggleIcon) toggleIcon.textContent = '☰';
+    }
 
     function showToast(statusType, msg, subtext = '', duration = 5000) {
       const toast = document.getElementById('wol-toast');
@@ -1374,6 +1568,8 @@
 
     // Check status on load
     window.addEventListener('DOMContentLoaded', () => {
+      initLayoutMode();
+
       fetch(`${GATEWAY}/status?target=nuc`).then(r => r.json()).then(d => updateStatusUI('nuc', d.online, d.latencyMs, d.disk, d.torrent, d.vitals)).catch(() => updateStatusUI('nuc', false));
       fetch(`${GATEWAY}/status?target=desktop`).then(r => r.json()).then(d => updateStatusUI('desktop', d.online, d.latencyMs, d.disk, d.torrent, d.vitals)).catch(() => updateStatusUI('desktop', false));
 
@@ -1395,12 +1591,21 @@
         const trigger = dd.querySelector('.btn-nav, .btn-torrent, .btn-gemini, .btn-wol, #wol-btn');
         if (trigger) {
           trigger.addEventListener('click', (e) => {
-            if (trigger.tagName === 'BUTTON' || trigger.getAttribute('href') === 'javascript:void(0)') {
+            if (trigger.tagName === 'BUTTON' || trigger.getAttribute('href') === 'javascript:void(0)' || document.documentElement.classList.contains('mobile-layout') || window.innerWidth <= 768) {
               e.preventDefault();
               dd.classList.toggle('is-open');
             }
           });
         }
+      });
+
+      // Mobile nav item auto-dismiss & backdrop click handlers
+      document.querySelectorAll('.nav-links a:not(.dropdown > a), .nav-links button:not(.dropdown > button)').forEach(item => {
+        item.addEventListener('click', () => {
+          if (document.documentElement.classList.contains('mobile-layout') || window.innerWidth <= 768) {
+            closeMobileNav();
+          }
+        });
       });
 
       document.addEventListener('click', (e) => {
@@ -1412,6 +1617,9 @@
         }
         if (!e.target.closest('.dropdown')) {
           document.querySelectorAll('.dropdown').forEach(dd => dd.classList.remove('is-open'));
+        }
+        if (!e.target.closest('.header')) {
+          closeMobileNav();
         }
       });
 
@@ -1745,8 +1953,6 @@
       const badge = document.getElementById('ctrl-node-status-badge');
       const dot = document.getElementById('ctrl-node-status-dot');
       const text = document.getElementById('ctrl-node-status-text');
-      const select = document.getElementById('ctrl-target-select');
-      if (select) select.value = currentControlTarget;
 
       if (currentControlTarget === 'nuc') {
         if (label) label.innerHTML = '&#9889; NUC Core Server (24/7 Always-On)';
@@ -1810,15 +2016,6 @@
       }
     }
 
-    function filterControlMatrix(node) {
-      if (node && node !== 'all') {
-        const sel = document.getElementById('ctrl-target-select');
-        if (sel) {
-          sel.value = node;
-          onControlNodeChange(node);
-        }
-      }
-    }
 
     // Live Cluster Stats & Swarm Poller
     function fetchClusterStats() {
@@ -2034,7 +2231,7 @@
       if (modal) modal.classList.remove('active');
     }
     function closeMagnetModalOnBackdrop(e) {
-      if (e.target.id === 'magnet-modal-overlay') closeMagnetModal();
+      if (e.target && e.target.id === 'magnet-modal-overlay') closeMagnetModal();
     }
     function submitMagnet() {
       const input = document.getElementById('magnet-input');
@@ -2092,8 +2289,17 @@
       const playerPage = currentCamAi ? 'ai.html' : 'webrtc.html';
       const frame = document.getElementById('camera-live-frame');
       const title = document.getElementById('cam-header-active-name');
+      const targetUrl = `https://cam.digitalresolve.ca/${playerPage}?src=${src}`;
       if (frame) {
-        frame.src = `https://cam.digitalresolve.ca/${playerPage}?src=${src}`;
+        frame.src = targetUrl;
+      }
+      const directLink = document.getElementById('cam-direct-link');
+      if (directLink) {
+        directLink.href = targetUrl;
+      }
+      const helperLink = document.getElementById('cam-helper-link');
+      if (helperLink) {
+        helperLink.href = targetUrl;
       }
       if (title) {
         title.innerText = currentCamTarget === 'bedroom' ? 'Bedroom' : "Penny's Feeder";
@@ -2498,15 +2704,15 @@
 
   <!-- Remote Magnet Ingestion Modal -->
   <div id="magnet-modal-overlay" class="magnet-modal-overlay" onclick="closeMagnetModalOnBackdrop(event)">
-    <div class="magnet-modal">
+    <div class="magnet-modal" role="dialog" aria-modal="true" aria-label="Remote torrent magnet drop">
       <div class="magnet-header">
         <div class="magnet-title">[+] Remote Torrent / Magnet Drop</div>
-        <button type="button" class="magnet-close" onclick="closeMagnetModal()" title="Close Remote Magnet Modal">&times;</button>
+        <button type="button" class="magnet-close" onclick="closeMagnetModal()" title="Close Remote Magnet Modal" aria-label="Close magnet dialog">&times;</button>
       </div>
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.5;">
         Inject any torrent or magnet link into your home server. Traffic is downloaded through Mullvad WireGuard VPN and auto-unpacked.
       </p>
-      <textarea id="magnet-input" class="magnet-input" placeholder="Paste magnet:?xt=... or .torrent HTTP URL here"></textarea>
+      <textarea id="magnet-input" class="magnet-input" aria-label="Magnet link or torrent URL" placeholder="Paste magnet:?xt=... or .torrent HTTP URL here"></textarea>
       <div class="magnet-targets">
         <label class="magnet-target-label">
           <input type="radio" name="magnet-target" value="nuc" checked>
@@ -2522,12 +2728,12 @@
   </div>
   <!-- Embedded Antigravity (AGY) Interactive Terminal Console Modal -->
   <div id="agy-console-modal-overlay" class="agy-modal-overlay" onclick="closeAgyConsoleOnBackdrop(event)">
-    <div class="agy-console-window" id="agy-console-window">
+    <div class="agy-console-window" id="agy-console-window" role="dialog" aria-modal="true" aria-label="Antigravity live terminal">
       <div class="agy-console-header">
         <div class="agy-window-controls">
-          <span class="win-dot dot-close" onclick="closeAgyConsole()" title="Close"></span>
-          <span class="win-dot dot-min" onclick="closeAgyConsole()" title="Minimize"></span>
-          <span class="win-dot dot-max" onclick="maximizeAgyConsole()" title="Fullscreen"></span>
+          <button type="button" class="win-dot dot-close" onclick="closeAgyConsole()" title="Close" aria-label="Close terminal console"></button>
+          <button type="button" class="win-dot dot-min" onclick="closeAgyConsole()" title="Minimize" aria-label="Minimize terminal console"></button>
+          <button type="button" class="win-dot dot-max" onclick="maximizeAgyConsole()" title="Fullscreen" aria-label="Toggle fullscreen terminal console"></button>
         </div>
         <div class="agy-console-title">
           <span class="pulse-dot" id="agy-modal-pulse-dot"></span>
@@ -2538,8 +2744,8 @@
           <button type="button" class="btn-console-act" onclick="startNewAgySession('desktop')" style="color: #60a5fa; border-color: rgba(59, 130, 246, 0.4);" title="Start New AGY Session on Desktop with agy --dangerously-skip-permissions">🚀 New: Desktop</button>
           <button type="button" class="btn-console-act" onclick="startNewAgySession('nuc')" style="color: #c084fc; border-color: rgba(192, 132, 252, 0.4);" title="Start New AGY Session on NUC with agy --dangerously-skip-permissions">🚀 New: NUC</button>
           <button type="button" class="btn-console-act" onclick="toggleConsoleAutoPoll()" id="btn-console-poll" title="Toggle 2s Live Auto-Polling">Auto-Stream: ON</button>
-          <button type="button" class="btn-console-act" onclick="refreshAgyConsole()" title="Refresh Now">&#x21bb;</button>
-          <button type="button" class="btn-console-act" onclick="closeAgyConsole()" title="Close Fullscreen Terminal Console">&times;</button>
+          <button type="button" class="btn-console-act" onclick="refreshAgyConsole()" title="Refresh Now" aria-label="Refresh terminal stream">&#x21bb;</button>
+          <button type="button" class="btn-console-act" onclick="closeAgyConsole()" title="Close Fullscreen Terminal Console" aria-label="Close terminal console">&times;</button>
         </div>
       </div>
 
@@ -2574,14 +2780,14 @@
           <!-- One-Click Microsoft 365 Entra ID SSO Unlock Button -->
           <div style="display: flex; gap: 10px; width: 100%; max-width: 440px; margin-top: 6px;">
             <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" title="Authenticate with Microsoft 365 Entra ID SSO" style="flex: 1; padding: 12px 18px; font-size: 0.92rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 0 16px rgba(59, 130, 246, 0.35); cursor: pointer;">
-              <svg width="18" height="18" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;"><path d="M0 0h9.9v9.9H0z" fill="#f25022"/><path d="M11.1 0H21v9.9h-9.9z" fill="#7fba00"/><path d="M0 11.1h9.9V21H0z" fill="#00a4ef"/><path d="M11.1 11.1H21V21h-9.9z" fill="#ffb900"/></svg>
+              <svg width="18" height="18" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;" aria-hidden="true" focusable="false"><path d="M0 0h9.9v9.9H0z" fill="#f25022"/><path d="M11.1 0H21v9.9h-9.9z" fill="#7fba00"/><path d="M0 11.1h9.9V21H0z" fill="#00a4ef"/><path d="M11.1 11.1H21V21h-9.9z" fill="#ffb900"/></svg>
               <span>Authenticate with Microsoft 365 SSO</span>
             </button>
           </div>
 
           <!-- PIN / Passkey Unlock Option -->
           <div style="display: flex; gap: 8px; width: 100%; max-width: 440px; margin-top: 4px;">
-            <input type="password" id="modal-sso-pin" class="sso-pin-input" placeholder="Enter PIN or Passkey (e.g. 2026)..." style="flex: 1;" onkeydown="if(event.key==='Enter') unlockSSO('pin-modal')" />
+            <input type="password" id="modal-sso-pin" class="sso-pin-input" aria-label="Console SSO PIN or passkey" placeholder="Enter PIN or Passkey (e.g. 2026)..." style="flex: 1;" onkeydown="if(event.key==='Enter') unlockSSO('pin-modal')" />
             <button type="button" class="btn btn-secondary" onclick="unlockSSO('pin-modal')" title="Unlock Terminal with PIN or Passkey" style="font-size: 0.88rem; padding: 8px 16px;">Unlock &rarr;</button>
             <button type="button" class="btn-nav" onclick="unlockSSO('passkey')" title="Fast Passkey / FIDO2 Unlock" style="font-size: 0.88rem; padding: 8px 14px; border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7;">Passkey &#128273;</button>
           </div>
@@ -2609,27 +2815,42 @@
         <div class="agy-prompt-label">
           <span style="color: #4ade80;">agy</span><span style="color: #94a3b8;">@</span><span style="color: #38bdf8;">digitalresolve</span><span style="color: #f8fafc;">:</span><span style="color: #a78bfa;">~</span><span style="color: #4ade80;">$</span>
         </div>
-        <input type="text" id="agy-modal-input" class="agy-modal-input" placeholder="Type prompt or command to transmit to active AGY agent..." onkeydown="if(event.key==='Enter') sendConsolePrompt()" autocomplete="off" spellcheck="false" />
+        <input type="text" id="agy-modal-input" class="agy-modal-input" aria-label="Terminal command prompt" placeholder="Type prompt or command to transmit to active AGY agent..." onkeydown="if(event.key==='Enter') sendConsolePrompt()" autocomplete="off" spellcheck="false" />
         <button type="button" class="agy-send-btn" id="agy-modal-send-btn" onclick="sendConsolePrompt()" title="Execute Prompt in Active AGY Autonomous Session">Execute &crarr;</button>
       </div>
     </div>
   </div>
   <!-- Comprehensive High-Level System Release Changelog Modal -->
   <div id="changelog-modal-overlay" class="changelog-modal-overlay" onclick="closeChangelogModalOnBackdrop(event)">
-    <div class="changelog-modal">
+    <div class="changelog-modal" role="dialog" aria-modal="true" aria-label="System changelog">
       <div class="changelog-header">
         <div class="changelog-title-group">
           <span class="pulse-dot"></span>
           <span class="changelog-title">Digital Resolve System Changelog &amp; Release History</span>
         </div>
-        <button type="button" class="changelog-close" onclick="closeChangelogModal()" title="Close Changelog Modal">&times;</button>
+        <button type="button" class="changelog-close" onclick="closeChangelogModal()" title="Close Changelog Modal" aria-label="Close changelog">&times;</button>
       </div>
 
       <div class="changelog-body">
-        <!-- Version 2.4.9 (Current) -->
+        <!-- Version 2.5.0 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.4.9 &bull; Current</span>
+            <span class="ver-tag current">v2.5.0 &bull; Current</span>
+            <span class="ver-date">October 27, 2026</span>
+          </div>
+          <h4 class="ver-title">Touch-First Adaptive Mobile Engine &amp; Persistent Layout Switcher</h4>
+          <ul class="ver-list">
+            <li><strong>Touch-First Mobile Engine:</strong> Integrated automated mobile device detection with fluid single-column card stacking, zero horizontal overflow across 360px-430px viewports, and compliant minimum 44px tap targets for all controls.</li>
+            <li><strong>Persistent Layout Switcher:</strong> Added synchronized "Mobile View / Desktop View" manual toggle controls in header and footer, persisting user preference seamlessly in localStorage across sessions.</li>
+            <li><strong>Touch-Optimized Navigation:</strong> Enhanced header with accessible slide-down mobile navigation drawer, inline dropdown accordions, and swipe-friendly horizontal chip scrolling.</li>
+            <li><strong>Adaptive Media &amp; WebRTC:</strong> Implemented responsive 16:9 aspect-ratio scaling for live camera WebRTC optical streams and full-screen mobile terminal console integration.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.4.9 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.4.9</span>
             <span class="ver-date">October 26, 2026</span>
           </div>
           <h4 class="ver-title">Consolidated Node Selector Dropdown &amp; Functional Action Groups</h4>
