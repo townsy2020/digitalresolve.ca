@@ -26,6 +26,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-y: auto;
 }
 
 body {
@@ -33,9 +34,15 @@ body {
   color: var(--text-main);
   font-family: var(--font-family);
   line-height: 1.6;
-  overflow-x: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
   position: relative;
   min-height: 100vh;
+}
+
+/* Scroll Offset for Fixed/Sticky Header */
+section[id], div[id], #deck, #ops, #fleet, #uptime, #camera-feed-card {
+  scroll-margin-top: 84px;
 }
 
 .background-glow {
@@ -61,12 +68,14 @@ body {
 
 /* Header */
 .header {
-  padding: 24px 0;
+  padding: 16px 0;
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   position: sticky;
   top: 0;
-  z-index: 10;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  z-index: 100;
+  background: rgba(13, 17, 23, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .nav-container {
@@ -2680,88 +2689,77 @@ html.desktop-layout body {
   overflow-x: auto !important;
 }
 
-/* When forced mobile view on larger desktop screens (>768px), apply full mobile layout */
+/* When forced mobile view on larger desktop screens (>768px), enhance touch targets without breaking desktop width */
 @media (min-width: 769px) {
   html.mobile-layout body {
-    overflow-x: hidden !important;
+    overflow-x: clip !important;
     width: 100% !important;
   }
   html.mobile-layout body .container {
-    max-width: 520px !important;
+    max-width: 1100px !important;
     margin: 0 auto !important;
-    padding: 0 16px !important;
+    padding: 0 20px !important;
   }
   html.mobile-layout .header .container {
-    max-width: 520px !important;
+    max-width: 1100px !important;
   }
   html.mobile-layout .nav-container {
     display: flex !important;
     flex-wrap: wrap !important;
     justify-content: space-between !important;
     align-items: center !important;
-    gap: 8px !important;
+    gap: 12px !important;
     position: relative !important;
   }
   html.mobile-layout .nav-menu-toggle {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    min-width: 44px !important;
-    min-height: 44px !important;
-    padding: 8px 12px !important;
-    background: rgba(59, 130, 246, 0.15) !important;
-    border: 1px solid rgba(96, 165, 250, 0.4) !important;
-    color: #93c5fd !important;
-    border-radius: 8px !important;
-    font-size: 1.25rem !important;
-    cursor: pointer !important;
+    display: none !important;
   }
   html.mobile-layout .nav-links {
-    order: 3 !important;
-    width: 100% !important;
-    display: none !important;
-    flex-direction: column !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
     gap: 8px !important;
-    padding: 12px 0 6px 0 !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    width: auto !important;
+    border-top: none !important;
+    padding: 0 !important;
   }
   html.mobile-layout .nav-container.nav-open .nav-links {
     display: flex !important;
-    animation: fadeInDown 0.2s ease-out;
   }
   html.mobile-layout .nav-links > .btn-nav,
   html.mobile-layout .nav-links > a.btn-nav,
   html.mobile-layout .nav-links > button.btn-nav {
-    width: 100% !important;
-    min-height: 44px !important;
-    display: flex !important;
+    width: auto !important;
+    min-height: 40px !important;
+    display: inline-flex !important;
     align-items: center !important;
-    justify-content: flex-start !important;
-    padding: 10px 14px !important;
-    font-size: 0.9rem !important;
+    justify-content: center !important;
+    padding: 8px 14px !important;
+    font-size: 0.88rem !important;
     box-sizing: border-box !important;
   }
   html.mobile-layout .nav-links .dropdown {
-    width: 100% !important;
+    width: auto !important;
     margin: 0 !important;
     padding: 0 !important;
   }
   html.mobile-layout .nav-links .dropdown > .btn-nav {
-    width: 100% !important;
-    min-height: 44px !important;
-    display: flex !important;
-    justify-content: space-between !important;
+    width: auto !important;
+    min-height: 40px !important;
+    display: inline-flex !important;
+    justify-content: center !important;
     align-items: center !important;
-    padding: 10px 14px !important;
-    font-size: 0.9rem !important;
+    padding: 8px 14px !important;
+    font-size: 0.88rem !important;
     box-sizing: border-box !important;
   }
   html.mobile-layout .nav-links .dropdown-menu {
-    position: static !important;
-    width: 100% !important;
-    min-width: 100% !important;
-    max-width: 100% !important;
-    box-shadow: none !important;
+    position: absolute !important;
+    width: auto !important;
+    min-width: 220px !important;
+    max-width: 320px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
     border: 1px solid rgba(59, 130, 246, 0.25) !important;
     border-radius: 8px !important;
     margin-top: 6px !important;
@@ -2820,6 +2818,16 @@ html.desktop-layout body {
     max-height: 340px !important;
     display: block !important;
   }
+  html.mobile-layout #camera-feed-card .btn,
+  html.mobile-layout #camera-feed-card .btn-secondary {
+    min-height: 44px !important;
+    padding: 10px 14px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.82rem !important;
+    box-sizing: border-box !important;
+  }
   html.mobile-layout .magnet-modal,
   html.mobile-layout .changelog-modal {
     width: 95% !important;
@@ -2866,7 +2874,7 @@ html.desktop-layout body {
 @media (max-width: 768px) {
   html:not(.desktop-layout) body,
   html.mobile-layout body {
-    overflow-x: hidden !important;
+    overflow-x: clip !important;
     width: 100% !important;
   }
 
@@ -3373,8 +3381,10 @@ html.desktop-layout body {
   html.mobile-layout .agy-console-window {
     width: 100vw !important;
     height: 100vh !important;
+    height: 100dvh !important;
     max-width: 100vw !important;
     max-height: 100vh !important;
+    max-height: 100dvh !important;
     border-radius: 0 !important;
     border: none !important;
   }
@@ -3558,6 +3568,8 @@ html.desktop-layout body {
 /* ==========================================================================
    Mobile fixes found by exact-width (360/390/430px) browser testing
    ========================================================================== */
+html:not(.desktop-layout) .terminal-sso-gate > div,
+html:not(.desktop-layout) .modal-sso-gate > div,
 html.mobile-layout .terminal-sso-gate > div,
 html.mobile-layout .modal-sso-gate > div {
   width: 100%;
@@ -3565,28 +3577,39 @@ html.mobile-layout .modal-sso-gate > div {
   min-width: 0;
 }
 
+html:not(.desktop-layout) .terminal-sso-gate > div > div,
+html:not(.desktop-layout) .modal-sso-gate > div > div,
 html.mobile-layout .terminal-sso-gate > div > div,
 html.mobile-layout .modal-sso-gate > div > div {
   max-width: 100% !important;
   flex-wrap: wrap;
 }
 
+html:not(.desktop-layout) .sso-badge-row,
 html.mobile-layout .sso-badge-row {
   flex-wrap: wrap;
   justify-content: center;
 }
 
+html:not(.desktop-layout) .sso-badge-tag,
 html.mobile-layout .sso-badge-tag {
   white-space: normal;
   text-align: center;
 }
 
+html:not(.desktop-layout) .terminal-sso-gate .sso-pin-input,
+html:not(.desktop-layout) .modal-sso-gate .sso-pin-input,
 html.mobile-layout .terminal-sso-gate .sso-pin-input,
 html.mobile-layout .modal-sso-gate .sso-pin-input {
   flex: 1 1 100% !important;
   min-width: 0;
 }
 
+html:not(.desktop-layout) .terminal-sso-gate .btn,
+html:not(.desktop-layout) .terminal-sso-gate .btn-nav,
+html:not(.desktop-layout) .modal-sso-gate .btn,
+html:not(.desktop-layout) .modal-sso-gate .btn-nav,
+html:not(.desktop-layout) #btn-probe-now,
 html.mobile-layout .terminal-sso-gate .btn,
 html.mobile-layout .terminal-sso-gate .btn-nav,
 html.mobile-layout .modal-sso-gate .btn,
@@ -3594,4 +3617,45 @@ html.mobile-layout .modal-sso-gate .btn-nav,
 html.mobile-layout #btn-probe-now {
   min-height: 44px;
   flex: 1 1 auto;
+}
+
+/* Prompt bar and chips on mobile when unlocked */
+html:not(.desktop-layout) .agy-remote-prompt-bar,
+html.mobile-layout .agy-remote-prompt-bar {
+  flex-direction: column !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+html:not(.desktop-layout) .agy-remote-prompt-bar input,
+html.mobile-layout .agy-remote-prompt-bar input {
+  min-height: 44px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+html:not(.desktop-layout) .agy-remote-prompt-bar .btn-nav,
+html.mobile-layout .agy-remote-prompt-bar .btn-nav {
+  min-height: 44px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: normal !important;
+  text-align: center !important;
+  padding: 10px 12px !important;
+}
+
+html:not(.desktop-layout) .agy-inline-chips,
+html.mobile-layout .agy-inline-chips {
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  flex-wrap: nowrap !important;
+  max-width: 100% !important;
+  padding: 6px 2px !important;
 }

@@ -22,10 +22,7 @@
         } else if (stored === 'desktop') {
           isMobile = false;
         } else {
-          isMobile = (window.innerWidth <= 768) ||
-                     (window.matchMedia && window.matchMedia('(max-width: 768px)').matches) ||
-                     (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) ||
-                     /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+          isMobile = (window.innerWidth <= 768);
         }
         var doc = document.documentElement;
         if (isMobile) {
@@ -48,15 +45,6 @@
         <span class="logo-text-group"><span class="logo-accent">Digital</span>Resolve</span>
         <span class="logo-deck-badge">HOMELAB DECK</span>
       </a>
-      <div class="nav-mobile-actions">
-        <button type="button" class="btn-nav layout-toggle-btn" id="layout-toggle-nav" onclick="toggleLayoutMode()" title="Switch layout mode (Mobile / Desktop)" aria-label="Toggle Layout Mode">
-          <span class="layout-toggle-icon" id="layout-toggle-nav-icon">📱</span>
-          <span class="layout-toggle-text" id="layout-toggle-nav-text">Mobile View</span>
-        </button>
-        <button type="button" class="btn-nav nav-menu-toggle" id="nav-menu-toggle" onclick="toggleMobileNav()" aria-label="Toggle navigation menu" aria-expanded="false">
-          <span id="nav-toggle-icon">☰</span>
-        </button>
-      </div>
       <nav class="nav-links">
         <a href="#deck" class="btn-nav">DECK</a>
 
@@ -194,6 +182,15 @@
         <a href="#uptime" class="btn-nav">Uptime &amp; SLA</a>
         <a href="https://stream.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn-nav">Watch Library</a>
       </nav>
+      <div class="nav-mobile-actions">
+        <button type="button" class="btn-nav layout-toggle-btn" id="layout-toggle-nav" onclick="toggleLayoutMode()" title="Switch layout mode (Mobile / Desktop)" aria-label="Toggle Layout Mode">
+          <span class="layout-toggle-icon" id="layout-toggle-nav-icon">📱</span>
+          <span class="layout-toggle-text" id="layout-toggle-nav-text">Mobile View</span>
+        </button>
+        <button type="button" class="btn-nav nav-menu-toggle" id="nav-menu-toggle" onclick="toggleMobileNav()" aria-label="Toggle navigation menu" aria-expanded="false">
+          <span id="nav-toggle-icon">☰</span>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -656,7 +653,7 @@
 
             <!-- Video Stream Container -->
             <div style="background: #020617; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 8px;">
-              <iframe id="camera-live-frame" src="https://cam.digitalresolve.ca/ai.html?src=pennys_feeder" style="width: 100%; height: 440px; border: none; display: block;" allow="autoplay; fullscreen; picture-in-picture" title="Live Camera Feed"></iframe>
+              <iframe id="camera-live-frame" src="https://cam.digitalresolve.ca/ai.html?src=pennys_feeder" style="width: 100%; height: 440px; border: none; display: block;" allow="autoplay; fullscreen; picture-in-picture" title="Live Camera Feed" loading="lazy"></iframe>
             </div>
             <div style="font-size: 0.76rem; color: #94a3b8; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
               <span>&#128274; Stream protected by Cloudflare Zero Trust &amp; M365 SSO.</span>
@@ -1189,30 +1186,28 @@
     /* Mobile Device Detection & Adaptive Layout Mode Switcher (dr_layout_mode) */
     function detectMobileDevice() {
       try {
-        return (window.innerWidth <= 768) ||
-               (window.matchMedia && window.matchMedia('(max-width: 768px)').matches) ||
-               (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) ||
-               /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      } catch (e) {
         return window.innerWidth <= 768;
+      } catch (e) {
+        return false;
       }
     }
 
+    let sessionLayoutModeOverride = null;
+
     function getStoredLayoutMode() {
       try {
-        return localStorage.getItem('dr_layout_mode');
+        return localStorage.getItem('dr_layout_mode') || sessionLayoutModeOverride;
       } catch (e) {
-        return null;
+        return sessionLayoutModeOverride;
       }
     }
 
     function updateLayoutToggleButtons(mode) {
       const isMobile = mode === 'mobile';
-      // Button label shows the view you will switch TO (clearer than showing the current view)
-      const labelText = isMobile ? 'Desktop View' : 'Mobile View';
+      const actionText = isMobile ? 'Desktop View' : 'Mobile View';
       const icon = isMobile ? '🖥️' : '📱';
       const currentModeText = isMobile ? 'Mobile' : 'Desktop';
-      const title = `Currently in ${currentModeText} View. Click to switch to ${labelText}.`;
+      const title = `Currently in ${currentModeText} View. Click to switch to ${actionText}.`;
 
       const navBtn = document.getElementById('layout-toggle-nav');
       const navText = document.getElementById('layout-toggle-nav-text');
@@ -1221,7 +1216,7 @@
         navBtn.setAttribute('title', title);
         navBtn.setAttribute('aria-label', title);
       }
-      if (navText) navText.textContent = labelText;
+      if (navText) navText.textContent = actionText;
       if (navIcon) navIcon.textContent = icon;
 
       const footerBtn = document.getElementById('layout-toggle-footer');
@@ -1231,7 +1226,7 @@
         footerBtn.setAttribute('title', title);
         footerBtn.setAttribute('aria-label', title);
       }
-      if (footerText) footerText.textContent = labelText;
+      if (footerText) footerText.textContent = actionText;
       if (footerIcon) footerIcon.textContent = icon;
     }
 
@@ -1258,6 +1253,7 @@
       }
 
       if (savePreference) {
+        sessionLayoutModeOverride = mode;
         try {
           localStorage.setItem('dr_layout_mode', mode);
         } catch (e) {}
@@ -1568,6 +1564,8 @@
 
     // Check status on load
     window.addEventListener('DOMContentLoaded', () => {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
       initLayoutMode();
 
       fetch(`${GATEWAY}/status?target=nuc`).then(r => r.json()).then(d => updateStatusUI('nuc', d.online, d.latencyMs, d.disk, d.torrent, d.vitals)).catch(() => updateStatusUI('nuc', false));
@@ -1612,6 +1610,7 @@
         if (e.target.closest('.dropdown-menu button, .dropdown-menu a')) {
           setTimeout(() => {
             document.querySelectorAll('.dropdown').forEach(dd => dd.classList.remove('is-open'));
+            closeMobileNav();
           }, 80);
           return;
         }
@@ -2019,10 +2018,13 @@
 
     // Live Cluster Stats & Swarm Poller
     function fetchClusterStats() {
-      fetch(`${GATEWAY}/stats`)
+      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const timeoutId = controller ? setTimeout(() => controller.abort(), 4000) : null;
+      fetch(`${GATEWAY}/stats`, controller ? { signal: controller.signal } : {})
         .then(r => r.json())
         .then(data => {
-          if (data.status === 'success' && data.nuc) {
+          if (timeoutId) clearTimeout(timeoutId);
+          if (data && data.status === 'success' && data.nuc) {
             const nuc = data.nuc;
             if (nuc.swarm) {
               const sw = nuc.swarm;
@@ -2070,7 +2072,9 @@
             }
           }
         })
-        .catch(() => {});
+        .catch(() => {
+          if (timeoutId) clearTimeout(timeoutId);
+        });
     }
 
     // Terminal Log Streamer
@@ -2223,12 +2227,14 @@
       const modal = document.getElementById('magnet-modal-overlay');
       if (modal) {
         modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
         setTimeout(() => document.getElementById('magnet-input')?.focus(), 150);
       }
     }
     function closeMagnetModal() {
       const modal = document.getElementById('magnet-modal-overlay');
       if (modal) modal.classList.remove('active');
+      document.body.style.overflow = '';
     }
     function closeMagnetModalOnBackdrop(e) {
       if (e.target && e.target.id === 'magnet-modal-overlay') closeMagnetModal();
@@ -2670,6 +2676,7 @@
         if (typeof closeAgyConsole === 'function') closeAgyConsole();
         if (typeof closeChangelogModal === 'function') closeChangelogModal();
         if (typeof closeMagnetModal === 'function') closeMagnetModal();
+        document.body.style.overflow = '';
         document.querySelectorAll('.dropdown.is-open').forEach(dd => dd.classList.remove('is-open'));
       }
     });
