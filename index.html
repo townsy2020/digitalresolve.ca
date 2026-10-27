@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://wake.digitalresolve.ca">
+  <link rel="preconnect" href="https://cam.digitalresolve.ca">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="canonical" href="https://digitalresolve.ca/" />
 </head>
@@ -1413,19 +1415,29 @@
         }
       });
 
-      // Start live stats & terminal stream
+      // Start live stats & terminal stream with Page Visibility throttling
       fetchClusterStats();
-      setInterval(fetchClusterStats, 4000);
+      setInterval(() => { if (!document.hidden) fetchClusterStats(); }, 4000);
       updateSSOGateUI();
       if (isSSOAuthenticated()) {
         loadLog('agy');
       }
       fetchISPHistory();
-      setInterval(fetchISPHistory, 15000);
+      setInterval(() => { if (!document.hidden) fetchISPHistory(); }, 15000);
       renderUptimeMatrix();
-      setInterval(renderUptimeMatrix, 60000);
+      setInterval(() => { if (!document.hidden) renderUptimeMatrix(); }, 60000);
+
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+          fetchClusterStats();
+          fetchISPHistory();
+          if (currentLogTab && isSSOAuthenticated()) loadLog(currentLogTab);
+        }
+      });
+
       // Auto-stream inline terminal every 3s
       setInterval(() => {
+        if (document.hidden) return;
         if (currentLogTab && isSSOAuthenticated()) {
           const ssoPin = localStorage.getItem('dr_sso_pin') || '2026';
           fetch(`${GATEWAY}/api/logs?name=${encodeURIComponent(currentLogTab)}&pin=${encodeURIComponent(ssoPin)}`)
@@ -2005,8 +2017,7 @@
         showToast('success', 'Download Started!', data.message || `Torrent sent to ${target.toUpperCase()}`);
       })
       .catch(() => {
-        if (input) input.value = '';
-        showToast('success', 'Dispatched to Server', `Injected into ${target.toUpperCase()} via Mullvad VPN`);
+        showToast('error', 'Dispatch Failed', `Could not reach ${GATEWAY} to inject torrent.`);
       });
     }
 
@@ -2053,8 +2064,7 @@
       })
       .catch(err => {
         if (btn) { btn.disabled = false; btn.textContent = 'Start Remote Download'; }
-        showToast('success', 'Dispatched to Server', `Injected into ${target.toUpperCase()}!`);
-        closeMagnetModal();
+        showToast('error', 'Dispatch Failed', `Could not reach ${GATEWAY} to inject torrent.`);
       });
     }
 

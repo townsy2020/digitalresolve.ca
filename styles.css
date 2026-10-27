@@ -255,6 +255,7 @@ body {
 
 /* Accessible Focus Ring for Keyboard Navigation */
 button:focus-visible,
+a:focus-visible,
 .btn:focus-visible,
 .btn-primary:focus-visible,
 .btn-secondary:focus-visible,
@@ -271,7 +272,13 @@ button:focus-visible,
 .pill-btn:focus-visible,
 .magnet-submit-btn:focus-visible,
 .agy-send-btn:focus-visible,
-.meta-link-btn:focus-visible {
+.meta-link-btn:focus-visible,
+.dropdown-item:focus-visible,
+.app-card:focus-visible,
+.logo:focus-visible,
+.changelog-close:focus-visible,
+.magnet-close:focus-visible,
+.version-badge-btn:focus-visible {
   outline: 2px solid #38bdf8 !important;
   outline-offset: 2px !important;
   box-shadow: 0 0 12px rgba(56, 189, 248, 0.5) !important;
