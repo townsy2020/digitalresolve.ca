@@ -616,7 +616,7 @@
 
             <!-- Video Stream Container -->
             <div style="background: #020617; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 12px;">
-              <iframe id="camera-live-frame" src="https://cam.digitalresolve.ca/webrtc.html?src=pennys_feeder" style="width: 100%; height: 420px; border: none; display: block;" allow="autoplay; fullscreen; picture-in-picture" title="Live Camera Feed"></iframe>
+              <iframe id="camera-live-frame" src="https://cam.digitalresolve.ca/ai.html?src=pennys_feeder" style="width: 100%; height: 440px; border: none; display: block;" allow="autoplay; fullscreen; picture-in-picture" title="Live Camera Feed"></iframe>
             </div>
 
             <!-- Stream Switcher Toolbar -->
@@ -629,9 +629,12 @@
                 <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700;">Quality:</span>
                 <button type="button" class="btn btn-secondary" id="btn-cam-hd" style="font-size: 0.75rem; padding: 4px 10px; background: rgba(56, 189, 248, 0.25); border-color: #38bdf8; color: #93c5fd;" onclick="selectCamQuality('hd')">HD</button>
                 <button type="button" class="btn btn-secondary" id="btn-cam-sd" style="font-size: 0.75rem; padding: 4px 10px;" onclick="selectCamQuality('sd')">SD (Low-BW)</button>
+                <span style="color: rgba(255,255,255,0.15); margin: 0 4px;">|</span>
+                <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700;">Vision:</span>
+                <button type="button" class="btn btn-secondary" id="btn-cam-ai" style="font-size: 0.75rem; padding: 4px 10px; background: rgba(16, 185, 129, 0.25); border-color: #10b981; color: #6ee7b7;" onclick="toggleCamAi()" title="Toggle Real-Time AI Computer Vision &amp; Confidence Tracking">&#129302; AI Cat Vision: ON</button>
               </div>
               <div style="font-family: monospace; font-size: 0.75rem; color: #64748b;">
-                Ingested by NUC (192.168.2.35) &bull; WebRTC Zero-Latency
+                Ingested by NUC (192.168.2.35) &bull; WebRTC Zero-Latency &bull; Client Tensor Core
               </div>
             </div>
           </div>
@@ -2057,6 +2060,7 @@
 
     let currentCamTarget = 'pennys_feeder';
     let currentCamRes = 'hd';
+    let currentCamAi = true;
 
     function selectCamera(cam) {
       currentCamTarget = cam;
@@ -2068,12 +2072,18 @@
       updateCamFeed();
     }
 
+    function toggleCamAi() {
+      currentCamAi = !currentCamAi;
+      updateCamFeed();
+    }
+
     function updateCamFeed() {
       const src = currentCamRes === 'sd' ? `${currentCamTarget}_sd` : currentCamTarget;
+      const playerPage = currentCamAi ? 'ai.html' : 'webrtc.html';
       const frame = document.getElementById('camera-live-frame');
       const title = document.getElementById('cam-header-active-name');
       if (frame) {
-        frame.src = `https://cam.digitalresolve.ca/webrtc.html?src=${src}`;
+        frame.src = `https://cam.digitalresolve.ca/${playerPage}?src=${src}`;
       }
       if (title) {
         title.innerText = currentCamTarget === 'bedroom' ? 'Bedroom' : "Penny's Feeder";
@@ -2083,6 +2093,7 @@
       const bBedroom = document.getElementById('btn-cam-bedroom');
       const bHd = document.getElementById('btn-cam-hd');
       const bSd = document.getElementById('btn-cam-sd');
+      const bAi = document.getElementById('btn-cam-ai');
 
       [bFeeder, bBedroom].forEach(b => {
         if (b) { b.style.background = ''; b.style.borderColor = ''; b.style.color = ''; }
@@ -2102,6 +2113,20 @@
         activeResBtn.style.background = 'rgba(56, 189, 248, 0.25)';
         activeResBtn.style.borderColor = '#38bdf8';
         activeResBtn.style.color = '#93c5fd';
+      }
+
+      if (bAi) {
+        if (currentCamAi) {
+          bAi.style.background = 'rgba(16, 185, 129, 0.25)';
+          bAi.style.borderColor = '#10b981';
+          bAi.style.color = '#6ee7b7';
+          bAi.innerHTML = '&#129302; AI Cat Vision: ON';
+        } else {
+          bAi.style.background = '';
+          bAi.style.borderColor = '';
+          bAi.style.color = '';
+          bAi.innerHTML = '&#9889; Stream Only (AI Off)';
+        }
       }
     }
 
