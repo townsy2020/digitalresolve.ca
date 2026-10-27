@@ -253,95 +253,102 @@
               Direct Remote Telemetry &bull; Zero Lag Execution via Cloudflare Tunnel
             </div>
           </div>
-          <div class="control-filter-tabs" style="display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;">
-            <button type="button" class="btn btn-secondary active" id="tab-ctrl-all" onclick="filterControlMatrix('all')" style="font-size: 0.78rem; padding: 4px 12px; font-weight: 600;">All Dual-Node Controls</button>
-            <button type="button" class="btn btn-secondary" id="tab-ctrl-desktop" onclick="filterControlMatrix('desktop')" style="font-size: 0.78rem; padding: 4px 12px; font-weight: 600; color: #60a5fa !important;">&#128421;&#65039; Desktop PC (Core)</button>
-            <button type="button" class="btn btn-secondary" id="tab-ctrl-nuc" onclick="filterControlMatrix('nuc')" style="font-size: 0.78rem; padding: 4px 12px; font-weight: 600; color: #c084fc !important;">&#9889; NUC Server (24/7)</button>
+
+          <!-- Top Target Node Selector Bar -->
+          <div class="control-node-bar">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <label for="ctrl-target-select" style="font-size: 0.82rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Target Node:</label>
+              <select id="ctrl-target-select" class="ctrl-node-select" onchange="onControlNodeChange(this.value)">
+                <option value="nuc" selected>&#9889; NUC Core Server (24/7 Always-On &bull; 192.168.2.35)</option>
+                <option value="desktop">&#128421;&#65039; Desktop PC (Core Workstation &bull; 192.168.2.62)</option>
+              </select>
+            </div>
+            <div id="ctrl-node-status-badge" class="ctrl-node-status-badge">
+              <span class="dropdown-dot" id="ctrl-node-status-dot" style="background-color: #c084fc; box-shadow: 0 0 8px #c084fc;"></span>
+              <span id="ctrl-node-status-text" style="color: #e9d5ff; font-weight: 700; font-size: 0.8rem;">Target: NUC Server (Port 8081)</span>
+            </div>
           </div>
-          <div class="control-actions-grid" id="control-grid">
-            <!-- Swarms & Torrents Dual Options -->
-            <button type="button" class="btn-control active-pause ctrl-node-nuc" onclick="sendControl('pause-all', 'nuc')" title="Pause All Active Torrent Swarms on NUC (Port 8081)">
-              <span>||</span> Pause Swarms (NUC)
-            </button>
-            <button type="button" class="btn-control active-pause ctrl-node-desktop" onclick="sendControl('pause-all', 'desktop')" title="Pause All Active Torrent Swarms on Desktop (Port 8080)">
-              <span>||</span> Pause Swarms (Desktop)
-            </button>
-            <button type="button" class="btn-control active-resume ctrl-node-nuc" onclick="sendControl('resume-all', 'nuc')" title="Resume All Torrent Swarms on NUC (Port 8081)">
-              <span>&gt;</span> Resume Swarms (NUC)
-            </button>
-            <button type="button" class="btn-control active-resume ctrl-node-desktop" onclick="sendControl('resume-all', 'desktop')" title="Resume All Torrent Swarms on Desktop (Port 8080)">
-              <span>&gt;</span> Resume Swarms (Desktop)
-            </button>
 
-            <!-- Bandwidth Throttle Dual Options -->
-            <button type="button" class="btn-control active-eco ctrl-node-nuc" onclick="sendControl('eco-throttle', 'nuc')" title="Apply 500 KB/s Eco Limit on NUC Server">
-              <span>ECO</span> Eco Throttle (NUC)
-            </button>
-            <button type="button" class="btn-control active-eco ctrl-node-desktop" onclick="sendControl('eco-throttle', 'desktop')" title="Apply 500 KB/s Eco Limit on Desktop PC">
-              <span>ECO</span> Eco Throttle (Desktop)
-            </button>
-            <button type="button" class="btn-control ctrl-node-nuc" onclick="sendControl('unlimit', 'nuc')" title="Restore Full Unconstrained Bandwidth on NUC Server">
-              <span>MAX</span> Full Speed (NUC)
-            </button>
-            <button type="button" class="btn-control ctrl-node-desktop" onclick="sendControl('unlimit', 'desktop')" title="Restore Full Unconstrained Bandwidth on Desktop PC">
-              <span>MAX</span> Full Speed (Desktop)
-            </button>
+          <!-- Consolidated Action Groups Container -->
+          <div class="control-groups-container">
+            <!-- Group 1: Torrent Swarms & Bandwidth Throttling -->
+            <div class="control-group">
+              <div class="control-group-header">
+                <span class="control-group-icon">&#127754;</span>
+                <span class="control-group-title">Torrent Swarms &amp; Bandwidth Throttling</span>
+              </div>
+              <div class="control-group-grid">
+                <button type="button" class="btn-control active-pause" onclick="executeNodeAction('pause-all')" title="Pause All Active Torrent Swarms on Selected Target">
+                  <span>||</span> Pause All Swarms
+                </button>
+                <button type="button" class="btn-control active-resume" onclick="executeNodeAction('resume-all')" title="Resume All Torrent Swarms on Selected Target">
+                  <span>&gt;</span> Resume All Swarms
+                </button>
+                <button type="button" class="btn-control active-eco" onclick="executeNodeAction('eco-throttle')" title="Apply 500 KB/s Eco Bandwidth Limit on Selected Target">
+                  <span>ECO</span> Eco Throttle (500K)
+                </button>
+                <button type="button" class="btn-control" onclick="executeNodeAction('unlimit')" title="Restore Full Unconstrained Bandwidth on Selected Target">
+                  <span>MAX</span> Full Speed (Uncapped)
+                </button>
+              </div>
+            </div>
 
-            <!-- Power & Sleep Dual Options -->
-            <button type="button" class="btn-control active-wake ctrl-node-desktop" onclick="sendWol('desktop')" title="Send Wake-on-LAN Packet to Desktop (NetBIOS: DESKTOP)">
-              <span>ON</span> Wake Desktop PC
-            </button>
-            <button type="button" class="btn-control active-wake ctrl-node-nuc" onclick="sendWol('nuc')" title="Send Wake-on-LAN Packet to NUC Server (NetBIOS: NUC)">
-              <span>ON</span> Wake NUC Server
-            </button>
-            <button type="button" class="btn-control active-sleep ctrl-node-desktop" onclick="sendSleep('desktop')" title="Put Desktop PC into Low-Power Sleep Standby">
-              <span>ZZ</span> Sleep Desktop PC
-            </button>
-            <button type="button" class="btn-control active-sleep ctrl-node-nuc" onclick="sendSleep('nuc')" title="Put NUC Server into Low-Power Sleep Standby">
-              <span>ZZ</span> Sleep NUC Server
-            </button>
+            <!-- Group 2: Power & Standby Operations -->
+            <div class="control-group">
+              <div class="control-group-header">
+                <span class="control-group-icon">&#9889;</span>
+                <span class="control-group-title">Power &amp; Standby Operations</span>
+              </div>
+              <div class="control-group-grid">
+                <button type="button" class="btn-control active-wake" onclick="executeNodeAction('wake')" title="Send Wake-on-LAN Magic Packet to Selected Target">
+                  <span>ON</span> Wake Machine (WoL)
+                </button>
+                <button type="button" class="btn-control active-sleep" onclick="executeNodeAction('sleep')" title="Put Selected Target into Low-Power Sleep Standby">
+                  <span>ZZ</span> Sleep Standby
+                </button>
+                <button type="button" class="btn-control btn-reboot" onclick="executeNodeAction('reboot')" title="Strictly locked behind Microsoft 365 Entra ID SSO / Passkey">
+                  <span>&#128260;</span> Reboot System (SSO)
+                </button>
+              </div>
+            </div>
 
-            <!-- Disaster Recovery & Maintenance Dual Options -->
-            <button type="button" class="btn-control ctrl-node-desktop" onclick="sendControl('run-backup', 'desktop')" title="Trigger Cloud Disaster Recovery Backup from Desktop PC">
-              <span>BAK</span> Cloud Backup (Desktop)
-            </button>
-            <button type="button" class="btn-control ctrl-node-nuc" onclick="sendControl('run-backup', 'nuc')" title="Trigger Cloud Disaster Recovery Backup from NUC Server">
-              <span>BAK</span> Cloud Backup (NUC)
-            </button>
-            <button type="button" class="btn-control ctrl-node-desktop" onclick="sendControl('run-audit', 'desktop')" title="Run Sentinel Watchdog Health Audit on Desktop PC">
-              <span>RUN</span> Sentinel Audit (Desktop)
-            </button>
-            <button type="button" class="btn-control ctrl-node-nuc" onclick="sendControl('run-audit', 'nuc')" title="Run Sentinel Watchdog Health Audit on NUC Server">
-              <span>RUN</span> Sentinel Audit (NUC)
-            </button>
-            <button type="button" class="btn-control ctrl-node-desktop" onclick="sendControl('run-update-computer', 'desktop')" title="Execute Update-Computer.exe Optimization on Desktop PC">
-              <span>&#128640;</span> Update (Desktop)
-            </button>
-            <button type="button" class="btn-control ctrl-node-nuc" onclick="sendControl('run-update-computer', 'nuc')" title="Execute Update-Computer.exe Optimization on NUC Server">
-              <span>&#128640;</span> Update (NUC)
-            </button>
-            <button type="button" class="btn-control ctrl-node-desktop" onclick="sendControl('clean-junk', 'desktop')" title="Clean Temp Files &amp; Cache on Desktop PC">
-              <span>&#129529;</span> Clean Junk (Desktop)
-            </button>
-            <button type="button" class="btn-control ctrl-node-nuc" onclick="sendControl('clean-junk', 'nuc')" title="Clean Temp Files &amp; Cache on NUC Server">
-              <span>&#129529;</span> Clean Junk (NUC)
-            </button>
+            <!-- Group 3: System Maintenance & Disk Hygiene -->
+            <div class="control-group">
+              <div class="control-group-header">
+                <span class="control-group-icon">&#128736;&#65039;</span>
+                <span class="control-group-title">System Maintenance &amp; Disk Hygiene</span>
+              </div>
+              <div class="control-group-grid">
+                <button type="button" class="btn-control" onclick="executeNodeAction('run-update-computer')" title="Execute Update-Computer.exe Optimization on Selected Target">
+                  <span>&#128640;</span> Run Update-Computer
+                </button>
+                <button type="button" class="btn-control" onclick="executeNodeAction('clean-junk')" title="Clean Temp Files &amp; Storage Cache on Selected Target">
+                  <span>&#129529;</span> Clean Temp &amp; Junk
+                </button>
+                <button type="button" class="btn-control" onclick="executeNodeAction('run-backup')" title="Trigger Cloud Disaster Recovery Backup to OneDrive">
+                  <span>BAK</span> Cloud Backup (OneDrive)
+                </button>
+                <button type="button" class="btn-control" onclick="executeNodeAction('run-audit')" title="Run Sentinel Watchdog System Health Audit on Selected Target">
+                  <span>RUN</span> Sentinel Health Audit
+                </button>
+              </div>
+            </div>
 
-            <!-- SSO Guarded Reboots -->
-            <button type="button" class="btn-control btn-reboot ctrl-node-desktop" onclick="confirmRebootDesktop()" title="Strictly locked behind Microsoft 365 Entra ID SSO / Passkey">
-              <span>&#128260;</span> Reboot Desktop PC
-            </button>
-            <button type="button" class="btn-control btn-reboot ctrl-node-nuc" onclick="confirmRebootNuc()" title="Strictly locked behind Microsoft 365 Entra ID SSO / Passkey">
-              <span>&#128260;</span> Reboot NUC Server
-            </button>
-
-            <!-- Transport & Cluster Services -->
-            <button type="button" class="btn-control" id="btn-probe-speed" onclick="sendControl('run-speedtest', 'nuc')" title="Probe Bell Canada Fiber Gigabit Throughput and Jitter">
-              <span>&#127760;</span> Probe Bell Speed
-            </button>
-            <button type="button" class="btn-control ctrl-node-nuc" onclick="sendControl('restart-daemon&daemon=streamhub', 'nuc')" title="Restart Watch Library StreamHub Service on Port 8088">
-              <span>&#127916;</span> Restart Watch Library
-            </button>
+            <!-- Group 4: Cluster Transport & Services -->
+            <div class="control-group">
+              <div class="control-group-header">
+                <span class="control-group-icon">&#127760;</span>
+                <span class="control-group-title">Cluster Transport &amp; Services</span>
+              </div>
+              <div class="control-group-grid">
+                <button type="button" class="btn-control" id="btn-probe-speed" onclick="sendControl('run-speedtest', 'nuc')" title="Probe Bell Canada Fiber Gigabit Throughput and Jitter">
+                  <span>&#127760;</span> Probe Bell Gigabit Speed
+                </button>
+                <button type="button" class="btn-control" onclick="sendControl('restart-daemon&daemon=streamhub', 'nuc')" title="Restart Watch Library StreamHub Service on Port 8088">
+                  <span>&#127916;</span> Restart Watch Library (StreamHub)
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1180,7 +1187,7 @@
       <div class="footer-meta" style="display: flex; align-items: center; gap: 16px;">
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;">v2.4.8</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;">v2.4.9</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
         <div class="footer-links">
@@ -1801,21 +1808,69 @@
         });
     }
 
-    function filterControlMatrix(node) {
-      ['all', 'desktop', 'nuc'].forEach(n => {
-        const t = document.getElementById(`tab-ctrl-${n}`);
-        if (t) t.classList.toggle('active', n === node);
-      });
-      const items = document.querySelectorAll('#control-grid .btn-control');
-      items.forEach(el => {
-        if (node === 'all') {
-          el.style.display = 'flex';
-        } else if (node === 'desktop') {
-          el.style.display = el.classList.contains('ctrl-node-desktop') || el.id === 'btn-probe-speed' ? 'flex' : 'none';
-        } else if (node === 'nuc') {
-          el.style.display = el.classList.contains('ctrl-node-nuc') || el.id === 'btn-probe-speed' ? 'flex' : 'none';
+    let currentControlTarget = 'nuc';
+
+    function onControlNodeChange(val) {
+      currentControlTarget = val || 'nuc';
+      const badge = document.getElementById('ctrl-node-status-badge');
+      const dot = document.getElementById('ctrl-node-status-dot');
+      const text = document.getElementById('ctrl-node-status-text');
+      
+      if (currentControlTarget === 'nuc') {
+        if (dot) {
+          dot.style.backgroundColor = '#c084fc';
+          dot.style.boxShadow = '0 0 8px #c084fc';
         }
-      });
+        if (text) {
+          text.style.color = '#e9d5ff';
+          text.textContent = 'Target: NUC Server (Port 8081)';
+        }
+        if (badge) {
+          badge.style.background = 'rgba(192, 132, 252, 0.15)';
+          badge.style.borderColor = 'rgba(192, 132, 252, 0.35)';
+        }
+        showToast('info', 'Target Switched: NUC', 'Actions will target NUC Server (24/7 Always-On).');
+      } else {
+        if (dot) {
+          dot.style.backgroundColor = '#60a5fa';
+          dot.style.boxShadow = '0 0 8px #60a5fa';
+        }
+        if (text) {
+          text.style.color = '#93c5fd';
+          text.textContent = 'Target: Desktop PC (Port 8080)';
+        }
+        if (badge) {
+          badge.style.background = 'rgba(96, 165, 250, 0.15)';
+          badge.style.borderColor = 'rgba(96, 165, 250, 0.35)';
+        }
+        showToast('info', 'Target Switched: Desktop', 'Actions will target Desktop PC (Core Workstation).');
+      }
+    }
+
+    function executeNodeAction(action) {
+      if (action === 'wake') {
+        sendWol(currentControlTarget);
+      } else if (action === 'sleep') {
+        sendSleep(currentControlTarget);
+      } else if (action === 'reboot') {
+        if (currentControlTarget === 'nuc') {
+          confirmRebootNuc();
+        } else {
+          confirmRebootDesktop();
+        }
+      } else {
+        sendControl(action, currentControlTarget);
+      }
+    }
+
+    function filterControlMatrix(node) {
+      if (node && node !== 'all') {
+        const sel = document.getElementById('ctrl-target-select');
+        if (sel) {
+          sel.value = node;
+          onControlNodeChange(node);
+        }
+      }
     }
 
     // Live Cluster Stats & Swarm Poller
@@ -2682,10 +2737,24 @@
       </div>
 
       <div class="changelog-body">
-        <!-- Version 2.4.8 (Current) -->
+        <!-- Version 2.4.9 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.4.8 &bull; Current</span>
+            <span class="ver-tag current">v2.4.9 &bull; Current</span>
+            <span class="ver-date">October 26, 2026</span>
+          </div>
+          <h4 class="ver-title">Consolidated Node Selector Dropdown &amp; Functional Action Groups</h4>
+          <ul class="ver-list">
+            <li><strong>Node Dropdown Consolidation:</strong> Replaced sprawling button walls with an intuitive Target Node Selector dropdown (<code>⚡ NUC Core Server</code> vs <code>🖥️ Desktop PC</code>) and live status badge.</li>
+            <li><strong>Structured Action Groups:</strong> Organized matrix actions into four clean, focused categories: <em>Torrent Swarms &amp; Bandwidth</em>, <em>Power &amp; Standby</em>, <em>System Maintenance &amp; Disk Hygiene</em>, and <em>Cluster Transport &amp; Services</em>.</li>
+            <li><strong>Dynamic Target Dispatch:</strong> Wired <code>executeNodeAction()</code> to dispatch commands directly to the actively selected node without clutter or redundancy.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.4.8 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.4.8</span>
             <span class="ver-date">October 26, 2026</span>
           </div>
           <h4 class="ver-title">Symmetrical Dual-Node Matrix, SSO Auth Fix &amp; Live Cat Cam Bridge</h4>
