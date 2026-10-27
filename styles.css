@@ -2687,6 +2687,79 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
   transform: scale(0.96) !important;
 }
 
+/* AI Model Breakdown Tags & Multi-Model Progress Bar */
+.token-breakdown-tags {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.item-tag.tag-flash {
+  background: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+  font-size: 0.68rem;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.item-tag.tag-argon {
+  background: rgba(168, 85, 247, 0.2);
+  color: #c084fc;
+  font-size: 0.68rem;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.item-tag.tag-pro {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  font-size: 0.68rem;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.model-progress-bar {
+  display: flex;
+  height: 6px;
+  border-radius: 9999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 6px 0 8px;
+  width: 100%;
+}
+
+.model-segment {
+  height: 100%;
+  transition: width 0.4s ease;
+}
+
+.model-segment.flash {
+  background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+}
+
+.model-segment.argon {
+  background: linear-gradient(90deg, #9333ea, #c084fc);
+}
+
+.model-segment.pro {
+  background: linear-gradient(90deg, #d97706, #fbbf24);
+}
+
+@media (max-width: 600px) {
+  .token-counter-btn .token-breakdown-tags .tag-pro {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .token-counter-btn .token-breakdown-tags .tag-argon {
+    display: none;
+  }
+}
+
 .layout-toggle-icon {
   font-size: 1rem;
   line-height: 1;
