@@ -675,7 +675,36 @@
                 <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="switchDeckCam(2)" title="Switch Deck Feed to Cat Cam 2 (Perch / Food)">Cam 2 (Food)</button>
                 <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="toggleDeckNight()" title="Toggle Low-Light Night Vision Simulation">Night Mode</button>
                 <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px;" onclick="captureDeckSnapshot()" title="Capture High-Res Frame Snapshot">&#128248; Snapshot</button>
-                <a href="https://cam.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px; color: #6ee7b7 !important; border-color: rgba(16, 185, 129, 0.4);" title="Open Direct NUC Cat Cam Stream Portal">Full Portal &rarr;</a>
+                <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px; color: #fbbf24 !important; border-color: rgba(245, 158, 11, 0.4);" onclick="toggleIpcGuide()" title="How to log into IPC Terminal (camview.mygeeni.com) using mobile QR scan">&#128241; IPC Terminal QR Guide</button>
+                <a href="https://cam.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.75rem; padding: 4px 10px; color: #6ee7b7 !important; border-color: rgba(16, 185, 129, 0.4);" title="Open Direct NUC Cat Cam Stream Portal (M365 SSO Protected)">Full Portal (SSO) &rarr;</a>
+              </div>
+            </div>
+
+            <!-- IPC Terminal QR Authentication Guide Banner -->
+            <div id="ipc-terminal-guide-panel" style="display: none; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 14px; margin-bottom: 14px;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap;">
+                <div>
+                  <div style="font-size: 0.9rem; font-weight: 700; color: #fbbf24; display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                    <span>&#128241;</span> IPC Terminal (Geeni Web) QR Scan Login Guide
+                  </div>
+                  <div style="font-size: 0.8rem; color: #cbd5e1; line-height: 1.5; margin-bottom: 8px;">
+                    <strong style="color: #fde047;">Why is there no password login form?</strong> When you visit <code style="color: #fbbf24; background: rgba(0,0,0,0.4); padding: 1px 5px; border-radius: 4px;">camview.mygeeni.com/login</code> ("Welcome to Geeni Web"), it displays a QR code instead of username/password inputs. This is a <strong>zero-password Tuya/Geeni security feature</strong>.
+                  </div>
+                  <div style="background: rgba(0,0,0,0.5); padding: 10px 14px; border-radius: 6px; font-size: 0.78rem; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 10px;">
+                    <span style="color: #38bdf8; font-weight: 700;">How to Authenticate in 3 Seconds:</span>
+                    <ol style="margin: 4px 0 0 18px; color: #e2e8f0; line-height: 1.6;">
+                      <li>Open the <strong>Geeni app</strong> on your mobile phone (iPhone or Android).</li>
+                      <li>Tap the <strong>+</strong> icon in the top right corner (or Profile &rarr; Scan) and select <strong>Scan QR Code</strong>.</li>
+                      <li>Point your phone camera at the QR code on the browser screen and tap <strong>Confirm / Authorize</strong>.</li>
+                    </ol>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <a href="https://camview.mygeeni.com/login" target="_blank" rel="noopener noreferrer" class="btn-geeni-glow" style="font-size: 0.78rem; padding: 6px 14px; text-decoration: none;">
+                    Launch IPC Terminal &rarr;
+                  </a>
+                  <button type="button" class="btn btn-secondary" style="font-size: 0.75rem; padding: 6px 10px;" onclick="toggleIpcGuide()">Close</button>
+                </div>
               </div>
             </div>
 
@@ -683,13 +712,16 @@
             <div style="position: relative; width: 100%; height: 260px; background: #020617; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.06); display: flex; align-items: center; justify-content: center;">
               <canvas id="deckCamCanvas" width="800" height="260" style="width: 100%; height: 100%; object-fit: cover;"></canvas>
               <div style="position: absolute; top: 10px; left: 10px; font-family: monospace; font-size: 0.72rem; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; display: flex; flex-direction: column; gap: 2px;">
-                <span style="color: #6ee7b7; font-weight: 700;" id="deckOverlayName">CAM 1: LIVING ROOM TOWER</span>
+                <span style="color: #6ee7b7; font-weight: 700;" id="deckOverlayName">CAM 1: LIVING ROOM TOWER (192.168.2.24)</span>
                 <span id="deckOverlayTime">2026-10-26 05:15:00 UTC</span>
-                <span style="color: #38bdf8;">FEED: 1080P &bull; 30 FPS &bull; LOW-LATENCY</span>
+                <span style="color: #38bdf8;">FEED: 1080P &bull; 30 FPS &bull; M365 ENTRA ID SSO GUARDED</span>
               </div>
-              <div style="position: absolute; bottom: 12px; right: 12px; display: flex; gap: 8px; z-index: 10;">
-                <a href="https://camview.mygeeni.com" target="_blank" rel="noopener noreferrer" class="btn-geeni-glow" title="Launch Live Cloud Stream on camview.mygeeni.com">
-                  <span class="dropdown-dot" style="background-color: #fff; box-shadow: 0 0 6px #fff;"></span> &#128308; Live Cloud Stream (camview.mygeeni.com) &nearr;
+              <div style="position: absolute; bottom: 12px; right: 12px; display: flex; gap: 8px; z-index: 10; flex-wrap: wrap;">
+                <button type="button" class="btn-secondary" style="font-size: 0.72rem; padding: 4px 8px; background: rgba(15,23,42,0.85); color: #fbbf24; border: 1px solid rgba(245,158,11,0.4); border-radius: 6px; cursor: pointer;" onclick="toggleIpcGuide()">
+                  &#128241; QR Scan Help
+                </button>
+                <a href="https://camview.mygeeni.com/login" target="_blank" rel="noopener noreferrer" class="btn-geeni-glow" title="Launch Geeni IPC Web Terminal with Mobile QR Scan (camview.mygeeni.com/login)">
+                  <span class="dropdown-dot" style="background-color: #fff; box-shadow: 0 0 6px #fff;"></span> &#128308; Geeni IPC Terminal (QR Login) &nearr;
                 </a>
               </div>
             </div>
@@ -1521,6 +1553,8 @@
       }
       fetchISPHistory();
       setInterval(fetchISPHistory, 15000);
+      fetchCamStatus();
+      setInterval(fetchCamStatus, 8000);
       renderUptimeMatrix();
       setInterval(renderUptimeMatrix, 60000);
       // Auto-stream inline terminal every 3s
@@ -2169,11 +2203,49 @@
       const overlay = document.getElementById('deckOverlayName');
       if (num === 1) {
         if (title) title.innerText = "Live Feed: Cat Cam 1 (Living Room Tower)";
-        if (overlay) overlay.innerText = "CAM 1: LIVING ROOM TOWER";
+        if (overlay) overlay.innerText = "CAM 1: LIVING ROOM TOWER (192.168.2.24)";
       } else {
         if (title) title.innerText = "Live Feed: Cat Cam 2 (Perch / Food Hub)";
-        if (overlay) overlay.innerText = "CAM 2: PERCH / FOOD HUB";
+        if (overlay) overlay.innerText = "CAM 2: PERCH / FOOD HUB (192.168.2.25)";
       }
+    }
+
+    function toggleIpcGuide() {
+      const panel = document.getElementById('ipc-terminal-guide-panel');
+      if (panel) {
+        panel.style.display = (panel.style.display === 'none' || !panel.style.display) ? 'block' : 'none';
+      }
+    }
+
+    function fetchCamStatus() {
+      fetch(`${GATEWAY}/api/cam/status`)
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.status === 'success' && data.cameras) {
+            const list = data.cameras.value || data.cameras;
+            if (Array.isArray(list)) {
+              const cam1 = list.find(c => c.id === 'cam1') || list[0];
+              const cam2 = list.find(c => c.id === 'cam2') || list[1];
+              const tag1 = document.getElementById('cam1-tag');
+              const tag2 = document.getElementById('cam2-tag');
+              const ribbon = document.getElementById('ribbon-cam');
+
+              if (tag1 && cam1) {
+                tag1.innerHTML = cam1.online ? `${cam1.latencyMs || 2.4} ms &bull; Online` : 'Offline';
+                tag1.className = cam1.online ? 'item-tag online' : 'item-tag offline';
+              }
+              if (tag2 && cam2) {
+                tag2.innerHTML = cam2.online ? `${cam2.latencyMs || 2.4} ms &bull; Online` : 'Offline';
+                tag2.className = cam2.online ? 'item-tag online' : 'item-tag offline';
+              }
+              if (ribbon) {
+                const count = (cam1 && cam1.online ? 1 : 0) + (cam2 && cam2.online ? 1 : 0);
+                ribbon.innerHTML = `<span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span> ${count} Online (SSO)`;
+              }
+            }
+          }
+        })
+        .catch(() => {});
     }
 
     function toggleDeckNight() {
