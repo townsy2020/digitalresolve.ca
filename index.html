@@ -599,11 +599,11 @@
         <div class="control-matrix-card" id="camera-feed-card" style="margin-top: 24px; margin-bottom: 40px; border-color: rgba(16, 185, 129, 0.25);">
             <div class="control-matrix-header">
               <div class="control-matrix-title" style="color: #6ee7b7;">
-                <span>[LIVE]</span> Optical Feeds &bull; Penny's Feeder
+                <span>[LIVE]</span> Optical Feeds &bull; <span id="cam-header-active-name">Penny's Feeder</span>
               </div>
               <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                 <span class="item-tag online" id="camera-status-tag">
-                  <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span> 24/7 NUC Bridge Active
+                  <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span> 2 Cameras Active (NUC)
                 </span>
                 <span class="item-tag" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">
                   Microsoft 365 Entra ID SSO
@@ -616,14 +616,19 @@
 
             <!-- Video Stream Container -->
             <div style="background: #020617; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 12px;">
-              <iframe id="camera-live-frame" src="https://cam.digitalresolve.ca/webrtc.html?src=pennys_feeder" style="width: 100%; height: 420px; border: none; display: block;" allow="autoplay; fullscreen; picture-in-picture" title="Penny's Feeder Live Feed"></iframe>
+              <iframe id="camera-live-frame" src="https://cam.digitalresolve.ca/webrtc.html?src=pennys_feeder" style="width: 100%; height: 420px; border: none; display: block;" allow="autoplay; fullscreen; picture-in-picture" title="Live Camera Feed"></iframe>
             </div>
 
             <!-- Stream Switcher Toolbar -->
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 0.8rem; color: #94a3b8;">
-              <div style="display: flex; gap: 6px;">
-                <button type="button" class="btn btn-secondary active" id="btn-cam-hd" style="font-size: 0.75rem; padding: 4px 10px; background: rgba(16, 185, 129, 0.25); border-color: #10b981; color: #6ee7b7;" onclick="setCamStream('pennys_feeder', this)">HD Stream</button>
-                <button type="button" class="btn btn-secondary" id="btn-cam-sd" style="font-size: 0.75rem; padding: 4px 10px;" onclick="setCamStream('pennys_feeder_sd', this)">SD Stream (Low-Bandwidth)</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 0.8rem; color: #94a3b8;">
+              <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700;">Camera:</span>
+                <button type="button" class="btn btn-secondary" id="btn-cam-feeder" style="font-size: 0.75rem; padding: 4px 10px; background: rgba(16, 185, 129, 0.25); border-color: #10b981; color: #6ee7b7;" onclick="selectCamera('pennys_feeder')">Penny's Feeder</button>
+                <button type="button" class="btn btn-secondary" id="btn-cam-bedroom" style="font-size: 0.75rem; padding: 4px 10px;" onclick="selectCamera('bedroom')">Bedroom</button>
+                <span style="color: rgba(255,255,255,0.15); margin: 0 4px;">|</span>
+                <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700;">Quality:</span>
+                <button type="button" class="btn btn-secondary" id="btn-cam-hd" style="font-size: 0.75rem; padding: 4px 10px; background: rgba(56, 189, 248, 0.25); border-color: #38bdf8; color: #93c5fd;" onclick="selectCamQuality('hd')">HD</button>
+                <button type="button" class="btn btn-secondary" id="btn-cam-sd" style="font-size: 0.75rem; padding: 4px 10px;" onclick="selectCamQuality('sd')">SD (Low-BW)</button>
               </div>
               <div style="font-family: monospace; font-size: 0.75rem; color: #64748b;">
                 Ingested by NUC (192.168.2.35) &bull; WebRTC Zero-Latency
@@ -2050,24 +2055,53 @@
       });
     }
 
-    function setCamStream(src, btn) {
+    let currentCamTarget = 'pennys_feeder';
+    let currentCamRes = 'hd';
+
+    function selectCamera(cam) {
+      currentCamTarget = cam;
+      updateCamFeed();
+    }
+
+    function selectCamQuality(res) {
+      currentCamRes = res;
+      updateCamFeed();
+    }
+
+    function updateCamFeed() {
+      const src = currentCamRes === 'sd' ? `${currentCamTarget}_sd` : currentCamTarget;
       const frame = document.getElementById('camera-live-frame');
+      const title = document.getElementById('cam-header-active-name');
       if (frame) {
         frame.src = `https://cam.digitalresolve.ca/webrtc.html?src=${src}`;
       }
+      if (title) {
+        title.innerText = currentCamTarget === 'bedroom' ? 'Bedroom' : "Penny's Feeder";
+      }
+
+      const bFeeder = document.getElementById('btn-cam-feeder');
+      const bBedroom = document.getElementById('btn-cam-bedroom');
       const bHd = document.getElementById('btn-cam-hd');
       const bSd = document.getElementById('btn-cam-sd');
-      [bHd, bSd].forEach(b => {
-        if (b) {
-          b.style.background = '';
-          b.style.borderColor = '';
-          b.style.color = '';
-        }
+
+      [bFeeder, bBedroom].forEach(b => {
+        if (b) { b.style.background = ''; b.style.borderColor = ''; b.style.color = ''; }
       });
-      if (btn) {
-        btn.style.background = 'rgba(16, 185, 129, 0.25)';
-        btn.style.borderColor = '#10b981';
-        btn.style.color = '#6ee7b7';
+      const activeCamBtn = currentCamTarget === 'bedroom' ? bBedroom : bFeeder;
+      if (activeCamBtn) {
+        activeCamBtn.style.background = 'rgba(16, 185, 129, 0.25)';
+        activeCamBtn.style.borderColor = '#10b981';
+        activeCamBtn.style.color = '#6ee7b7';
+      }
+
+      [bHd, bSd].forEach(b => {
+        if (b) { b.style.background = ''; b.style.borderColor = ''; b.style.color = ''; }
+      });
+      const activeResBtn = currentCamRes === 'sd' ? bSd : bHd;
+      if (activeResBtn) {
+        activeResBtn.style.background = 'rgba(56, 189, 248, 0.25)';
+        activeResBtn.style.borderColor = '#38bdf8';
+        activeResBtn.style.color = '#93c5fd';
       }
     }
 
