@@ -153,6 +153,7 @@
           </div>
         </div>
 
+        <a href="#camera-feed-card" class="btn-nav">Live Feed</a>
         <a href="#uptime" class="btn-nav">Uptime &amp; SLA</a>
         <a href="https://stream.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn-nav">Watch Library</a>
       </nav>
@@ -592,10 +593,43 @@
               </table>
             </div>
           </div>
-
-
-
         </div>
+
+        <!-- Live Camera Stream (24/7 NUC Bridge & SSO) -->
+        <div class="control-matrix-card" id="camera-feed-card" style="margin-top: 24px; margin-bottom: 40px; border-color: rgba(16, 185, 129, 0.25);">
+            <div class="control-matrix-header">
+              <div class="control-matrix-title" style="color: #6ee7b7;">
+                <span>[LIVE]</span> Optical Feeds &bull; Penny's Feeder
+              </div>
+              <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <span class="item-tag online" id="camera-status-tag">
+                  <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span> 24/7 NUC Bridge Active
+                </span>
+                <span class="item-tag" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">
+                  Microsoft 365 Entra ID SSO
+                </span>
+                <a href="https://cam.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.78rem; padding: 4px 12px; background: rgba(16, 185, 129, 0.2); color: #6ee7b7 !important; border-color: rgba(16, 185, 129, 0.5);" title="Open full streaming console in new tab">
+                  Full Console &rarr;
+                </a>
+              </div>
+            </div>
+
+            <!-- Video Stream Container -->
+            <div style="background: #020617; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 12px;">
+              <iframe id="camera-live-frame" src="https://cam.digitalresolve.ca/webrtc.html?src=pennys_feeder" style="width: 100%; height: 420px; border: none; display: block;" allow="autoplay; fullscreen; picture-in-picture" title="Penny's Feeder Live Feed"></iframe>
+            </div>
+
+            <!-- Stream Switcher Toolbar -->
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 0.8rem; color: #94a3b8;">
+              <div style="display: flex; gap: 6px;">
+                <button type="button" class="btn btn-secondary active" id="btn-cam-hd" style="font-size: 0.75rem; padding: 4px 10px; background: rgba(16, 185, 129, 0.25); border-color: #10b981; color: #6ee7b7;" onclick="setCamStream('pennys_feeder', this)">HD Stream</button>
+                <button type="button" class="btn btn-secondary" id="btn-cam-sd" style="font-size: 0.75rem; padding: 4px 10px;" onclick="setCamStream('pennys_feeder_sd', this)">SD Stream (Low-Bandwidth)</button>
+              </div>
+              <div style="font-family: monospace; font-size: 0.75rem; color: #64748b;">
+                Ingested by NUC (192.168.2.35) &bull; WebRTC Zero-Latency
+              </div>
+            </div>
+          </div>
       </div>
     </section>
 
@@ -2014,6 +2048,27 @@
         showToast(`Dispatched to ${target.toUpperCase()}!`);
         closeMagnetModal();
       });
+    }
+
+    function setCamStream(src, btn) {
+      const frame = document.getElementById('camera-live-frame');
+      if (frame) {
+        frame.src = `https://cam.digitalresolve.ca/webrtc.html?src=${src}`;
+      }
+      const bHd = document.getElementById('btn-cam-hd');
+      const bSd = document.getElementById('btn-cam-sd');
+      [bHd, bSd].forEach(b => {
+        if (b) {
+          b.style.background = '';
+          b.style.borderColor = '';
+          b.style.color = '';
+        }
+      });
+      if (btn) {
+        btn.style.background = 'rgba(16, 185, 129, 0.25)';
+        btn.style.borderColor = '#10b981';
+        btn.style.color = '#6ee7b7';
+      }
     }
 
     // 90-Day Uptime Matrix & Sparkline Controller
