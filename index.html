@@ -48,29 +48,44 @@
       <nav class="nav-links">
         <a href="#deck" class="btn-nav">DECK</a>
 
-        <!-- Torrents Dropdown -->
+        <!-- Consolidated Menu 1: Cluster & Media -->
         <div class="dropdown">
-          <button type="button" class="btn-nav" id="torrents-menu-btn" aria-haspopup="true" aria-expanded="false" title="Open Torrents and Media Streaming Menu">
-            Check Torrents <span class="dropdown-arrow">&#9662;</span>
+          <button type="button" class="btn-nav" id="cluster-menu-btn" aria-haspopup="true" aria-expanded="false" title="Cluster Nodes, Media Streaming, and NUC Microservices">
+            <span>🖥️ Cluster &amp; Media</span> <span class="dropdown-arrow">&#9662;</span>
           </button>
-          <div class="dropdown-menu torrent-dropdown">
+          <div class="dropdown-menu">
+            <a href="#nuc-services" class="dropdown-item" style="color: #6ee7b7; font-weight: 700;">
+              <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+              <span>⚡ NUC 24/7 Services Suite</span>
+              <span class="item-tag online">Active</span>
+            </a>
+            <a href="https://stream.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="dropdown-item" style="color: #c4b5fd; font-weight: 600;">
+              <span class="dropdown-dot" style="background-color: #8b5cf6; box-shadow: 0 0 8px #8b5cf6;"></span>
+              <span>🎬 Watch Library (Stream 4K/HD)</span>
+              <span class="item-tag" style="background: rgba(139, 92, 246, 0.2); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.4);">Media</span>
+            </a>
+            <a href="https://files.digitalresolve.ca/files/" target="_blank" rel="noopener noreferrer" class="dropdown-item">
+              <span class="dropdown-dot dot-2"></span>
+              <span>📁 Browse Media &amp; Files (NUC)</span>
+            </a>
+            <a href="#camera-feed-card" class="dropdown-item">
+              <span class="dropdown-dot dot-2"></span>
+              <span>🐾 Penny's Feeder Optical Stream</span>
+            </a>
+            <div class="dropdown-divider"></div>
             <a href="https://torrents.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="dropdown-item">
-              <span class="dropdown-dot dot-1"></span> Torrents (Desktop)
+              <span class="dropdown-dot dot-1"></span>
+              <span>Torrents (Desktop qBit)</span>
               <span class="item-tag" id="desktop-speed-tag">Idle</span>
             </a>
             <a href="https://torrents2.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="dropdown-item">
-              <span class="dropdown-dot dot-2"></span> Torrents (NUC)
+              <span class="dropdown-dot dot-2"></span>
+              <span>Torrents (NUC qBit)</span>
               <span class="item-tag" id="nuc-disk-tag">D: -- GB free</span>
             </a>
-            <a href="https://files.digitalresolve.ca/files/" target="_blank" rel="noopener noreferrer" class="dropdown-item">
-              <span class="dropdown-dot dot-2"></span> Browse Media &amp; Files (NUC)
-            </a>
-            <a href="https://stream.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="dropdown-item" style="color: #a78bfa; font-weight: 600;">
-              <span class="dropdown-dot" style="background-color: #8b5cf6; box-shadow: 0 0 8px #8b5cf6;"></span> Browse &amp; Watch Media (Watch Library)
-              <span class="item-tag" style="background: rgba(139, 92, 246, 0.2); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.4);">4K / HD</span>
-            </a>
             <a href="javascript:void(0)" onclick="openMagnetModal()" class="dropdown-item" style="color: #60a5fa; font-weight: 600;">
-              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span> + Quick-Drop Magnet Link
+              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+              <span>+ Quick-Drop Magnet Link</span>
             </a>
             <div class="dropdown-divider"></div>
             <div class="disk-widget" id="nuc-disk-widget">
@@ -86,45 +101,63 @@
           </div>
         </div>
 
-        <!-- Disaster Recovery Test Trigger Button -->
-        <button type="button" class="btn-nav disaster-test-btn" id="disaster-test-btn" onclick="openDisasterModal()" style="background: rgba(245, 158, 11, 0.18); border-color: rgba(245, 158, 11, 0.5); color: #fde68a; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 0 10px rgba(245, 158, 11, 0.25); cursor: pointer;" title="Launch Disaster Recovery Test: Inject simulated infrastructure faults & test autonomous self-healing">
-          <span class="dropdown-dot" style="background-color: #f59e0b; box-shadow: 0 0 8px #f59e0b;"></span>
-          <span>🚨 Disaster Test</span>
-        </button>
-
-        <!-- Unified Microsoft 365 Entra ID SSO Admin Session Button -->
-        <button type="button" class="btn-nav header-sso-btn" id="header-sso-btn" onclick="toggleGlobalSSO()" style="background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.4); color: #fde68a; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s ease;" title="Unified Microsoft 365 Entra ID SSO Admin Session">
-          <span class="dropdown-dot" style="background-color: #f59e0b; box-shadow: 0 0 8px #f59e0b;" id="header-sso-dot"></span>
-          <span id="header-sso-text">🔒 Admin SSO Login</span>
-        </button>
-
-        <!-- NUC Services Jump Button -->
-        <a href="#nuc-services" class="btn-nav nuc-services-nav-btn" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.45); color: #6ee7b7 !important; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;" title="Jump to NUC 24/7 Extended Microservices (Speedtest, DNS Shield, Edge AI, Vault)">
-          <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
-          <span>⚡ NUC Services</span>
-        </a>
-
-        <!-- Live AI Token Telemetry Counter Button -->
-        <button type="button" class="btn-nav token-counter-btn" id="header-token-btn" onclick="openEmbeddedConsole()" style="background: rgba(56, 189, 248, 0.12); border-color: rgba(56, 189, 248, 0.35); color: #93c5fd; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;" title="Live AI Token Consumption Counter: 1.30M Tokens (Flash 68% &bull; Argon 24% &bull; Pro 8%)">
-          <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
-          <span style="color: #94a3b8; font-size: 0.8rem;">Tokens:</span>
-          <span id="header-token-count" class="mono" style="font-weight: 700; color: #38bdf8;">1.30M</span>
-          <span class="token-breakdown-tags" id="header-token-breakdown">
-            <span class="item-tag tag-flash" id="header-tag-flash" title="Gemini 3.8 Flash: 68%">Flash 68%</span>
-            <span class="item-tag tag-argon" id="header-tag-argon" title="Argon: 24%">Argon 24%</span>
-            <span class="item-tag tag-pro" id="header-tag-pro" title="Gemini Pro: 8%">Pro 8%</span>
-          </span>
-        </button>
-
-        <!-- AGY Session & Gemini CLI Dropdown -->
+        <!-- Consolidated Menu 2: Power & Fleet -->
         <div class="dropdown">
-          <button type="button" class="btn-nav" id="agy-btn" aria-haspopup="true" title="Toggle Antigravity Autonomous Agent Control Menu">
-            AGY Menu <span class="dropdown-arrow">&#9662;</span>
+          <button type="button" class="btn-nav" id="wol-btn" aria-haspopup="true" title="Wake-on-LAN, Remote Power, and Hardware Topology">
+            <span>⚡ Power &amp; Fleet</span> <span class="dropdown-arrow">&#9662;</span>
+          </button>
+          <div class="dropdown-menu">
+            <button type="button" class="btn-action-item" onclick="sendWol('desktop')" title="Send Wake-on-LAN Magic Packet to Desktop">
+              <span class="dropdown-dot dot-1" id="badge-desktop"></span>
+              <span>Wake Desktop</span>
+              <span class="item-tag" id="status-tag-desktop">Active</span>
+            </button>
+            <button type="button" class="btn-action-item btn-sleep" onclick="sendSleep('desktop')" title="Put Desktop PC into Sleep Standby">
+              <span class="dropdown-dot dot-sleep"></span>
+              <span>Sleep Desktop</span>
+              <span class="item-tag">Standby</span>
+            </button>
+            <button type="button" class="btn-action-item" onclick="sendWol('nuc')" title="Send Wake-on-LAN Magic Packet to NUC Server">
+              <span class="dropdown-dot dot-2" id="badge-nuc"></span>
+              <span>Wake NUC</span>
+              <span class="item-tag" id="status-tag-nuc">24/7 Core</span>
+            </button>
+            <button type="button" class="btn-action-item" onclick="sendWol('both')" title="Broadcast Wake-on-LAN Magic Packets to Both Desktop and NUC">
+              <span class="dropdown-dot dot-1"></span>
+              <span>Wake Both</span>
+            </button>
+            <div class="dropdown-divider"></div>
+            <a href="#fleet" class="dropdown-item">
+              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
+              <span>🗺️ Hardware Topology &amp; Schematic</span>
+            </a>
+            <a href="#uptime" class="dropdown-item">
+              <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 6px #10b981;"></span>
+              <span>📊 90-Day SLA &amp; Uptime History</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <button type="button" class="btn-action-item" onclick="checkStatus('nuc')" title="Query Live Status and Latency for NUC Server">
+              <span class="dropdown-dot dot-2"></span>
+              <span>Ping NUC Server</span>
+              <span class="item-tag" id="latency-nuc">-- ms</span>
+            </button>
+            <button type="button" class="btn-action-item" onclick="checkStatus('desktop')" title="Query Live Status and Latency for Desktop">
+              <span class="dropdown-dot dot-1"></span>
+              <span>Ping Desktop Node</span>
+              <span class="item-tag" id="latency-desktop">-- ms</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Consolidated Menu 3: Ops, AI & Resilience -->
+        <div class="dropdown">
+          <button type="button" class="btn-nav" id="ops-menu-btn" aria-haspopup="true" title="Antigravity Autonomous Agent, Disaster Resilience Test, and AI Telemetry">
+            <span>🛠️ Ops &amp; AI</span> <span class="dropdown-arrow">&#9662;</span>
           </button>
           <div class="dropdown-menu">
             <button type="button" class="btn-action-item" onclick="openEmbeddedConsole()" title="Open Live Interactive Terminal for Active Session 51f0adb8">
               <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
-              <span>Open This Very Session (51f0adb8)</span>
+              <span>Open AGY Terminal (51f0adb8)</span>
               <span class="item-tag online">Live</span>
             </button>
             <button type="button" class="btn-action-item" onclick="launchAgySession('stream')" title="View Live Antigravity Agent Transcript Stream">
@@ -133,37 +166,24 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openEmbeddedConsole(true)" title="Open Fullscreen Antigravity Command &amp; Telemetry Console">
               <span class="dropdown-dot dot-1"></span>
-              <span>Fullscreen AGY Console Active</span>
+              <span>Fullscreen AGY Console</span>
               <span class="item-tag online">Active</span>
             </button>
-            <button type="button" class="btn-action-item" onclick="launchAgySession('app')" title="Launch Antigravity Native Desktop CLI via Windows Terminal">
-              <span class="dropdown-dot" style="background-color: #4ade80; box-shadow: 0 0 8px #4ade80;"></span>
-              <span>Launch Desktop App CLI</span>
-              <span class="item-tag">CLI</span>
+            <div class="dropdown-divider"></div>
+            <button type="button" class="btn-action-item" onclick="openDisasterModal()" style="color: #fde68a;" title="Launch Disaster Recovery Test Workbench">
+              <span class="dropdown-dot" style="background-color: #f59e0b; box-shadow: 0 0 8px #f59e0b;"></span>
+              <span>🚨 Disaster Test &amp; Chaos Lab</span>
+              <span class="item-tag" style="background: rgba(245, 158, 11, 0.2); color: #fde68a;">Test</span>
             </button>
-            <button type="button" class="btn-action-item" onclick="launchAgySession('copy')" title="Copy Active Conversation ID to Clipboard">
+            <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Copy Session ID (51f0adb8...)</span>
+              <span>📋 Release Changelog (v2.7.2)</span>
             </button>
             <div class="dropdown-divider"></div>
-            <button type="button" class="btn-action-item" onclick="startNewAgySession('desktop')" title="Launch New AGY Session on Desktop (NetBIOS: DESKTOP) with --dangerously-skip-permissions" style="color: #93c5fd;">
-              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
-              <span>+ New Session (Desktop): agy --dangerously-skip-permissions</span>
-            </button>
-            <button type="button" class="btn-action-item" onclick="startNewAgySession('nuc')" title="Launch New AGY Session on NUC (NetBIOS: NUC) with --dangerously-skip-permissions" style="color: #c4b5fd;">
-              <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 8px #a855f7;"></span>
-              <span>+ New Session (NUC): agy --dangerously-skip-permissions</span>
-            </button>
-            <div class="dropdown-divider"></div>
-            <button type="button" class="btn-action-item" onclick="checkStatus('desktop')" title="Query Live Status and Latency for Desktop (NetBIOS: DESKTOP)">
-              <span class="dropdown-dot dot-1"></span>
-              <span>Instance: Cory-Desktop (Online)</span>
-              <span class="item-tag online" id="agy-node-ping">Ping &rarr;</span>
-            </button>
-            <div class="dropdown-divider"></div>
+            <!-- Embedded AI Token Widget -->
             <div style="padding: 8px 14px 6px; font-size: 0.78rem;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                <span style="color: #94a3b8; font-weight: 600;">AI Token Breakdown:</span>
+                <span style="color: #94a3b8; font-weight: 600;">AI Token Efficiency:</span>
                 <span id="menu-token-val" class="mono" style="font-weight: 700; color: #38bdf8;">1.30M</span>
               </div>
               <div class="model-progress-bar" id="menu-progress-bar" title="Flash 68% | Argon 24% | Pro 8%">
@@ -171,67 +191,42 @@
                 <div class="model-segment argon" id="menu-bar-argon" style="width: 24%;"></div>
                 <div class="model-segment pro" id="menu-bar-pro" style="width: 8%;"></div>
               </div>
-              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; color: #cbd5e1; gap: 4px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; color: #cbd5e1; gap: 4px; margin-top: 4px;">
                 <span style="color: #38bdf8;" id="menu-pct-flash"><strong style="font-weight:700;">68%</strong> Flash</span>
                 <span style="color: #c084fc;" id="menu-pct-argon"><strong style="font-weight:700;">24%</strong> Argon</span>
                 <span style="color: #fbbf24;" id="menu-pct-pro"><strong style="font-weight:700;">8%</strong> Pro</span>
               </div>
               <div style="margin-top: 6px; font-size: 0.68rem; color: #64748b; display: flex; justify-content: space-between;">
                 <span>Active: <span style="color: #34d399;">Flash + Argon</span></span>
-                <span>Quota: <span style="color: #4ade80;">Safe (Optimal)</span></span>
-              </div>
-              <div style="margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 0.7rem; display: flex; justify-content: space-between; align-items: center;">
-                <span style="color: #94a3b8;">Cost Saved (vs Pro):</span>
-                <span id="menu-cost-saved" style="color: #34d399; font-weight: 700;">Saved ~$3.12 (95%)</span>
+                <span>Saved: <span style="color: #34d399; font-weight: 700;">~$3.12 (95%)</span></span>
               </div>
             </div>
           </div>
         </div>
+      </nav>
 
-        <!-- Wake on LAN & Power Dropdown -->
-        <div class="dropdown">
-          <button type="button" class="btn-nav" id="wol-btn" aria-haspopup="true" title="Toggle Wake-on-LAN and Power Control Menu">
-            Wake on LAN <span class="dropdown-arrow">&#9662;</span>
+      <!-- Top Right Actions: Dedicated SSO Login / Logout Controls & Layout Toggle -->
+      <div class="nav-mobile-actions">
+        <!-- Top Dedicated SSO Controls -->
+        <div id="top-sso-container" class="top-sso-container">
+          <!-- Logged Out: SSO Login Button -->
+          <button type="button" class="btn-sso-login" id="top-sso-login-btn" onclick="openGlobalSSOModal('Admin Workspace Authorization')" title="Sign in with Microsoft 365 Entra ID / Admin PIN">
+            <span class="dropdown-dot" style="background-color: #f59e0b; box-shadow: 0 0 8px #f59e0b;"></span>
+            <span>🔒 SSO Login</span>
           </button>
-          <div class="dropdown-menu">
-            <button type="button" class="btn-action-item" onclick="sendWol('desktop')" title="Send Wake-on-LAN Magic Packet to Desktop (NetBIOS: DESKTOP)">
-              <span class="dropdown-dot dot-1" id="badge-desktop"></span>
-              <span>Wake Desktop</span>
-              <span class="item-tag" id="status-tag-desktop">Checking...</span>
-            </button>
-            <button type="button" class="btn-action-item btn-sleep" onclick="sendSleep('desktop')" title="Put Desktop PC (NetBIOS: DESKTOP) into Sleep Standby">
-              <span class="dropdown-dot dot-sleep"></span>
-              <span>Sleep Desktop</span>
-              <span class="item-tag">Standby</span>
-            </button>
-            <button type="button" class="btn-action-item" onclick="sendWol('nuc')" title="Send Wake-on-LAN Magic Packet to NUC Server (NetBIOS: NUC)">
-              <span class="dropdown-dot dot-2" id="badge-nuc"></span>
-              <span>Wake NUC</span>
-              <span class="item-tag" id="status-tag-nuc">Checking...</span>
-            </button>
-            <button type="button" class="btn-action-item" onclick="sendWol('both')" title="Broadcast Wake-on-LAN Magic Packets to Both Desktop and NUC">
-              <span class="dropdown-dot dot-1"></span>
-              <span>Wake Both</span>
-            </button>
-            <div class="dropdown-divider"></div>
-            <button type="button" class="btn-action-item" onclick="checkStatus('nuc')" title="Query Live Status and Latency for NUC Server (NetBIOS: NUC)">
-              <span class="dropdown-dot dot-2"></span>
-              <span>Ping NUC</span>
-              <span class="item-tag" id="latency-nuc">-- ms</span>
-            </button>
-            <button type="button" class="btn-action-item" onclick="checkStatus('desktop')" title="Query Live Status and Latency for Desktop (NetBIOS: DESKTOP)">
-              <span class="dropdown-dot dot-1"></span>
-              <span>Ping Desktop</span>
-              <span class="item-tag" id="latency-desktop">-- ms</span>
+
+          <!-- Logged In: User Profile Badge & Dedicated Logout Button -->
+          <div id="top-sso-authed-group" class="top-sso-authed-group" style="display: none;">
+            <div class="top-sso-user-pill" title="Authenticated via Microsoft 365 Entra ID">
+              <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 6px #10b981;"></span>
+              <span id="top-sso-user-name">Cory Townsend</span>
+            </div>
+            <button type="button" class="btn-sso-logout" id="top-sso-logout-btn" onclick="lockSSO()" title="Sign out of Microsoft 365 Admin Session">
+              <span>Sign Out</span>
             </button>
           </div>
         </div>
 
-        <a href="#camera-feed-card" class="btn-nav">Live Feed</a>
-        <a href="#uptime" class="btn-nav">Uptime &amp; SLA</a>
-        <a href="https://stream.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn-nav">Watch Library</a>
-      </nav>
-      <div class="nav-mobile-actions">
         <button type="button" class="btn-nav layout-toggle-btn" id="layout-toggle-nav" onclick="toggleLayoutMode()" title="Switch layout mode (Mobile / Desktop)" aria-label="Toggle Layout Mode">
           <span class="layout-toggle-icon" id="layout-toggle-nav-icon">📱</span>
           <span class="layout-toggle-text" id="layout-toggle-nav-text">Mobile View</span>
@@ -2010,9 +2005,9 @@
           <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;">v2.6.3</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" title="Project Codebase Scale: 10,325 Lines of Code (HTML: 5,333 lines &bull; CSS: 4,991 lines &bull; CNAME)">
+        <div class="footer-loc-badge" title="Project Codebase Scale: 10,420 Lines of Code (HTML: 5,345 lines &bull; CSS: 5,074 lines &bull; CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">10,325</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">10,420</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -2567,7 +2562,24 @@
     function updateSSOGateUI() {
       const authed = isSSOAuthenticated();
       
-      // Header SSO Button elements
+      // Top Dedicated SSO Login & Logout Controls
+      const topLoginBtn = document.getElementById('top-sso-login-btn');
+      const topAuthedGroup = document.getElementById('top-sso-authed-group');
+      const topUserName = document.getElementById('top-sso-user-name');
+      if (topLoginBtn && topAuthedGroup) {
+        if (authed) {
+          topLoginBtn.style.display = 'none';
+          topAuthedGroup.style.display = 'inline-flex';
+          if (topUserName) {
+            topUserName.textContent = 'Cory Townsend';
+          }
+        } else {
+          topLoginBtn.style.display = 'inline-flex';
+          topAuthedGroup.style.display = 'none';
+        }
+      }
+
+      // Legacy Header SSO Button elements fallback
       const headerSsoBtn = document.getElementById('header-sso-btn');
       const headerSsoDot = document.getElementById('header-sso-dot');
       const headerSsoText = document.getElementById('header-sso-text');
