@@ -57,38 +57,41 @@
             <span>🖥️ Cluster &amp; Media</span> <span class="dropdown-arrow">&#9662;</span>
           </button>
           <div class="dropdown-menu">
-            <a href="#nuc-services" class="dropdown-item" style="color: #6ee7b7; font-weight: 700;">
+            <a href="#nuc-services" class="btn-action-item" title="Open NUC 24/7 Telemetry &amp; Microservices Suite">
               <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
               <span>⚡ NUC 24/7 Services Suite</span>
               <span class="item-tag online">Active</span>
             </a>
-            <a href="javascript:void(0)" onclick="launchProtectedService('https://stream.digitalresolve.ca', 'Watch Library &amp; StreamHub (stream.digitalresolve.ca)')" class="dropdown-item" style="color: #c4b5fd; font-weight: 600;">
-              <span class="dropdown-dot" style="background-color: #8b5cf6; box-shadow: 0 0 8px #8b5cf6;"></span>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://stream.digitalresolve.ca', 'Watch Library &amp; StreamHub (stream.digitalresolve.ca)')" class="btn-action-item" title="Open Watch Library (stream.digitalresolve.ca)">
+              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
               <span>🎬 Watch Library (Stream 4K/HD)</span>
-              <span class="item-tag" style="background: rgba(139, 92, 246, 0.2); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.4);">SSO</span>
+              <span class="item-tag online">Live</span>
             </a>
-            <a href="javascript:void(0)" onclick="launchProtectedService('https://files.digitalresolve.ca/files/', 'Media &amp; File Vault (files.digitalresolve.ca)')" class="dropdown-item">
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://files.digitalresolve.ca/files/', 'Media &amp; File Vault (files.digitalresolve.ca)')" class="btn-action-item" title="Open File Vault (files.digitalresolve.ca)">
               <span class="dropdown-dot dot-2"></span>
               <span>📁 Browse Media &amp; Files (NUC)</span>
+              <span class="item-tag">Vault</span>
             </a>
-            <a href="#camera-feed-card" class="dropdown-item">
+            <a href="#camera-feed-card" class="btn-action-item" title="View Penny's Feeder Live Camera">
               <span class="dropdown-dot dot-2"></span>
               <span>🐾 Penny's Feeder Optical Stream</span>
+              <span class="item-tag online">WebRTC</span>
             </a>
             <div class="dropdown-divider"></div>
-            <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents.digitalresolve.ca', 'qBittorrent Workstation (torrents.digitalresolve.ca)')" class="dropdown-item">
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents.digitalresolve.ca', 'qBittorrent Workstation (torrents.digitalresolve.ca)')" class="btn-action-item" title="Open Workstation qBittorrent">
               <span class="dropdown-dot dot-1"></span>
               <span>Torrents (Desktop qBit)</span>
               <span class="item-tag" id="desktop-speed-tag">Idle</span>
             </a>
-            <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents2.digitalresolve.ca', 'qBittorrent NUC (torrents2.digitalresolve.ca)')" class="dropdown-item">
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents2.digitalresolve.ca', 'qBittorrent NUC (torrents2.digitalresolve.ca)')" class="btn-action-item" title="Open NUC qBittorrent">
               <span class="dropdown-dot dot-2"></span>
               <span>Torrents (NUC qBit)</span>
               <span class="item-tag" id="nuc-disk-tag">D: -- GB free</span>
             </a>
-            <a href="javascript:void(0)" onclick="openMagnetModal()" class="dropdown-item" style="color: #60a5fa; font-weight: 600;">
+            <a href="javascript:void(0)" onclick="openMagnetModal()" class="btn-action-item" title="Open Rapid Torrent &amp; Magnet Ingestion Console">
               <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
               <span>+ Quick-Drop Magnet Link</span>
+              <span class="item-tag">Inject</span>
             </a>
             <div class="dropdown-divider"></div>
             <div class="disk-widget" id="nuc-disk-widget">
@@ -130,13 +133,15 @@
               <span>Wake Both</span>
             </button>
             <div class="dropdown-divider"></div>
-            <a href="#fleet" class="dropdown-item">
-              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
+            <a href="#fleet" class="btn-action-item" title="Jump to Cluster Hardware Topology &amp; Circuit Schematic">
+              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
               <span>🗺️ Hardware Topology &amp; Schematic</span>
+              <span class="item-tag">Schematic</span>
             </a>
-            <a href="#uptime" class="dropdown-item">
-              <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 6px #10b981;"></span>
+            <a href="#uptime" class="btn-action-item" title="Jump to Cluster Availability &amp; 90-Day SLA History">
+              <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
               <span>📊 90-Day SLA &amp; Uptime History</span>
+              <span class="item-tag online">99.98%</span>
             </a>
             <div class="dropdown-divider"></div>
             <button type="button" class="btn-action-item" onclick="checkStatus('nuc')" title="Query Live Status and Latency for NUC Server">
@@ -163,28 +168,30 @@
               <span>Open AGY Terminal (51f0adb8)</span>
               <span class="item-tag online">Live</span>
             </button>
-            <button type="button" class="btn-action-item" onclick="launchAgySession('stream')" title="View Live Antigravity Agent Transcript Stream">
+            <a href="#ops-ai" class="btn-action-item" title="Jump to In-Page Compute, AI &amp; Terminal Operations Console">
               <span class="dropdown-dot dot-1"></span>
-              <span>In-Page Stream Viewer</span>
-            </button>
+              <span>In-Page Terminal &amp; Ollama</span>
+              <span class="item-tag">Ops Hub</span>
+            </a>
             <button type="button" class="btn-action-item" onclick="openEmbeddedConsole(true)" title="Open Fullscreen Antigravity Command &amp; Telemetry Console">
               <span class="dropdown-dot dot-1"></span>
               <span>Fullscreen AGY Console</span>
               <span class="item-tag online">Active</span>
             </button>
             <div class="dropdown-divider"></div>
-            <button type="button" class="btn-action-item" onclick="openDisasterModal()" style="color: #fde68a;" title="Launch Disaster Recovery Test Workbench">
+            <button type="button" class="btn-action-item" onclick="openDisasterModal()" title="Launch Disaster Recovery Test Workbench">
               <span class="dropdown-dot" style="background-color: #f59e0b; box-shadow: 0 0 8px #f59e0b;"></span>
               <span>🚨 Disaster Test &amp; Chaos Lab</span>
-              <span class="item-tag" style="background: rgba(245, 158, 11, 0.2); color: #fde68a;">Test</span>
+              <span class="item-tag">Chaos Lab</span>
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
               <span>📋 Release Changelog (v2.8.0)</span>
             </button>
-            <button type="button" class="btn-action-item" onclick="lockSSO(true)" style="color: #fca5a5;" title="Perform complete Microsoft 365 Entra ID &amp; Cloudflare Access session logout and browser cache purge">
+            <button type="button" class="btn-action-item" onclick="lockSSO(true)" title="Perform complete Microsoft 365 Entra ID session logout">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
               <span>🔒 Full SSO &amp; M365 Sign-Out</span>
+              <span class="item-tag">Sign Out</span>
             </button>
             <div class="dropdown-divider"></div>
             <!-- Embedded AI Token Widget -->

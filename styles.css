@@ -362,32 +362,54 @@ a:focus-visible,
   margin: 6px 4px;
 }
 
-/* Action buttons inside dropdown (matching the Wake on LAN button style) */
-.btn-action-item {
+/* Action buttons and navigation links inside dropdowns - Unified Button Style & Palette */
+.btn-action-item,
+.dropdown-item,
+a.dropdown-item,
+button.dropdown-item,
+.dropdown-menu button,
+.dropdown-menu a {
   background: rgba(59, 130, 246, 0.12) !important;
-  color: #60a5fa !important;
-  border: 1px solid rgba(59, 130, 246, 0.35) !important;
+  color: #93c5fd !important;
+  border: 1px solid rgba(96, 165, 250, 0.35) !important;
   border-radius: 8px !important;
   padding: 8px 12px !important;
-  margin-bottom: 5px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 0.88rem;
-  transition: all 0.2s ease;
+  margin-bottom: 5px !important;
+  font-weight: 600 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  font-family: inherit !important;
+  font-size: 0.86rem !important;
+  text-decoration: none !important;
+  box-sizing: border-box !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
 }
 
-.btn-action-item:hover {
-  background: rgba(59, 130, 246, 0.25) !important;
+.btn-action-item:hover,
+.dropdown-item:hover,
+a.dropdown-item:hover,
+button.dropdown-item:hover,
+.dropdown-menu button:hover,
+.dropdown-menu a:hover {
+  background: rgba(59, 130, 246, 0.26) !important;
   border-color: #60a5fa !important;
-  box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
-  transform: translateY(-1px);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.38) !important;
+  transform: translateY(-1px) !important;
   color: #ffffff !important;
+}
+
+.btn-action-item:active,
+.dropdown-item:active,
+a.dropdown-item:active,
+button.dropdown-item:active,
+.dropdown-menu button:active,
+.dropdown-menu a:active {
+  transform: translateY(1px) scale(0.98) !important;
 }
 
 .item-tag {
@@ -413,41 +435,6 @@ a:focus-visible,
   color: #f87171;
   background: rgba(239, 68, 68, 0.12);
   border-color: rgba(239, 68, 68, 0.25);
-}
-
-button.dropdown-item,
-.dropdown-menu button {
-  background: rgba(59, 130, 246, 0.12) !important;
-  color: #93c5fd !important;
-  border: 1px solid rgba(96, 165, 250, 0.38) !important;
-  border-radius: 8px !important;
-  padding: 8px 12px !important;
-  margin-bottom: 6px;
-  font-weight: 600 !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 10px !important;
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 0.88rem;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-button.dropdown-item:hover,
-.dropdown-menu button:hover {
-  background: rgba(59, 130, 246, 0.28) !important;
-  border-color: #60a5fa !important;
-  box-shadow: 0 0 16px rgba(59, 130, 246, 0.4) !important;
-  transform: translateY(-1px);
-  color: #ffffff !important;
-}
-
-button.dropdown-item:active,
-.dropdown-menu button:active {
-  transform: translateY(0);
 }
 
 .dot-wol-desktop {
@@ -633,24 +620,7 @@ button.dropdown-item:active,
   }
 }
 
-.dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 12px;
-  color: var(--text-main, #f8fafc) !important;
-  font-size: 0.85rem;
-  font-weight: 500;
-  text-decoration: none;
-  border-radius: 6px;
-  transition: all 0.15s ease;
-}
 
-.dropdown-item:hover {
-  background: rgba(59, 130, 246, 0.18);
-  color: #60a5fa !important;
-  transform: translateX(3px);
-}
 
 .dropdown-dot {
   width: 8px;
@@ -3253,7 +3223,7 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
   font-size: 0.82rem;
   font-weight: 700;
   padding: 6px 14px;
-  border-radius: 6px;
+  border-radius: 8px;
   background: rgba(245, 158, 11, 0.15);
   border: 1px solid rgba(245, 158, 11, 0.45);
   color: #fde68a;
@@ -3287,7 +3257,7 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
   font-size: 0.78rem;
   font-weight: 600;
   padding: 5px 11px;
-  border-radius: 6px;
+  border-radius: 8px;
   background: rgba(16, 185, 129, 0.15);
   border: 1px solid rgba(16, 185, 129, 0.35);
   color: #6ee7b7;
@@ -3301,7 +3271,7 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
   font-size: 0.76rem;
   font-weight: 700;
   padding: 5px 11px;
-  border-radius: 6px;
+  border-radius: 8px;
   background: rgba(239, 68, 68, 0.15);
   border: 1px solid rgba(239, 68, 68, 0.4);
   color: #fca5a5;
