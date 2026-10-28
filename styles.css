@@ -1090,6 +1090,7 @@ button.dropdown-item:active,
   height: 60px;
   display: block;
   margin: -6px 0;
+  overflow: visible;
 }
 
 .circuit-wire {
@@ -1104,18 +1105,67 @@ button.dropdown-item:active,
   stroke-width: 2.5;
   fill: none;
   stroke-linecap: round;
-  stroke-dasharray: 6 10;
-  animation: circuitFlow 1.6s linear infinite;
+  stroke-dasharray: 8 12;
+  stroke-dashoffset: 40;
+  animation: circuitFlow 1.4s linear infinite;
+  will-change: stroke-dashoffset;
 }
 
-.circuit-stream.edge { stroke: #38bdf8; }
-.circuit-stream.fiber { stroke: #60a5fa; }
-.circuit-stream.vpn { stroke: #34d399; }
-.circuit-stream.lan { stroke: #a78bfa; }
+.circuit-stream.edge {
+  stroke: #38bdf8;
+  filter: drop-shadow(0 0 5px #38bdf8);
+}
+.circuit-stream.fiber {
+  stroke: #60a5fa;
+  filter: drop-shadow(0 0 5px #60a5fa);
+}
+.circuit-stream.vpn {
+  stroke: #34d399;
+  filter: drop-shadow(0 0 5px #34d399);
+}
+.circuit-stream.lan {
+  stroke: #a78bfa;
+  filter: drop-shadow(0 0 5px #a78bfa);
+}
 
 @keyframes circuitFlow {
-  0% { stroke-dashoffset: 32; }
-  100% { stroke-dashoffset: 0; }
+  0% {
+    stroke-dashoffset: 40;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes modalScaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .circuit-wire.pulsing {

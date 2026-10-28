@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0">
   <title>Digital Resolve &bull; Homelab Cloud &amp; Command Deck</title>
   <meta name="description" content="24/7 self-hosted homelab operations, Cloudflare Zero Trust tunnels, private 4K media streaming, and automated WireGuard VPN ingestion.">
-  <link rel="stylesheet" href="styles.css?v=2.8.1">
+  <link rel="stylesheet" href="styles.css?v=2.8.2">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -192,7 +192,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.1</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.2</span>)</span>
             </button>
             <button type="button" class="btn-action-item" onclick="lockSSO()" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -4144,58 +4144,87 @@
         }
       });
 
-      // Render 24-Hour Sparkline Canvas
+      // Initialize real-time animated sparkline heartbeat if not already running
+      initSparklineHeartbeat();
+    }
+
+    let sparklineAnimId = null;
+    let sparklinePhase = 0;
+
+    function renderSparklineFrame() {
       const canvas = document.getElementById('uptimeSparkline');
-      if (canvas) {
-        const ctx = canvas.getContext('2d');
-        const w = canvas.width;
-        const h = canvas.height;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
 
-        ctx.clearRect(0, 0, w, h);
+      ctx.clearRect(0, 0, w, h);
 
-        // Grid lines (0ms, 5ms, 10ms)
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-        ctx.lineWidth = 1;
-        for (let y = 15; y < h; y += 25) {
-          ctx.beginPath();
-          ctx.moveTo(0, y);
-          ctx.lineTo(w, y);
-          ctx.stroke();
-        }
-
-        // Draw Bell Fiber Line (blue ~4.5ms)
+      // Grid lines (0ms, 5ms, 10ms)
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.lineWidth = 1;
+      for (let y = 15; y < h; y += 25) {
         ctx.beginPath();
-        ctx.strokeStyle = '#60a5fa';
-        ctx.lineWidth = 2;
-        for (let x = 0; x <= w; x += 10) {
-          const jitter = Math.sin(x * 0.05) * 4 + Math.cos(x * 0.1) * 2;
-          const y = h - 35 + jitter;
-          if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
-
-        // Draw Cloudflare Edge Line (cyan ~1.1ms)
-        ctx.beginPath();
-        ctx.strokeStyle = '#38bdf8';
-        ctx.lineWidth = 1.5;
-        for (let x = 0; x <= w; x += 10) {
-          const jitter = Math.sin(x * 0.08) * 2;
-          const y = h - 18 + jitter;
-          if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
-
-        // Draw NUC Server Line (green ~0.2ms)
-        ctx.beginPath();
-        ctx.strokeStyle = '#10b981';
-        ctx.lineWidth = 2;
-        for (let x = 0; x <= w; x += 10) {
-          const y = h - 6 + Math.sin(x * 0.04);
-          if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        }
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
         ctx.stroke();
       }
+
+      sparklinePhase += 0.032;
+
+      // Draw Bell Fiber Line (blue ~4.5ms)
+      ctx.beginPath();
+      ctx.strokeStyle = '#60a5fa';
+      ctx.lineWidth = 2;
+      for (let x = 0; x <= w; x += 10) {
+        const jitter = Math.sin((x * 0.05) + sparklinePhase) * 4 + Math.cos((x * 0.1) + sparklinePhase * 0.7) * 2;
+        const y = h - 35 + jitter;
+        if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Draw Cloudflare Edge Line (cyan ~1.1ms)
+      ctx.beginPath();
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 1.5;
+      for (let x = 0; x <= w; x += 10) {
+        const jitter = Math.sin((x * 0.08) + sparklinePhase * 1.2) * 2;
+        const y = h - 18 + jitter;
+        if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Draw NUC Server Line (green ~0.2ms)
+      ctx.beginPath();
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 2;
+      for (let x = 0; x <= w; x += 10) {
+        const y = h - 6 + Math.sin((x * 0.04) + sparklinePhase * 0.5) * 1.2;
+        if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      if (!document.hidden) {
+        sparklineAnimId = requestAnimationFrame(renderSparklineFrame);
+      }
     }
+
+    function initSparklineHeartbeat() {
+      if (!sparklineAnimId && !document.hidden) {
+        sparklineAnimId = requestAnimationFrame(renderSparklineFrame);
+      }
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        if (sparklineAnimId) {
+          cancelAnimationFrame(sparklineAnimId);
+          sparklineAnimId = null;
+        }
+      } else {
+        initSparklineHeartbeat();
+      }
+    });
 
     // Remote Actions Extension Handlers
     function confirmRebootNuc() {
@@ -4677,11 +4706,12 @@
       const btn = document.getElementById('btn-toggle-flow');
       const streams = document.querySelectorAll('.circuit-stream');
       if (btn) {
-        btn.innerHTML = circuitFlowActive ? 'Flow: ON' : '<span>️</span> Flow: OFF';
+        btn.innerHTML = circuitFlowActive ? 'Flow: ON' : '<span>&#9889;</span> Flow: OFF';
         btn.classList.toggle('pulse-active', circuitFlowActive);
       }
       streams.forEach(s => {
-        s.style.display = circuitFlowActive ? 'block' : 'none';
+        s.style.display = circuitFlowActive ? '' : 'none';
+        s.style.animationPlayState = circuitFlowActive ? 'running' : 'paused';
       });
       playChaosTone(350, circuitFlowActive ? 700 : 200, 'sine', 0.12);
     }
