@@ -2233,18 +2233,34 @@ button.dropdown-item:active,
 .terminal-tabs {
   display: flex;
   gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .terminal-tab {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #94a3b8;
-  padding: 4px 12px;
+  padding: 5px 12px;
   border-radius: 6px;
   font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.2;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+#tab-lock-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  line-height: 1.2;
 }
 
 .terminal-tab:hover,
@@ -3466,7 +3482,7 @@ html.desktop-layout body {
     -webkit-overflow-scrolling: touch !important;
     flex-wrap: nowrap !important;
     max-width: 100% !important;
-    padding: 6px 2px !important;
+    padding: 6px 12px !important;
     gap: 8px !important;
   }
   html.mobile-layout .terminal-tab {
@@ -4078,7 +4094,7 @@ html.desktop-layout body {
     -webkit-overflow-scrolling: touch !important;
     flex-wrap: nowrap !important;
     max-width: 100% !important;
-    padding: 6px 2px !important;
+    padding: 6px 12px !important;
     gap: 8px !important;
   }
 

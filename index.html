@@ -1370,7 +1370,7 @@
                 <button type="button" class="terminal-tab" id="tab-report" onclick="loadLog('report')" title="View Comprehensive Daily Homelab Morning Briefing">Briefing</button>
                 <button type="button" class="terminal-tab" onclick="startNewAgySession('desktop')" style="border-color: rgba(59, 130, 246, 0.4); color: #93c5fd; background: rgba(59, 130, 246, 0.1);" title="Launch New AGY Session on Desktop: agy --dangerously-skip-permissions">Desktop</button>
                 <button type="button" class="terminal-tab" onclick="startNewAgySession('nuc')" style="border-color: rgba(167, 139, 250, 0.4); color: #c4b5fd; background: rgba(167, 139, 250, 0.1);" title="Launch New AGY Session on NUC: agy --dangerously-skip-permissions">NUC</button>
-                <button type="button" class="terminal-tab" id="tab-lock-btn" onclick="lockSSO()" title="Lock Session" style="border-color: rgba(239, 68, 68, 0.4); color: #fca5a5; display: none;">&#128274; Lock</button>
+                <button type="button" class="terminal-tab" id="tab-lock-btn" onclick="lockSSO()" title="Lock Session" style="border-color: rgba(239, 68, 68, 0.4); color: #fca5a5; display: none; align-items: center; gap: 6px; padding: 5px 12px; white-space: nowrap;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; flex-shrink: 0;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg><span>Lock</span></button>
               </div>
               <div id="terminal-header-sso-badge" style="display: inline-flex; align-items: center; gap: 8px;">
                 <span class="sso-badge-tag">Zero Trust Edge</span>
@@ -1390,8 +1390,8 @@
             <!-- Locked Gate State Container (Shown until unlocked) -->
             <div class="terminal-sso-gate" id="terminal-sso-gate" style="display: flex;">
               <div style="max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 14px;">
-                <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; box-shadow: 0 0 24px rgba(59, 130, 246, 0.25);">
-                  &#128274;
+                <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 24px rgba(59, 130, 246, 0.25);">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                 </div>
                 <div class="sso-badge-row">
                   <span class="sso-badge-tag">Zero Trust Edge</span>
@@ -1443,7 +1443,7 @@
               </div>
               <div style="display: flex; align-items: center; gap: 12px;">
                 <span id="ai-infer-stats" style="font-size: 0.74rem; color: #94a3b8; font-family: monospace;">Intel Core i5 &bull; Local Compute</span>
-                <button type="button" class="btn btn-secondary" id="edge-ai-lock-btn" onclick="lockSSO()" style="display: none; font-size: 0.72rem; padding: 2px 8px; color: #f87171 !important; border-color: rgba(239, 68, 68, 0.4);" title="Lock Session">Lock</button>
+                <button type="button" class="btn btn-secondary" id="edge-ai-lock-btn" onclick="lockSSO()" style="display: none; font-size: 0.74rem; padding: 4px 10px; color: #f87171 !important; border-color: rgba(239, 68, 68, 0.4); align-items: center; gap: 5px;" title="Lock Session"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; flex-shrink: 0;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg><span>Lock</span></button>
               </div>
             </div>
 
@@ -2764,7 +2764,7 @@
         if (termTitle) termTitle.innerHTML = 'Live Interactive Terminal &bull; Stream Active';
         if (termPulse) { termPulse.style.background = '#10b981'; termPulse.style.boxShadow = '0 0 8px #10b981'; }
         if (termTabs) termTabs.style.display = 'flex';
-        if (termLock) termLock.style.display = 'inline-block';
+        if (termLock) termLock.style.display = 'inline-flex';
         if (termBadge) termBadge.style.display = 'none';
         const termTokenPill = document.getElementById('terminal-token-pill');
         if (termTokenPill) termTokenPill.style.display = 'inline-flex';
@@ -2787,7 +2787,7 @@
         if (aiGate) aiGate.style.display = 'none';
         if (aiControls) aiControls.style.display = 'flex';
         if (aiBadge) { aiBadge.textContent = 'Ready (Port 11434)'; aiBadge.className = 'item-tag online'; }
-        if (aiLock) aiLock.style.display = 'inline-block';
+        if (aiLock) aiLock.style.display = 'inline-flex';
         if (aiPulse) { aiPulse.style.background = '#10b981'; aiPulse.style.boxShadow = '0 0 8px #10b981'; }
         if (aiStats) aiStats.textContent = 'Intel Core i5 &bull; Local Compute';
 
@@ -5354,8 +5354,8 @@
       <!-- Modal SSO Gate (Shown until unlocked) -->
       <div class="modal-sso-gate" id="modal-sso-gate" style="display: flex;">
         <div style="max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 16px;">
-          <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; box-shadow: 0 0 24px rgba(59, 130, 246, 0.25);">
-            &#128274;
+          <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 24px rgba(59, 130, 246, 0.25);">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
           </div>
           <div class="sso-badge-row">
             <span class="sso-badge-tag">Zero Trust Edge Protected</span>
