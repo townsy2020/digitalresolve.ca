@@ -2341,13 +2341,13 @@
       const dev = devices[target] || devices.nuc;
       const ip = dev.ip || (target === 'desktop' ? '192.168.2.62' : '192.168.2.35');
       const dns = dev.dns || 'digitalresolve.ca';
-      showToast('loading', `Pinging ${dev.name}...`, `${ip} \u2022 ${dns}`, 0);
+      showToast('loading', `Pinging ${dev.name}...`, `${ip} | ${dns}`, 0);
 
       fetch(`${GATEWAY}/status?target=${target}`)
         .then(r => r.json())
         .then(data => {
           if (data.online) {
-            const diskSub = (data.disk && data.disk.drive) ? ` \u2022 D: ${data.disk.freeGB} GB free (${data.disk.usedPercent}% used)` : '';
+            const diskSub = (data.disk && data.disk.drive) ? ` | D: ${data.disk.freeGB} GB free (${data.disk.usedPercent}% used)` : '';
             showToast('success', `${dev.name} is Online`, `${data.latencyMs} ms latency${diskSub}`, 6000);
             updateStatusUI(target, true, data.latencyMs, data.disk);
           } else {
@@ -2388,7 +2388,7 @@
               .then(data => {
                 if (data.online) {
                   clearInterval(pollInterval);
-                  const diskSub = (data.disk && data.disk.drive) ? ` \u2022 D: ${data.disk.freeGB} GB free` : '';
+                  const diskSub = (data.disk && data.disk.drive) ? ` | D: ${data.disk.freeGB} GB free` : '';
                   showToast('success', `${dev.name} is Awake & Online!`, `${data.latencyMs} ms latency${diskSub}`, 6000);
                   updateStatusUI(target, true, data.latencyMs, data.disk);
                 } else if (attempts >= maxAttempts) {
@@ -2461,7 +2461,7 @@
       }
       if (lat && latencyMs !== null) {
         if (disk && disk.freeGB) {
-          lat.textContent = `${latencyMs} ms \u2022 D: ${Math.round(disk.freeGB)} GB`;
+          lat.textContent = `${latencyMs} ms | D: ${Math.round(disk.freeGB)} GB`;
         } else {
           lat.textContent = `${latencyMs} ms`;
         }
@@ -2507,7 +2507,7 @@
             diskBar.classList.remove('warning');
           }
         }
-        const speedNote = (torrent && torrent.dlSpeed > 0) ? ` \u2022 \u2B07 ${torrent.dlSpeedText}` : '';
+        const speedNote = (torrent && torrent.dlSpeed > 0) ? ` | \u2B07 ${torrent.dlSpeedText}` : '';
         if (diskSub) {
           diskSub.innerHTML = `${disk.usedGB} GB used of ${disk.totalGB} GB (${disk.usedPercent}%)${speedNote}`;
         }
@@ -2539,7 +2539,7 @@
           const fVitals = document.getElementById('fleet-vitals-nuc');
           const fVpn = document.getElementById('fleet-vpn-nuc');
           if (fVitals) {
-            fVitals.textContent = `${vitals.ramUsedGB} GB / ${vitals.ramTotalGB} GB (${vitals.ramPercent}%) \u2022 ${vitals.uptime} up`;
+            fVitals.textContent = `${vitals.ramUsedGB} GB / ${vitals.ramTotalGB} GB (${vitals.ramPercent}%) | ${vitals.uptime} up`;
           }
           if (fVpn && vitals.vpn) {
             fVpn.textContent = vitals.vpn;
@@ -2548,7 +2548,7 @@
 
         const rNuc = document.getElementById('ribbon-nuc');
         if (rNuc) {
-          rNuc.innerHTML = `<span class="dropdown-dot dot-2"></span> ${latencyMs !== null ? latencyMs + ' ms' : '0 ms'} \u2022 ${isOnline ? 'Online' : 'Offline'}`;
+          rNuc.innerHTML = `<span class="dropdown-dot dot-2"></span> ${latencyMs !== null ? latencyMs + ' ms' : '0 ms'} | ${isOnline ? 'Online' : 'Offline'}`;
         }
         const rStorage = document.getElementById('ribbon-storage');
         if (rStorage && disk) {
@@ -2557,7 +2557,7 @@
       } else if (target === 'desktop') {
         const rDesk = document.getElementById('ribbon-desktop');
         if (rDesk) {
-          rDesk.innerHTML = `<span class="dropdown-dot dot-1"></span> Bell Fiber \u2022 ${isOnline ? 'Online' : 'Standby'}`;
+          rDesk.innerHTML = `<span class="dropdown-dot dot-1"></span> Bell Fiber | ${isOnline ? 'Online' : 'Standby'}`;
         }
       }
     }
@@ -2727,7 +2727,7 @@
           headerSsoBtn.style.color = '#6ee7b7';
           headerSsoDot.style.backgroundColor = '#10b981';
           headerSsoDot.style.boxShadow = '0 0 8px #10b981';
-          headerSsoText.innerHTML = 'Admin \u2022 Sign Out (M365)';
+          headerSsoText.innerHTML = 'Admin | Sign Out (M365)';
           headerSsoBtn.title = 'Authenticated as Microsoft 365 Admin (Cory Townsend). Click to sign out.';
         } else {
           headerSsoBtn.style.background = 'rgba(245, 158, 11, 0.15)';
@@ -2771,7 +2771,7 @@
 
       if (authed) {
         // Unlocked Terminal Card
-        if (termTitle) termTitle.innerHTML = 'Live Interactive Terminal \u2022 Stream Active';
+        if (termTitle) termTitle.innerHTML = 'Live Interactive Terminal | Stream Active';
         if (termPulse) { termPulse.style.background = '#10b981'; termPulse.style.boxShadow = '0 0 8px #10b981'; }
         if (termTabs) termTabs.style.display = 'flex';
         if (termLock) termLock.style.display = 'inline-flex';
@@ -2789,7 +2789,7 @@
         if (modalScreen) modalScreen.style.display = 'block';
         if (modalChips) modalChips.style.display = 'flex';
         if (modalInput) modalInput.style.display = 'flex';
-        if (modalTitle) modalTitle.innerHTML = 'Antigravity (AGY) Live Terminal \u2022 <span class="mono" style="color: #60a5fa;">' + (window.AGY_SESSION_NAME || 'webdev1.0') + ' (' + (window.AGY_SESSION_ID || '572d607f').substring(0,8) + ')</span>';
+        if (modalTitle) modalTitle.innerHTML = 'Antigravity (AGY) Live Terminal | <span class="mono" style="color: #60a5fa;">' + (window.AGY_SESSION_NAME || 'webdev1.0') + ' (' + (window.AGY_SESSION_ID || '572d607f').substring(0,8) + ')</span>';
         if (modalPulse) { modalPulse.style.background = '#10b981'; modalPulse.style.boxShadow = '0 0 8px #10b981'; }
         if (modalStatus) { modalStatus.textContent = 'ONLINE (Desktop :8082)'; modalStatus.className = 'item-tag online'; }
 
@@ -2799,7 +2799,7 @@
         if (aiBadge) { aiBadge.textContent = 'Ready (Port 11434)'; aiBadge.className = 'item-tag online'; }
         if (aiLock) aiLock.style.display = 'inline-flex';
         if (aiPulse) { aiPulse.style.background = '#10b981'; aiPulse.style.boxShadow = '0 0 8px #10b981'; }
-        if (aiStats) aiStats.textContent = 'Intel Core i5 \u2022 Local Compute';
+        if (aiStats) aiStats.textContent = 'Intel Core i5 | Local Compute';
 
         // Unlocked Quick Drop Magnet Console
         const quickUnlocked = document.getElementById('quick-drop-unlocked-form');
@@ -2846,7 +2846,7 @@
         if (aiBadge) { aiBadge.textContent = 'Port 11434'; aiBadge.className = 'item-tag'; }
         if (aiLock) aiLock.style.display = 'none';
         if (aiPulse) { aiPulse.style.background = '#f59e0b'; aiPulse.style.boxShadow = '0 0 8px #f59e0b'; }
-        if (aiStats) aiStats.textContent = 'Intel Core i5 \u2022 Local Compute';
+        if (aiStats) aiStats.textContent = 'Intel Core i5 | Local Compute';
 
         // Locked Quick Drop Magnet Console
         const quickUnlocked = document.getElementById('quick-drop-unlocked-form');
@@ -3064,12 +3064,12 @@
       const tab = document.getElementById('tab-agy');
       if (tab) {
         tab.textContent = `[AGY] ${sName} (${shortId})`;
-        tab.title = `View Active Antigravity Autonomous Agent Stream (${sName} \u2022 ${shortId})`;
+        tab.title = `View Active Antigravity Autonomous Agent Stream (${sName} | ${shortId})`;
       }
 
       const modalTitle = document.getElementById('agy-modal-title-text');
       if (modalTitle) {
-        modalTitle.innerHTML = `Antigravity (AGY) Live Terminal \u2022 <span class="mono" style="color: #60a5fa;">${sName} (${shortId})</span>`;
+        modalTitle.innerHTML = `Antigravity (AGY) Live Terminal | <span class="mono" style="color: #60a5fa;">${sName} (${shortId})</span>`;
       }
 
       const metaName = document.getElementById('agy-meta-name');
@@ -3286,7 +3286,7 @@
         }
         if (text) {
           text.style.color = '#e9d5ff';
-          text.textContent = 'Active Target: NUC Server (Port 8081) \u2022 ONLINE';
+          text.textContent = 'Active Target: NUC Server (Port 8081) | ONLINE';
         }
         if (badge) {
           badge.style.background = 'rgba(192, 132, 252, 0.15)';
@@ -3305,7 +3305,7 @@
         }
         if (text) {
           text.style.color = '#93c5fd';
-          text.textContent = 'Active Target: Desktop PC (Port 8080) \u2022 ONLINE';
+          text.textContent = 'Active Target: Desktop PC (Port 8080) | ONLINE';
         }
         if (badge) {
           badge.style.background = 'rgba(96, 165, 250, 0.15)';
@@ -3422,7 +3422,7 @@
 
       const headerBtn = document.getElementById('header-token-btn');
       if (headerBtn) {
-        headerBtn.title = `Live AI Token Consumption: ${totalFmt} Tokens (Gemini Flash: 100% \u2022 ${cacheFmt} Context Cache Reused) \u2022 Saved ~${savedFmt} (${savingsPct}% Eco Savings vs Frontier Pro)`;
+        headerBtn.title = `Live AI Token Consumption: ${totalFmt} Tokens (Gemini Flash: 100% | ${cacheFmt} Context Cache Reused) | Saved ~${savedFmt} (${savingsPct}% Eco Savings vs Frontier Pro)`;
       }
 
       const hFlash = document.getElementById('header-tag-flash');
@@ -3469,7 +3469,7 @@
 
       // Update Modal
       const modalVal = document.getElementById('modal-token-count');
-      if (modalVal) modalVal.textContent = `${fullTotalStr} (In: ${inFmt} \u2022 Out: ${outFmt})`;
+      if (modalVal) modalVal.textContent = `${fullTotalStr} (In: ${inFmt} | Out: ${outFmt})`;
 
       const modalBreakdown = document.getElementById('modal-model-breakdown');
       if (modalBreakdown) {
@@ -3529,7 +3529,7 @@
               const throttleTag = document.getElementById('stat-throttle-tag');
               const swTag = document.getElementById('swarm-tag');
 
-              if (swAct) swAct.textContent = `${sw.activeDl} Active \u2022 ${sw.totalTorrents - sw.activeDl} Seed`;
+              if (swAct) swAct.textContent = `${sw.activeDl} Active | ${sw.totalTorrents - sw.activeDl} Seed`;
               if (swTag) swTag.textContent = `${sw.totalTorrents} Managed`;
               if (dht) dht.textContent = `DHT: ${sw.dhtNodes} Nodes`;
               if (vpnIp && sw.vpnExitIp) vpnIp.textContent = `VPN: ${sw.vpnExitIp}`;
@@ -3556,7 +3556,7 @@
             const ramSub = document.getElementById('stat-ram-sub');
             if (cpuVal && nuc.cpuLoad !== undefined) cpuVal.innerHTML = `${nuc.cpuLoad}% <span style="font-size: 0.9rem; color: #8b949e;">CPU</span>`;
             if (ramSub && nuc.vitals) {
-              ramSub.textContent = `Memory: ${nuc.vitals.ramUsedGB} GB / ${nuc.vitals.ramTotalGB} GB (${nuc.vitals.ramPercent}%) \u2022 ${nuc.vitals.uptime} up`;
+              ramSub.textContent = `Memory: ${nuc.vitals.ramUsedGB} GB / ${nuc.vitals.ramTotalGB} GB (${nuc.vitals.ramPercent}%) | ${nuc.vitals.uptime} up`;
             }
 
             if (nuc.disk) {
@@ -3643,9 +3643,9 @@
             const extIp = (latest && latest.externalIp) ? latest.externalIp : '184.148.161.160';
 
             if (pingVal) pingVal.innerHTML = `${pingAvg} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>`;
-            if (pingSub) pingSub.textContent = `Min: ${pingMin} ms \u2022 Max: ${pingMax} ms \u2022 Google: ${googleDns} ms`;
+            if (pingSub) pingSub.textContent = `Min: ${pingMin} ms | Max: ${pingMax} ms | Google: ${googleDns} ms`;
             if (jitterVal) jitterVal.innerHTML = `&plusmn; ${jitter} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>`;
-            if (lossSub) lossSub.textContent = `Packet Loss: ${loss}% \u2022 Fiber Optic`;
+            if (lossSub) lossSub.textContent = `Packet Loss: ${loss}% | Fiber Optic`;
             if (gradeTag) {
               gradeTag.textContent = `Grade: ${grade} (Ultra Stable)`;
               gradeTag.className = grade === 'A+' ? 'item-tag online' : 'item-tag';
@@ -3955,7 +3955,7 @@
           const bar = document.createElement('div');
           bar.className = 'uptime-bar';
 
-          bar.title = `${dateStr} \u2022 ${node.title}\nStatus: 100.0% Operational & Active\nAvailability: 100.0%\nSession: Interactive`;
+          bar.title = `${dateStr} | ${node.title}\nStatus: 100.0% Operational & Active\nAvailability: 100.0%\nSession: Interactive`;
 
           container.appendChild(bar);
         }
@@ -5116,7 +5116,7 @@
           i++;
           if (i >= resp.length) {
             clearInterval(typer);
-            if (stats) stats.textContent = 'Complete \u2022 Cluster Assistant';
+            if (stats) stats.textContent = 'Complete | Cluster Assistant';
           }
         }, 12);
       }
