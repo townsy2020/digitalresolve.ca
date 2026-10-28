@@ -92,6 +92,12 @@
           <span>🚨 Disaster Test</span>
         </button>
 
+        <!-- Unified Microsoft 365 Entra ID SSO Admin Session Button -->
+        <button type="button" class="btn-nav header-sso-btn" id="header-sso-btn" onclick="toggleGlobalSSO()" style="background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.4); color: #fde68a; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s ease;" title="Unified Microsoft 365 Entra ID SSO Admin Session">
+          <span class="dropdown-dot" style="background-color: #f59e0b; box-shadow: 0 0 8px #f59e0b;" id="header-sso-dot"></span>
+          <span id="header-sso-text">🔒 Admin SSO Login</span>
+        </button>
+
         <!-- NUC Services Jump Button -->
         <a href="#nuc-services" class="btn-nav nuc-services-nav-btn" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.45); color: #6ee7b7 !important; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;" title="Jump to NUC 24/7 Extended Microservices (Speedtest, DNS Shield, Edge AI, Vault)">
           <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
@@ -770,6 +776,7 @@
                 <span style="color: rgba(255,255,255,0.15); margin: 0 4px;">|</span>
                 <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700;">Mode:</span>
                 <button type="button" class="btn btn-secondary" id="btn-cam-ai" style="font-size: 0.75rem; padding: 4px 10px; background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.35); color: #6ee7b7;" onclick="toggleCamAi()" title="Toggle between lightweight WebRTC stream (0% CPU) and client-side AI object detection (TensorFlow)">&#9889; Fast WebRTC (0% CPU)</button>
+                <button type="button" class="btn btn-secondary" id="btn-cam-stop" style="font-size: 0.75rem; padding: 4px 10px; border-color: rgba(239, 68, 68, 0.35); color: #f87171;" onclick="stopLiveCameraFeed()" title="Unload WebRTC stream to save bandwidth">⏹ Stop Stream</button>
               </div>
               <div style="font-family: monospace; font-size: 0.75rem; color: #64748b;">
                 Ingested by NUC (192.168.2.35) &bull; Hardware WebRTC H.264 &bull; Zero Browser Jank
@@ -2003,9 +2010,9 @@
           <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;">v2.6.3</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" title="Project Codebase Scale: 10,288 Lines of Code (HTML: 5,296 lines &bull; CSS: 4,991 lines &bull; CNAME)">
+        <div class="footer-loc-badge" title="Project Codebase Scale: 10,325 Lines of Code (HTML: 5,333 lines &bull; CSS: 4,991 lines &bull; CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">10,288</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">10,325</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -2560,6 +2567,30 @@
     function updateSSOGateUI() {
       const authed = isSSOAuthenticated();
       
+      // Header SSO Button elements
+      const headerSsoBtn = document.getElementById('header-sso-btn');
+      const headerSsoDot = document.getElementById('header-sso-dot');
+      const headerSsoText = document.getElementById('header-sso-text');
+      if (headerSsoBtn && headerSsoDot && headerSsoText) {
+        if (authed) {
+          headerSsoBtn.style.background = 'rgba(16, 185, 129, 0.18)';
+          headerSsoBtn.style.borderColor = 'rgba(16, 185, 129, 0.45)';
+          headerSsoBtn.style.color = '#6ee7b7';
+          headerSsoDot.style.backgroundColor = '#10b981';
+          headerSsoDot.style.boxShadow = '0 0 8px #10b981';
+          headerSsoText.innerHTML = '🟢 Admin (M365) &bull; Sign Out';
+          headerSsoBtn.title = 'Authenticated as Microsoft 365 Admin (Cory Townsend). Click to sign out.';
+        } else {
+          headerSsoBtn.style.background = 'rgba(245, 158, 11, 0.15)';
+          headerSsoBtn.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+          headerSsoBtn.style.color = '#fde68a';
+          headerSsoDot.style.backgroundColor = '#f59e0b';
+          headerSsoDot.style.boxShadow = '0 0 8px #f59e0b';
+          headerSsoText.innerHTML = '🔒 Admin SSO Login';
+          headerSsoBtn.title = 'Unified Microsoft 365 Entra ID SSO Admin Session. Click to authenticate.';
+        }
+      }
+
       // Live Terminal elements
       const termTitle = document.getElementById('terminal-title-text');
       const termPulse = document.getElementById('terminal-pulse-dot');
@@ -2654,6 +2685,15 @@
       }
     }
 
+    function toggleGlobalSSO() {
+      if (isSSOAuthenticated()) {
+        lockSSO();
+      } else {
+        openGlobalSSOModal('Admin Workspace Authorization');
+      }
+    }
+    window.toggleGlobalSSO = toggleGlobalSSO;
+
     function unlockSSO(method = 'm365') {
       const termInput = document.getElementById('terminal-sso-pin');
       const modalInput = document.getElementById('modal-sso-pin');
@@ -2669,6 +2709,7 @@
       localStorage.setItem('dr_sso_user', 'CoryTownsend@digitalresolve.ca');
       showToast('success', 'SSO Verified', 'Identity authenticated via Microsoft 365 Entra ID & Zero Trust.');
       updateSSOGateUI();
+      closeSpeedtestSSOModal();
       loadLog(currentLogTab);
 
       const modal = document.getElementById('agy-console-modal-overlay');
@@ -2683,31 +2724,13 @@
         try { cb(); } catch(e) {}
       }
     }
-      
-      if (method === 'passkey') {
-        pin = '2026';
-      }
-      
-      localStorage.setItem('dr_sso_pin', pin);
-      localStorage.setItem('dr_sso_authenticated', 'true');
-      localStorage.setItem('dr_sso_user', 'CoryTownsend@digitalresolve.ca');
-      showToast('success', 'SSO Verified', 'Identity authenticated via Microsoft 365 Entra ID & Zero Trust.');
-      updateSSOGateUI();
-      loadLog(currentLogTab);
-
-      const modal = document.getElementById('agy-console-modal-overlay');
-      if (modal && modal.classList.contains('active')) {
-        refreshAgyConsole();
-        startConsoleAutoPoll();
-      }
-    }
 
     function lockSSO() {
       localStorage.removeItem('dr_sso_authenticated');
       localStorage.removeItem('dr_sso_pin');
       stopConsoleAutoPoll();
       updateSSOGateUI();
-      showToast('info', 'SSO Locked', 'Terminal & Console secured.');
+      showToast('info', 'SSO Session Locked', 'All system-interacting operations secured behind Microsoft 365 Entra ID SSO.');
     }
 
     // Multi-modal AGY session launcher
@@ -3328,6 +3351,10 @@
 
     // Inline Quick Magnet Submission Handler
     function submitQuickMagnet() {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal('Torrent Magnet Ingestion', submitQuickMagnet);
+        return;
+      }
       const input = document.getElementById('quick-magnet-input');
       const targetSelect = document.getElementById('quick-magnet-target');
       const val = input ? input.value.trim() : '';
@@ -3427,6 +3454,19 @@
       showToast('info', 'Live WebRTC Connected', "Ultra-fast zero-lag hardware stream connected to Intel NUC.");
     }
     window.loadLiveCameraFeed = loadLiveCameraFeed;
+
+    function stopLiveCameraFeed() {
+      camFeedLoaded = false;
+      const frame = document.getElementById('camera-live-frame');
+      const placeholder = document.getElementById('camera-placeholder');
+      if (frame) {
+        frame.src = 'about:blank';
+        frame.style.display = 'none';
+      }
+      if (placeholder) placeholder.style.display = 'flex';
+      showToast('info', 'WebRTC Disconnected', 'Optical stream unmounted to preserve network and GPU resources.');
+    }
+    window.stopLiveCameraFeed = stopLiveCameraFeed;
 
     function selectCamera(cam) {
       currentCamTarget = cam;
@@ -4436,9 +4476,6 @@
       if (pane) pane.classList.add('active');
     }
     window.switchNucTab = switchNucTab;
-
-    // --- 1. Bell Speedtest (SSO Protected) ---
-    let isSpeedtesting = false;
 
     // --- 1. Bell Speedtest (SSO Protected) & Global Security Gate ---
     let isSpeedtesting = false;
