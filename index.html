@@ -2562,7 +2562,7 @@
       updateTokenCounterUI();
 
       // Ensure all modal overlays are strictly hidden on load
-      ['magnet-modal-overlay', 'agy-console-modal-overlay', 'changelog-modal-overlay', 'health-modal-overlay', 'chaos-modal-overlay', 'disaster-modal-overlay', 'speedtest-sso-modal-overlay'].forEach(id => {
+      ['magnet-modal-overlay', 'agy-console-modal-overlay', 'changelog-modal-overlay', 'health-modal-overlay', 'chaos-modal-overlay', 'disaster-modal-overlay', 'speedtest-sso-modal-overlay', 'cloudflare-stats-modal-overlay', 'adguard-modal-overlay'].forEach(id => {
         const el = document.getElementById(id);
         if (el) { el.classList.remove('active'); el.style.display = 'none'; }
       });
@@ -4946,6 +4946,7 @@
       const modal = document.getElementById('cloudflare-stats-modal-overlay');
       if (modal) {
         modal.style.display = 'flex';
+        modal.classList.add('active');
         document.body.style.overflow = 'hidden';
       }
     }
@@ -4954,6 +4955,7 @@
     function closeCloudflareStatsModal() {
       const modal = document.getElementById('cloudflare-stats-modal-overlay');
       if (modal) {
+        modal.classList.remove('active');
         modal.style.display = 'none';
         document.body.style.overflow = '';
       }
@@ -4964,6 +4966,7 @@
       const modal = document.getElementById('adguard-modal-overlay');
       if (modal) {
         modal.style.display = 'flex';
+        modal.classList.add('active');
         document.body.style.overflow = 'hidden';
       }
     }
@@ -4972,6 +4975,7 @@
     function closeAdGuardConfigModal() {
       const modal = document.getElementById('adguard-modal-overlay');
       if (modal) {
+        modal.classList.remove('active');
         modal.style.display = 'none';
         document.body.style.overflow = '';
       }
