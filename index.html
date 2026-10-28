@@ -194,7 +194,7 @@
               <span class="dropdown-dot dot-2"></span>
               <span>Release Changelog (<span id="menu-changelog-ver">v2.8.1</span>)</span>
             </button>
-            <button type="button" class="btn-action-item" onclick="lockSSO(true)" title="Perform complete Microsoft 365 Entra ID session logout">
+            <button type="button" class="btn-action-item" onclick="lockSSO()" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
               <span>Sign Out (M365)</span>
               <span class="item-tag">Sign Out</span>
@@ -2165,6 +2165,13 @@
 
   <script>
     // Force canonical apex domain: redirect www.digitalresolve.ca to https://digitalresolve.ca
+    // Clean up cache-busting query parameter from address bar if reloaded after sign-out
+    if (window.location.search && window.location.search.includes('_fresh=')) {
+      try {
+        history.replaceState(null, document.title, window.location.pathname);
+      } catch(e) {}
+    }
+
     if (window.location.hostname === 'www.digitalresolve.ca') {
       window.location.replace('https://digitalresolve.ca' + window.location.pathname + window.location.search + window.location.hash);
     }
@@ -3022,8 +3029,11 @@
     window.unlockSSO = unlockSSO;
     window.isSSOAuthenticated = isSSOAuthenticated;
 
-    function lockSSO(fullIdpLogout = false) {
-      // 1. Explicitly clear all localStorage authentication keys
+    async function lockSSO(fullIdpLogout = false) {
+      // 1. Show immediate toast feedback
+      showToast('info', 'Signing Out & Clearing Cache...', 'Purging browser caches, credentials and resetting deck behind SSO...', 3000);
+
+      // 2. Explicitly clear all localStorage authentication keys
       try {
         localStorage.removeItem('dr_sso_authenticated');
         localStorage.removeItem('dr_sso_pin');
@@ -3032,12 +3042,30 @@
         localStorage.setItem('dr_sso_authenticated', 'false');
       } catch(e) {}
 
-      // 2. Clear all sessionStorage cache
+      // 3. Clear all sessionStorage cache
       try {
         sessionStorage.clear();
       } catch(e) {}
 
-      // 3. Clear relevant domain auth cookies
+      // 4. Purge CacheStorage API caches (Service Worker & HTTP caches)
+      try {
+        if ('caches' in window) {
+          const cacheKeys = await caches.keys();
+          await Promise.all(cacheKeys.map(k => caches.delete(k)));
+        }
+      } catch(e) {}
+
+      // 5. Unregister all Service Workers
+      try {
+        if ('serviceWorker' in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          for (const reg of registrations) {
+            await reg.unregister();
+          }
+        }
+      } catch(e) {}
+
+      // 6. Clear relevant domain auth cookies
       try {
         const host = window.location.hostname;
         const cookieList = ['dr_sso_authenticated', 'dr_sso_user', 'dr_sso', 'CF_Authorization', 'CF_AppSession'];
@@ -3049,27 +3077,31 @@
         });
       } catch(e) {}
 
-      // 4. Terminate background pollers and reset memory states
+      // 7. Terminate background pollers and reset memory states
       window.pendingSSOCallback = null;
       if (typeof stopConsoleAutoPoll === 'function') stopConsoleAutoPoll();
 
-      // 5. Instantly force UI updates across all gates and header buttons
+      // 8. Instantly force UI updates across all gates and header buttons
       updateSSOGateUI();
       try { updateCodebaseMetrics(); } catch(e) {}
       try { fetchISPHistory(); } catch(e) {}
 
-      // 6. Ping Cloudflare Zero Trust Access logout endpoint in background
+      // 9. Ping Cloudflare Zero Trust Access logout endpoint in background
       try {
         fetch('/cdn-cgi/access/logout', { method: 'GET', credentials: 'include', mode: 'no-cors' }).catch(() => {});
       } catch(e) {}
 
-      // 7. Show confirmation toast
-      showToast('info', 'SSO Session Locked', 'Admin credentials & browser storage cleared. Zero Trust gate engaged.');
-
-      // 8. If requested or triggered with Shift key, redirect to Microsoft Entra ID global logout
-      if (fullIdpLogout) {
-        window.location.href = 'https://login.microsoftonline.com/common/oauth2/v2.0/logout?post_logout_redirect_uri=' + encodeURIComponent(window.location.origin);
+      // 10. If explicit full Microsoft IdP logout was requested with Shift key
+      if (fullIdpLogout && (window.event && window.event.shiftKey)) {
+        window.location.href = 'https://login.microsoftonline.com/common/oauth2/v2.0/logout?post_logout_redirect_uri=' + encodeURIComponent(window.location.origin + window.location.pathname);
+        return;
       }
+
+      // 11. Automatically refresh page with cache-busting timestamp so everything is fresh and locked behind SSO
+      setTimeout(() => {
+        const cleanUrl = window.location.origin + window.location.pathname + '?_fresh=' + Date.now();
+        window.location.replace(cleanUrl);
+      }, 300);
     }
     window.lockSSO = lockSSO;
 
