@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0">
   <title>Digital Resolve &bull; Homelab Cloud &amp; Command Deck</title>
   <meta name="description" content="24/7 self-hosted homelab operations, Cloudflare Zero Trust tunnels, private 4K media streaming, and automated WireGuard VPN ingestion.">
-  <link rel="stylesheet" href="styles.css?v=2.7.4">
+  <link rel="stylesheet" href="styles.css?v=2.8.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -180,7 +180,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>📋 Release Changelog (v2.7.4)</span>
+              <span>📋 Release Changelog (v2.8.0)</span>
             </button>
             <button type="button" class="btn-action-item" onclick="lockSSO(true)" style="color: #fca5a5;" title="Perform complete Microsoft 365 Entra ID &amp; Cloudflare Access session logout and browser cache purge">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -251,7 +251,7 @@
       <div class="container">
         <div class="homelab-badge">
           <span class="pulse-dot"></span>
-          <span>24/7 Always-On Homelab Cluster &bull; M365 Entra ID Protected</span>
+          <span>24/7 Always-On Homelab Cluster &bull; Zero Trust Edge</span>
         </div>
         <h1 class="hero-homelab-title">
           Homelab Operations &amp; <span class="gradient-text">Cloud Command Deck</span>
@@ -262,10 +262,6 @@
 
         <!-- Command Launch Pills -->
         <div class="command-pills">
-          <button type="button" onclick="openEmbeddedConsole()" class="pill-btn" style="border-color: #3b82f6; background: rgba(59, 130, 246, 0.35); color: #ffffff; font-weight: 700; font-size: 0.92rem; padding: 10px 18px; box-shadow: 0 0 16px rgba(59, 130, 246, 0.4); cursor: pointer;" title="Open live interactive terminal for this active session (51f0adb8)">
-            <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 10px #10b981;"></span>
-            <span>▶ Open This Session Terminal (51f0adb8)</span>
-          </button>
           <button type="button" onclick="launchProtectedService('https://stream.digitalresolve.ca', 'Watch Library (HD / 4K)')" class="pill-btn pill-stream" style="cursor: pointer;">
             <span>[PLAY]</span> Open Watch Library (HD / 4K)
           </button>
@@ -278,8 +274,11 @@
           <button type="button" onclick="openDisasterModal()" class="pill-btn pill-disaster pill-chaos" id="hero-disaster-btn" style="border-color: #f59e0b; background: rgba(245, 158, 11, 0.25); color: #fde68a; font-weight: 700; cursor: pointer; box-shadow: 0 0 14px rgba(245, 158, 11, 0.3);" title="Open Homelab Disaster Recovery & Resilience Test Workbench">
             <span>🚨</span> Disaster Test
           </button>
+          <a href="#ops-ai" class="pill-btn pill-outline" style="border-color: rgba(168, 85, 247, 0.4); color: #c084fc;">
+            <span>🤖</span> AI &amp; Terminal Ops
+          </a>
           <a href="#nuc-services" class="pill-btn pill-outline" style="border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;">
-            <span>⚡</span> NUC Services &amp; AI
+            <span>⚡</span> NUC Services
           </a>
           <a href="#fleet" class="pill-btn pill-outline">
             <span>[CLUSTER]</span> Topology &amp; Power
@@ -314,7 +313,7 @@
           </div>
           <div class="ribbon-item">
             <span class="ribbon-label">Perimeter Shield</span>
-            <span class="ribbon-value" style="color: #38bdf8;">0 Open Ports &bull; SSO</span>
+            <span class="ribbon-value" style="color: #38bdf8;">0 Open Ports &bull; Zero Trust</span>
           </div>
           <div class="ribbon-item" id="ribbon-token-card">
             <span class="ribbon-label">AI Token Telemetry</span>
@@ -355,7 +354,7 @@
         <div class="control-matrix-card">
           <div class="control-matrix-header">
             <div class="control-matrix-title">
-              <span>[CTRL]</span> Homelab Remote Control Matrix <span style="font-size: 0.72rem; color: #10b981; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); padding: 2px 8px; border-radius: 6px; margin-left: 8px; vertical-align: middle;">M365 ENTRA ID SSO GUARDED</span>
+              <span>[CTRL]</span> Homelab Remote Control Matrix
             </div>
             <div style="font-size: 0.8rem; color: #8b949e;">
               Direct Remote Telemetry &bull; Zero Lag Execution via Cloudflare Tunnel
@@ -429,8 +428,8 @@
                 <button type="button" class="btn-control active-sleep" onclick="executeNodeAction('sleep')" title="Put Selected Target into Low-Power Sleep Standby">
                   <span>ZZ</span> Sleep Standby
                 </button>
-                <button type="button" class="btn-control btn-reboot" onclick="executeNodeAction('reboot')" title="Strictly locked behind Microsoft 365 Entra ID SSO / Passkey">
-                  <span>&#128260;</span> Reboot System (SSO)
+                <button type="button" class="btn-control btn-reboot" onclick="executeNodeAction('reboot')" title="Requires Admin Authorization">
+                  <span>&#128260;</span> Reboot System
                 </button>
               </div>
             </div>
@@ -545,89 +544,7 @@
           </div>
         </div>
 
-        <!-- Live Sentinel & Daemon Terminal Viewer -->
-        <div class="terminal-window" id="terminal-card">
-          <div class="terminal-header" id="terminal-header">
-            <div class="terminal-title-group" id="terminal-title-group">
-              <span class="pulse-dot" id="terminal-pulse-dot"></span>
-              <span id="terminal-title-text">&#128274; Protected Live Terminal &bull; SSO Required</span>
-            </div>
-            <div class="terminal-tabs" id="terminal-tabs-group" style="display: none;">
-              <button type="button" class="terminal-tab active" id="tab-agy" onclick="loadLog('agy')" title="View Active Antigravity Autonomous Agent Stream (Session 51f0adb8)">[AGY] Active Session (51f0adb8)</button>
-              <button type="button" class="terminal-tab" id="tab-sentinel" onclick="loadLog('sentinel')" title="View Sentinel Watchdog Security &amp; Fleet Health Audit Log">Sentinel Watchdog</button>
-              <button type="button" class="terminal-tab" id="tab-power" onclick="loadLog('power')" title="View Smart Power Optimizer &amp; Dynamic Standby Log">Power Optimizer</button>
-              <button type="button" class="terminal-tab" id="tab-report" onclick="loadLog('report')" title="View Comprehensive Daily Homelab Morning Briefing">Morning Briefing</button>
-              <button type="button" class="terminal-tab" onclick="startNewAgySession('desktop')" style="border-color: rgba(59, 130, 246, 0.4); color: #93c5fd; background: rgba(59, 130, 246, 0.1);" title="Launch New AGY Session on Desktop: agy --dangerously-skip-permissions">🚀 New: Desktop</button>
-              <button type="button" class="terminal-tab" onclick="startNewAgySession('nuc')" style="border-color: rgba(167, 139, 250, 0.4); color: #c4b5fd; background: rgba(167, 139, 250, 0.1);" title="Launch New AGY Session on NUC: agy --dangerously-skip-permissions">🚀 New: NUC</button>
-              <button type="button" class="terminal-tab" id="tab-lock-btn" onclick="lockSSO()" title="Lock SSO Session" style="border-color: rgba(239, 68, 68, 0.4); color: #fca5a5; display: none;">&#128274; Lock</button>
-            </div>
-            <div id="terminal-header-sso-badge" style="display: inline-flex; align-items: center; gap: 8px;">
-              <span class="sso-badge-tag">&#128274; Cloudflare Zero Trust &bull; M365 SSO Active</span>
-              <div id="terminal-token-pill" style="display: none; align-items: center; gap: 6px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.35); padding: 4px 10px; border-radius: 8px; font-size: 0.78rem;">
-                <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-                <span style="color: #94a3b8;">Tokens:</span>
-                <strong class="mono" id="term-token-val" style="color: #38bdf8;">1,299,171</strong>
-                <span class="token-breakdown-tags" id="term-token-breakdown">
-                  <span class="item-tag tag-flash" id="term-tag-flash" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-size: 0.68rem; padding: 1px 5px;">Flash 68%</span>
-                  <span class="item-tag tag-argon" id="term-tag-argon" style="background: rgba(168, 85, 247, 0.2); color: #c084fc; font-size: 0.68rem; padding: 1px 5px;">Argon 24%</span>
-                  <span class="item-tag tag-pro" id="term-tag-pro" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; font-size: 0.68rem; padding: 1px 5px;">Pro 8%</span>
-                </span>
-              </div>
-            </div>
-          </div>
 
-          <!-- Locked Gate State Container (Shown until unlocked) -->
-          <div class="terminal-sso-gate" id="terminal-sso-gate" style="display: flex;">
-            <div style="max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 14px;">
-              <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; box-shadow: 0 0 24px rgba(59, 130, 246, 0.25);">
-                &#128274;
-              </div>
-              <div class="sso-badge-row">
-                <span class="sso-badge-tag">&#128274; Cloudflare Zero Trust &bull; M365 SSO Active</span>
-                <span class="sso-badge-tag green">&#10004; Entra ID MFA Protected</span>
-              </div>
-              <h3 style="font-size: 1.15rem; font-weight: 700; color: #f8fafc; margin: 0;">&#128274; Protected Live Terminal &bull; SSO Required</h3>
-              <p style="font-size: 0.84rem; color: #94a3b8; line-height: 1.5; margin: 0;">
-                Authentication required before viewing real-time daemon logs, cluster sentinel streams, or dispatching remote instructions to Cory-Desktop.
-              </p>
-              
-              <!-- One-Click Microsoft 365 Entra ID SSO Unlock Button -->
-              <div style="display: flex; gap: 10px; width: 100%; max-width: 440px; margin-top: 6px;">
-                <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" title="Authenticate with Microsoft 365 Entra ID SSO" style="flex: 1; padding: 10px 16px; font-size: 0.88rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 0 16px rgba(59, 130, 246, 0.35); cursor: pointer;">
-                  <svg width="16" height="16" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;" aria-hidden="true" focusable="false"><path d="M0 0h9.9v9.9H0z" fill="#f25022"/><path d="M11.1 0H21v9.9h-9.9z" fill="#7fba00"/><path d="M0 11.1h9.9V21H0z" fill="#00a4ef"/><path d="M11.1 11.1H21V21h-9.9z" fill="#ffb900"/></svg>
-                  <span>Authenticate with Microsoft 365 SSO</span>
-                </button>
-              </div>
-
-              <!-- PIN / Passkey Unlock Option -->
-              <div style="display: flex; gap: 8px; width: 100%; max-width: 440px; margin-top: 4px;">
-                <input type="password" id="terminal-sso-pin" class="sso-pin-input" aria-label="Terminal SSO PIN or passkey" placeholder="Enter PIN or Passkey (e.g. 2026)..." style="flex: 1;" onkeydown="if(event.key==='Enter') unlockSSO('pin-terminal')" />
-                <button type="button" class="btn btn-secondary" onclick="unlockSSO('pin-terminal')" title="Unlock Terminal with PIN or Passkey" style="font-size: 0.84rem; padding: 8px 14px;">Unlock &rarr;</button>
-                <button type="button" class="btn-nav" onclick="unlockSSO('passkey')" title="Fast Passkey / FIDO2 Unlock" style="font-size: 0.84rem; padding: 8px 12px; border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7;">Passkey &#128273;</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Unlocked Terminal Content -->
-          <div class="terminal-body" id="terminal-content" style="display: none;">Connecting to active AGY session stream...</div>
-          
-          <!-- Command Quick Chips (Inline Terminal) -->
-          <div class="agy-inline-chips" id="agy-inline-chips" style="display: none; gap: 8px; margin-top: 10px; margin-bottom: 4px; flex-wrap: wrap;">
-            <button type="button" class="quick-chip" onclick="triggerInlineQuickChip(this, 'Check cluster health and uptime stats')" title="Query Cluster Health &amp; Uptime Stats">&#9889; Cluster Health</button>
-            <button type="button" class="quick-chip" onclick="triggerInlineQuickChip(this, 'Run deep codebase audit')" title="Execute Deep Codebase Security &amp; Health Audit">&#128737;&#65039; Code Audit</button>
-            <button type="button" class="quick-chip" onclick="triggerInlineQuickChip(this, 'Report ISP jitter, loss, and latency')" title="Report Bell Canada Gigabit Jitter, Packet Loss, and Latency">&#127760; ISP Diagnostics</button>
-            <button type="button" class="quick-chip" onclick="triggerInlineQuickChip(this, 'Review current git branch and changes')" title="Review Current Git Branch &amp; Uncommitted Worktree Changes">&#127807; Git Status</button>
-            <button type="button" class="quick-chip" onclick="startNewAgySession('desktop')" style="border-color: #38bdf8; background: rgba(56, 189, 248, 0.2); color: #93c5fd;" title="Launch New AGY Session on Desktop: agy --dangerously-skip-permissions">🚀 New: Desktop</button>
-            <button type="button" class="quick-chip" onclick="startNewAgySession('nuc')" style="border-color: #a78bfa; background: rgba(167, 139, 250, 0.2); color: #c4b5fd;" title="Launch New AGY Session on NUC: agy --dangerously-skip-permissions">🚀 New: NUC</button>
-          </div>
-
-          <!-- Remote Instruction Dispatcher for Active AGY Session -->
-          <div class="agy-remote-prompt-bar" id="agy-prompt-container" style="display: none; gap: 8px; margin-top: 8px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.08); flex-wrap: wrap;">
-            <input type="text" id="agy-prompt-input" aria-label="Prompt for active AGY session" placeholder="Transmit instruction / prompt to this active AGY session (M365 SSO Guarded)..." style="flex: 1; min-width: 250px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 10px 14px; color: #f8fafc; font-family: monospace; font-size: 0.88rem;" onkeydown="if(event.key==='Enter') sendAgyPrompt()" />
-            <button type="button" class="btn-nav" style="border-color: #3b82f6; background: rgba(59, 130, 246, 0.25); color: #fff;" onclick="sendAgyPrompt()" title="Queue Prompt to Active Antigravity Autonomous Session">Send to Agent &rarr;</button>
-            <button type="button" class="btn-nav" style="border-color: #10b981; background: rgba(16, 185, 129, 0.25); color: #a7f3d0; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 0 10px rgba(16, 185, 129, 0.25);" onclick="openEmbeddedConsole()" title="Pop out Fullscreen Interactive Console for this session">🖥️ Pop Out Fullscreen Console (51f0adb8) &nearr;</button>
-          </div>
-        </div>
 
         <!-- ISP Health, Jitter, Packet Loss & Throughput Monitor -->
         <div class="control-matrix-card" id="isp-health-card" style="margin-bottom: 40px;">
@@ -1323,6 +1240,187 @@
       </div>
     </section>
 
+    <!-- Compute, AI & Operations Console -->
+    <section class="section ops-ai-section" id="ops-ai">
+      <div class="container">
+        <div class="section-header" style="text-align: left; margin-bottom: 24px;">
+          <div class="homelab-badge" style="margin-bottom: 8px;">
+            <span class="pulse-dot"></span>
+            <span>Edge Compute &bull; Local Intelligence Hub</span>
+          </div>
+          <h2 style="font-size: 1.85rem; font-weight: 800; color: #f8fafc; margin-bottom: 6px;">
+            Compute, AI &amp; <span class="gradient-text">Operations Console</span>
+          </h2>
+          <p style="font-size: 0.92rem; color: #94a3b8; max-width: 720px; margin: 0;">
+            Unified workspace combining real-time Antigravity autonomous agent streams, daemon watchdogs, and on-premise Ollama LLM inference directly on NUC hardware.
+          </p>
+        </div>
+
+        <!-- 4-Metric KPI Row -->
+        <div class="kpi-row-4" style="margin-bottom: 24px;">
+          <div class="kpi-mini-card purple">
+            <div class="kpi-label">Active Local Model</div>
+            <div class="kpi-val" style="color: #d8b4fe; font-size: 1.15rem;">Llama 3.2 3B</div>
+            <div class="kpi-sub">Q4_K_M &bull; 2.0 GB Memory Footprint</div>
+          </div>
+          <div class="kpi-mini-card success">
+            <div class="kpi-label">Generation Speed</div>
+            <div class="kpi-val" style="color: #34d399;">28.4 <span style="font-size: 0.85rem; color: #94a3b8;">tok/s</span></div>
+            <div class="kpi-sub">Intel Core i5 AVX2 Acceleration</div>
+          </div>
+          <div class="kpi-mini-card">
+            <div class="kpi-label">Privacy Guarantee</div>
+            <div class="kpi-val" style="color: #38bdf8; font-size: 1.15rem;">Air-Gapped</div>
+            <div class="kpi-sub">0% External Cloud Data Exfiltration</div>
+          </div>
+          <div class="kpi-mini-card amber">
+            <div class="kpi-label">Secondary Code Model</div>
+            <div class="kpi-val" style="color: #fbbf24; font-size: 1.15rem;">Qwen 2.5 3B</div>
+            <div class="kpi-sub">Specialized in PowerShell &amp; Python</div>
+          </div>
+        </div>
+
+        <!-- 2-Column Side-by-Side Ops & AI Console Grid -->
+        <div class="ops-ai-grid">
+          <!-- Column 1: Live Interactive Terminal & Daemon Streams -->
+          <div class="terminal-window" id="terminal-card">
+            <div class="terminal-header" id="terminal-header">
+              <div class="terminal-title-group" id="terminal-title-group">
+                <span class="pulse-dot" id="terminal-pulse-dot"></span>
+                <span id="terminal-title-text">Live Interactive Terminal</span>
+              </div>
+              <div class="terminal-tabs" id="terminal-tabs-group" style="display: none;">
+                <button type="button" class="terminal-tab active" id="tab-agy" onclick="loadLog('agy')" title="View Active Antigravity Autonomous Agent Stream (Session 51f0adb8)">[AGY] Session (51f0adb8)</button>
+                <button type="button" class="terminal-tab" id="tab-sentinel" onclick="loadLog('sentinel')" title="View Sentinel Watchdog Security &amp; Fleet Health Audit Log">Sentinel</button>
+                <button type="button" class="terminal-tab" id="tab-power" onclick="loadLog('power')" title="View Smart Power Optimizer &amp; Dynamic Standby Log">Power</button>
+                <button type="button" class="terminal-tab" id="tab-report" onclick="loadLog('report')" title="View Comprehensive Daily Homelab Morning Briefing">Briefing</button>
+                <button type="button" class="terminal-tab" onclick="startNewAgySession('desktop')" style="border-color: rgba(59, 130, 246, 0.4); color: #93c5fd; background: rgba(59, 130, 246, 0.1);" title="Launch New AGY Session on Desktop: agy --dangerously-skip-permissions">🚀 Desktop</button>
+                <button type="button" class="terminal-tab" onclick="startNewAgySession('nuc')" style="border-color: rgba(167, 139, 250, 0.4); color: #c4b5fd; background: rgba(167, 139, 250, 0.1);" title="Launch New AGY Session on NUC: agy --dangerously-skip-permissions">🚀 NUC</button>
+                <button type="button" class="terminal-tab" id="tab-lock-btn" onclick="lockSSO()" title="Lock Session" style="border-color: rgba(239, 68, 68, 0.4); color: #fca5a5; display: none;">&#128274; Lock</button>
+              </div>
+              <div id="terminal-header-sso-badge" style="display: inline-flex; align-items: center; gap: 8px;">
+                <span class="sso-badge-tag">Zero Trust Edge</span>
+                <div id="terminal-token-pill" style="display: none; align-items: center; gap: 6px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.35); padding: 4px 10px; border-radius: 8px; font-size: 0.78rem;">
+                  <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
+                  <span style="color: #94a3b8;">Tokens:</span>
+                  <strong class="mono" id="term-token-val" style="color: #38bdf8;">1,299,171</strong>
+                  <span class="token-breakdown-tags" id="term-token-breakdown">
+                    <span class="item-tag tag-flash" id="term-tag-flash" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-size: 0.68rem; padding: 1px 5px;">Flash 68%</span>
+                    <span class="item-tag tag-argon" id="term-tag-argon" style="background: rgba(168, 85, 247, 0.2); color: #c084fc; font-size: 0.68rem; padding: 1px 5px;">Argon 24%</span>
+                    <span class="item-tag tag-pro" id="term-tag-pro" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; font-size: 0.68rem; padding: 1px 5px;">Pro 8%</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Locked Gate State Container (Shown until unlocked) -->
+            <div class="terminal-sso-gate" id="terminal-sso-gate" style="display: flex;">
+              <div style="max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 14px;">
+                <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; box-shadow: 0 0 24px rgba(59, 130, 246, 0.25);">
+                  &#128274;
+                </div>
+                <div class="sso-badge-row">
+                  <span class="sso-badge-tag">Zero Trust Edge</span>
+                  <span class="sso-badge-tag green">&#10004; Entra ID MFA</span>
+                </div>
+                <h3 style="font-size: 1.15rem; font-weight: 700; color: #f8fafc; margin: 0;">Live Interactive Terminal</h3>
+                <p style="font-size: 0.84rem; color: #94a3b8; line-height: 1.5; margin: 0; text-align: center;">
+                  Authentication required to view real-time daemon logs, cluster sentinel streams, or dispatch remote instructions.
+                </p>
+                
+                <!-- One-Click Microsoft 365 Entra ID SSO Unlock Button -->
+                <div style="display: flex; gap: 10px; width: 100%; max-width: 440px; margin-top: 6px;">
+                  <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" title="Authenticate with Microsoft 365" style="flex: 1; padding: 10px 16px; font-size: 0.88rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 0 16px rgba(59, 130, 246, 0.35); cursor: pointer;">
+                    <svg width="16" height="16" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;" aria-hidden="true" focusable="false"><path d="M0 0h9.9v9.9H0z" fill="#f25022"/><path d="M11.1 0H21v9.9h-9.9z" fill="#7fba00"/><path d="M0 11.1h9.9V21H0z" fill="#00a4ef"/><path d="M11.1 11.1H21V21h-9.9z" fill="#ffb900"/></svg>
+                    <span>Authenticate with Microsoft 365</span>
+                  </button>
+                </div>
+
+                <!-- PIN / Passkey Unlock Option -->
+                <div style="display: flex; gap: 8px; width: 100%; max-width: 440px; margin-top: 4px;">
+                  <input type="password" id="terminal-sso-pin" class="sso-pin-input" aria-label="Terminal PIN or passkey" placeholder="Enter PIN or Passkey (e.g. 2026)..." style="flex: 1;" onkeydown="if(event.key==='Enter') unlockSSO('pin-terminal')" />
+                  <button type="button" class="btn btn-secondary" onclick="unlockSSO('pin-terminal')" title="Unlock Terminal with PIN or Passkey" style="font-size: 0.84rem; padding: 8px 14px;">Unlock &rarr;</button>
+                  <button type="button" class="btn-nav" onclick="unlockSSO('passkey')" title="Fast Passkey / FIDO2 Unlock" style="font-size: 0.84rem; padding: 8px 12px; border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7;">Passkey &#128273;</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Unlocked Terminal Content -->
+            <div class="terminal-body" id="terminal-content" style="display: none;">Connecting to active AGY session stream...</div>
+            
+            <!-- Command Quick Chips (Inline Terminal) -->
+            <div class="agy-inline-chips" id="agy-inline-chips" style="display: none; gap: 8px; margin-top: 10px; margin-bottom: 4px; flex-wrap: wrap;">
+              <button type="button" class="quick-chip" onclick="triggerInlineQuickChip(this, 'Check cluster health and uptime stats')" title="Query Cluster Health &amp; Uptime Stats">&#9889; Cluster Health</button>
+              <button type="button" class="quick-chip" onclick="triggerInlineQuickChip(this, 'Run deep codebase audit')" title="Execute Deep Codebase Security &amp; Health Audit">&#128737;&#65039; Code Audit</button>
+              <button type="button" class="quick-chip" onclick="triggerInlineQuickChip(this, 'Report ISP jitter, loss, and latency')" title="Report Bell Canada Gigabit Jitter, Packet Loss, and Latency">&#127760; ISP Diagnostics</button>
+              <button type="button" class="quick-chip" onclick="triggerInlineQuickChip(this, 'Review current git branch and changes')" title="Review Current Git Branch &amp; Uncommitted Worktree Changes">&#127807; Git Status</button>
+              <button type="button" class="quick-chip" onclick="startNewAgySession('desktop')" style="border-color: #38bdf8; background: rgba(56, 189, 248, 0.2); color: #93c5fd;" title="Launch New AGY Session on Desktop: agy --dangerously-skip-permissions">🚀 New: Desktop</button>
+              <button type="button" class="quick-chip" onclick="startNewAgySession('nuc')" style="border-color: #a78bfa; background: rgba(167, 139, 250, 0.2); color: #c4b5fd;" title="Launch New AGY Session on NUC: agy --dangerously-skip-permissions">🚀 New: NUC</button>
+            </div>
+
+            <!-- Remote Instruction Dispatcher for Active AGY Session -->
+            <div class="agy-remote-prompt-bar" id="agy-prompt-container" style="display: none; gap: 8px; margin-top: 8px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.08); flex-wrap: wrap;">
+              <input type="text" id="agy-prompt-input" aria-label="Prompt for active AGY session" placeholder="Transmit instruction / prompt to active AGY session..." style="flex: 1; min-width: 250px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 10px 14px; color: #f8fafc; font-family: monospace; font-size: 0.88rem;" onkeydown="if(event.key==='Enter') sendAgyPrompt()" />
+              <button type="button" class="btn-nav" style="border-color: #3b82f6; background: rgba(59, 130, 246, 0.25); color: #fff;" onclick="sendAgyPrompt()" title="Queue Prompt to Active Antigravity Autonomous Session">Send &rarr;</button>
+              <button type="button" class="btn-nav" style="border-color: #10b981; background: rgba(16, 185, 129, 0.25); color: #a7f3d0; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 0 10px rgba(16, 185, 129, 0.25);" onclick="openEmbeddedConsole()" title="Pop out Fullscreen Interactive Console for this session">🖥️ Pop Out &nearr;</button>
+            </div>
+          </div>
+
+          <!-- Column 2: Ollama 24/7 Local Inference Playground -->
+          <div class="edge-ai-box" id="edge-ai-card">
+            <div class="edge-ai-header">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="pulse-dot" id="edge-ai-pulse" style="background:#f59e0b;"></span>
+                <span style="font-weight: 700; color: #f8fafc; font-size: 0.88rem;">Ollama 24/7 Local Inference Playground</span>
+                <span class="item-tag" id="edge-ai-badge" style="background: rgba(245, 158, 11, 0.2); color: #fde68a;">Port 11434</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span id="ai-infer-stats" style="font-size: 0.74rem; color: #94a3b8; font-family: monospace;">Intel Core i5 &bull; Port 11434</span>
+                <button type="button" class="btn btn-secondary" id="edge-ai-lock-btn" onclick="lockSSO()" style="display: none; font-size: 0.72rem; padding: 2px 8px; color: #f87171 !important; border-color: rgba(239, 68, 68, 0.4);" title="Lock Session">Lock</button>
+              </div>
+            </div>
+
+            <!-- Unlocked State Interactive Controls -->
+            <div id="edge-ai-unlocked-container" style="display: none; flex-direction: column; flex: 1;">
+              <div class="edge-ai-chips">
+                <button type="button" class="edge-chip" onclick="askEdgeAiPreset('summarize')">Explain NUC homelab architecture</button>
+                <button type="button" class="edge-chip" onclick="askEdgeAiPreset('bufferbloat')">Why is Bell Fiber bufferbloat Grade A+?</button>
+                <button type="button" class="edge-chip" onclick="askEdgeAiPreset('catcam')">How does Cat Cam decode work?</button>
+                <button type="button" class="edge-chip" onclick="askEdgeAiPreset('security')">Audit Zero Trust perimeter</button>
+              </div>
+              <div class="edge-ai-output" id="edge-ai-output-feed">
+                <span style="color: #64748b;">// NUC Local LLM (Llama 3.2 3B Instruct) initialized on 192.168.2.35.</span><br>
+                <span style="color: #a855f7;">dr-ollama&gt;</span> Ready. Click a preset query above or enter a prompt below to run 100% on-premise inference directly on the NUC.
+              </div>
+              <div class="edge-ai-input-bar">
+                <input type="text" id="edge-ai-input" class="edge-ai-input" placeholder="Ask your private NUC AI assistant anything..." onkeydown="if(event.key==='Enter')submitEdgeAiPrompt()">
+                <button type="button" class="btn btn-primary" onclick="submitEdgeAiPrompt()" style="background: #a855f7; border-color: #a855f7; font-weight: 700; padding: 6px 18px; cursor: pointer;">Generate &rarr;</button>
+              </div>
+            </div>
+
+            <!-- Locked Gate State Banner (shown when not authenticated) -->
+            <div id="edge-ai-sso-gate" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 36px 20px; text-align: center; gap: 12px; background: rgba(15, 23, 42, 0.85); flex: 1;">
+              <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🔒</div>
+              <div>
+                <div style="font-weight: 800; font-size: 1.05rem; color: #f8fafc;">Local AI Inference Playground &bull; Port 11434</div>
+                <div style="font-size: 0.8rem; color: #94a3b8; max-width: 520px; margin-top: 4px; line-height: 1.5;">
+                  Ollama LLM inference executes directly on Intel NUC hardware (192.168.2.35). On-premise compute is restricted to authorized administrators to prevent hardware exhaustion.
+                </div>
+              </div>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 4px;">
+                <button type="button" class="btn btn-primary" onclick="openGlobalSSOModal('Ollama 24/7 Local Inference Playground')" style="font-size: 0.84rem; padding: 8px 18px; font-weight: 700; background: linear-gradient(135deg, #a855f7, #7c3aed); border-color: #a855f7; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                  <span>🛡️</span> Sign In to Access
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="openGlobalSSOModal('Ollama 24/7 Local Inference Playground')" style="font-size: 0.84rem; padding: 8px 16px; cursor: pointer;">
+                  Enter Admin PIN
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- NUC 24/7 Extended Microservices & Telemetry Suite -->
     <section id="nuc-services" class="fleet-section" style="border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 60px;">
       <div class="container">
@@ -1336,13 +1434,10 @@
           <!-- Segmented Tab Navigation Bar -->
           <div class="nuc-tabs-bar" role="tablist">
             <button type="button" class="nuc-tab-btn active" id="tab-btn-speedtest" onclick="switchNucTab('speedtest')">
-              <span>⚡</span> Bell Speedtest (SSO Protected)
+              <span>⚡</span> Bell Speedtest
             </button>
             <button type="button" class="nuc-tab-btn" id="tab-btn-dns" onclick="switchNucTab('dns')">
               <span>🛡️</span> DNS Threat Shield
-            </button>
-            <button type="button" class="nuc-tab-btn" id="tab-btn-ai" onclick="switchNucTab('ai')">
-              <span>🤖</span> Edge AI (Ollama)
             </button>
             <button type="button" class="nuc-tab-btn" id="tab-btn-books" onclick="switchNucTab('books')">
               <span>📚</span> Knowledge Vault
@@ -1355,7 +1450,7 @@
             </button>
           </div>
 
-          <!-- PANE 1: Bell Gigabit Fiber Speedtest (SSO Protected) -->
+          <!-- PANE 1: Bell Gigabit Fiber Speedtest -->
           <div class="nuc-pane active" id="pane-speedtest">
             <div class="kpi-row-4">
               <div class="kpi-mini-card success">
@@ -1405,14 +1500,14 @@
                 </div>
               </div>
 
-              <!-- SSO Protection Banner & Action Trigger -->
+              <!-- Speedtest Action Trigger -->
               <div class="speedtest-sso-banner">
                 <div style="display: flex; align-items: center; gap: 10px;">
-                  <span style="font-size: 1.4rem;">🔒</span>
+                  <span style="font-size: 1.4rem;">⚡</span>
                   <div>
-                    <div style="font-weight: 700; color: #fde68a; font-size: 0.85rem;">Interactive WAN Test Protected by Microsoft 365 Entra ID SSO</div>
+                    <div style="font-weight: 700; color: #fde68a; font-size: 0.85rem;">Interactive Gigabit WAN Benchmark</div>
                     <div style="font-size: 0.76rem; color: #94a3b8; max-width: 600px;">
-                      Live bidirectional tests transmit 1.2+ GB across WAN. Restricted to administrators to prevent saturating Cat Cam WebRTC or dropping WireGuard tunnel packets.
+                      Live bidirectional tests transmit full bandwidth across WAN. Automated tests run hourly via NUC daemon.
                     </div>
                   </div>
                 </div>
@@ -1484,83 +1579,7 @@
             </div>
           </div>
 
-          <!-- PANE 3: Local 24/7 Edge AI Inference Gateway (Ollama) -->
-          <div class="nuc-pane" id="pane-ai">
-            <div class="kpi-row-4">
-              <div class="kpi-mini-card purple">
-                <div class="kpi-label">Active Model</div>
-                <div class="kpi-val" style="color: #d8b4fe; font-size: 1.15rem;">Llama 3.2 3B</div>
-                <div class="kpi-sub">Q4_K_M &bull; 2.0 GB Memory Footprint</div>
-              </div>
-              <div class="kpi-mini-card success">
-                <div class="kpi-label">Generation Speed</div>
-                <div class="kpi-val" style="color: #34d399;">28.4 <span style="font-size: 0.85rem; color: #94a3b8;">tok/s</span></div>
-                <div class="kpi-sub">Intel Core i5 AVX2 Acceleration</div>
-              </div>
-              <div class="kpi-mini-card">
-                <div class="kpi-label">Privacy Guarantee</div>
-                <div class="kpi-val" style="color: #38bdf8; font-size: 1.15rem;">Air-Gapped</div>
-                <div class="kpi-sub">0% External Cloud Data Exfiltration</div>
-              </div>
-              <div class="kpi-mini-card amber">
-                <div class="kpi-label">Secondary Code Model</div>
-                <div class="kpi-val" style="color: #fbbf24; font-size: 1.15rem;">Qwen 2.5 3B</div>
-                <div class="kpi-sub">Specialized in PowerShell &amp; Python</div>
-              </div>
-            </div>
 
-            <!-- Edge AI Interactive Console Box -->
-            <div class="edge-ai-box">
-              <div class="edge-ai-header">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span class="pulse-dot" id="edge-ai-pulse" style="background:#f59e0b;"></span>
-                  <span style="font-weight: 700; color: #f8fafc; font-size: 0.88rem;">Ollama 24/7 Local Inference Playground</span>
-                  <span class="item-tag" id="edge-ai-badge" style="background: rgba(245, 158, 11, 0.2); color: #fde68a;">Port 11434</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span id="ai-infer-stats" style="font-size: 0.74rem; color: #94a3b8; font-family: monospace;">🔒 Protected &bull; SSO Required</span>
-                  <button type="button" class="btn btn-secondary" id="edge-ai-lock-btn" onclick="lockSSO()" style="display: none; font-size: 0.72rem; padding: 2px 8px; color: #f87171 !important; border-color: rgba(239, 68, 68, 0.4);" title="Lock SSO Session">Lock</button>
-                </div>
-              </div>
-
-              <!-- Unlocked State Interactive Controls -->
-              <div id="edge-ai-unlocked-container" style="display: none;">
-                <div class="edge-ai-chips">
-                  <button type="button" class="edge-chip" onclick="askEdgeAiPreset('summarize')">Explain NUC homelab architecture</button>
-                  <button type="button" class="edge-chip" onclick="askEdgeAiPreset('bufferbloat')">Why is Bell Fiber bufferbloat Grade A+?</button>
-                  <button type="button" class="edge-chip" onclick="askEdgeAiPreset('catcam')">How does Cat Cam WebRTC hardware decode work?</button>
-                  <button type="button" class="edge-chip" onclick="askEdgeAiPreset('security')">Audit Zero Trust perimeter</button>
-                </div>
-                <div class="edge-ai-output" id="edge-ai-output-feed">
-                  <span style="color: #64748b;">// NUC Local LLM (Llama 3.2 3B Instruct) initialized on 192.168.2.35.</span><br>
-                  <span style="color: #a855f7;">dr-ollama&gt;</span> Ready. Click a preset query above or enter a prompt below to run 100% on-premise inference directly on the NUC.
-                </div>
-                <div class="edge-ai-input-bar">
-                  <input type="text" id="edge-ai-input" class="edge-ai-input" placeholder="Ask your private NUC AI assistant anything..." onkeydown="if(event.key==='Enter')submitEdgeAiPrompt()">
-                  <button type="button" class="btn btn-primary" onclick="submitEdgeAiPrompt()" style="background: #a855f7; border-color: #a855f7; font-weight: 700; padding: 6px 18px; cursor: pointer;">Generate &rarr;</button>
-                </div>
-              </div>
-
-              <!-- Locked SSO Gate Banner (shown when not authenticated) -->
-              <div id="edge-ai-sso-gate" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 36px 20px; text-align: center; gap: 12px; background: rgba(15, 23, 42, 0.85);">
-                <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🔒</div>
-                <div>
-                  <div style="font-weight: 800; font-size: 1.05rem; color: #f8fafc;">Protected Local AI Inference &bull; Port 11434</div>
-                  <div style="font-size: 0.8rem; color: #94a3b8; max-width: 520px; margin-top: 4px; line-height: 1.5;">
-                    Ollama LLM inference executes directly on the Intel NUC hardware (192.168.2.35). Because this is a front-facing website, on-premise compute is restricted to authenticated <strong>Microsoft 365 Administrators</strong> to prevent CPU/memory exhaustion.
-                  </div>
-                </div>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 4px;">
-                  <button type="button" class="btn btn-primary" onclick="openGlobalSSOModal('Ollama 24/7 Local Inference Playground')" style="font-size: 0.84rem; padding: 8px 18px; font-weight: 700; background: linear-gradient(135deg, #a855f7, #7c3aed); border-color: #a855f7; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
-                    <span>🛡️</span> Sign In with Microsoft 365
-                  </button>
-                  <button type="button" class="btn btn-secondary" onclick="openGlobalSSOModal('Ollama 24/7 Local Inference Playground')" style="font-size: 0.84rem; padding: 8px 16px; cursor: pointer;">
-                    Enter Admin PIN
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
 
           <!-- PANE 4: Curated Knowledge Vault & Audiobookshelf -->
           <div class="nuc-pane" id="pane-books">
@@ -1924,7 +1943,7 @@
           </div>
 
           <!-- Ollama Edge AI Card -->
-          <a href="#nuc-services" onclick="switchNucTab('ai')" class="app-card">
+          <a href="#ops-ai" class="app-card">
             <div>
               <div class="app-card-header">
                 <div class="app-icon" style="color: #c084fc; border-color: rgba(168, 85, 247, 0.4); background: rgba(168, 85, 247, 0.15); font-weight: 700; font-size: 0.85rem;">LLM</div>
@@ -2641,7 +2660,7 @@
 
       if (authed) {
         // Unlocked Terminal Card
-        if (termTitle) termTitle.innerHTML = 'Live Daemon Terminal &bull; Sentinel Audit Stream';
+        if (termTitle) termTitle.innerHTML = 'Live Interactive Terminal &bull; Stream Active';
         if (termPulse) { termPulse.style.background = '#10b981'; termPulse.style.boxShadow = '0 0 8px #10b981'; }
         if (termTabs) termTabs.style.display = 'flex';
         if (termLock) termLock.style.display = 'inline-block';
@@ -2665,14 +2684,14 @@
 
         // Unlocked Ollama Edge AI Card
         if (aiGate) aiGate.style.display = 'none';
-        if (aiControls) aiControls.style.display = 'block';
-        if (aiBadge) { aiBadge.textContent = 'Active (Authenticated)'; aiBadge.className = 'item-tag online'; }
+        if (aiControls) aiControls.style.display = 'flex';
+        if (aiBadge) { aiBadge.textContent = 'Ready (Port 11434)'; aiBadge.className = 'item-tag online'; }
         if (aiLock) aiLock.style.display = 'inline-block';
         if (aiPulse) { aiPulse.style.background = '#10b981'; aiPulse.style.boxShadow = '0 0 8px #10b981'; }
-        if (aiStats) aiStats.textContent = 'Ollama Ready • Port 11434';
+        if (aiStats) aiStats.textContent = 'Intel Core i5 &bull; Port 11434';
       } else {
         // Locked Terminal Card
-        if (termTitle) termTitle.innerHTML = '&#128274; Protected Live Terminal &bull; SSO Required';
+        if (termTitle) termTitle.innerHTML = 'Live Interactive Terminal';
         if (termPulse) { termPulse.style.background = '#f59e0b'; termPulse.style.boxShadow = '0 0 8px #f59e0b'; }
         if (termTabs) termTabs.style.display = 'none';
         if (termLock) termLock.style.display = 'none';
@@ -2690,17 +2709,17 @@
         if (modalScreen) modalScreen.style.display = 'none';
         if (modalChips) modalChips.style.display = 'none';
         if (modalInput) modalInput.style.display = 'none';
-        if (modalTitle) modalTitle.innerHTML = '&#128274; Protected Live Terminal &bull; SSO Required';
+        if (modalTitle) modalTitle.innerHTML = 'Antigravity (AGY) Live Terminal';
         if (modalPulse) { modalPulse.style.background = '#f59e0b'; modalPulse.style.boxShadow = '0 0 8px #f59e0b'; }
-        if (modalStatus) { modalStatus.textContent = 'SSO REQUIRED'; modalStatus.className = 'item-tag'; }
+        if (modalStatus) { modalStatus.textContent = 'AUTHENTICATION REQUIRED'; modalStatus.className = 'item-tag'; }
 
         // Locked Ollama Edge AI Card
         if (aiGate) aiGate.style.display = 'flex';
         if (aiControls) aiControls.style.display = 'none';
-        if (aiBadge) { aiBadge.textContent = 'SSO Protected'; aiBadge.className = 'item-tag'; }
+        if (aiBadge) { aiBadge.textContent = 'Port 11434'; aiBadge.className = 'item-tag'; }
         if (aiLock) aiLock.style.display = 'none';
         if (aiPulse) { aiPulse.style.background = '#f59e0b'; aiPulse.style.boxShadow = '0 0 8px #f59e0b'; }
-        if (aiStats) aiStats.textContent = '🔒 SSO Required';
+        if (aiStats) aiStats.textContent = 'Intel Core i5 &bull; Port 11434';
       }
     }
 
@@ -4529,6 +4548,11 @@
     // NUC EXTENDED SERVICES & TELEMETRY SUITE
     // ==========================================
     function switchNucTab(tabKey) {
+      if (tabKey === 'ai') {
+        const ops = document.getElementById('ops-ai');
+        if (ops) ops.scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
       document.querySelectorAll('.nuc-tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.nuc-pane').forEach(pane => pane.classList.remove('active'));
 
@@ -4804,7 +4828,7 @@
         </div>
         <div class="agy-console-title">
           <span class="pulse-dot" id="agy-modal-pulse-dot"></span>
-          <span id="agy-modal-title-text">&#128274; Protected Live Terminal &bull; SSO Required</span>
+          <span id="agy-modal-title-text">Antigravity (AGY) Live Terminal</span>
         </div>
         <div class="agy-console-header-actions">
           <span class="item-tag online" id="agy-console-status">ONLINE (Desktop :8082)</span>
@@ -4840,10 +4864,10 @@
             &#128274;
           </div>
           <div class="sso-badge-row">
-            <span class="sso-badge-tag">&#128274; Cloudflare Zero Trust &bull; M365 SSO Active</span>
-            <span class="sso-badge-tag green">&#10004; Entra ID MFA Protected</span>
+            <span class="sso-badge-tag">Zero Trust Edge Protected</span>
+            <span class="sso-badge-tag green">&#10004; Entra ID MFA</span>
           </div>
-          <h3 style="font-size: 1.25rem; font-weight: 700; color: #f8fafc; margin: 0;">&#128274; Protected Live Terminal &bull; SSO Required</h3>
+          <h3 style="font-size: 1.25rem; font-weight: 700; color: #f8fafc; margin: 0;">Live Interactive Terminal</h3>
           <p style="font-size: 0.88rem; color: #94a3b8; line-height: 1.5; margin: 0;">
             Authentication required before viewing real-time terminal interactions or dispatching commands to the active Antigravity session.
           </p>
@@ -5193,10 +5217,26 @@
       </div>
 
       <div class="changelog-body">
-        <!-- Version 2.6.1 (Current) -->
+        <!-- Version 2.8.0 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.6.1 &bull; Current</span>
+            <span class="ver-tag current">v2.8.0 &bull; Current</span>
+            <span class="ver-date">October 27, 2026</span>
+          </div>
+          <h4 class="ver-title">⚡ Consolidated Compute &amp; AI Console, Clean UI &amp; Top SSO</h4>
+          <ul class="ver-list">
+            <li><strong>Consolidated Compute, AI &amp; Terminal Operations:</strong> Grouped the Live Interactive Terminal and Ollama 24/7 Local Inference Playground together side-by-side in a unified operations hub (<code>#ops-ai</code>) with synchronized model metrics.</li>
+            <li><strong>Streamlined UI &amp; Label De-cluttering:</strong> Removed redundant "SSO Required" and "Protected by M365" visual badges across buttons, tabs, and speedtest banners in favor of the dedicated top header controls.</li>
+            <li><strong>Dedicated Top Header SSO Controls:</strong> Positioned clean <code>[ 🔒 SSO Login ]</code> and <code>[ 🟢 Cory Townsend ] [ Sign Out ]</code> action buttons directly in the top right navigation bar.</li>
+            <li><strong>Cloudflare Zero Trust Edge Lockdown:</strong> Deleted home network bypass via Cloudflare API, ensuring strict Microsoft 365 identity challenges on 100% of subdomain requests.</li>
+            <li><strong>Instant CLI Cache Wiper (<code>fresh</code>):</strong> Built and deployed a global PowerShell/CMD utility to cleanly purge all browser caches across Chrome, Edge, and Firefox and flush Windows DNS in seconds.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.6.1 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.6.1</span>
             <span class="ver-date">October 27, 2026</span>
           </div>
           <h4 class="ver-title">🚨 Disaster Recovery Test Workbench &amp; Ultra-Smooth 60FPS Scroll Pipeline</h4>
