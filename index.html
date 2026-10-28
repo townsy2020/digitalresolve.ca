@@ -617,7 +617,7 @@
                 <span class="item-tag" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa;">Direct Fiber</span>
               </div>
               <div class="stat-big-val" style="font-size: 1.25rem; color: #f0f6fc; margin-top: 4px;" id="isp-carrier-val">Bell Canada</div>
-              <div class="stat-subtext" id="isp-ip-sub">IPv4: 184.148.161.160</div>
+              <div class="stat-subtext" id="isp-ip-sub">IPv4: <span id="isp-ip-text" style="color: #94a3b8; font-style: italic;">Protected (MFA Required)</span></div>
             </div>
 
             <!-- Throughput Uptime -->
@@ -900,7 +900,7 @@
                 <div class="uptime-tier-title">
                   <span class="dropdown-dot" style="background:#60a5fa; box-shadow:0 0 8px #60a5fa;"></span>
                   <strong>Bell Canada Gigabit Fiber</strong>
-                  <span class="tier-role">Direct WAN &bull; IPv4: 184.148.161.160</span>
+                  <span class="tier-role" id="uptime-bell-role">Direct WAN | IPv4: <span id="tier-bell-ip-text" style="color: #94a3b8; font-style: italic;">Protected (MFA Required)</span></span>
                 </div>
                 <div class="uptime-tier-sla">
                   <span class="tier-val">99.98% Uptime</span>
@@ -2801,6 +2801,18 @@
         if (aiPulse) { aiPulse.style.background = '#10b981'; aiPulse.style.boxShadow = '0 0 8px #10b981'; }
         if (aiStats) aiStats.textContent = 'Intel Core i5 | Local Compute';
 
+        // External WAN IPv4 (Exposed only when MFA/SSO authenticated)
+        const ispIpSub = document.getElementById('isp-ip-sub');
+        const tierBellIp = document.getElementById('tier-bell-ip-text');
+        const resolvedIp = window.CURRENT_EXTERNAL_IP || '184.148.161.160';
+        if (ispIpSub) ispIpSub.innerHTML = 'IPv4: <span id="isp-ip-text" style="color: #60a5fa; font-family: monospace; font-style: normal;">' + resolvedIp + '</span>';
+        if (tierBellIp) {
+          tierBellIp.textContent = resolvedIp;
+          tierBellIp.style.color = '#cbd5e1';
+          tierBellIp.style.fontStyle = 'normal';
+          tierBellIp.style.fontFamily = 'monospace';
+        }
+
         // Unlocked Quick Drop Magnet Console
         const quickUnlocked = document.getElementById('quick-drop-unlocked-form');
         const quickGate = document.getElementById('quick-drop-sso-gate');
@@ -2848,6 +2860,17 @@
         if (aiPulse) { aiPulse.style.background = '#f59e0b'; aiPulse.style.boxShadow = '0 0 8px #f59e0b'; }
         if (aiStats) aiStats.textContent = 'Intel Core i5 | Local Compute';
 
+        // Mask External WAN IPv4 (MFA Required)
+        const ispIpSub = document.getElementById('isp-ip-sub');
+        const tierBellIp = document.getElementById('tier-bell-ip-text');
+        if (ispIpSub) ispIpSub.innerHTML = 'IPv4: <span id="isp-ip-text" style="color: #94a3b8; font-style: italic;">Protected (MFA Required)</span>';
+        if (tierBellIp) {
+          tierBellIp.textContent = 'Protected (MFA Required)';
+          tierBellIp.style.color = '#94a3b8';
+          tierBellIp.style.fontStyle = 'italic';
+          tierBellIp.style.fontFamily = 'inherit';
+        }
+
         // Locked Quick Drop Magnet Console
         const quickUnlocked = document.getElementById('quick-drop-unlocked-form');
         const quickGate = document.getElementById('quick-drop-sso-gate');
@@ -2882,6 +2905,7 @@
       localStorage.removeItem('dr_sso_pin'); // PIN completely deprecated; SSO only
       showToast('success', 'Microsoft 365 SSO Active', 'Authenticated as Cory Townsend (cory.townsend@digitalresolve.ca)');
       updateSSOGateUI();
+      try { fetchISPHistory(); } catch(e) {}
 
       const cb = window.pendingSSOCallback;
       window.pendingSSOCallback = null;
@@ -2934,6 +2958,7 @@
 
       // 5. Instantly force UI updates across all gates and header buttons
       updateSSOGateUI();
+      try { fetchISPHistory(); } catch(e) {}
 
       // 6. Ping Cloudflare Zero Trust Access logout endpoint in background
       try {
@@ -3612,7 +3637,9 @@
 
     // ISP Diagnostics & History Poller
     function fetchISPHistory() {
-      fetch(`${GATEWAY}/api/isp-health`)
+      const ssoEmail = isSSOAuthenticated() ? (localStorage.getItem('dr_sso_email') || 'cory.townsend@digitalresolve.ca') : '';
+      const fetchHeaders = ssoEmail ? { 'X-SSO-Email': ssoEmail } : {};
+      fetch(`${GATEWAY}/api/isp-health`, { headers: fetchHeaders })
         .then(r => r.json())
         .then(data => {
           if (data && data.status === 'success') {
@@ -3651,7 +3678,32 @@
               gradeTag.className = grade === 'A+' ? 'item-tag online' : 'item-tag';
             }
             if (carrierVal) carrierVal.textContent = carrier;
-            if (ipSub) ipSub.textContent = `IPv4: ${extIp}`;
+            if (latest && latest.externalIp && latest.externalIp !== 'Protected (MFA Required)') {
+              window.CURRENT_EXTERNAL_IP = latest.externalIp;
+            }
+            const authed = isSSOAuthenticated();
+            const safeIp = (window.CURRENT_EXTERNAL_IP || extIp);
+            if (ipSub) {
+              if (authed && extIp !== 'Protected (MFA Required)') {
+                ipSub.innerHTML = `IPv4: <span id="isp-ip-text" style="color: #60a5fa; font-family: monospace; font-style: normal;">${safeIp}</span>`;
+              } else {
+                ipSub.innerHTML = 'IPv4: <span id="isp-ip-text" style="color: #94a3b8; font-style: italic;">Protected (MFA Required)</span>';
+              }
+            }
+            const tierBellIp = document.getElementById('tier-bell-ip-text');
+            if (tierBellIp) {
+              if (authed && extIp !== 'Protected (MFA Required)') {
+                tierBellIp.textContent = safeIp;
+                tierBellIp.style.color = '#cbd5e1';
+                tierBellIp.style.fontStyle = 'normal';
+                tierBellIp.style.fontFamily = 'monospace';
+              } else {
+                tierBellIp.textContent = 'Protected (MFA Required)';
+                tierBellIp.style.color = '#94a3b8';
+                tierBellIp.style.fontStyle = 'italic';
+                tierBellIp.style.fontFamily = 'inherit';
+              }
+            }
             if (pingTag) pingTag.textContent = `\u2713 ${pingAvg} ms`;
 
             const tbody = document.getElementById('isp-history-tbody');
