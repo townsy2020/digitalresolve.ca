@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0">
   <title>Digital Resolve &bull; Homelab Cloud &amp; Command Deck</title>
   <meta name="description" content="24/7 self-hosted homelab operations, Cloudflare Zero Trust tunnels, private 4K media streaming, and automated WireGuard VPN ingestion.">
-  <link rel="stylesheet" href="styles.css?v=2.8.2">
+  <link rel="stylesheet" href="styles.css?v=2.8.3">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -192,7 +192,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.2</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.3</span>)</span>
             </button>
             <button type="button" class="btn-action-item" onclick="lockSSO()" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -470,6 +470,9 @@
                 </button>
                 <button type="button" class="btn-control" onclick="executeNodeAction('clean-junk')" title="Clean Temp Files &amp; Storage Cache on Selected Target">
                   <span>&#129529;</span> Clean Temp &amp; Junk
+                </button>
+                <button type="button" class="btn-control active-maint" id="btn-nuc-maintenance" onclick="openMaintenanceModal()" title="Toggle NUC Scheduled Maintenance Mode (Protects 90-Day SLA &amp; Uptime Statistics during updates and reboots)">
+                  <span id="btn-maint-icon">&#128736;&#65039;</span> <span id="btn-maint-label">Maintenance Window</span>
                 </button>
                 <button type="button" class="btn-control" onclick="executeNodeAction('run-backup')" title="Trigger Cloud Disaster Recovery Backup to OneDrive">
                   <span>BAK</span> Cloud Backup (OneDrive)
@@ -783,10 +786,18 @@
         <!-- Uptime History & SLA Matrix Section -->
     <section id="uptime" class="fleet-section" style="border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 50px;">
       <div class="container">
-        <div class="section-header">
-          <span class="section-tag" style="background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3);">Availability &amp; SLA Telemetry</span>
-          <h2>Cluster Uptime History &amp; Reliability Matrix</h2>
-          <p>Continuous 90-day operational heartbeat across physical compute, gigabit fiber transport, and edge tunnels.</p>
+        <div class="section-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 14px;">
+          <div>
+            <span class="section-tag" style="background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3);">Availability &amp; SLA Telemetry</span>
+            <h2>Cluster Uptime History &amp; Reliability Matrix</h2>
+            <p>Continuous 90-day operational heartbeat across physical compute, gigabit fiber transport, and edge tunnels.</p>
+          </div>
+          <div>
+            <button type="button" class="btn-maint-sla-chip" id="btn-maint-sla-status" onclick="openMaintenanceModal()" title="Scheduled Maintenance Window &amp; SLA Protection Controller">
+              <span class="pulse-dot" id="maint-chip-dot" style="background-color: #10b981; box-shadow: 0 0 6px #10b981; width: 8px; height: 8px;"></span>
+              <span id="maint-chip-text">SLA Shield: 100% Protected</span>
+            </button>
+          </div>
         </div>
 
         <div class="control-matrix-card" style="margin-bottom: 24px;">
@@ -884,7 +895,7 @@
                 </div>
                 <div class="uptime-tier-sla">
                   <span class="tier-val">99.99% Uptime</span>
-                  <span class="tier-status online">Operational</span>
+                  <span class="tier-status online" id="nuc-tier-status-badge">Operational</span>
                 </div>
               </div>
               <div class="uptime-bars" id="bars-nuc"></div>
@@ -2132,12 +2143,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.2</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.3</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 11,638 Lines of Code (HTML: 6,375 lines | CSS: 5,262 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 12,085 Lines of Code (HTML: 6,761 lines | CSS: 5,323 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">11,638</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">12,085</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -2212,15 +2223,15 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.2';
+          const activeVer = match ? match[0] : 'v2.8.3';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-        const baseHtmlLines = 6375;
-        const baseCssLines = 5262;
+        const baseHtmlLines = 6761;
+        const baseCssLines = 5323;
         const baseCnameLines = 1;
         const defaultTotal = baseHtmlLines + baseCssLines + baseCnameLines;
 
@@ -2751,7 +2762,7 @@
       // Start live stats & terminal stream with Page Visibility throttling
       fetchClusterStats();
       setInterval(() => { if (!document.hidden) fetchClusterStats(); }, 4000);
-      updateSSOGateUI();
+      updateSSOGateUI(); try { updateMaintenanceVisualStates(); } catch(e) {}
       try { updateCodebaseMetrics(); } catch(e) {}
       if (isSSOAuthenticated()) {
         loadLog('agy');
@@ -3006,7 +3017,7 @@
       localStorage.setItem('dr_sso_email', 'cory.townsend@digitalresolve.ca');
       localStorage.removeItem('dr_sso_pin'); // PIN completely deprecated; SSO only
       showToast('success', 'Microsoft 365 SSO Active', 'Authenticated as Cory Townsend (cory.townsend@digitalresolve.ca)');
-      updateSSOGateUI();
+      updateSSOGateUI(); try { updateMaintenanceVisualStates(); } catch(e) {}
       try { updateCodebaseMetrics(); } catch(e) {}
       try { fetchISPHistory(); } catch(e) {}
 
@@ -3081,7 +3092,7 @@
       if (typeof stopConsoleAutoPoll === 'function') stopConsoleAutoPoll();
 
       // 8. Instantly force UI updates across all gates and header buttons
-      updateSSOGateUI();
+      updateSSOGateUI(); try { updateMaintenanceVisualStates(); } catch(e) {}
       try { updateCodebaseMetrics(); } catch(e) {}
       try { fetchISPHistory(); } catch(e) {}
 
@@ -3737,7 +3748,7 @@
       });
 
       if (!isSSOAuthenticated()) {
-        updateSSOGateUI();
+        updateSSOGateUI(); try { updateMaintenanceVisualStates(); } catch(e) {}
       try { updateCodebaseMetrics(); } catch(e) {}
         return;
       }
@@ -4114,6 +4125,280 @@
       }
     }
 
+    // ==========================================================
+    // ðŸ› ï¸ NUC Server Scheduled Maintenance & SLA Shield Controller
+    // ==========================================================
+    let selectedMaintDuration = 30;
+    let maintCountdownInterval = null;
+
+    function isNucMaintenanceActive() {
+      try {
+        const stored = localStorage.getItem('dr_nuc_maintenance');
+        if (!stored) return false;
+        const data = JSON.parse(stored);
+        if (!data || !data.active) return false;
+        if (data.expiresAt && Date.now() > data.expiresAt) {
+          localStorage.removeItem('dr_nuc_maintenance');
+          return false;
+        }
+        return true;
+      } catch(e) {
+        return false;
+      }
+    }
+    window.isNucMaintenanceActive = isNucMaintenanceActive;
+
+    function getNucMaintenanceData() {
+      try {
+        const stored = localStorage.getItem('dr_nuc_maintenance');
+        if (!stored) return null;
+        return JSON.parse(stored);
+      } catch(e) {
+        return null;
+      }
+    }
+    window.getNucMaintenanceData = getNucMaintenanceData;
+
+    function selectMaintDuration(mins) {
+      selectedMaintDuration = mins;
+      const btns = document.querySelectorAll('.maint-dur-btn');
+      btns.forEach(b => {
+        const dur = parseInt(b.getAttribute('data-dur'), 10);
+        if (dur === mins) {
+          b.classList.add('active');
+          b.style.borderColor = '#f59e0b';
+          b.style.color = '#fef08a';
+          b.style.background = 'rgba(245, 158, 11, 0.15)';
+        } else {
+          b.classList.remove('active');
+          b.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+          b.style.color = '';
+          b.style.background = '';
+        }
+      });
+    }
+    window.selectMaintDuration = selectMaintDuration;
+
+    function openMaintenanceModal() {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal('NUC Maintenance Window & SLA Shield', openMaintenanceModal);
+        return;
+      }
+      updateMaintenanceModalUI();
+      const modal = document.getElementById('maintenance-modal-overlay');
+      if (modal) modal.style.display = 'flex';
+      playChaosTone(440, 880, 'sine', 0.1);
+    }
+    window.openMaintenanceModal = openMaintenanceModal;
+
+    function closeMaintenanceModal() {
+      const modal = document.getElementById('maintenance-modal-overlay');
+      if (modal) modal.style.display = 'none';
+      if (maintCountdownInterval) {
+        clearInterval(maintCountdownInterval);
+        maintCountdownInterval = null;
+      }
+    }
+    window.closeMaintenanceModal = closeMaintenanceModal;
+
+    function updateMaintenanceModalUI() {
+      const banner = document.getElementById('maint-modal-banner');
+      const dot = document.getElementById('maint-banner-dot');
+      const title = document.getElementById('maint-banner-title');
+      const sub = document.getElementById('maint-banner-sub');
+      const tag = document.getElementById('maint-banner-tag');
+      const actionBtn = document.getElementById('btn-maint-toggle-action');
+      const updateTriggerBtn = document.getElementById('btn-maint-trigger-update');
+      const active = isNucMaintenanceActive();
+      const data = getNucMaintenanceData();
+
+      if (active && data) {
+        if (banner) { banner.style.background = 'rgba(245, 158, 11, 0.15)'; banner.style.borderColor = 'rgba(245, 158, 11, 0.4)'; }
+        if (dot) { dot.style.background = '#f59e0b'; dot.style.boxShadow = '0 0 10px #f59e0b'; }
+        if (tag) { tag.textContent = 'Active (SLA Shield)'; tag.className = 'item-tag'; tag.style.background = 'rgba(245, 158, 11, 0.25)'; tag.style.color = '#fde047'; }
+        if (actionBtn) {
+          actionBtn.innerHTML = '&#9989; Exit Maintenance Mode';
+          actionBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+          actionBtn.style.borderColor = '#10b981';
+        }
+        if (updateTriggerBtn) updateTriggerBtn.style.display = 'none';
+
+        if (maintCountdownInterval) clearInterval(maintCountdownInterval);
+        maintCountdownInterval = setInterval(() => {
+          if (!isNucMaintenanceActive()) {
+            clearInterval(maintCountdownInterval);
+            updateMaintenanceModalUI();
+            updateMaintenanceVisualStates();
+            return;
+          }
+          const d = getNucMaintenanceData();
+          if (d && d.expiresAt) {
+            const diff = Math.max(0, d.expiresAt - Date.now());
+            const mins = Math.floor(diff / 60000);
+            const secs = Math.floor((diff % 60000) / 1000);
+            if (title) title.textContent = MAINTENANCE ACTIVE: m s Remaining;
+            if (sub) sub.textContent = Reason:  | SLA Status: 100% Compliant (Zero Penalty);
+          } else {
+            if (title) title.textContent = 'MAINTENANCE ACTIVE (Manual Mode)';
+            if (sub) sub.textContent = Reason:  | Running until manually exited;
+          }
+        }, 1000);
+      } else {
+        if (banner) { banner.style.background = 'rgba(16, 185, 129, 0.1)'; banner.style.borderColor = 'rgba(16, 185, 129, 0.3)'; }
+        if (dot) { dot.style.background = '#10b981'; dot.style.boxShadow = '0 0 8px #10b981'; }
+        if (title) title.textContent = 'Normal 24/7 Operations â€” 90-Day SLA: 99.985%';
+        if (sub) sub.textContent = 'Planned maintenance windows are excluded from outage penalties.';
+        if (tag) { tag.textContent = 'SLA Protected'; tag.className = 'item-tag online'; tag.style.background = ''; tag.style.color = ''; }
+        if (actionBtn) {
+          actionBtn.innerHTML = '&#128736;&#65039; Activate Maintenance Window';
+          actionBtn.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+          actionBtn.style.borderColor = '#f59e0b';
+        }
+        if (updateTriggerBtn) updateTriggerBtn.style.display = 'inline-flex';
+      }
+    }
+
+    function confirmToggleMaintenance() {
+      if (isNucMaintenanceActive()) {
+        deactivateMaintenanceMode();
+      } else {
+        const reasonInput = document.getElementById('maint-reason-input');
+        const reason = reasonInput ? reasonInput.value.trim() : 'Windows Updates & Optimization';
+        activateMaintenanceMode(selectedMaintDuration, reason, false);
+      }
+    }
+    window.confirmToggleMaintenance = confirmToggleMaintenance;
+
+    function activateMaintenanceWithUpdate() {
+      const reasonInput = document.getElementById('maint-reason-input');
+      const reason = reasonInput ? reasonInput.value.trim() : 'Update-Computer & Windows Updates';
+      activateMaintenanceMode(selectedMaintDuration, reason, true);
+    }
+    window.activateMaintenanceWithUpdate = activateMaintenanceWithUpdate;
+
+    function activateMaintenanceMode(durationMinutes = 30, reason = 'Windows Updates & Optimization', autoRunUpdate = false) {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal('Activate Maintenance Window', () => activateMaintenanceMode(durationMinutes, reason, autoRunUpdate));
+        return;
+      }
+
+      const expiresAt = durationMinutes > 0 ? (Date.now() + durationMinutes * 60000) : null;
+      const data = {
+        active: true,
+        durationMinutes: durationMinutes,
+        expiresAt: expiresAt,
+        reason: reason,
+        activatedAt: Date.now()
+      };
+
+      try {
+        localStorage.setItem('dr_nuc_maintenance', JSON.stringify(data));
+      } catch(e) {}
+
+      // Inform NUC listener backend
+      fetch(${GATEWAY}/api/control?action=maintenance&target=nuc&enable=true&duration=, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-SSO-Email': 'contact@digitalresolve.ca' },
+        body: JSON.stringify({ enable: true, duration: durationMinutes, reason: reason })
+      }).catch(() => {});
+
+      // Optionally pause torrent swarms
+      const pauseChk = document.getElementById('maint-chk-pause');
+      if (pauseChk && pauseChk.checked) {
+        sendControl('pause-all', 'nuc');
+      }
+
+      // If requested, trigger Update-Computer
+      if (autoRunUpdate) {
+        setTimeout(() => {
+          sendControl('run-update-computer', 'nuc');
+        }, 1200);
+      }
+
+      updateMaintenanceVisualStates();
+      updateMaintenanceModalUI();
+      closeMaintenanceModal();
+
+      playChaosTone(523, 1046, 'triangle', 0.25);
+      showToast('success', 'NUC Maintenance Window Engaged', SLA Shield Active for . Updates & reboots are 100% exempt from outage metrics.);
+    }
+    window.activateMaintenanceMode = activateMaintenanceMode;
+
+    function deactivateMaintenanceMode() {
+      try {
+        localStorage.removeItem('dr_nuc_maintenance');
+      } catch(e) {}
+
+      fetch(${GATEWAY}/api/control?action=maintenance&target=nuc&enable=false, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-SSO-Email': 'contact@digitalresolve.ca' },
+        body: JSON.stringify({ enable: false })
+      }).catch(() => {});
+
+      // Optionally resume torrents
+      const resumeChk = document.getElementById('maint-chk-resume');
+      if (resumeChk && resumeChk.checked) {
+        sendControl('resume-all', 'nuc');
+      }
+
+      updateMaintenanceVisualStates();
+      updateMaintenanceModalUI();
+      closeMaintenanceModal();
+
+      playChaosTone(880, 440, 'sine', 0.2);
+      showToast('info', 'Maintenance Window Concluded', 'NUC Server restored to 24/7 continuous operational monitoring.');
+    }
+    window.deactivateMaintenanceMode = deactivateMaintenanceMode;
+
+    function updateMaintenanceVisualStates() {
+      const active = isNucMaintenanceActive();
+      const data = getNucMaintenanceData();
+
+      // 1. Control Matrix Button
+      const ctrlBtn = document.getElementById('btn-nuc-maintenance');
+      const ctrlLbl = document.getElementById('btn-maint-label');
+      if (ctrlBtn) {
+        ctrlBtn.classList.toggle('in-maintenance', active);
+        if (ctrlLbl) ctrlLbl.textContent = active ? 'Maintenance: ACTIVE' : 'Maintenance Window';
+      }
+
+      // 2. SLA Telemetry Chip in #uptime
+      const slaChip = document.getElementById('btn-maint-sla-status');
+      const chipDot = document.getElementById('maint-chip-dot');
+      const chipText = document.getElementById('maint-chip-text');
+      if (slaChip) {
+        slaChip.classList.toggle('in-maintenance', active);
+        if (active) {
+          if (chipDot) { chipDot.style.backgroundColor = '#f59e0b'; chipDot.style.boxShadow = '0 0 8px #f59e0b'; }
+          if (chipText) chipText.textContent = 'ðŸ› ï¸ NUC Maintenance Active (SLA Shield)';
+        } else {
+          if (chipDot) { chipDot.style.backgroundColor = '#10b981'; chipDot.style.boxShadow = '0 0 6px #10b981'; }
+          if (chipText) chipText.textContent = 'SLA Shield: 100% Protected';
+        }
+      }
+
+      // 3. NUC Tier Status in Uptime Matrix
+      const nucTierStatus = document.getElementById('nuc-tier-status-badge');
+      if (nucTierStatus) {
+        if (active) {
+          nucTierStatus.textContent = 'Maintenance (SLA Shield)';
+          nucTierStatus.className = 'tier-status';
+          nucTierStatus.style.background = 'rgba(245, 158, 11, 0.2)';
+          nucTierStatus.style.border = '1px solid rgba(245, 158, 11, 0.4)';
+          nucTierStatus.style.color = '#fde047';
+        } else {
+          nucTierStatus.textContent = 'Operational';
+          nucTierStatus.className = 'tier-status online';
+          nucTierStatus.style.background = '';
+          nucTierStatus.style.border = '';
+          nucTierStatus.style.color = '';
+        }
+      }
+
+      // 4. Re-render Uptime Matrix to shade maintenance bars
+      try { renderUptimeMatrix(); } catch(e) {}
+    }
+    window.updateMaintenanceVisualStates = updateMaintenanceVisualStates;
     // 90-Day Uptime Matrix & Sparkline Controller
     function renderUptimeMatrix() {
       const nodes = [
@@ -4137,7 +4422,14 @@
           const bar = document.createElement('div');
           bar.className = 'uptime-bar';
 
-          bar.title = `${dateStr} | ${node.title}\nStatus: 100.0% Operational & Active\nAvailability: 100.0%\nSession: Interactive`;
+          if (node.id === 'bars-nuc' && isNucMaintenanceActive() && i === 0) {
+            bar.classList.add('maintenance');
+            const mData = getNucMaintenanceData();
+            const reason = (mData && mData.reason) ? mData.reason : 'Windows Updates & Optimization';
+            bar.title = `${dateStr} | ${node.title}\nStatus: Scheduled Maintenance (SLA Protected)\nAvailability: 100.0% Compliant (Zero Outage Penalty)\nReason: ${reason}`;
+          } else {
+            bar.title = `${dateStr} | ${node.title}\nStatus: 100.0% Operational & Active\nAvailability: 100.0%\nSession: Interactive`;
+          }
 
           container.appendChild(bar);
         }
@@ -4260,7 +4552,7 @@
       if (fullscreen && win && !win.classList.contains('fullscreen')) {
         win.classList.add('fullscreen');
       }
-      updateSSOGateUI();
+      updateSSOGateUI(); try { updateMaintenanceVisualStates(); } catch(e) {}
       try { updateCodebaseMetrics(); } catch(e) {}
       fetchAgySessionInfo();
       refreshAgyConsole();
@@ -4324,7 +4616,7 @@
 
     function refreshAgyConsole(isSilent = false) {
       if (!isSSOAuthenticated()) {
-        updateSSOGateUI();
+        updateSSOGateUI(); try { updateMaintenanceVisualStates(); } catch(e) {}
       try { updateCodebaseMetrics(); } catch(e) {}
         return;
       }
@@ -4466,7 +4758,7 @@
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         if (typeof closeAgyConsole === 'function') closeAgyConsole();
-        if (typeof closeChangelogModal === 'function') closeChangelogModal();
+        if (typeof closeChangelogModal === 'function') closeChangelogModal(); if (typeof closeMaintenanceModal === 'function') closeMaintenanceModal();
         if (typeof closeMagnetModal === 'function') closeMagnetModal();
         document.body.style.overflow = '';
         document.querySelectorAll('.dropdown.is-open').forEach(dd => dd.classList.remove('is-open'));
@@ -4498,7 +4790,7 @@
 
     function closeChangelogModalOnBackdrop(e) {
       if (e.target && e.target.id === 'changelog-modal-overlay') {
-        closeChangelogModal();
+        closeChangelogModal(); if (typeof closeMaintenanceModal === 'function') closeMaintenanceModal();
       }
     }
 
@@ -5433,7 +5725,7 @@
         closeDisasterModal();
         closeChaosModal();
         closeHealthModal();
-        closeChangelogModal();
+        closeChangelogModal(); if (typeof closeMaintenanceModal === 'function') closeMaintenanceModal();
         closeAgyConsole();
         closeMagnetModal();
         closeAdGuardConfigModal();
@@ -6115,10 +6407,25 @@
       </div>
 
       <div class="changelog-body">
-        <!-- Version 2.8.2 (Current) -->
+        <!-- Version 2.8.3 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.2 | Current</span>
+            <span class="ver-tag current">v2.8.3 | Current</span>
+            <span class="ver-date">October 28, 2026</span>
+          </div>
+          <h4 class="ver-title">NUC Scheduled Maintenance Mode &amp; Zero-Penalty SLA Shield</h4>
+          <ul class="ver-list">
+            <li><strong>NUC Server Maintenance Window Engine:</strong> Introduced dedicated scheduled maintenance mode controller in the Control Matrix and SLA Telemetry ribbon to protect 90-Day SLA metrics during Windows Updates, driver installs, and reboots.</li>
+            <li><strong>Zero-Penalty SLA Protection:</strong> Planned maintenance windows are mathematically exempt from unplanned outage incidents, preserving 99.985% Grade A+ uptime compliance.</li>
+            <li><strong>Interactive Maintenance Workbench Modal:</strong> Configure flexible 15m, 30m, 1h, or 2h maintenance windows with live countdown timers, automated torrent pausing, and 1-click "Maintenance &amp; Run Update-Computer" dispatch.</li>
+            <li><strong>Visual Maintenance Telemetry:</strong> Amber-striped glowing status bar hashes, SLA Shield header badges, and node inspector telemetry during active maintenance windows.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.8.2 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.2</span>
             <span class="ver-date">October 28, 2026</span>
           </div>
           <h4 class="ver-title">Topology Circuit Flows, Heartbeat Sparkline &amp; Dynamic Codebase Metrics</h4>
@@ -6367,6 +6674,85 @@
             <li><strong>Core Infrastructure:</strong> Unified 24/7 Intel NUC Server (<code>192.168.2.35</code>) and High-Power Desktop Workstation (<code>192.168.2.62</code>).</li>
             <li><strong>Zero Trust Edge Tunnels:</strong> Cloudflare edge routing, WireGuard VPN ingestion, and Wake-on-LAN power state switching.</li>
           </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ðŸ› ï¸ NUC Server Scheduled Maintenance & SLA Protection Modal -->
+  <div id="maintenance-modal-overlay" class="health-modal-overlay" style="display: none;" onclick="if(event.target===this)closeMaintenanceModal()">
+    <div class="health-modal-window" role="dialog" aria-modal="true" aria-label="NUC Server Scheduled Maintenance Mode" style="max-width: 680px; max-height: 90vh; display: flex; flex-direction: column;">
+      <div class="health-modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 14px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.4rem;">ðŸ› ï¸</span>
+          <div>
+            <h3 style="font-size: 1.05rem; font-weight: 800; color: #f8fafc; margin: 0;">NUC Server Scheduled Maintenance Window</h3>
+            <div style="font-size: 0.76rem; color: #94a3b8; margin-top: 2px;">Protect 90-Day SLA &amp; Cluster Heartbeat (0 Outage Impact) during Windows Updates &amp; Reboots</div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-secondary" onclick="closeMaintenanceModal()" style="font-size: 0.85rem; padding: 4px 10px; cursor: pointer;">&times;</button>
+      </div>
+
+      <div class="health-modal-body" style="padding: 18px 0; display: flex; flex-direction: column; gap: 16px; overflow-y: auto;">
+        <!-- Status Banner -->
+        <div id="maint-modal-banner" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span class="pulse-dot" id="maint-banner-dot" style="background: #10b981; box-shadow: 0 0 8px #10b981; width: 10px; height: 10px;"></span>
+            <div>
+              <div style="font-weight: 700; color: #f0fdf4; font-size: 0.88rem;" id="maint-banner-title">Normal 24/7 Operations â€” 90-Day SLA: 99.985%</div>
+              <div style="font-size: 0.76rem; color: #94a3b8;" id="maint-banner-sub">Planned maintenance windows are excluded from outage penalties.</div>
+            </div>
+          </div>
+          <span class="item-tag online" id="maint-banner-tag">SLA Protected</span>
+        </div>
+
+        <!-- Window Duration Selector -->
+        <div>
+          <label style="font-size: 0.8rem; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 8px;">Select Maintenance Window Duration:</label>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px;">
+            <button type="button" class="btn btn-secondary maint-dur-btn" data-dur="15" onclick="selectMaintDuration(15)" style="font-size: 0.78rem; padding: 8px; text-align: center; border-color: rgba(255,255,255,0.15);">15 Minutes<br><span style="font-size: 0.68rem; color: #94a3b8;">Quick Patch</span></button>
+            <button type="button" class="btn btn-secondary maint-dur-btn active" data-dur="30" onclick="selectMaintDuration(30)" style="font-size: 0.78rem; padding: 8px; text-align: center; border-color: #f59e0b; color: #fef08a !important; background: rgba(245, 158, 11, 0.15);">30 Minutes<br><span style="font-size: 0.68rem; color: #cbd5e1;">Windows Update</span></button>
+            <button type="button" class="btn btn-secondary maint-dur-btn" data-dur="60" onclick="selectMaintDuration(60)" style="font-size: 0.78rem; padding: 8px; text-align: center; border-color: rgba(255,255,255,0.15);">1 Hour<br><span style="font-size: 0.68rem; color: #94a3b8;">Deep Updates</span></button>
+            <button type="button" class="btn btn-secondary maint-dur-btn" data-dur="120" onclick="selectMaintDuration(120)" style="font-size: 0.78rem; padding: 8px; text-align: center; border-color: rgba(255,255,255,0.15);">2 Hours<br><span style="font-size: 0.68rem; color: #94a3b8;">Hardware/Driver</span></button>
+            <button type="button" class="btn btn-secondary maint-dur-btn" data-dur="0" onclick="selectMaintDuration(0)" style="font-size: 0.78rem; padding: 8px; text-align: center; border-color: rgba(255,255,255,0.15);">Manual Toggle<br><span style="font-size: 0.68rem; color: #94a3b8;">Until Closed</span></button>
+          </div>
+        </div>
+
+        <!-- Reason Input -->
+        <div>
+          <label for="maint-reason-input" style="font-size: 0.8rem; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 6px;">Maintenance Reason / Work Description:</label>
+          <input type="text" id="maint-reason-input" class="quick-drop-input" value="Windows Updates &amp; Optimization" placeholder="e.g. Windows Cumulative Update &amp; Reboot" style="width: 100%; box-sizing: border-box;">
+        </div>
+
+        <!-- DevOps SLA Protection Features -->
+        <div style="background: rgba(2, 6, 23, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 12px 14px; font-size: 0.78rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 8px;">
+          <div style="font-weight: 700; color: #60a5fa; display: flex; align-items: center; gap: 6px;">
+            <span>ðŸ›¡ï¸</span> Zero-Penalty SLA Shield Protections:
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="maint-chk-pause" checked style="accent-color: #3b82f6;">
+            <label for="maint-chk-pause">Gracefully pause torrent swarms during maintenance</label>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="maint-chk-resume" checked style="accent-color: #3b82f6;">
+            <label for="maint-chk-resume">Auto-resume all torrents &amp; background daemons when maintenance ends</label>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="maint-chk-sla" checked disabled style="accent-color: #10b981;">
+            <label for="maint-chk-sla" style="color: #6ee7b7;">Exempt reboots from 90-Day SLA downtime &amp; suppress watchdog failure alerts</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Buttons -->
+      <div style="border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <button type="button" class="btn btn-secondary" onclick="closeMaintenanceModal()" style="font-size: 0.8rem; padding: 6px 14px;">Close</button>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button type="button" id="btn-maint-trigger-update" class="btn btn-secondary" onclick="activateMaintenanceWithUpdate()" style="font-size: 0.8rem; padding: 6px 14px; color: #38bdf8 !important; border-color: rgba(56, 189, 248, 0.4);" title="Activate maintenance window and immediately execute Update-Computer on NUC">
+            ðŸš€ Maintenance &amp; Run Update-Computer
+          </button>
+          <button type="button" id="btn-maint-toggle-action" class="btn btn-primary" onclick="confirmToggleMaintenance()" style="font-size: 0.8rem; padding: 6px 16px; background: linear-gradient(135deg, #f59e0b, #d97706); border-color: #f59e0b;">
+            ðŸ› ï¸ Activate Maintenance Window
+          </button>
         </div>
       </div>
     </div>
