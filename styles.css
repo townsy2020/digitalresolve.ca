@@ -908,6 +908,347 @@ button.dropdown-item:active,
   font-weight: 600;
 }
 
+/* ==========================================================================
+   🎛️ Interactive Homelab Topology & Circuit Schematic Map
+   ========================================================================== */
+.schematic-section-container {
+  background: #080c16;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 34px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(56, 189, 248, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.schematic-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.schematic-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.schematic-main-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #f8fafc;
+  letter-spacing: -0.3px;
+}
+
+.schematic-sub-title {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.schematic-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-schematic-chip {
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+}
+
+.btn-schematic-chip:hover {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: #38bdf8;
+  color: #38bdf8;
+  transform: translateY(-1px);
+}
+
+.btn-schematic-chip.pulse-active {
+  border-color: #38bdf8;
+  color: #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
+}
+
+/* Schematic Board & Multi-Zone Grid */
+.schematic-board {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.schematic-zones-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 900px) {
+  .schematic-zones-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+.schematic-zone {
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.schematic-zone-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.schematic-zone-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Schematic Node Cards */
+.schematic-node-card {
+  background: #0d1322;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  user-select: none;
+}
+
+.schematic-node-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(56, 189, 248, 0.45);
+  background: #111a30;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45), 0 0 15px rgba(56, 189, 248, 0.15);
+}
+
+.schematic-node-card.selected {
+  border-color: #38bdf8 !important;
+  background: rgba(56, 189, 248, 0.12) !important;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.35) !important;
+}
+
+.schematic-node-card.severed {
+  border-color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.12) !important;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.35) !important;
+}
+
+.schematic-node-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.schematic-node-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.schematic-node-icon {
+  font-size: 1.25rem;
+}
+
+.schematic-node-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.schematic-node-ip {
+  font-size: 0.74rem;
+  color: #94a3b8;
+  font-family: monospace;
+}
+
+.schematic-node-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.72rem;
+  margin-top: 4px;
+  color: #64748b;
+}
+
+.schematic-node-throughput {
+  color: #38bdf8;
+  font-weight: 600;
+  font-family: monospace;
+}
+
+/* Circuit Flow Animation Lines */
+.schematic-circuits-svg {
+  width: 100%;
+  height: 60px;
+  display: block;
+  margin: -6px 0;
+}
+
+.circuit-wire {
+  stroke: rgba(255, 255, 255, 0.12);
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  transition: stroke 0.3s;
+}
+
+.circuit-stream {
+  stroke-width: 2.5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 6 10;
+  animation: circuitFlow 1.6s linear infinite;
+}
+
+.circuit-stream.edge { stroke: #38bdf8; }
+.circuit-stream.fiber { stroke: #60a5fa; }
+.circuit-stream.vpn { stroke: #34d399; }
+.circuit-stream.lan { stroke: #a78bfa; }
+
+@keyframes circuitFlow {
+  0% { stroke-dashoffset: 32; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.circuit-wire.pulsing {
+  stroke: #38bdf8 !important;
+  stroke-width: 3 !important;
+  filter: drop-shadow(0 0 6px #38bdf8);
+  transition: all 0.1s ease;
+}
+
+/* Node Inspector Telemetry Panel */
+.schematic-inspector-panel {
+  background: #0b1120;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.inspector-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.inspector-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.inspector-node-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #f8fafc;
+}
+
+.inspector-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.inspector-stat-box {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.inspector-stat-lbl {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.inspector-stat-val {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  font-family: monospace;
+}
+
+.inspector-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.inspector-services {
+  font-size: 0.76rem;
+  color: #94a3b8;
+}
+
+.inspector-btn-action {
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #7dd3fc;
+  transition: all 0.2s;
+}
+
+.inspector-btn-action:hover {
+  background: rgba(56, 189, 248, 0.3);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+}
+
 /* Contact */
 .contact {
   padding: 80px 0 100px;
