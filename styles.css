@@ -3891,3 +3891,357 @@ html.mobile-layout .agy-inline-chips {
   max-width: 100% !important;
   padding: 6px 2px !important;
 }
+
+/* ==========================================================================
+   🕹️ Homelab Chaos Monkey & Resilience Simulator
+   ========================================================================== */
+.chaos-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  z-index: 10003;
+  display: none !important;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease-out;
+}
+
+.chaos-modal-overlay.active {
+  display: flex !important;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.chaos-modal-window {
+  background: #090d16;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 16px;
+  width: 95%;
+  max-width: 860px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 35px rgba(245, 158, 11, 0.22);
+  overflow: hidden;
+  animation: chaosPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes chaosPop {
+  0% { transform: scale(0.96); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.chaos-modal-header {
+  padding: 16px 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.7);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.chaos-modal-body {
+  padding: 20px 22px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Status Bar & Score */
+.chaos-status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px 18px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+}
+
+.chaos-score-container {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.chaos-score-val {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #34d399;
+  letter-spacing: -0.5px;
+  transition: color 0.3s ease;
+}
+
+.chaos-score-val.warning {
+  color: #fbbf24;
+}
+
+.chaos-score-val.critical {
+  color: #f87171;
+  text-shadow: 0 0 12px rgba(239, 68, 68, 0.5);
+  animation: pulseCrit 1s infinite alternate;
+}
+
+@keyframes pulseCrit {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.03); }
+}
+
+.chaos-actions-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-chaos-action {
+  padding: 7px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-chaos-sound {
+  background: rgba(148, 163, 184, 0.1);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  color: #cbd5e1;
+}
+
+.btn-chaos-sound.active {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+.btn-chaos-heal {
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid #10b981;
+  color: #a7f3d0;
+}
+
+.btn-chaos-heal:hover {
+  background: rgba(16, 185, 129, 0.35);
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.4);
+}
+
+/* Interactive Topology Map */
+.chaos-topology-box {
+  background: rgba(10, 15, 29, 0.8);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.chaos-topology-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.chaos-grid-nodes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  position: relative;
+  z-index: 2;
+}
+
+.chaos-node {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 12px 10px;
+  text-align: center;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.chaos-node.node-ok {
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.08);
+}
+
+.chaos-node.node-fault {
+  border-color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.15) !important;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.45) !important;
+  animation: shakeNode 0.5s ease-in-out infinite alternate;
+}
+
+.chaos-node.node-rerouted {
+  border-color: #f59e0b !important;
+  background: rgba(245, 158, 11, 0.15) !important;
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.35) !important;
+}
+
+@keyframes shakeNode {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+  100% { transform: translateY(1px); }
+}
+
+.chaos-node-icon {
+  font-size: 1.4rem;
+  margin-bottom: 4px;
+}
+
+.chaos-node-name {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #f8fafc;
+  line-height: 1.2;
+}
+
+.chaos-node-status {
+  font-size: 0.68rem;
+  font-weight: 600;
+  margin-top: 5px;
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.chaos-node-status.ok {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+}
+
+.chaos-node-status.fault {
+  background: rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
+.chaos-node-status.warn {
+  background: rgba(245, 158, 11, 0.3);
+  color: #fde68a;
+}
+
+/* Chaos Injection Controls Cards */
+.chaos-arsenal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.chaos-card {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.chaos-card.active-fault {
+  border-color: rgba(239, 68, 68, 0.5);
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.chaos-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: #f1f5f9;
+}
+
+.chaos-card-desc {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+.chaos-card-trigger {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  background: rgba(239, 68, 68, 0.18);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  color: #fca5a5;
+}
+
+.chaos-card-trigger:hover {
+  background: rgba(239, 68, 68, 0.3);
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
+}
+
+.chaos-card-trigger.btn-recovering {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: #10b981;
+  color: #6ee7b7;
+}
+
+.chaos-card-trigger.btn-recovering:hover {
+  background: rgba(16, 185, 129, 0.35);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+}
+
+/* Chaos Live Streaming Console */
+.chaos-console-box {
+  background: #050811;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.chaos-console-header {
+  background: rgba(15, 23, 42, 0.9);
+  padding: 8px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.72rem;
+  color: #64748b;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.chaos-console-feed {
+  height: 125px;
+  overflow-y: auto;
+  padding: 10px 14px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  font-size: 0.74rem;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.chaos-line {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.chaos-line.sys { color: #64748b; }
+.chaos-line.fault { color: #f87171; font-weight: 600; }
+.chaos-line.heal { color: #34d399; font-weight: 600; }
+.chaos-line.info { color: #38bdf8; }
+.chaos-line.warn { color: #fbbf24; }
+

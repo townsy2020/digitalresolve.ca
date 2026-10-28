@@ -86,6 +86,12 @@
           </div>
         </div>
 
+        <!-- Chaos Monkey Resilience Simulator Trigger Button -->
+        <button type="button" class="btn-nav chaos-lab-btn" onclick="openChaosModal()" style="background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.4); color: #fcd34d; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);" title="Launch Homelab Chaos Monkey: Inject simulated faults & test automated self-healing resilience">
+          <span class="dropdown-dot" style="background-color: #f59e0b; box-shadow: 0 0 8px #f59e0b;"></span>
+          <span>🕹️ Chaos Lab</span>
+        </button>
+
         <!-- Live AI Token Telemetry Counter Button -->
         <button type="button" class="btn-nav token-counter-btn" id="header-token-btn" onclick="openEmbeddedConsole()" style="background: rgba(56, 189, 248, 0.12); border-color: rgba(56, 189, 248, 0.35); color: #93c5fd; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;" title="Live AI Token Consumption Counter: 1.30M Tokens (Flash 68% &bull; Argon 24% &bull; Pro 8%)">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
@@ -254,6 +260,9 @@
           </a>
           <button type="button" onclick="openMagnetModal()" class="pill-btn pill-magnet" title="Open 1-Click Remote Magnet Ingestion Modal">
             <span>[+]</span> Quick-Drop Magnet
+          </button>
+          <button type="button" onclick="openChaosModal()" class="pill-btn pill-chaos" style="border-color: #f59e0b; background: rgba(245, 158, 11, 0.22); color: #fde68a; font-weight: 700; cursor: pointer; box-shadow: 0 0 14px rgba(245, 158, 11, 0.28);" title="Open Homelab Chaos Monkey & Fault Resilience Simulator">
+            <span>🕹️</span> Chaos Monkey Lab
           </button>
           <a href="#fleet" class="pill-btn pill-outline">
             <span>[CLUSTER]</span> Topology &amp; Power
@@ -1215,12 +1224,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;">v2.5.0</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;">v2.6.0</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" title="Project Codebase Scale: 7,339 Lines of Code (HTML: 3,445 lines &bull; CSS: 3,893 lines &bull; CNAME)">
+        <div class="footer-loc-badge" title="Project Codebase Scale: 8,228 Lines of Code (HTML: 3,980 lines &bull; CSS: 4,247 lines &bull; CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">7,339</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">8,228</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1640,7 +1649,7 @@
       updateTokenCounterUI();
 
       // Ensure all modal overlays are strictly hidden on load
-      ['magnet-modal-overlay', 'agy-console-modal-overlay', 'changelog-modal-overlay', 'health-modal-overlay'].forEach(id => {
+      ['magnet-modal-overlay', 'agy-console-modal-overlay', 'changelog-modal-overlay', 'health-modal-overlay', 'chaos-modal-overlay'].forEach(id => {
         const el = document.getElementById(id);
         if (el) { el.classList.remove('active'); el.style.display = 'none'; }
       });
@@ -3020,9 +3029,345 @@
       }
     }
 
+    // ==========================================
+    // 🕹️ Chaos Monkey Resilience Simulator Engine
+    // ==========================================
+    const chaosState = {
+      soundEnabled: false,
+      audioCtx: null,
+      faults: {
+        bellFiber: false,
+        desktopPower: false,
+        ddosFlood: false,
+        diskFull: false
+      }
+    };
+
+    function getChaosAudioCtx() {
+      if (!chaosState.audioCtx && typeof (window.AudioContext || window.webkitAudioContext) !== 'undefined') {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        chaosState.audioCtx = new AudioCtx();
+      }
+      if (chaosState.audioCtx && chaosState.audioCtx.state === 'suspended') {
+        chaosState.audioCtx.resume();
+      }
+      return chaosState.audioCtx;
+    }
+
+    function playChaosTone(freq1, freq2, type = 'sine', duration = 0.15) {
+      if (!chaosState.soundEnabled) return;
+      try {
+        const ctx = getChaosAudioCtx();
+        if (!ctx) return;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq1, ctx.currentTime);
+        if (freq2) {
+          osc.frequency.exponentialRampToValueAtTime(freq2, ctx.currentTime + duration);
+        }
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) {
+        // AudioContext ignored if blocked
+      }
+    }
+
+    function toggleChaosSound() {
+      chaosState.soundEnabled = !chaosState.soundEnabled;
+      const btn = document.getElementById('btn-chaos-sound');
+      if (btn) {
+        btn.classList.toggle('active', chaosState.soundEnabled);
+        btn.innerHTML = chaosState.soundEnabled ? '🔊 Sound: ON' : '🔈 Sound: OFF';
+      }
+      if (chaosState.soundEnabled) {
+        getChaosAudioCtx();
+        playChaosTone(587, 880, 'triangle', 0.18);
+        addChaosLog('info', '[AUDIO] Procedural Web Audio synth initialized. Acoustic telemetry active.');
+      } else {
+        addChaosLog('sys', '[AUDIO] Audio feedback muted.');
+      }
+    }
+
+    function openChaosModal() {
+      const modal = document.getElementById('chaos-modal-overlay');
+      if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeChaosModal() {
+      const modal = document.getElementById('chaos-modal-overlay');
+      if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+      }
+      document.body.style.overflow = '';
+    }
+
+    function closeChaosModalOnBackdrop(e) {
+      if (e.target && e.target.id === 'chaos-modal-overlay') {
+        closeChaosModal();
+      }
+    }
+
+    function addChaosLog(type, msg) {
+      const feed = document.getElementById('chaos-console-feed');
+      if (!feed) return;
+      const timeStr = new Date().toTimeString().split(' ')[0];
+      const div = document.createElement('div');
+      div.className = `chaos-line ${type}`;
+      div.textContent = `[${timeStr}] ${msg}`;
+      feed.appendChild(div);
+      feed.scrollTop = feed.scrollHeight;
+    }
+
+    function updateChaosScoreUI() {
+      const activeCount = Object.values(chaosState.faults).filter(Boolean).length;
+      const scoreEl = document.getElementById('chaos-score-val');
+      const badgeEl = document.getElementById('chaos-fault-counter');
+
+      let label = '99% Optimal';
+      let stateClass = 'ok';
+
+      if (activeCount === 1) {
+        label = '76% Degraded';
+        stateClass = 'warning';
+      } else if (activeCount === 2) {
+        label = '58% High Strain';
+        stateClass = 'warning';
+      } else if (activeCount === 3) {
+        label = '39% Critical';
+        stateClass = 'critical';
+      } else if (activeCount >= 4) {
+        label = '18% Lockdown';
+        stateClass = 'critical';
+      }
+
+      if (scoreEl) {
+        scoreEl.textContent = label;
+        scoreEl.className = `chaos-score-val ${stateClass}`;
+      }
+      if (badgeEl) {
+        badgeEl.textContent = `${activeCount} Fault${activeCount === 1 ? '' : 's'} Active`;
+        badgeEl.className = activeCount > 0 ? 'item-tag offline' : 'item-tag online';
+      }
+    }
+
+    function triggerChaosFault(type) {
+      if (type === 'bellFiber') {
+        chaosState.faults.bellFiber = !chaosState.faults.bellFiber;
+        const isFault = chaosState.faults.bellFiber;
+        const btn = document.getElementById('btn-fault-fiber');
+        const nodeBell = document.getElementById('c-node-bell');
+        const nodeVpn = document.getElementById('c-node-vpn');
+        const card = document.getElementById('c-card-fiber');
+
+        if (isFault) {
+          playChaosTone(220, 110, 'sawtooth', 0.25);
+          btn.innerHTML = '🔄 Recover Fiber Link';
+          btn.className = 'chaos-card-trigger btn-recovering';
+          nodeBell.className = 'chaos-node node-fault';
+          nodeBell.querySelector('.chaos-node-status').textContent = 'OFFLINE (0 Mbps)';
+          nodeBell.querySelector('.chaos-node-status').className = 'chaos-node-status fault';
+          nodeVpn.className = 'chaos-node node-rerouted';
+          nodeVpn.querySelector('.chaos-node-status').textContent = 'FAILOVER (Cellular 38ms)';
+          nodeVpn.querySelector('.chaos-node-status').className = 'chaos-node-status warn';
+          card.classList.add('active-fault');
+
+          addChaosLog('fault', '[FAULT INJECTED] Physical link carrier lost on eth0 (Bell GigaHub 1.5G).');
+          addChaosLog('warn', '[SENTINEL] Upstream gateway 192.168.2.1 unreachable (100% loss). Initiating multi-WAN failover...');
+          setTimeout(() => {
+            addChaosLog('heal', '[AUTONOMOUS FAILOVER] Mullvad WireGuard tunnel re-established via secondary cellular uplink in 1.14s.');
+            addChaosLog('info', '[UPTIME PRESERVED] Edge tunnels YUL/YYZ rerouted. Zero dropped client sessions.');
+          }, 350);
+        } else {
+          playChaosTone(440, 880, 'sine', 0.2);
+          btn.innerHTML = '💥 Sever Fiber Link';
+          btn.className = 'chaos-card-trigger';
+          nodeBell.className = 'chaos-node node-ok';
+          nodeBell.querySelector('.chaos-node-status').textContent = '1.5 Gbps (Optimal)';
+          nodeBell.querySelector('.chaos-node-status').className = 'chaos-node-status ok';
+          nodeVpn.className = 'chaos-node node-ok';
+          nodeVpn.querySelector('.chaos-node-status').textContent = 'Encrypted (WireGuard)';
+          nodeVpn.querySelector('.chaos-node-status').className = 'chaos-node-status ok';
+          card.classList.remove('active-fault');
+
+          addChaosLog('heal', '[RESOLVED] Bell Fiber carrier link re-negotiated at 1.5 Gbps / 940 Mbps.');
+          addChaosLog('info', '[SENTINEL] Primary gateway route restored. Backup route standing by.');
+        }
+      } else if (type === 'desktopPower') {
+        chaosState.faults.desktopPower = !chaosState.faults.desktopPower;
+        const isFault = chaosState.faults.desktopPower;
+        const btn = document.getElementById('btn-fault-desktop');
+        const nodeDesktop = document.getElementById('c-node-desktop');
+        const nodeNuc = document.getElementById('c-node-nuc');
+        const card = document.getElementById('c-card-desktop');
+
+        if (isFault) {
+          playChaosTone(300, 80, 'square', 0.25);
+          btn.innerHTML = '⚡ Send Wake-on-LAN';
+          btn.className = 'chaos-card-trigger btn-recovering';
+          nodeDesktop.className = 'chaos-node node-fault';
+          nodeDesktop.querySelector('.chaos-node-status').textContent = 'OFFLINE (0 Watts)';
+          nodeDesktop.querySelector('.chaos-node-status').className = 'chaos-node-status fault';
+          nodeNuc.className = 'chaos-node node-rerouted';
+          nodeNuc.querySelector('.chaos-node-status').textContent = 'PROXY ABSORPTION';
+          nodeNuc.querySelector('.chaos-node-status').className = 'chaos-node-status warn';
+          card.classList.add('active-fault');
+
+          addChaosLog('fault', '[FAULT INJECTED] Hard power outage detected on 192.168.2.62 (Desktop Workstation).');
+          addChaosLog('warn', '[HEARTBEAT] Ping timeout on TCP:9090. Active background agent and torrent tasks stalled.');
+          setTimeout(() => {
+            addChaosLog('heal', '[NUC TAKEOVER] Intel NUC gateway absorbed queued torrent state and proxy ingest.');
+            addChaosLog('info', '[SENTINEL] Node marked for automated Wake-on-LAN reboot cycle.');
+          }, 350);
+        } else {
+          playChaosTone(350, 700, 'sine', 0.22);
+          btn.innerHTML = '💥 Pull Desktop Plug';
+          btn.className = 'chaos-card-trigger';
+          nodeDesktop.className = 'chaos-node node-ok';
+          nodeDesktop.querySelector('.chaos-node-status').textContent = 'Online (2.5 GbE)';
+          nodeDesktop.querySelector('.chaos-node-status').className = 'chaos-node-status ok';
+          nodeNuc.className = 'chaos-node node-ok';
+          nodeNuc.querySelector('.chaos-node-status').textContent = 'Online (24/7 Node)';
+          nodeNuc.querySelector('.chaos-node-status').className = 'chaos-node-status ok';
+          card.classList.remove('active-fault');
+
+          addChaosLog('heal', '[WOL SENT] Magic packet dispatched to MAC 70:85:C2:59:71:B8 via broadcast 192.168.2.255.');
+          addChaosLog('heal', '[BOOT OK] Desktop workstation booted, NVMe pools mounted, AGY daemon online.');
+        }
+      } else if (type === 'ddosFlood') {
+        chaosState.faults.ddosFlood = !chaosState.faults.ddosFlood;
+        const isFault = chaosState.faults.ddosFlood;
+        const btn = document.getElementById('btn-fault-ddos');
+        const nodeCf = document.getElementById('c-node-cf');
+        const card = document.getElementById('c-card-ddos');
+
+        if (isFault) {
+          playChaosTone(180, 260, 'sawtooth', 0.28);
+          btn.innerHTML = '🛡️ Engage Rate Limiting';
+          btn.className = 'chaos-card-trigger btn-recovering';
+          nodeCf.className = 'chaos-node node-fault';
+          nodeCf.querySelector('.chaos-node-status').textContent = 'SHIELD ENGAGED (52k/s)';
+          nodeCf.querySelector('.chaos-node-status').className = 'chaos-node-status fault';
+          card.classList.add('active-fault');
+
+          addChaosLog('fault', '[FAULT INJECTED] High-velocity SYN/HTTP flood: 52,840 req/s targeting digitalresolve.ca.');
+          addChaosLog('warn', '[EDGE ALERT] Sudden variance spike across Montreal (YUL) & Toronto (YYZ) edge PoPs.');
+          setTimeout(() => {
+            addChaosLog('heal', '[SHIELD ACTIVE] Cloudflare Zero Trust rate-limiting and challenge mode deployed.');
+            addChaosLog('heal', '[MITIGATED] 99.82% malicious packets dropped at edge. NUC origin CPU unaffected (14%).');
+          }, 350);
+        } else {
+          playChaosTone(523, 1046, 'sine', 0.2);
+          btn.innerHTML = '💥 Flood Edge with 50k SYN';
+          btn.className = 'chaos-card-trigger';
+          nodeCf.className = 'chaos-node node-ok';
+          nodeCf.querySelector('.chaos-node-status').textContent = 'Active (Zero Trust)';
+          nodeCf.querySelector('.chaos-node-status').className = 'chaos-node-status ok';
+          card.classList.remove('active-fault');
+
+          addChaosLog('heal', '[RESOLVED] Attack signature cleared. Edge traffic normalized to 28 req/m.');
+        }
+      } else if (type === 'diskFull') {
+        chaosState.faults.diskFull = !chaosState.faults.diskFull;
+        const isFault = chaosState.faults.diskFull;
+        const btn = document.getElementById('btn-fault-disk');
+        const nodeStorage = document.getElementById('c-node-storage');
+        const card = document.getElementById('c-card-disk');
+
+        if (isFault) {
+          playChaosTone(150, 90, 'sawtooth', 0.25);
+          btn.innerHTML = '🧹 Auto-Prune & Evacuate';
+          btn.className = 'chaos-card-trigger btn-recovering';
+          nodeStorage.className = 'chaos-node node-fault';
+          nodeStorage.querySelector('.chaos-node-status').textContent = 'CRITICAL (99.8% FULL)';
+          nodeStorage.querySelector('.chaos-node-status').className = 'chaos-node-status fault';
+          card.classList.add('active-fault');
+
+          addChaosLog('fault', '[FAULT INJECTED] Storage pool /storage/torrents hit critical threshold: 99.8% capacity!');
+          addChaosLog('warn', '[DISK LOCK] Only 284 MB free space remaining. Torrent ingestion paused.');
+          setTimeout(() => {
+            addChaosLog('heal', '[SENTINEL PRUNE] Autonomous cleaner purged 12.6 GB temporary torrent buffers.');
+            addChaosLog('heal', '[SMB EVACUATION] Completed media archives relocated to Desktop secondary array.');
+            addChaosLog('info', '[HEADROOM RESTORED] Storage pool dropped to 42% healthy.');
+          }, 350);
+        } else {
+          playChaosTone(440, 660, 'sine', 0.18);
+          btn.innerHTML = '💥 Fill Disk to 99.8%';
+          btn.className = 'chaos-card-trigger';
+          nodeStorage.className = 'chaos-node node-ok';
+          nodeStorage.querySelector('.chaos-node-status').textContent = 'Healthy (42% Pool)';
+          nodeStorage.querySelector('.chaos-node-status').className = 'chaos-node-status ok';
+          card.classList.remove('active-fault');
+
+          addChaosLog('heal', '[RESOLVED] Storage partitions rebalanced. Normal I/O throughput resumed.');
+        }
+      }
+
+      updateChaosScoreUI();
+    }
+
+    function restoreAllChaos() {
+      const hadFaults = Object.values(chaosState.faults).some(Boolean);
+      chaosState.faults.bellFiber = false;
+      chaosState.faults.desktopPower = false;
+      chaosState.faults.ddosFlood = false;
+      chaosState.faults.diskFull = false;
+
+      const nodes = [
+        { id: 'c-node-bell', status: '1.5 Gbps (Optimal)' },
+        { id: 'c-node-vpn', status: 'Encrypted (WireGuard)' },
+        { id: 'c-node-nuc', status: 'Online (24/7 Node)' },
+        { id: 'c-node-desktop', status: 'Online (2.5 GbE)' },
+        { id: 'c-node-cf', status: 'Active (Zero Trust)' },
+        { id: 'c-node-storage', status: 'Healthy (42% Pool)' }
+      ];
+
+      nodes.forEach(n => {
+        const el = document.getElementById(n.id);
+        if (el) {
+          el.className = 'chaos-node node-ok';
+          const s = el.querySelector('.chaos-node-status');
+          if (s) { s.textContent = n.status; s.className = 'chaos-node-status ok'; }
+        }
+      });
+
+      const btnFiber = document.getElementById('btn-fault-fiber');
+      if (btnFiber) { btnFiber.innerHTML = '💥 Sever Fiber Link'; btnFiber.className = 'chaos-card-trigger'; }
+
+      const btnDesktop = document.getElementById('btn-fault-desktop');
+      if (btnDesktop) { btnDesktop.innerHTML = '💥 Pull Desktop Plug'; btnDesktop.className = 'chaos-card-trigger'; }
+
+      const btnDdos = document.getElementById('btn-fault-ddos');
+      if (btnDdos) { btnDdos.innerHTML = '💥 Flood Edge with 50k SYN'; btnDdos.className = 'chaos-card-trigger'; }
+
+      const btnDisk = document.getElementById('btn-fault-disk');
+      if (btnDisk) { btnDisk.innerHTML = '💥 Fill Disk to 99.8%'; btnDisk.className = 'chaos-card-trigger'; }
+
+      document.querySelectorAll('.chaos-card').forEach(c => c.classList.remove('active-fault'));
+
+      if (hadFaults) {
+        playChaosTone(523, 1046, 'sine', 0.28);
+        addChaosLog('heal', '[RESTORE ALL] Master sentinel override dispatched. All 6 nodes restored to 100% optimal.');
+      } else {
+        addChaosLog('sys', '[DIAGNOSTIC] All topology nodes verified green. Cluster health is 99% optimal.');
+      }
+
+      updateChaosScoreUI();
+    }
+
     // Global Escape Key Handler to dismiss all modals & restore scroll
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
+        closeChaosModal();
         closeHealthModal();
         closeChangelogModal();
         closeAgyConsole();
@@ -3237,6 +3582,181 @@
     </div>
   </div>
 
+  <!-- 🕹️ Chaos Monkey & Resilience Simulator Modal -->
+  <div id="chaos-modal-overlay" class="chaos-modal-overlay" style="display: none;" onclick="closeChaosModalOnBackdrop(event)">
+    <div class="chaos-modal-window" role="dialog" aria-modal="true" aria-label="Homelab Chaos Monkey Simulator">
+      <div class="chaos-modal-header">
+        <div style="display: flex; align-items: center; gap: 9px;">
+          <span style="font-size: 1.25rem;">🕹️</span>
+          <div>
+            <div style="font-weight: 800; color: #f8fafc; font-size: 1rem; letter-spacing: -0.3px;">Chaos Monkey &bull; Homelab Resilience Lab</div>
+            <div style="font-size: 0.72rem; color: #94a3b8;">Simulate real-world failures &amp; verify autonomous self-healing sentinel failover.</div>
+          </div>
+        </div>
+        <button type="button" class="changelog-close" onclick="closeChaosModal()" title="Close Chaos Simulator" aria-label="Close chaos dialog">&times;</button>
+      </div>
+
+      <div class="chaos-modal-body">
+        <!-- Top Status Bar -->
+        <div class="chaos-status-bar">
+          <div class="chaos-score-container">
+            <div>
+              <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Cluster Resilience Index</div>
+              <div class="chaos-score-val" id="chaos-score-val">99% Optimal</div>
+            </div>
+            <span class="item-tag online" id="chaos-fault-counter">0 Faults Active</span>
+          </div>
+          <div class="chaos-actions-top">
+            <button type="button" class="btn-chaos-action btn-chaos-sound" id="btn-chaos-sound" onclick="toggleChaosSound()" title="Toggle Web Audio procedural synthesizer sound effects">
+              🔈 Sound: OFF
+            </button>
+            <button type="button" class="btn-chaos-action btn-chaos-heal" onclick="restoreAllChaos()" title="Master Sentinel Override: Restore all nodes to 100% green">
+              🔄 Restore All Nodes
+            </button>
+          </div>
+        </div>
+
+        <!-- Interactive Topology Sandbox Grid -->
+        <div class="chaos-topology-box">
+          <div class="chaos-topology-header">
+            <span style="font-size: 0.78rem; font-weight: 700; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px;">Live Topology Schematic</span>
+            <span style="font-size: 0.72rem; color: #64748b;">Autonomous Sentinel Watchdog: Active (0.4s heartbeat)</span>
+          </div>
+
+          <div class="chaos-grid-nodes">
+            <!-- 1. Cloudflare Edge -->
+            <div class="chaos-node node-ok" id="c-node-cf">
+              <div class="chaos-node-icon">🛡️</div>
+              <div class="chaos-node-name">Cloudflare Edge</div>
+              <span class="chaos-node-status ok">Active (Zero Trust)</span>
+            </div>
+
+            <!-- 2. Bell Fiber GigaHub -->
+            <div class="chaos-node node-ok" id="c-node-bell">
+              <div class="chaos-node-icon">📡</div>
+              <div class="chaos-node-name">Bell Fiber 1.5G</div>
+              <span class="chaos-node-status ok">1.5 Gbps (Optimal)</span>
+            </div>
+
+            <!-- 3. Mullvad VPN -->
+            <div class="chaos-node node-ok" id="c-node-vpn">
+              <div class="chaos-node-icon">⚡</div>
+              <div class="chaos-node-name">Mullvad Tunnel</div>
+              <span class="chaos-node-status ok">Encrypted (WireGuard)</span>
+            </div>
+
+            <!-- 4. Intel NUC Core -->
+            <div class="chaos-node node-ok" id="c-node-nuc">
+              <div class="chaos-node-icon">🐧</div>
+              <div class="chaos-node-name">Intel NUC 24/7</div>
+              <span class="chaos-node-status ok">Online (24/7 Node)</span>
+            </div>
+
+            <!-- 5. Desktop Workstation -->
+            <div class="chaos-node node-ok" id="c-node-desktop">
+              <div class="chaos-node-icon">🖥️</div>
+              <div class="chaos-node-name">Desktop Workstation</div>
+              <span class="chaos-node-status ok">Online (2.5 GbE)</span>
+            </div>
+
+            <!-- 6. Storage Pool -->
+            <div class="chaos-node node-ok" id="c-node-storage">
+              <div class="chaos-node-icon">💾</div>
+              <div class="chaos-node-name">Storage Pools</div>
+              <span class="chaos-node-status ok">Healthy (42% Pool)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chaos Arsenal: Fault Injection Controls -->
+        <div>
+          <div style="font-size: 0.78rem; font-weight: 700; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
+            Simulated Fault Arsenal (Click to Inject / Recover)
+          </div>
+          <div class="chaos-arsenal-grid">
+            <!-- Scenario 1: Bell Fiber -->
+            <div class="chaos-card" id="c-card-fiber">
+              <div>
+                <div class="chaos-card-header">
+                  <span>✂️</span>
+                  <span>Cut Bell Fiber Uplink</span>
+                </div>
+                <div class="chaos-card-desc">
+                  Simulates complete physical fiber carrier drop. Sentinel triggers multi-WAN failover to standby cellular WireGuard route.
+                </div>
+              </div>
+              <button type="button" class="chaos-card-trigger" id="btn-fault-fiber" onclick="triggerChaosFault('bellFiber')">
+                💥 Sever Fiber Link
+              </button>
+            </div>
+
+            <!-- Scenario 2: Desktop Hard Power Loss -->
+            <div class="chaos-card" id="c-card-desktop">
+              <div>
+                <div class="chaos-card-header">
+                  <span>🔌</span>
+                  <span>Desktop Sudden Power Cut</span>
+                </div>
+                <div class="chaos-card-desc">
+                  Simulates workstation power outage (0W). NUC assumes queued torrent &amp; agent proxies; arms Wake-on-LAN reboot packet.
+                </div>
+              </div>
+              <button type="button" class="chaos-card-trigger" id="btn-fault-desktop" onclick="triggerChaosFault('desktopPower')">
+                💥 Pull Desktop Plug
+              </button>
+            </div>
+
+            <!-- Scenario 3: Volumetric DDoS -->
+            <div class="chaos-card" id="c-card-ddos">
+              <div>
+                <div class="chaos-card-header">
+                  <span>🌊</span>
+                  <span>50k req/s Volumetric DDoS</span>
+                </div>
+                <div class="chaos-card-desc">
+                  Simulates synthetic SYN/HTTP flood assault against public endpoints. Cloudflare Under-Attack defense shields local origin NUC.
+                </div>
+              </div>
+              <button type="button" class="chaos-card-trigger" id="btn-fault-ddos" onclick="triggerChaosFault('ddosFlood')">
+                💥 Flood Edge with 50k SYN
+              </button>
+            </div>
+
+            <!-- Scenario 4: Storage Saturation -->
+            <div class="chaos-card" id="c-card-disk">
+              <div>
+                <div class="chaos-card-header">
+                  <span>💾</span>
+                  <span>Storage Saturation (99.8%)</span>
+                </div>
+                <div class="chaos-card-desc">
+                  Simulates torrent disk exhaustion (&lt;300MB free). Sentinel executes automated temp buffer pruning and SMB relocation.
+                </div>
+              </div>
+              <button type="button" class="chaos-card-trigger" id="btn-fault-disk" onclick="triggerChaosFault('diskFull')">
+                💥 Fill Disk to 99.8%
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Streaming Chaos Console Feed -->
+        <div class="chaos-console-box">
+          <div class="chaos-console-header">
+            <span>LIVE SENTINEL EVENT STREAM</span>
+            <span>AUTO-SCROLL &bull; REAL-TIME</span>
+          </div>
+          <div class="chaos-console-feed" id="chaos-console-feed">
+            <div class="chaos-line sys">[SYSTEM] Chaos Engineering Sentinel v2.5 initialized. Topology verified green.</div>
+            <div class="chaos-line info">[PROBE] All 6 infrastructure nodes responding within SLA (&lt; 12ms latency).</div>
+            <div class="chaos-line heal">[READY] Autonomous failover triggers armed. Select a fault above to test resilience.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
   <!-- Comprehensive High-Level System Release Changelog Modal -->
   <div id="changelog-modal-overlay" class="changelog-modal-overlay" style="display: none;" onclick="closeChangelogModalOnBackdrop(event)">
     <div class="changelog-modal" role="dialog" aria-modal="true" aria-label="System changelog">
@@ -3249,10 +3769,25 @@
       </div>
 
       <div class="changelog-body">
-        <!-- Version 2.5.0 (Current) -->
+        <!-- Version 2.6.0 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.5.0 &bull; Current</span>
+            <span class="ver-tag current">v2.6.0 &bull; Current</span>
+            <span class="ver-date">October 27, 2026</span>
+          </div>
+          <h4 class="ver-title">🕹️ Chaos Monkey &bull; Interactive Homelab Resilience Simulator</h4>
+          <ul class="ver-list">
+            <li><strong>Interactive Chaos Engineering Workbench:</strong> Real-time fault injection sandbox simulating Bell Fiber WAN severed carrier, Desktop sudden power drop (0W), 50k req/s volumetric DDoS floods, and 99.8% torrent disk saturation.</li>
+            <li><strong>Autonomous Self-Healing Sentinel:</strong> Live visual rerouting showing multi-WAN cellular failover, NUC task absorption, Cloudflare Zero Trust rate-limiting shields, and automated SMB storage evacuation.</li>
+            <li><strong>Tactile Web Audio Procedural Synth:</strong> Zero-dependency acoustic feedback synthesizing sci-fi warning warbles, failover chimes, and system recovery melodies via HTML5 Web Audio API.</li>
+            <li><strong>Dynamic Cluster Resilience Score:</strong> Live health penalty index dynamically adjusting from 99% Optimal down to 18% Lockdown based on active faults, with single-click master sentinel recovery.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.5.0 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.5.0</span>
             <span class="ver-date">October 27, 2026</span>
           </div>
           <h4 class="ver-title">Touch-First Adaptive Mobile Engine, Health Radar &amp; Token Savings</h4>
