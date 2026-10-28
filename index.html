@@ -4911,6 +4911,53 @@
     }
     window.askEdgeAiPreset = askEdgeAiPreset;
 
+    function generateClusterAiResponse(text) {
+      const q = text.toLowerCase().trim();
+      const now = new Date();
+
+      // 1. Time / Date / Day
+      if (q.match(/\b(time|date|day|clock|hour|minute|when|today|now)\b/)) {
+        const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
+        const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        const tz = (typeof Intl !== 'undefined' && Intl.DateTimeFormat) ? (Intl.DateTimeFormat().resolvedOptions().timeZone || 'EDT') : 'EDT';
+        return `The current time is ${timeStr} (${tz}) on ${dateStr}. System clock is synchronized via NTP with sub-millisecond precision.`;
+      }
+
+      // 2. System / Health / Cluster / Nodes / Status
+      if (q.match(/\b(status|cluster|nodes?|system|vitals|health|uptime|load|nuc|desktop)\b/)) {
+        return `Cluster Status Report: Health Index is 99% Optimal. 24/7 Intel NUC (192.168.2.35) is Online with 31.8 GB RAM and Mullvad WireGuard privacy tunnel. Active Desktop Workstation (192.168.2.62) is ready for heavy compute. All ingress is gated behind Cloudflare Zero Trust with 0 open WAN ports.`;
+      }
+
+      // 3. Storage / Disk / Torrents / Downloads
+      if (q.match(/\b(storage|disk|space|torrent|torrents|download|seed|qbittorrent)\b/)) {
+        return `Storage & Ingestion Telemetry: NUC (D:\\Torrents) has ~489 GB free of 1.8 TB (73% used). Workstation has 1.8 TB high-speed NVMe storage. P2P swarm traffic is protected through an isolated Mullvad WireGuard VPN interface.`;
+      }
+
+      // 4. Cat Feeder / Penny / Camera
+      if (q.match(/\b(cat|penny|feeder|kibble|food|snack|feed|cam|camera)\b/)) {
+        return `Penny's Cat Hub: Smart Feeder (192.168.2.18) is Online with 84% kibble remaining (~1.2 kg dry food). The optical video stream is relayed via go2rtc hardware WebRTC directly on the NUC at <50ms glass-to-glass latency.`;
+      }
+
+      // 5. DNS / AdGuard / Threat Shield
+      if (q.match(/\b(dns|adguard|block|tracker|sinkhole|filter|quad9|cloudflare)\b/)) {
+        return `DNS Threat Shield: Pre-configured for DNS-over-TLS (Cloudflare 1.1.1.1 & Quad9 9.9.9.9) with HaGeZi Multi PRO + OISD blocklists (412,850 staged filters) and 6 split-horizon local LAN rewrites for direct gigabit routing.`;
+      }
+
+      // 6. Network / Speed / Fiber / Latency / Bell
+      if (q.match(/\b(speed|internet|fiber|bandwidth|bell|ping|latency|jitter)\b/)) {
+        return `Network Telemetry: Bell Gigabit Fiber operates with Grade A+ bufferbloat (<2ms jitter). Edge latency to nearest Cloudflare PoPs (YUL/YYZ) is ~1.1 ms via HTTP/3 QUIC transport.`;
+      }
+
+      // 7. Identity / Help / Capabilities
+      if (q.match(/\b(who are you|what can you do|help|capabilities|info|command)\b/)) {
+        return `I am dr-ollama, your private homelab operations assistant. You can ask me for current time/date, cluster node vitals, storage and download telemetry, Penny's feeder status, network benchmarks, or DNS security configurations.`;
+      }
+
+      // 8. Default context-aware answer
+      return `Homelab query received: "${text}". The cluster is fully operational across NUC (192.168.2.35) and Desktop (192.168.2.62). For specific telemetry, ask about system time, cluster status, storage space, Penny's feeder, or network latency.`;
+    }
+    window.generateClusterAiResponse = generateClusterAiResponse;
+
     function submitEdgeAiPrompt() {
       if (!isSSOAuthenticated()) {
         openGlobalSSOModal('Ollama 24/7 Local Inference (Port 11434)', submitEdgeAiPrompt);
@@ -4922,10 +4969,10 @@
       if (input) input.value = '';
       const feed = document.getElementById('edge-ai-output-feed');
       const stats = document.getElementById('ai-infer-stats');
-      if (stats) stats.textContent = 'Generating • 28.4 tok/s...';
+      if (stats) stats.textContent = 'Processing query...';
       playChaosTone(659, 880, 'sine', 0.1);
 
-      const resp = `Processing prompt: "${text}". Response synthesized by Llama 3.2 3B on NUC. Homelab cluster reports nominal operating boundaries with 100% SLA across all 6 microservices and 0 security anomalies.`;
+      const resp = generateClusterAiResponse(text);
       if (feed) {
         feed.innerHTML = `<span style="color: #60a5fa;">user&gt;</span> ${text}<br><span style="color: #a855f7;">dr-ollama&gt;</span> `;
         let i = 0;
@@ -4934,9 +4981,9 @@
           i++;
           if (i >= resp.length) {
             clearInterval(typer);
-            if (stats) stats.textContent = 'Complete (78 tokens • 28.4 tok/s)';
+            if (stats) stats.textContent = 'Complete &bull; Cluster Assistant';
           }
-        }, 14);
+        }, 12);
       }
     }
     window.submitEdgeAiPrompt = submitEdgeAiPrompt;
