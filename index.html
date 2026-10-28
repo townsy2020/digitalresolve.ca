@@ -168,9 +168,9 @@
             <span>️ Ops &amp; AI</span> <span class="dropdown-arrow">&#9662;</span>
           </button>
           <div class="dropdown-menu">
-            <button type="button" class="btn-action-item" onclick="openEmbeddedConsole()" title="Open Live Interactive Terminal for Active Session 51f0adb8">
+            <button type="button" class="btn-action-item" onclick="openEmbeddedConsole()" title="Open Live Interactive Terminal for Active Session 572d607f">
               <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
-              <span>Open AGY Terminal (51f0adb8)</span>
+              <span>Open AGY Terminal (572d607f)</span>
               <span class="item-tag online">Live</span>
             </button>
             <a href="#ops-ai" class="btn-action-item" title="Jump to In-Page Compute, AI &amp; Terminal Operations Console">
@@ -1364,7 +1364,7 @@
                 <span id="terminal-title-text">Live Interactive Terminal</span>
               </div>
               <div class="terminal-tabs" id="terminal-tabs-group" style="display: none;">
-                <button type="button" class="terminal-tab active" id="tab-agy" onclick="loadLog('agy')" title="View Active Antigravity Autonomous Agent Stream (Session 51f0adb8)">[AGY] Session (51f0adb8)</button>
+                <button type="button" class="terminal-tab active" id="tab-agy" onclick="loadLog('agy')" title="View Active Antigravity Autonomous Agent Stream (Session 572d607f)">[AGY] Session (572d607f)</button>
                 <button type="button" class="terminal-tab" id="tab-sentinel" onclick="loadLog('sentinel')" title="View Sentinel Watchdog Security &amp; Fleet Health Audit Log">Sentinel</button>
                 <button type="button" class="terminal-tab" id="tab-power" onclick="loadLog('power')" title="View Smart Power Optimizer &amp; Dynamic Standby Log">Power</button>
                 <button type="button" class="terminal-tab" id="tab-report" onclick="loadLog('report')" title="View Comprehensive Daily Homelab Morning Briefing">Briefing</button>
@@ -1909,8 +1909,8 @@
               </div>
             </div>
             <div class="app-card-footer" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
-              <button type="button" onclick="openEmbeddedConsole()" class="btn-nav" title="Open Live Interactive Terminal for Active Session 51f0adb8" style="font-size: 0.82rem; height: 32px; padding: 4px 14px; background: rgba(16, 185, 129, 0.25); border-color: #10b981; color: #a7f3d0; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
-                <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span> Open This Session (51f0adb8) &rarr;
+              <button type="button" onclick="openEmbeddedConsole()" class="btn-nav" title="Open Live Interactive Terminal for Active Session 572d607f" style="font-size: 0.82rem; height: 32px; padding: 4px 14px; background: rgba(16, 185, 129, 0.25); border-color: #10b981; color: #a7f3d0; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span> Open This Session (572d607f) &rarr;
               </button>
               <button type="button" onclick="startNewAgySession('desktop')" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px; color: #93c5fd !important; border-color: rgba(59, 130, 246, 0.4);" title="Start New AGY Session on Desktop: agy --dangerously-skip-permissions">
                 + New: Desktop &rarr;
@@ -2779,7 +2779,7 @@
         if (modalScreen) modalScreen.style.display = 'block';
         if (modalChips) modalChips.style.display = 'flex';
         if (modalInput) modalInput.style.display = 'flex';
-        if (modalTitle) modalTitle.innerHTML = 'Antigravity (AGY) Live Autonomous Terminal &bull; <span class="mono" style="color: #60a5fa;">51f0adb8-74d9</span>';
+        if (modalTitle) modalTitle.innerHTML = 'Antigravity (AGY) Live Autonomous Terminal &bull; <span class="mono" style="color: #60a5fa;">572d607f-e5b8</span>';
         if (modalPulse) { modalPulse.style.background = '#10b981'; modalPulse.style.boxShadow = '0 0 8px #10b981'; }
         if (modalStatus) { modalStatus.textContent = 'ONLINE (Desktop :8082)'; modalStatus.className = 'item-tag online'; }
 
@@ -2942,18 +2942,18 @@
 
     // Multi-modal AGY session launcher
     function launchAgySession(target) {
-      const cid = '51f0adb8-74d9-4ada-92d6-c532f19e0629';
+      const cid = '572d607f-e5b8-42bc-8659-2cce0820852a';
       if (target === 'stream' || !target) {
         loadLog('agy');
         const term = document.getElementById('terminal-card');
         if (term) term.scrollIntoView({ behavior: 'smooth' });
-        showToast('info', 'AGY Live Terminal', 'Streaming active session 51f0adb8...');
+        showToast('info', 'AGY Live Terminal', 'Streaming active session 572d607f...');
       } else if (target === 'app') {
         if (!isSSOAuthenticated()) {
           openGlobalSSOModal('Antigravity Session Launcher', () => launchAgySession(target));
           return;
         }
-        showToast('loading', 'Launching Antigravity App...', 'Connecting to conversation://51f0adb8-74d9...', 3000);
+        showToast('loading', 'Launching Antigravity App...', 'Connecting to conversation://572d607f-e5b8...', 3000);
         window.location.href = `conversation://${cid}`;
         setTimeout(() => {
           loadLog('agy');
@@ -2982,7 +2982,7 @@
       const promptText = input ? input.value.trim() : '';
       if (!promptText) return;
 
-      showToast('loading', 'Dispatching Prompt to AGY Session...', 'Session ID: 51f0adb8-74d9', 0);
+      showToast('loading', 'Dispatching Prompt to AGY Session...', 'Session ID: 572d607f-e5b8', 0);
       const ssoPin = localStorage.getItem('dr_sso_pin') || '';
       fetch(`${GATEWAY}/api/agy/send`, {
         method: 'POST',
@@ -3032,14 +3032,64 @@
       }, 2500);
     }
 
+    function updateAgySessionDisplay(cid) {
+      if (!cid) return;
+      window.AGY_SESSION_ID = cid;
+      const shortId = cid.substring(0, 8);
+      const mediumId = cid.length >= 13 ? cid.substring(0, 13) : shortId;
+
+      const tab = document.getElementById('tab-agy');
+      if (tab) {
+        tab.textContent = `[AGY] Session (${shortId})`;
+        tab.title = `View Active Antigravity Autonomous Agent Stream (Session ${shortId})`;
+      }
+
+      const modalTitle = document.getElementById('agy-modal-title-text');
+      if (modalTitle) {
+        modalTitle.innerHTML = `Antigravity (AGY) Live Terminal &bull; <span class="mono" style="color: #60a5fa;">${mediumId}</span>`;
+      }
+
+      const metaCid = document.getElementById('agy-meta-cid');
+      if (metaCid) metaCid.textContent = cid;
+
+      const connLine = document.getElementById('agy-conn-line');
+      if (connLine) connLine.textContent = `[SYSTEM] Connected to AGY conversation stream: ${cid}`;
+
+      document.querySelectorAll('.agy-session-link-btn').forEach(btn => {
+        btn.title = `Open Live Interactive Terminal for Active Session ${shortId}`;
+        const span = btn.querySelector('span:not(.dropdown-dot)');
+        if (span) span.textContent = `Open AGY Terminal (${shortId})`;
+      });
+
+      const headerBtn = document.getElementById('agy-header-session-btn');
+      if (headerBtn) {
+        headerBtn.title = `Open Live Interactive Terminal for Active Session ${shortId}`;
+        headerBtn.innerHTML = `<span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span> Open This Session (${shortId}) &rarr;`;
+      }
+    }
+
+    function fetchAgySessionInfo(callback) {
+      fetch(`${GATEWAY}/api/agy/session`)
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.conversationId) {
+            updateAgySessionDisplay(data.conversationId);
+          }
+          if (callback) callback(data);
+        })
+        .catch(() => {
+          if (callback) callback(null);
+        });
+    }
+
     function startNewAgySession(target = 'desktop') {
       if (!isSSOAuthenticated()) {
         openGlobalSSOModal(`Start New AGY Session (${target.toUpperCase()})`, () => startNewAgySession(target));
         return;
       }
-      const hostLabel = target === 'nuc' ? 'NUC (Home Server)' : 'Desktop (Workstation)';
+      const hostLabel = target === 'nuc' ? 'NUC Server' : 'Desktop Workstation';
       const ssoPin = localStorage.getItem('dr_sso_pin') || '';
-      showToast('loading', `Starting Session on ${hostLabel}...`, 'Running: agy --dangerously-skip-permissions', 3000);
+      showToast('loading', `Starting New Session on ${hostLabel}...`, 'Spawning: agy --dangerously-skip-permissions', 4000);
 
       fetch(`${GATEWAY}/api/agy/launch`, {
         method: 'POST',
@@ -3049,10 +3099,16 @@
       .then(r => r.json())
       .then(data => {
         if (data.status === 'success') {
-          showToast('success', `AGY Launched (${target.toUpperCase()})`, data.message || 'Session initialized with --dangerously-skip-permissions.');
-          setTimeout(() => {
-            loadLog('agy');
-            refreshAgyConsole(true);
+          showToast('success', `AGY Session Dispatched (${target.toUpperCase()})`, data.message || 'Session initialized with --dangerously-skip-permissions.');
+          // Auto-detect and poll for new session
+          let attempts = 0;
+          const pollInterval = setInterval(() => {
+            attempts++;
+            fetchAgySessionInfo(() => {
+              loadLog('agy');
+              refreshAgyConsole(true);
+            });
+            if (attempts >= 5) clearInterval(pollInterval);
           }, 2000);
         } else {
           showToast('error', 'Launch Failed', data.message || 'Could not start new AGY session.');
@@ -3903,7 +3959,7 @@
     // ==========================================
     let consoleAutoPollTimer = null;
     let consoleAutoPollActive = true;
-    const AGY_SESSION_ID = '51f0adb8-74d9-4ada-92d6-c532f19e0629';
+    const AGY_SESSION_ID = '572d607f-e5b8-42bc-8659-2cce0820852a';
 
     function openEmbeddedConsole(fullscreen = false) {
       if (!isSSOAuthenticated()) {
@@ -3921,6 +3977,7 @@
         win.classList.add('fullscreen');
       }
       updateSSOGateUI();
+      fetchAgySessionInfo();
       refreshAgyConsole();
       startConsoleAutoPoll();
       const input = document.getElementById('agy-modal-input');
@@ -4093,7 +4150,7 @@
       }
 
       if (input) input.value = '';
-      showToast('loading', 'Dispatching Prompt to AGY Session...', 'Session ID: 51f0adb8-74d9', 1500);
+      showToast('loading', 'Dispatching Prompt to AGY Session...', 'Session ID: 572d607f-e5b8', 1500);
 
       const ssoPin = localStorage.getItem('dr_sso_pin') || '';
       fetch(`${GATEWAY}/api/agy/send`, {
@@ -4268,7 +4325,7 @@
         sec: 'Continuous Active • High Performance (Sleep Disabled)',
         speed: '2.5 Gbps High-Bandwidth Link',
         role: 'RTX GPU Inference & AGY Agent Runtime',
-        services: 'Antigravity CLI Daemon (51f0adb8) • Git Mirror • Torrent Seeding',
+        services: 'Antigravity CLI Daemon (572d607f) • Git Mirror • Torrent Seeding',
         btnText: 'Inspect Desktop →',
         action: () => { checkStatus('desktop'); }
       },
@@ -5402,7 +5459,7 @@
       <!-- Quick Session Bar -->
       <div class="agy-session-meta-bar" id="agy-session-meta-bar" style="display: none;">
         <div class="meta-item"><span class="meta-lbl">Agent:</span> <span class="meta-val">Antigravity CLI (agy)</span></div>
-        <div class="meta-item"><span class="meta-lbl">Session ID:</span> <span class="meta-val mono">51f0adb8-74d9-4ada-92d6-c532f19e0629</span></div>
+        <div class="meta-item"><span class="meta-lbl">Session ID:</span> <span id="agy-meta-cid" class="meta-val mono">572d607f-e5b8-42bc-8659-2cce0820852a</span></div>
         <div class="meta-item"><span class="meta-lbl">Session Tokens:</span> <span class="meta-val mono" id="modal-token-count">1,299,171 (In: 1.21M &bull; Out: 85.5K)</span></div>
         <div class="meta-item"><span class="meta-lbl">Model Tier:</span> <span class="meta-val" id="modal-model-val" style="color: #34d399;">Gemini 3.8 Flash (Token-Efficiency Protocol) &bull; Argon</span></div>
         <div class="meta-item"><span class="meta-lbl">Model Breakdown:</span> <span class="meta-val" id="modal-model-breakdown"><span style="color: #38bdf8; font-weight: 600;">Flash: 68%</span> &bull; <span style="color: #c084fc; font-weight: 600;">Argon: 24%</span> &bull; <span style="color: #fbbf24; font-weight: 600;">Pro: 8%</span></span></div>
@@ -5444,7 +5501,7 @@
       <!-- Live Terminal Stream Output Screen -->
       <div class="agy-console-screen" id="agy-console-screen" style="display: none;">
         <div class="agy-line system">[SYSTEM] Establishing encrypted tunnel to Cory-Desktop (Port 8082 via M365 SSO)...</div>
-        <div class="agy-line system">[SYSTEM] Connected to AGY conversation stream: 51f0adb8-74d9-4ada-92d6-c532f19e0629</div>
+        <div class="agy-line system">[SYSTEM] Connected to AGY conversation stream: 572d607f-e5b8-42bc-8659-2cce0820852a</div>
       </div>
 
       <!-- Command Quick Chips -->
@@ -5502,7 +5559,7 @@
             <span style="color: #34d399; font-weight: 700;">100% (Bell Fiber)</span>
           </div>
           <div class="health-meter-bar"><div class="health-meter-fill" style="width: 100%;"></div></div>
-          <div style="font-size: 0.72rem; color: #64748b;">Services: Antigravity CLI Daemon (51f0adb8), High-Speed Torrenting, Git Sync</div>
+          <div style="font-size: 0.72rem; color: #64748b;">Services: Antigravity CLI Daemon (572d607f), High-Speed Torrenting, Git Sync</div>
         </div>
 
         <div class="health-radar-row">
@@ -5867,7 +5924,7 @@
           </div>
           <h4 class="ver-title">Bidirectional Agent Prompt Pipeline &amp; One-Click Diagnostics</h4>
           <ul class="ver-list">
-            <li><strong>Bidirectional Agent Dispatch:</strong> Connected web dispatchers directly to active AGY session 51f0adb8 via dual-path queue ingestion (Desktop background daemon + NUC SMB relay).</li>
+            <li><strong>Bidirectional Agent Dispatch:</strong> Connected web dispatchers directly to active AGY session 572d607f via dual-path queue ingestion (Desktop background daemon + NUC SMB relay).</li>
             <li><strong>One-Click Quick Action Chips:</strong> Interactive tactile blue buttons for Cluster Health, Code Audit, ISP Diagnostics, and Git Status with active spinning dispatch states.</li>
             <li><strong>Dual-Interface Terminal Experience:</strong> Added quick action chips and prompt dispatchers to both the in-page Live Daemon Terminal card and fullscreen Embedded Console modal.</li>
             <li><strong>Encoding &amp; Auth Resilience:</strong> Hardened HTTP listener against null ContentEncoding traps, with M365 Entra ID SSO and admin PIN bypass resilience.</li>
@@ -5927,7 +5984,7 @@
           </div>
           <h4 class="ver-title">Live Embedded AGY Terminal Console &amp; Apex Redirection</h4>
           <ul class="ver-list">
-            <li><strong>Interactive Embedded Console:</strong> Full-screen in-browser terminal connected to active session (<code>51f0adb8-74d9</code>) with verbose turn streaming, command chip shortcuts, and 2.5s auto-polling.</li>
+            <li><strong>Interactive Embedded Console:</strong> Full-screen in-browser terminal connected to active session (<code>572d607f-e5b8</code>) with verbose turn streaming, command chip shortcuts, and 2.5s auto-polling.</li>
             <li><strong>Bi-Directional NUC &harr; Desktop Proxy:</strong> Zero-latency background sync daemon and Entra ID SSO authorization for prompt injection.</li>
             <li><strong>Apex Domain Enforcement:</strong> Seamless canonical routing ensuring <code>www.digitalresolve.ca</code> immediately redirects to <code>https://digitalresolve.ca</code>.</li>
             <li><strong>Clickable Footer Versioning:</strong> Integrated system release changelog accessible directly from the operations deck.</li>
