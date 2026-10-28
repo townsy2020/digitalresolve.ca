@@ -2126,44 +2126,56 @@ button.dropdown-item:active,
   background: rgba(17, 24, 39, 0.94);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
-  padding: 20px 22px;
+  padding: 24px 26px;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 160px;
+  box-sizing: border-box;
 }
 
 .stat-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   flex-wrap: wrap;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .stat-card-title {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #8b949e;
+  letter-spacing: 0.6px;
+  color: #94a3b8;
   font-weight: 700;
 }
 
 .stat-big-val {
-  font-size: 1.8rem;
+  font-size: 1.85rem;
   font-weight: 800;
   color: #f0f6fc;
-  line-height: 1.1;
-  margin-bottom: 6px;
+  line-height: 1.25;
+  margin-bottom: 14px;
   font-family: var(--font-family);
   font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
 }
 
 .stat-subtext {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: #94a3b8;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px 12px;
+  flex-wrap: wrap;
+  line-height: 1.5;
+  margin-top: auto;
+  padding-top: 6px;
 }
 
 /* Multi-Segment Storage Bar */

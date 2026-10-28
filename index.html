@@ -502,37 +502,45 @@
           <div class="stats-grid-row">
             <!-- Swarm Activity Tile -->
             <div class="stat-metric-card">
-              <div class="stat-card-header">
-                <span class="stat-card-title">Torrent Swarm (NUC)</span>
-                <span class="item-tag online" id="swarm-tag">216 Managed</span>
+              <div>
+                <div class="stat-card-header">
+                  <span class="stat-card-title">Torrent Swarm (NUC)</span>
+                  <span class="item-tag online" id="swarm-tag">216 Managed</span>
+                </div>
+                <div class="stat-big-val" id="stat-swarm-active">4 Active &bull; 212 Seed</div>
               </div>
-              <div class="stat-big-val" id="stat-swarm-active">4 Active &bull; 212 Seed</div>
               <div class="stat-subtext">
-                <span style="color: #38bdf8;" id="stat-dht">DHT: 333 Nodes</span> &bull; 
+                <span style="color: #38bdf8;" id="stat-dht">DHT: 333 Nodes</span>
+                <span style="color: #475569; padding: 0 2px;">&bull;</span> 
                 <span style="color: #34d399;" id="stat-vpn-ip">VPN: 23.234.103.246</span>
               </div>
             </div>
 
             <!-- Bandwidth Meter Tile -->
-            <div class="stat-metric-card">
-              <div class="stat-card-header">
-                <span class="stat-card-title">Live Bandwidth</span>
-                <span class="item-tag" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa;" id="stat-throttle-tag">Unconstrained</span>
+            <div class="stat-metric-card stat-bandwidth-card">
+              <div>
+                <div class="stat-card-header">
+                  <span class="stat-card-title">Live Bandwidth</span>
+                  <span class="item-tag" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; padding: 4px 10px; border-radius: 6px;" id="stat-throttle-tag">Unconstrained</span>
+                </div>
+                <div class="stat-big-val" id="stat-dl-speed" style="color: #60a5fa;">0 KB/s <span style="font-size: 0.95rem; color: #8b949e; margin-left: 6px;">&darr;</span></div>
               </div>
-              <div class="stat-big-val" id="stat-dl-speed" style="color: #60a5fa;">0 KB/s <span style="font-size: 0.9rem; color: #8b949e;">&darr;</span></div>
               <div class="stat-subtext">
-                <span>Upload: <strong id="stat-up-speed" style="color: #c4b5fd;">0 KB/s</strong> &uarr;</span> &bull; 
+                <span>Upload: <strong id="stat-up-speed" style="color: #c4b5fd;">0 KB/s</strong> <span style="color: #c4b5fd; margin-left: 2px;">&uarr;</span></span>
+                <span style="color: #475569; padding: 0 2px;">&bull;</span> 
                 <span style="color: #a5b4fc;">Dual Gigabit Routing</span>
               </div>
             </div>
 
             <!-- NUC CPU & RAM Tile -->
             <div class="stat-metric-card">
-              <div class="stat-card-header">
-                <span class="stat-card-title">Hardware Utilization</span>
-                <span class="item-tag online" id="stat-hw-tag">Nominal</span>
+              <div>
+                <div class="stat-card-header">
+                  <span class="stat-card-title">Hardware Utilization</span>
+                  <span class="item-tag online" id="stat-hw-tag">Nominal</span>
+                </div>
+                <div class="stat-big-val" id="stat-cpu-val" style="color: #4ade80;">4% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span></div>
               </div>
-              <div class="stat-big-val" id="stat-cpu-val" style="color: #4ade80;">4% <span style="font-size: 0.9rem; color: #8b949e;">CPU</span></div>
               <div class="stat-subtext" id="stat-ram-sub">
                 Memory: 5.8 GB / 31.8 GB (18%) &bull; 0d 2h up
               </div>
@@ -3528,7 +3536,7 @@
               
               const dlText = sw.dlSpeed >= 1048576 ? `${(sw.dlSpeed / 1048576).toFixed(1)} MB/s` : `${Math.round(sw.dlSpeed / 1024)} KB/s`;
               const upText = sw.upSpeed >= 1048576 ? `${(sw.upSpeed / 1048576).toFixed(1)} MB/s` : `${Math.round(sw.upSpeed / 1024)} KB/s`;
-              if (dlSpd) dlSpd.innerHTML = `${dlText} <span style="font-size: 0.9rem; color: #8b949e;">&darr;</span>`;
+              if (dlSpd) dlSpd.innerHTML = `${dlText} <span style="font-size: 0.95rem; color: #8b949e; margin-left: 6px;">&darr;</span>`;
               if (upSpd) upSpd.textContent = upText;
 
               if (throttleTag) {
