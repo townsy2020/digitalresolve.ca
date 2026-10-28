@@ -170,7 +170,7 @@
           <div class="dropdown-menu">
             <button type="button" class="btn-action-item" onclick="openEmbeddedConsole()" title="Open Live Interactive Terminal for Active Session 572d607f">
               <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
-              <span>Open AGY Terminal (572d607f)</span>
+              <span>Open AGY Terminal (webdev1.0)</span>
               <span class="item-tag online">Live</span>
             </button>
             <a href="#ops-ai" class="btn-action-item" title="Jump to In-Page Compute, AI &amp; Terminal Operations Console">
@@ -1364,7 +1364,7 @@
                 <span id="terminal-title-text">Live Interactive Terminal</span>
               </div>
               <div class="terminal-tabs" id="terminal-tabs-group" style="display: none;">
-                <button type="button" class="terminal-tab active" id="tab-agy" onclick="loadLog('agy')" title="View Active Antigravity Autonomous Agent Stream (Session 572d607f)">[AGY] Session (572d607f)</button>
+                <button type="button" class="terminal-tab active" id="tab-agy" onclick="loadLog('agy')" title="View Active Antigravity Autonomous Agent Stream (webdev1.0 &bull; 572d607f)">[AGY] webdev1.0 (572d607f)</button>
                 <button type="button" class="terminal-tab" id="tab-sentinel" onclick="loadLog('sentinel')" title="View Sentinel Watchdog Security &amp; Fleet Health Audit Log">Sentinel</button>
                 <button type="button" class="terminal-tab" id="tab-power" onclick="loadLog('power')" title="View Smart Power Optimizer &amp; Dynamic Standby Log">Power</button>
                 <button type="button" class="terminal-tab" id="tab-report" onclick="loadLog('report')" title="View Comprehensive Daily Homelab Morning Briefing">Briefing</button>
@@ -1903,14 +1903,17 @@
                 <div class="app-icon" style="color: #60a5fa; border-color: rgba(59, 130, 246, 0.4); background: rgba(59, 130, 246, 0.15); font-weight: 700; font-size: 0.85rem;">AGY</div>
                 <span class="item-tag online" style="background: rgba(34, 197, 94, 0.2); color: #4ade80;">Active Session</span>
               </div>
-              <div class="app-card-title">Antigravity (AGY) Live Session</div>
+              <div class="app-card-title">Antigravity (AGY) Live Session &bull; <span style="color: #60a5fa;">webdev1.0</span></div>
               <div class="app-card-desc">
                 Direct remote access and real-time execution stream of this active Antigravity coding and autonomous homelab orchestration session. Protected by Microsoft 365 Entra ID SSO.
               </div>
             </div>
             <div class="app-card-footer" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
-              <button type="button" onclick="openEmbeddedConsole()" class="btn-nav" title="Open Live Interactive Terminal for Active Session 572d607f" style="font-size: 0.82rem; height: 32px; padding: 4px 14px; background: rgba(16, 185, 129, 0.25); border-color: #10b981; color: #a7f3d0; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
-                <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span> Open This Session (572d607f) &rarr;
+              <button type="button" id="agy-header-session-btn" onclick="openEmbeddedConsole()" class="btn-nav" title="Open In-Browser Live Interactive Terminal for Active Session webdev1.0 (572d607f)" style="font-size: 0.82rem; height: 32px; padding: 4px 14px; background: rgba(16, 185, 129, 0.25); border-color: #10b981; color: #a7f3d0; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span> Open Live Console: webdev1.0 &rarr;
+              </button>
+              <button type="button" onclick="resumeAgySessionOnDesktop()" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px; color: #34d399 !important; border-color: rgba(52, 211, 153, 0.4);" title="Resume Active Session webdev1.0 in Windows Terminal on Desktop">
+                Resume on Desktop &nearr;
               </button>
               <button type="button" onclick="startNewAgySession('desktop')" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px; color: #93c5fd !important; border-color: rgba(59, 130, 246, 0.4);" title="Start New AGY Session on Desktop: agy --dangerously-skip-permissions">
                 + New: Desktop &rarr;
@@ -2779,7 +2782,7 @@
         if (modalScreen) modalScreen.style.display = 'block';
         if (modalChips) modalChips.style.display = 'flex';
         if (modalInput) modalInput.style.display = 'flex';
-        if (modalTitle) modalTitle.innerHTML = 'Antigravity (AGY) Live Autonomous Terminal &bull; <span class="mono" style="color: #60a5fa;">572d607f-e5b8</span>';
+        if (modalTitle) modalTitle.innerHTML = 'Antigravity (AGY) Live Terminal &bull; <span class="mono" style="color: #60a5fa;">' + (window.AGY_SESSION_NAME || 'webdev1.0') + ' (' + (window.AGY_SESSION_ID || '572d607f').substring(0,8) + ')</span>';
         if (modalPulse) { modalPulse.style.background = '#10b981'; modalPulse.style.boxShadow = '0 0 8px #10b981'; }
         if (modalStatus) { modalStatus.textContent = 'ONLINE (Desktop :8082)'; modalStatus.className = 'item-tag online'; }
 
@@ -3032,39 +3035,46 @@
       }, 2500);
     }
 
-    function updateAgySessionDisplay(cid) {
+    window.AGY_SESSION_NAME = 'webdev1.0';
+    window.AGY_SESSION_ID = '572d607f-e5b8-42bc-8659-2cce0820852a';
+
+    function updateAgySessionDisplay(cid, name) {
       if (!cid) return;
       window.AGY_SESSION_ID = cid;
+      if (name) window.AGY_SESSION_NAME = name;
+      const sName = window.AGY_SESSION_NAME || 'webdev1.0';
       const shortId = cid.substring(0, 8);
-      const mediumId = cid.length >= 13 ? cid.substring(0, 13) : shortId;
 
       const tab = document.getElementById('tab-agy');
       if (tab) {
-        tab.textContent = `[AGY] Session (${shortId})`;
-        tab.title = `View Active Antigravity Autonomous Agent Stream (Session ${shortId})`;
+        tab.textContent = `[AGY] ${sName} (${shortId})`;
+        tab.title = `View Active Antigravity Autonomous Agent Stream (${sName} &bull; ${shortId})`;
       }
 
       const modalTitle = document.getElementById('agy-modal-title-text');
       if (modalTitle) {
-        modalTitle.innerHTML = `Antigravity (AGY) Live Terminal &bull; <span class="mono" style="color: #60a5fa;">${mediumId}</span>`;
+        modalTitle.innerHTML = `Antigravity (AGY) Live Terminal &bull; <span class="mono" style="color: #60a5fa;">${sName} (${shortId})</span>`;
       }
+
+      const metaName = document.getElementById('agy-meta-name');
+      if (metaName) metaName.textContent = sName;
 
       const metaCid = document.getElementById('agy-meta-cid');
       if (metaCid) metaCid.textContent = cid;
 
       const connLine = document.getElementById('agy-conn-line');
-      if (connLine) connLine.textContent = `[SYSTEM] Connected to AGY conversation stream: ${cid}`;
+      if (connLine) connLine.textContent = `[SYSTEM] Connected to AGY conversation stream: ${sName} (${cid})`;
 
       document.querySelectorAll('.agy-session-link-btn').forEach(btn => {
-        btn.title = `Open Live Interactive Terminal for Active Session ${shortId}`;
+        btn.title = `Open Live Interactive Terminal for Active Session ${sName} (${shortId})`;
         const span = btn.querySelector('span:not(.dropdown-dot)');
-        if (span) span.textContent = `Open AGY Terminal (${shortId})`;
+        if (span) span.textContent = `Open AGY Terminal (${sName})`;
       });
 
       const headerBtn = document.getElementById('agy-header-session-btn');
       if (headerBtn) {
-        headerBtn.title = `Open Live Interactive Terminal for Active Session ${shortId}`;
-        headerBtn.innerHTML = `<span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span> Open This Session (${shortId}) &rarr;`;
+        headerBtn.title = `Open Live Interactive Terminal for Active Session ${sName} (${shortId})`;
+        headerBtn.innerHTML = `<span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span> Open Live Console: ${sName} &rarr;`;
       }
     }
 
@@ -3073,13 +3083,43 @@
         .then(r => r.json())
         .then(data => {
           if (data && data.conversationId) {
-            updateAgySessionDisplay(data.conversationId);
+            updateAgySessionDisplay(data.conversationId, data.sessionName || 'webdev1.0');
           }
           if (callback) callback(data);
         })
         .catch(() => {
           if (callback) callback(null);
         });
+    }
+
+    function resumeAgySessionOnDesktop() {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal('Resume Active AGY Session on Desktop', resumeAgySessionOnDesktop);
+        return;
+      }
+      const sName = window.AGY_SESSION_NAME || 'webdev1.0';
+      const cid = window.AGY_SESSION_ID || '572d607f-e5b8-42bc-8659-2cce0820852a';
+      const ssoPin = localStorage.getItem('dr_sso_pin') || '';
+      showToast('loading', `Resuming ${sName} on Desktop...`, `Opening Windows Terminal: agy --conversation ${cid.substring(0,8)}...`, 4000);
+
+      // 1. Dispatch daemon trigger via gateway
+      fetch(`${GATEWAY}/api/agy/launch`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ target: 'desktop', action: 'resume', pin: ssoPin })
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.status === 'success') {
+          showToast('success', 'Session Resumed on Desktop', data.message || `Antigravity ${sName} active in Windows Terminal.`);
+        }
+      })
+      .catch(() => {});
+
+      // 2. Also invoke native protocol link for instant local spawn
+      try {
+        window.location.href = `conversation://${cid}`;
+      } catch (e) {}
     }
 
     function startNewAgySession(target = 'desktop') {
@@ -5448,8 +5488,9 @@
         </div>
         <div class="agy-console-header-actions">
           <span class="item-tag online" id="agy-console-status">ONLINE (Desktop :8082)</span>
-          <button type="button" class="btn-console-act" onclick="startNewAgySession('desktop')" style="color: #60a5fa; border-color: rgba(59, 130, 246, 0.4);" title="Start New AGY Session on Desktop with agy --dangerously-skip-permissions">New: Desktop</button>
-          <button type="button" class="btn-console-act" onclick="startNewAgySession('nuc')" style="color: #c084fc; border-color: rgba(192, 132, 252, 0.4);" title="Start New AGY Session on NUC with agy --dangerously-skip-permissions">New: NUC</button>
+          <button type="button" class="btn-console-act" onclick="resumeAgySessionOnDesktop()" style="color: #34d399; border-color: rgba(52, 211, 153, 0.4);" title="Resume Session webdev1.0 in Windows Terminal on Desktop">Resume on Desktop &nearr;</button>
+          <button type="button" class="btn-console-act" onclick="startNewAgySession('desktop')" style="color: #60a5fa; border-color: rgba(59, 130, 246, 0.4);" title="Start New AGY Session on Desktop: agy --dangerously-skip-permissions">+ New: Desktop</button>
+          <button type="button" class="btn-console-act" onclick="startNewAgySession('nuc')" style="color: #c084fc; border-color: rgba(192, 132, 252, 0.4);" title="Start New AGY Session on NUC: agy --dangerously-skip-permissions">+ New: NUC</button>
           <button type="button" class="btn-console-act" onclick="toggleConsoleAutoPoll()" id="btn-console-poll" title="Toggle 2s Live Auto-Polling">Auto-Stream: ON</button>
           <button type="button" class="btn-console-act" onclick="refreshAgyConsole()" title="Refresh Now" aria-label="Refresh terminal stream">&#x21bb;</button>
           <button type="button" class="btn-console-act" onclick="closeAgyConsole()" title="Close Fullscreen Terminal Console" aria-label="Close terminal console">&times;</button>
@@ -5458,7 +5499,7 @@
 
       <!-- Quick Session Bar -->
       <div class="agy-session-meta-bar" id="agy-session-meta-bar" style="display: none;">
-        <div class="meta-item"><span class="meta-lbl">Agent:</span> <span class="meta-val">Antigravity CLI (agy)</span></div>
+        <div class="meta-item"><span class="meta-lbl">Session:</span> <span class="meta-val"><strong style="color: #60a5fa;" id="agy-meta-name">webdev1.0</strong></span></div>
         <div class="meta-item"><span class="meta-lbl">Session ID:</span> <span id="agy-meta-cid" class="meta-val mono">572d607f-e5b8-42bc-8659-2cce0820852a</span></div>
         <div class="meta-item"><span class="meta-lbl">Session Tokens:</span> <span class="meta-val mono" id="modal-token-count">1,299,171 (In: 1.21M &bull; Out: 85.5K)</span></div>
         <div class="meta-item"><span class="meta-lbl">Model Tier:</span> <span class="meta-val" id="modal-model-val" style="color: #34d399;">Gemini 3.8 Flash (Token-Efficiency Protocol) &bull; Argon</span></div>
