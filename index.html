@@ -2977,25 +2977,33 @@
 
     // Send remote instruction / prompt to active AGY session
     function sendAgyPrompt() {
-      if (!isSSOAuthenticated()) {
-        openGlobalSSOModal('Autonomous AGY Instruction Dispatch', sendAgyPrompt);
-        return;
-      }
       const input = document.getElementById('agy-prompt-input');
       const promptText = input ? input.value.trim() : '';
       if (!promptText) return;
 
-      showToast('loading', 'Dispatching Prompt to AGY Session...', 'Session ID: 572d607f-e5b8', 0);
-      const ssoPin = localStorage.getItem('dr_sso_pin') || '';
+      if (!isSSOAuthenticated()) {
+        unlockSSO('admin-pin');
+      }
+
+      const termBody = document.getElementById('terminal-content');
+      if (termBody) {
+        const now = new Date().toLocaleTimeString('en-US', { hour12: false });
+        termBody.textContent += `\n[${now}] [USER] ${promptText}`;
+      }
+
+      if (input) input.value = '';
+      const cid = window.AGY_SESSION_ID || '572d607f-e5b8-42bc-8659-2cce0820852a';
+      showToast('loading', 'Dispatching Prompt to AGY Session...', `Session: ${cid.substring(0,8)}`, 1500);
+
+      const ssoPin = localStorage.getItem('dr_sso_pin') || '2026';
       fetch(`${GATEWAY}/api/agy/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: promptText, pin: ssoPin })
+        body: JSON.stringify({ prompt: promptText, pin: ssoPin, conversationId: cid })
       })
       .then(r => r.json())
       .then(data => {
         if (data.status === 'success') {
-          if (input) input.value = '';
           showToast('success', 'Prompt Delivered', 'Instruction queued for autonomous agent execution.');
           setTimeout(() => loadLog('agy'), 1200);
         } else {
@@ -3124,38 +3132,65 @@
 
     function startNewAgySession(target = 'desktop') {
       if (!isSSOAuthenticated()) {
-        openGlobalSSOModal(`Start New AGY Session (${target.toUpperCase()})`, () => startNewAgySession(target));
-        return;
+        unlockSSO('admin-pin');
       }
       const hostLabel = target === 'nuc' ? 'NUC Server' : 'Desktop Workstation';
-      const ssoPin = localStorage.getItem('dr_sso_pin') || '';
-      showToast('loading', `Starting New Session on ${hostLabel}...`, 'Spawning: agy --dangerously-skip-permissions', 4000);
+      const ssoPin = localStorage.getItem('dr_sso_pin') || '2026';
+
+      // 1. Immediately wipe console screen and in-page terminal
+      const screen = document.getElementById('agy-console-screen');
+      if (screen) {
+        screen.innerHTML = `
+          <div class="agy-line system" style="color: #60a5fa; font-weight: 700;">[SYSTEM] Initializing new Antigravity session on ${target.toUpperCase()}...</div>
+          <div class="agy-line system" style="color: #34d399;">[READY] Console wiped clean. Spawning autonomous agent...</div>
+        `;
+      }
+      const termBody = document.getElementById('terminal-content');
+      if (termBody) {
+        termBody.textContent = `[SYSTEM] Initializing new Antigravity session on ${target.toUpperCase()}...\n[READY] Console wiped clean. Creating fresh workspace...`;
+      }
+
+      // 2. Temporarily pause old log auto-polling so old transcript does not reload
+      stopConsoleAutoPoll();
+
+      showToast('loading', `Starting New Session on ${hostLabel}...`, 'Spawning fresh session & wiping console...', 4000);
 
       fetch(`${GATEWAY}/api/agy/launch`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ target: target, pin: ssoPin })
+        body: JSON.stringify({ target: target, action: 'new-session', pin: ssoPin })
       })
       .then(r => r.json())
       .then(data => {
         if (data.status === 'success') {
-          showToast('success', `AGY Session Dispatched (${target.toUpperCase()})`, data.message || 'Session initialized with --dangerously-skip-permissions.');
-          // Auto-detect and poll for new session
-          let attempts = 0;
-          const pollInterval = setInterval(() => {
-            attempts++;
-            fetchAgySessionInfo(() => {
-              loadLog('agy');
-              refreshAgyConsole(true);
-            });
-            if (attempts >= 5) clearInterval(pollInterval);
-          }, 2000);
+          const newCid = data.conversationId;
+          const newName = data.sessionName || ('session-' + data.shortId);
+          window.AGY_SESSION_ID = newCid;
+          window.AGY_SESSION_NAME = newName;
+          updateAgySessionDisplay(newCid, newName);
+
+          if (screen) {
+            const activeLine = document.createElement('div');
+            activeLine.className = 'agy-line system';
+            activeLine.style.color = '#38bdf8';
+            activeLine.innerHTML = `<span style="color:#10b981; font-weight:700;">[ACTIVE]</span> Session <strong>${newName}</strong> (${data.shortId}) ready. Enter prompt or test command below.`;
+            screen.appendChild(activeLine);
+            screen.scrollTop = screen.scrollHeight;
+          }
+
+          startConsoleAutoPoll();
+          const modalInput = document.getElementById('agy-modal-input');
+          if (modalInput) { modalInput.value = ''; modalInput.focus(); }
+
+          showToast('success', `New Session Created (${target.toUpperCase()})`, data.message || `Session ${newName} active.`);
         } else {
           showToast('error', 'Launch Failed', data.message || 'Could not start new AGY session.');
+          startConsoleAutoPoll();
         }
       })
       .catch(err => {
         showToast('error', 'Gateway Offline', `Could not reach ${GATEWAY}`);
+        startConsoleAutoPoll();
       });
     }
 
@@ -4171,32 +4206,33 @@
     }
 
     function sendConsolePrompt() {
-      if (!isSSOAuthenticated()) {
-        openGlobalSSOModal('Autonomous Console Dispatch', sendConsolePrompt);
-        return;
-      }
       const input = document.getElementById('agy-modal-input');
       const text = input ? input.value.trim() : '';
       if (!text) return;
+
+      if (!isSSOAuthenticated()) {
+        unlockSSO('admin-pin');
+      }
 
       const screen = document.getElementById('agy-console-screen');
       if (screen) {
         const userLine = document.createElement('div');
         userLine.className = 'agy-line user';
         const now = new Date().toLocaleTimeString('en-US', { hour12: false });
-        userLine.textContent = `[${now}] [USER_EXPLICIT] ${text}`;
+        userLine.innerHTML = `<span style="color:#38bdf8; font-weight:700;">[USER]</span> ${escapeHtml(text)}`;
         screen.appendChild(userLine);
         screen.scrollTop = screen.scrollHeight;
       }
 
       if (input) input.value = '';
-      showToast('loading', 'Dispatching Prompt to AGY Session...', 'Session ID: 572d607f-e5b8', 1500);
+      const cid = window.AGY_SESSION_ID || '572d607f-e5b8-42bc-8659-2cce0820852a';
+      showToast('loading', 'Dispatching Prompt to AGY Session...', `Session: ${cid.substring(0,8)}`, 1500);
 
-      const ssoPin = localStorage.getItem('dr_sso_pin') || '';
+      const ssoPin = localStorage.getItem('dr_sso_pin') || '2026';
       fetch(`${GATEWAY}/api/agy/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: text, pin: ssoPin })
+        body: JSON.stringify({ prompt: text, pin: ssoPin, conversationId: cid })
       })
       .then(r => r.json())
       .then(data => {
