@@ -46,14 +46,13 @@ section[id], div[id], #deck, #ops, #fleet, #uptime, #camera-feed-card {
 }
 
 .background-glow {
-  position: fixed;
-  top: -20%;
+  position: absolute;
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
   width: 800px;
-  height: 500px;
+  height: 480px;
   background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, rgba(168, 85, 247, 0.05) 50%, transparent 70%);
-  filter: blur(80px);
   pointer-events: none;
   z-index: 0;
 }
@@ -786,7 +785,6 @@ button.dropdown-item:active,
   padding: 36px 28px;
   border-radius: 14px;
   transition: transform 0.2s ease, border-color 0.2s ease;
-  backdrop-filter: blur(8px);
 }
 
 .card:hover {
@@ -854,7 +852,6 @@ button.dropdown-item:active,
   border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 28px;
-  backdrop-filter: blur(12px);
   transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
   display: flex;
   flex-direction: column;
@@ -1284,11 +1281,10 @@ button.dropdown-item:active,
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 14px;
-  background: rgba(15, 23, 42, 0.65);
+  background: rgba(15, 23, 42, 0.94);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   padding: 16px 20px;
-  backdrop-filter: blur(12px);
   margin-bottom: 50px;
 }
 
@@ -1327,14 +1323,13 @@ button.dropdown-item:active,
 }
 
 .app-card {
-  background: rgba(17, 24, 39, 0.75);
+  background: rgba(17, 24, 39, 0.94);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   padding: 24px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  backdrop-filter: blur(12px);
   text-decoration: none;
   transition: all 0.25s ease;
   position: relative;
@@ -1422,12 +1417,11 @@ button.dropdown-item:active,
 
 /* Quick Drop Inline Bar */
 .quick-drop-inline {
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(15, 23, 42, 0.95);
   border: 1px solid rgba(59, 130, 246, 0.3);
   border-radius: 14px;
   padding: 24px;
   margin-bottom: 40px;
-  backdrop-filter: blur(12px);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
@@ -1498,12 +1492,11 @@ button.dropdown-item:active,
 
 /* Control Matrix */
 .control-matrix-card {
-  background: rgba(15, 23, 42, 0.85);
+  background: rgba(15, 23, 42, 0.95);
   border: 1px solid rgba(59, 130, 246, 0.35);
   border-radius: 14px;
   padding: 24px;
   margin-bottom: 30px;
-  backdrop-filter: blur(14px);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
 }
 
@@ -1809,11 +1802,10 @@ button.dropdown-item:active,
 }
 
 .stat-metric-card {
-  background: rgba(17, 24, 39, 0.8);
+  background: rgba(17, 24, 39, 0.94);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   padding: 20px;
-  backdrop-filter: blur(12px);
   position: relative;
   overflow: hidden;
 }
@@ -3893,32 +3885,35 @@ html.mobile-layout .agy-inline-chips {
 }
 
 /* ==========================================================================
-   🕹️ Homelab Chaos Monkey & Resilience Simulator
+   🚨 Homelab Disaster Recovery & Resilience Test
    ========================================================================== */
+.disaster-modal-overlay,
 .chaos-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(2, 6, 23, 0.88);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  z-index: 10003;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(2, 6, 23, 0.94);
+  z-index: 10005;
   display: none !important;
   align-items: center;
   justify-content: center;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease-out;
+  transition: opacity 0.2s ease-out;
 }
 
+.disaster-modal-overlay.active,
 .chaos-modal-overlay.active {
   display: flex !important;
   opacity: 1;
   pointer-events: auto;
 }
 
+.disaster-modal-window,
 .chaos-modal-window {
   background: #090d16;
-  border: 1px solid rgba(245, 158, 11, 0.4);
+  border: 1px solid rgba(245, 158, 11, 0.45);
   border-radius: 16px;
   width: 95%;
   max-width: 860px;
@@ -3927,7 +3922,26 @@ html.mobile-layout .agy-inline-chips {
   flex-direction: column;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 35px rgba(245, 158, 11, 0.22);
   overflow: hidden;
-  animation: chaosPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: chaosPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.disaster-test-btn,
+.chaos-lab-btn {
+  background: rgba(245, 158, 11, 0.18) !important;
+  border-color: rgba(245, 158, 11, 0.5) !important;
+  color: #fde68a !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+}
+
+.pill-disaster,
+.pill-chaos {
+  border-color: #f59e0b !important;
+  background: rgba(245, 158, 11, 0.22) !important;
+  color: #fde68a !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.28) !important;
 }
 
 @keyframes chaosPop {

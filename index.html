@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Digital Resolve &bull; Homelab Cloud &amp; Command Deck</title>
   <meta name="description" content="24/7 self-hosted homelab operations, Cloudflare Zero Trust tunnels, private 4K media streaming, and automated WireGuard VPN ingestion.">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=2.6.1">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -86,10 +86,10 @@
           </div>
         </div>
 
-        <!-- Chaos Monkey Resilience Simulator Trigger Button -->
-        <button type="button" class="btn-nav chaos-lab-btn" onclick="openChaosModal()" style="background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.4); color: #fcd34d; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);" title="Launch Homelab Chaos Monkey: Inject simulated faults & test automated self-healing resilience">
+        <!-- Disaster Recovery Test Trigger Button -->
+        <button type="button" class="btn-nav disaster-test-btn" id="disaster-test-btn" onclick="openDisasterModal()" style="background: rgba(245, 158, 11, 0.18); border-color: rgba(245, 158, 11, 0.5); color: #fde68a; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 0 10px rgba(245, 158, 11, 0.25); cursor: pointer;" title="Launch Disaster Recovery Test: Inject simulated infrastructure faults & test autonomous self-healing">
           <span class="dropdown-dot" style="background-color: #f59e0b; box-shadow: 0 0 8px #f59e0b;"></span>
-          <span>🕹️ Chaos Lab</span>
+          <span>🚨 Disaster Test</span>
         </button>
 
         <!-- Live AI Token Telemetry Counter Button -->
@@ -261,8 +261,8 @@
           <button type="button" onclick="openMagnetModal()" class="pill-btn pill-magnet" title="Open 1-Click Remote Magnet Ingestion Modal">
             <span>[+]</span> Quick-Drop Magnet
           </button>
-          <button type="button" onclick="openChaosModal()" class="pill-btn pill-chaos" style="border-color: #f59e0b; background: rgba(245, 158, 11, 0.22); color: #fde68a; font-weight: 700; cursor: pointer; box-shadow: 0 0 14px rgba(245, 158, 11, 0.28);" title="Open Homelab Chaos Monkey & Fault Resilience Simulator">
-            <span>🕹️</span> Chaos Monkey Lab
+          <button type="button" onclick="openDisasterModal()" class="pill-btn pill-disaster pill-chaos" id="hero-disaster-btn" style="border-color: #f59e0b; background: rgba(245, 158, 11, 0.25); color: #fde68a; font-weight: 700; cursor: pointer; box-shadow: 0 0 14px rgba(245, 158, 11, 0.3);" title="Open Homelab Disaster Recovery & Resilience Test Workbench">
+            <span>🚨</span> Disaster Test
           </button>
           <a href="#fleet" class="pill-btn pill-outline">
             <span>[CLUSTER]</span> Topology &amp; Power
@@ -1224,12 +1224,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;">v2.6.0</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;">v2.6.1</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" title="Project Codebase Scale: 8,228 Lines of Code (HTML: 3,980 lines &bull; CSS: 4,247 lines &bull; CNAME)">
+        <div class="footer-loc-badge" title="Project Codebase Scale: 8,250 Lines of Code (HTML: 3,988 lines &bull; CSS: 4,261 lines &bull; CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">8,228</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">8,250</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1649,7 +1649,7 @@
       updateTokenCounterUI();
 
       // Ensure all modal overlays are strictly hidden on load
-      ['magnet-modal-overlay', 'agy-console-modal-overlay', 'changelog-modal-overlay', 'health-modal-overlay', 'chaos-modal-overlay'].forEach(id => {
+      ['magnet-modal-overlay', 'agy-console-modal-overlay', 'changelog-modal-overlay', 'health-modal-overlay', 'chaos-modal-overlay', 'disaster-modal-overlay'].forEach(id => {
         const el = document.getElementById(id);
         if (el) { el.classList.remove('active'); el.style.display = 'none'; }
       });
@@ -3093,29 +3093,35 @@
       }
     }
 
-    function openChaosModal() {
-      const modal = document.getElementById('chaos-modal-overlay');
+    function openDisasterModal() {
+      const modal = document.getElementById('disaster-modal-overlay') || document.getElementById('chaos-modal-overlay');
       if (modal) {
-        modal.style.display = 'flex';
+        modal.style.setProperty('display', 'flex', 'important');
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
       }
     }
 
-    function closeChaosModal() {
-      const modal = document.getElementById('chaos-modal-overlay');
+    function closeDisasterModal() {
+      const modal = document.getElementById('disaster-modal-overlay') || document.getElementById('chaos-modal-overlay');
       if (modal) {
         modal.classList.remove('active');
-        modal.style.display = 'none';
+        modal.style.setProperty('display', 'none', 'important');
       }
       document.body.style.overflow = '';
     }
 
-    function closeChaosModalOnBackdrop(e) {
-      if (e.target && e.target.id === 'chaos-modal-overlay') {
-        closeChaosModal();
+    function closeDisasterModalOnBackdrop(e) {
+      if (e.target && (e.target.id === 'disaster-modal-overlay' || e.target.id === 'chaos-modal-overlay')) {
+        closeDisasterModal();
       }
     }
+
+    // Direct global aliases for backward compatibility & direct invocation
+    window.openDisasterModal = openDisasterModal;
+    window.closeDisasterModal = closeDisasterModal;
+    window.openChaosModal = openDisasterModal;
+    window.closeChaosModal = closeDisasterModal;
 
     function addChaosLog(type, msg) {
       const feed = document.getElementById('chaos-console-feed');
@@ -3367,6 +3373,7 @@
     // Global Escape Key Handler to dismiss all modals & restore scroll
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
+        closeDisasterModal();
         closeChaosModal();
         closeHealthModal();
         closeChangelogModal();
@@ -3582,18 +3589,18 @@
     </div>
   </div>
 
-  <!-- 🕹️ Chaos Monkey & Resilience Simulator Modal -->
-  <div id="chaos-modal-overlay" class="chaos-modal-overlay" style="display: none;" onclick="closeChaosModalOnBackdrop(event)">
-    <div class="chaos-modal-window" role="dialog" aria-modal="true" aria-label="Homelab Chaos Monkey Simulator">
-      <div class="chaos-modal-header">
-        <div style="display: flex; align-items: center; gap: 9px;">
-          <span style="font-size: 1.25rem;">🕹️</span>
+  <!-- 🚨 Disaster Recovery & Resilience Test Modal -->
+  <div id="disaster-modal-overlay" class="disaster-modal-overlay chaos-modal-overlay" style="position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 10005; background: rgba(2, 6, 23, 0.94); display: none; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box;" onclick="closeDisasterModalOnBackdrop(event)">
+    <div class="disaster-modal-window chaos-modal-window" role="dialog" aria-modal="true" aria-label="Homelab Disaster Recovery Test" style="background: #090d16; border: 1px solid rgba(245, 158, 11, 0.45); border-radius: 16px; width: 95%; max-width: 860px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 35px rgba(245, 158, 11, 0.22); overflow: hidden;">
+      <div class="disaster-modal-header chaos-modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.35rem;">🚨</span>
           <div>
-            <div style="font-weight: 800; color: #f8fafc; font-size: 1rem; letter-spacing: -0.3px;">Chaos Monkey &bull; Homelab Resilience Lab</div>
-            <div style="font-size: 0.72rem; color: #94a3b8;">Simulate real-world failures &amp; verify autonomous self-healing sentinel failover.</div>
+            <div style="font-weight: 800; color: #f8fafc; font-size: 1.05rem; letter-spacing: -0.3px;">Disaster Recovery Test &bull; Homelab Resilience Lab</div>
+            <div style="font-size: 0.74rem; color: #94a3b8;">Simulate real-world outages &amp; verify autonomous self-healing sentinel failover.</div>
           </div>
         </div>
-        <button type="button" class="changelog-close" onclick="closeChaosModal()" title="Close Chaos Simulator" aria-label="Close chaos dialog">&times;</button>
+        <button type="button" class="changelog-close" onclick="closeDisasterModal()" title="Close Disaster Test" aria-label="Close disaster test dialog">&times;</button>
       </div>
 
       <div class="chaos-modal-body">
@@ -3604,14 +3611,14 @@
               <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Cluster Resilience Index</div>
               <div class="chaos-score-val" id="chaos-score-val">99% Optimal</div>
             </div>
-            <span class="item-tag online" id="chaos-fault-counter">0 Faults Active</span>
+            <span class="item-tag online" id="chaos-fault-counter">0 Outages Active</span>
           </div>
           <div class="chaos-actions-top">
             <button type="button" class="btn-chaos-action btn-chaos-sound" id="btn-chaos-sound" onclick="toggleChaosSound()" title="Toggle Web Audio procedural synthesizer sound effects">
               🔈 Sound: OFF
             </button>
             <button type="button" class="btn-chaos-action btn-chaos-heal" onclick="restoreAllChaos()" title="Master Sentinel Override: Restore all nodes to 100% green">
-              🔄 Restore All Nodes
+              🔄 Recover All Nodes
             </button>
           </div>
         </div>
@@ -3671,7 +3678,7 @@
         <!-- Chaos Arsenal: Fault Injection Controls -->
         <div>
           <div style="font-size: 0.78rem; font-weight: 700; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
-            Simulated Fault Arsenal (Click to Inject / Recover)
+            Disaster Scenarios (Click to Inject / Recover)
           </div>
           <div class="chaos-arsenal-grid">
             <!-- Scenario 1: Bell Fiber -->
@@ -3747,9 +3754,9 @@
             <span>AUTO-SCROLL &bull; REAL-TIME</span>
           </div>
           <div class="chaos-console-feed" id="chaos-console-feed">
-            <div class="chaos-line sys">[SYSTEM] Chaos Engineering Sentinel v2.5 initialized. Topology verified green.</div>
+            <div class="chaos-line sys">[SYSTEM] Disaster Recovery Sentinel v2.6.0 initialized. Topology verified green.</div>
             <div class="chaos-line info">[PROBE] All 6 infrastructure nodes responding within SLA (&lt; 12ms latency).</div>
-            <div class="chaos-line heal">[READY] Autonomous failover triggers armed. Select a fault above to test resilience.</div>
+            <div class="chaos-line heal">[READY] Autonomous failover triggers armed. Select an outage scenario above to test resilience.</div>
           </div>
         </div>
 
@@ -3769,18 +3776,19 @@
       </div>
 
       <div class="changelog-body">
-        <!-- Version 2.6.0 (Current) -->
+        <!-- Version 2.6.1 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.6.0 &bull; Current</span>
+            <span class="ver-tag current">v2.6.1 &bull; Current</span>
             <span class="ver-date">October 27, 2026</span>
           </div>
-          <h4 class="ver-title">🕹️ Chaos Monkey &bull; Interactive Homelab Resilience Simulator</h4>
+          <h4 class="ver-title">🚨 Disaster Recovery Test Workbench &amp; Ultra-Smooth 60FPS Scroll Pipeline</h4>
           <ul class="ver-list">
-            <li><strong>Interactive Chaos Engineering Workbench:</strong> Real-time fault injection sandbox simulating Bell Fiber WAN severed carrier, Desktop sudden power drop (0W), 50k req/s volumetric DDoS floods, and 99.8% torrent disk saturation.</li>
+            <li><strong>Disaster Recovery Test:</strong> Real-time outage simulation sandbox testing Bell Fiber WAN severed carrier, Desktop sudden power drop (0W), 50k req/s volumetric DDoS floods, and 99.8% torrent storage saturation.</li>
+            <li><strong>Bulletproof Modal Architecture:</strong> Inline layout guarantees and cache-busted stylesheet pipeline (<code>styles.css?v=2.6.1</code>) ensuring instant viewport rendering on all devices.</li>
+            <li><strong>Ultra-Smooth Scroll Pipeline:</strong> Replaced GPU-heavy composite backdrop blur filters across cards and fixed backgrounds with high-performance opaque palettes, eliminating scroll stutter and rendering inconsistencies.</li>
             <li><strong>Autonomous Self-Healing Sentinel:</strong> Live visual rerouting showing multi-WAN cellular failover, NUC task absorption, Cloudflare Zero Trust rate-limiting shields, and automated SMB storage evacuation.</li>
             <li><strong>Tactile Web Audio Procedural Synth:</strong> Zero-dependency acoustic feedback synthesizing sci-fi warning warbles, failover chimes, and system recovery melodies via HTML5 Web Audio API.</li>
-            <li><strong>Dynamic Cluster Resilience Score:</strong> Live health penalty index dynamically adjusting from 99% Optimal down to 18% Lockdown based on active faults, with single-click master sentinel recovery.</li>
           </ul>
         </div>
 
