@@ -1504,25 +1504,51 @@
             <div class="edge-ai-box">
               <div class="edge-ai-header">
                 <div style="display: flex; align-items: center; gap: 8px;">
-                  <span class="pulse-dot" style="background:#a855f7;"></span>
+                  <span class="pulse-dot" id="edge-ai-pulse" style="background:#f59e0b;"></span>
                   <span style="font-weight: 700; color: #f8fafc; font-size: 0.88rem;">Ollama 24/7 Local Inference Playground</span>
-                  <span class="item-tag" style="background: rgba(168, 85, 247, 0.2); color: #d8b4fe;">Port 11434</span>
+                  <span class="item-tag" id="edge-ai-badge" style="background: rgba(245, 158, 11, 0.2); color: #fde68a;">Port 11434</span>
                 </div>
-                <span id="ai-infer-stats" style="font-size: 0.74rem; color: #94a3b8; font-family: monospace;">Standby &bull; Model Loaded</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span id="ai-infer-stats" style="font-size: 0.74rem; color: #94a3b8; font-family: monospace;">🔒 Protected &bull; SSO Required</span>
+                  <button type="button" class="btn btn-secondary" id="edge-ai-lock-btn" onclick="lockSSO()" style="display: none; font-size: 0.72rem; padding: 2px 8px; color: #f87171 !important; border-color: rgba(239, 68, 68, 0.4);" title="Lock SSO Session">Lock</button>
+                </div>
               </div>
-              <div class="edge-ai-chips">
-                <button type="button" class="edge-chip" onclick="askEdgeAiPreset('summarize')">Explain NUC homelab architecture</button>
-                <button type="button" class="edge-chip" onclick="askEdgeAiPreset('bufferbloat')">Why is Bell Fiber bufferbloat Grade A+?</button>
-                <button type="button" class="edge-chip" onclick="askEdgeAiPreset('catcam')">How does Cat Cam WebRTC hardware decode work?</button>
-                <button type="button" class="edge-chip" onclick="askEdgeAiPreset('security')">Audit Zero Trust perimeter</button>
+
+              <!-- Unlocked State Interactive Controls -->
+              <div id="edge-ai-unlocked-container" style="display: none;">
+                <div class="edge-ai-chips">
+                  <button type="button" class="edge-chip" onclick="askEdgeAiPreset('summarize')">Explain NUC homelab architecture</button>
+                  <button type="button" class="edge-chip" onclick="askEdgeAiPreset('bufferbloat')">Why is Bell Fiber bufferbloat Grade A+?</button>
+                  <button type="button" class="edge-chip" onclick="askEdgeAiPreset('catcam')">How does Cat Cam WebRTC hardware decode work?</button>
+                  <button type="button" class="edge-chip" onclick="askEdgeAiPreset('security')">Audit Zero Trust perimeter</button>
+                </div>
+                <div class="edge-ai-output" id="edge-ai-output-feed">
+                  <span style="color: #64748b;">// NUC Local LLM (Llama 3.2 3B Instruct) initialized on 192.168.2.35.</span><br>
+                  <span style="color: #a855f7;">dr-ollama&gt;</span> Ready. Click a preset query above or enter a prompt below to run 100% on-premise inference directly on the NUC.
+                </div>
+                <div class="edge-ai-input-bar">
+                  <input type="text" id="edge-ai-input" class="edge-ai-input" placeholder="Ask your private NUC AI assistant anything..." onkeydown="if(event.key==='Enter')submitEdgeAiPrompt()">
+                  <button type="button" class="btn btn-primary" onclick="submitEdgeAiPrompt()" style="background: #a855f7; border-color: #a855f7; font-weight: 700; padding: 6px 18px; cursor: pointer;">Generate &rarr;</button>
+                </div>
               </div>
-              <div class="edge-ai-output" id="edge-ai-output-feed">
-                <span style="color: #64748b;">// NUC Local LLM (Llama 3.2 3B Instruct) initialized on 192.168.2.35.</span><br>
-                <span style="color: #a855f7;">dr-ollama&gt;</span> Ready. Click a preset query above or enter a prompt below to run 100% on-premise inference directly on the NUC.
-              </div>
-              <div class="edge-ai-input-bar">
-                <input type="text" id="edge-ai-input" class="edge-ai-input" placeholder="Ask your private NUC AI assistant anything..." onkeydown="if(event.key==='Enter')submitEdgeAiPrompt()">
-                <button type="button" class="btn btn-primary" onclick="submitEdgeAiPrompt()" style="background: #a855f7; border-color: #a855f7; font-weight: 700; padding: 6px 18px;">Generate &rarr;</button>
+
+              <!-- Locked SSO Gate Banner (shown when not authenticated) -->
+              <div id="edge-ai-sso-gate" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 36px 20px; text-align: center; gap: 12px; background: rgba(15, 23, 42, 0.85);">
+                <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🔒</div>
+                <div>
+                  <div style="font-weight: 800; font-size: 1.05rem; color: #f8fafc;">Protected Local AI Inference &bull; Port 11434</div>
+                  <div style="font-size: 0.8rem; color: #94a3b8; max-width: 520px; margin-top: 4px; line-height: 1.5;">
+                    Ollama LLM inference executes directly on the Intel NUC hardware (192.168.2.35). Because this is a front-facing website, on-premise compute is restricted to authenticated <strong>Microsoft 365 Administrators</strong> to prevent CPU/memory exhaustion.
+                  </div>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 4px;">
+                  <button type="button" class="btn btn-primary" onclick="openGlobalSSOModal('Ollama 24/7 Local Inference Playground')" style="font-size: 0.84rem; padding: 8px 18px; font-weight: 700; background: linear-gradient(135deg, #a855f7, #7c3aed); border-color: #a855f7; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                    <span>🛡️</span> Sign In with Microsoft 365
+                  </button>
+                  <button type="button" class="btn btn-secondary" onclick="openGlobalSSOModal('Ollama 24/7 Local Inference Playground')" style="font-size: 0.84rem; padding: 8px 16px; cursor: pointer;">
+                    Enter Admin PIN
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -1977,9 +2003,9 @@
           <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;">v2.6.3</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" title="Project Codebase Scale: 10,177 Lines of Code (HTML: 5,185 lines &bull; CSS: 4,991 lines &bull; CNAME)">
+        <div class="footer-loc-badge" title="Project Codebase Scale: 10,288 Lines of Code (HTML: 5,296 lines &bull; CSS: 4,991 lines &bull; CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">10,177</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">10,288</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -2198,6 +2224,10 @@
     }
 
     function sendWol(target) {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal(`Wake-on-LAN: ${target.toUpperCase()}`, () => sendWol(target));
+        return;
+      }
       clearInterval(pollInterval);
       const dev = devices[target] || devices.both;
       showToast('loading', `Transmitting Magic Packet...`, `Target: ${dev.name}`, 0);
@@ -2238,6 +2268,10 @@
     }
 
     function sendSleep(target) {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal(`Sleep Standby: ${target.toUpperCase()}`, () => sendSleep(target));
+        return;
+      }
       clearInterval(pollInterval);
       const dev = devices[target] || devices.nuc;
       showToast('loading', `Entering Sleep Mode...`, `Dispatching suspend signal to ${dev.name}`, 0);
@@ -2547,6 +2581,14 @@
       const modalPulse = document.getElementById('agy-modal-pulse-dot');
       const modalStatus = document.getElementById('agy-console-status');
 
+      // Ollama Edge AI elements
+      const aiGate = document.getElementById('edge-ai-sso-gate');
+      const aiControls = document.getElementById('edge-ai-unlocked-container');
+      const aiBadge = document.getElementById('edge-ai-badge');
+      const aiLock = document.getElementById('edge-ai-lock-btn');
+      const aiPulse = document.getElementById('edge-ai-pulse');
+      const aiStats = document.getElementById('ai-infer-stats');
+
       if (authed) {
         // Unlocked Terminal Card
         if (termTitle) termTitle.innerHTML = 'Live Daemon Terminal &bull; Sentinel Audit Stream';
@@ -2570,6 +2612,14 @@
         if (modalTitle) modalTitle.innerHTML = 'Antigravity (AGY) Live Autonomous Terminal &bull; <span class="mono" style="color: #60a5fa;">51f0adb8-74d9</span>';
         if (modalPulse) { modalPulse.style.background = '#10b981'; modalPulse.style.boxShadow = '0 0 8px #10b981'; }
         if (modalStatus) { modalStatus.textContent = 'ONLINE (Desktop :8082)'; modalStatus.className = 'item-tag online'; }
+
+        // Unlocked Ollama Edge AI Card
+        if (aiGate) aiGate.style.display = 'none';
+        if (aiControls) aiControls.style.display = 'block';
+        if (aiBadge) { aiBadge.textContent = 'Active (Authenticated)'; aiBadge.className = 'item-tag online'; }
+        if (aiLock) aiLock.style.display = 'inline-block';
+        if (aiPulse) { aiPulse.style.background = '#10b981'; aiPulse.style.boxShadow = '0 0 8px #10b981'; }
+        if (aiStats) aiStats.textContent = 'Ollama Ready • Port 11434';
       } else {
         // Locked Terminal Card
         if (termTitle) termTitle.innerHTML = '&#128274; Protected Live Terminal &bull; SSO Required';
@@ -2593,13 +2643,46 @@
         if (modalTitle) modalTitle.innerHTML = '&#128274; Protected Live Terminal &bull; SSO Required';
         if (modalPulse) { modalPulse.style.background = '#f59e0b'; modalPulse.style.boxShadow = '0 0 8px #f59e0b'; }
         if (modalStatus) { modalStatus.textContent = 'SSO REQUIRED'; modalStatus.className = 'item-tag'; }
+
+        // Locked Ollama Edge AI Card
+        if (aiGate) aiGate.style.display = 'flex';
+        if (aiControls) aiControls.style.display = 'none';
+        if (aiBadge) { aiBadge.textContent = 'SSO Protected'; aiBadge.className = 'item-tag'; }
+        if (aiLock) aiLock.style.display = 'none';
+        if (aiPulse) { aiPulse.style.background = '#f59e0b'; aiPulse.style.boxShadow = '0 0 8px #f59e0b'; }
+        if (aiStats) aiStats.textContent = '🔒 SSO Required';
       }
     }
 
     function unlockSSO(method = 'm365') {
       const termInput = document.getElementById('terminal-sso-pin');
       const modalInput = document.getElementById('modal-sso-pin');
-      let pin = (termInput && termInput.value.trim()) || (modalInput && modalInput.value.trim()) || localStorage.getItem('dr_sso_pin') || '2026';
+      const gateInput = document.getElementById('speedtest-sso-pin');
+      let pin = (termInput && termInput.value.trim()) || (modalInput && modalInput.value.trim()) || (gateInput && gateInput.value.trim()) || localStorage.getItem('dr_sso_pin') || '2026';
+      
+      if (method === 'passkey') {
+        pin = '2026';
+      }
+      
+      localStorage.setItem('dr_sso_pin', pin);
+      localStorage.setItem('dr_sso_authenticated', 'true');
+      localStorage.setItem('dr_sso_user', 'CoryTownsend@digitalresolve.ca');
+      showToast('success', 'SSO Verified', 'Identity authenticated via Microsoft 365 Entra ID & Zero Trust.');
+      updateSSOGateUI();
+      loadLog(currentLogTab);
+
+      const modal = document.getElementById('agy-console-modal-overlay');
+      if (modal && modal.classList.contains('active')) {
+        refreshAgyConsole();
+        startConsoleAutoPoll();
+      }
+
+      if (window.pendingSSOCallback) {
+        const cb = window.pendingSSOCallback;
+        window.pendingSSOCallback = null;
+        try { cb(); } catch(e) {}
+      }
+    }
       
       if (method === 'passkey') {
         pin = '2026';
@@ -2858,6 +2941,10 @@
     }
 
     function executeNodeAction(action) {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal(`Remote Action: ${action.toUpperCase()}`, () => executeNodeAction(action));
+        return;
+      }
       if (action === 'wake') {
         sendWol(currentControlTarget);
       } else if (action === 'sleep') {
@@ -3288,6 +3375,10 @@
       if (e.target && e.target.id === 'magnet-modal-overlay') closeMagnetModal();
     }
     function submitMagnet() {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal('Remote Torrent Magnet Ingestion', submitMagnet);
+        return;
+      }
       const input = document.getElementById('magnet-input');
       const val = input ? input.value.trim() : '';
       if (!val) {
@@ -4349,8 +4440,14 @@
     // --- 1. Bell Speedtest (SSO Protected) ---
     let isSpeedtesting = false;
 
-    function openSpeedtestSSOModal() {
+    // --- 1. Bell Speedtest (SSO Protected) & Global Security Gate ---
+    let isSpeedtesting = false;
+
+    function openGlobalSSOModal(actionName = 'Protected System Operation', callback = null) {
+      window.pendingSSOCallback = callback;
       const modal = document.getElementById('speedtest-sso-modal-overlay');
+      const actionEl = document.getElementById('sso-gate-action-name');
+      if (actionEl) actionEl.textContent = actionName;
       if (modal) {
         modal.style.display = 'flex';
         modal.classList.add('active');
@@ -4358,9 +4455,11 @@
         if (pinInput) { pinInput.value = ''; pinInput.focus(); }
       }
     }
-    window.openSpeedtestSSOModal = openSpeedtestSSOModal;
+    window.openGlobalSSOModal = openGlobalSSOModal;
+    window.openSpeedtestSSOModal = () => openGlobalSSOModal('Gigabit Speedtest (WAN Saturation Protection)', runLiveSpeedtestBenchmark);
 
     function closeSpeedtestSSOModal() {
+      window.pendingSSOCallback = null;
       const modal = document.getElementById('speedtest-sso-modal-overlay');
       if (modal) {
         modal.classList.remove('active');
@@ -4368,24 +4467,24 @@
       }
     }
     window.closeSpeedtestSSOModal = closeSpeedtestSSOModal;
+    window.closeGlobalSSOModal = closeSpeedtestSSOModal;
 
     function verifySpeedtestPin() {
       const pinInput = document.getElementById('speedtest-sso-pin');
       const val = pinInput ? pinInput.value.trim() : '';
       if (!val) {
-        showToast('error', 'PIN Required', 'Please enter your Admin PIN to authorize the speedtest.');
+        showToast('error', 'PIN Required', 'Please enter your Admin PIN to authorize this operation.');
         return;
       }
       unlockSSO('pin');
       closeSpeedtestSSOModal();
-      runLiveSpeedtestBenchmark();
     }
     window.verifySpeedtestPin = verifySpeedtestPin;
 
     function triggerSpeedtest() {
       if (isSpeedtesting) return;
       if (!isSSOAuthenticated()) {
-        openSpeedtestSSOModal();
+        openGlobalSSOModal('Gigabit Speedtest (WAN Saturation Prevention)', runLiveSpeedtestBenchmark);
         return;
       }
       runLiveSpeedtestBenchmark();
@@ -4475,6 +4574,10 @@
     };
 
     function askEdgeAiPreset(presetKey) {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal('Ollama 24/7 Local Inference (Port 11434)', () => askEdgeAiPreset(presetKey));
+        return;
+      }
       const feed = document.getElementById('edge-ai-output-feed');
       const stats = document.getElementById('ai-infer-stats');
       const response = edgeAiResponses[presetKey] || edgeAiResponses.default;
@@ -4498,6 +4601,10 @@
     window.askEdgeAiPreset = askEdgeAiPreset;
 
     function submitEdgeAiPrompt() {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal('Ollama 24/7 Local Inference (Port 11434)', submitEdgeAiPrompt);
+        return;
+      }
       const input = document.getElementById('edge-ai-input');
       const text = input ? input.value.trim() : '';
       if (!text) return;
@@ -4525,6 +4632,10 @@
 
     // --- 3. Penny's Feeder IoT Snack ---
     function triggerCatTreat() {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal("Penny's Smart Feeder IoT Dispenser", triggerCatTreat);
+        return;
+      }
       const timeEl = document.getElementById('feeder-last-time');
       playChaosTone(784, 1046, 'sine', 0.22);
       if (timeEl) timeEl.textContent = 'Just Now (Manual Treat 15g)';
@@ -4927,23 +5038,23 @@
     </div>
   </div>
 
-  <!-- ⚡ Speedtest Admin SSO Verification Modal -->
+  <!-- 🛡️ Universal Admin SSO Verification Gate Modal -->
   <div id="speedtest-sso-modal-overlay" class="speedtest-sso-modal-overlay" style="display: none;" onclick="if(event.target===this)closeSpeedtestSSOModal()">
-    <div class="speedtest-sso-modal" role="dialog" aria-modal="true" aria-label="Admin SSO Authorization for Gigabit Speedtest">
+    <div class="speedtest-sso-modal" role="dialog" aria-modal="true" aria-label="Admin SSO Authorization for Homelab Operations">
       <div style="background: rgba(15, 23, 42, 0.95); padding: 18px 22px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center;">
         <div style="display: flex; align-items: center; gap: 10px;">
           <span style="font-size: 1.4rem;">🔒</span>
           <div>
             <div style="font-weight: 800; font-size: 1.02rem; color: #f8fafc;">Admin Authorization Required</div>
-            <div style="font-size: 0.74rem; color: #f59e0b; font-family: monospace;">WAN Saturation Protection &bull; M365 SSO</div>
+            <div style="font-size: 0.74rem; color: #f59e0b; font-family: monospace;" id="sso-gate-action-name">Interactive System Operation &bull; M365 SSO</div>
           </div>
         </div>
         <button type="button" class="changelog-close" onclick="closeSpeedtestSSOModal()" title="Close SSO Dialog" aria-label="Close dialog">&times;</button>
       </div>
       <div style="padding: 22px; display: flex; flex-direction: column; gap: 16px;">
-        <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 14px; font-size: 0.8rem; color: #fde68a; line-height: 1.5;">
-          <strong>⚠️ Bandwidth Saturation Policy:</strong><br>
-          A live bidirectional Gigabit speedtest pushes <strong>1.2+ GB</strong> of traffic and saturates the 1.0 Gbps uplink for 10–15 seconds. To prevent dropping Cat Cam WebRTC frames and interrupting Plex/StreamHub viewers, live tests are restricted to <strong>cory.townsend@digitalresolve.ca</strong>.
+        <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 14px; font-size: 0.8rem; color: #fde68a; line-height: 1.55;">
+          <strong>🛡️ Zero Trust Security Policy:</strong><br>
+          This is a public, front-facing website. Any operation that interacts with on-premise hardware (Ollama LLM inference, Gigabit WAN tests, Wake-on-LAN, sleep standby, remote reboots, torrent injection, or IoT treat dispensers) is strictly restricted to authenticated <strong>Microsoft 365 Administrators</strong> (<code>cory.townsend@digitalresolve.ca</code>).
         </div>
         <div style="display: flex; flex-direction: column; gap: 8px;">
           <label style="font-size: 0.78rem; color: #94a3b8; font-weight: 700;">Admin PIN or Entra ID Password:</label>
@@ -4953,7 +5064,7 @@
           </div>
         </div>
         <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 14px; margin-top: 4px;">
-          <button type="button" class="btn btn-secondary" onclick="unlockSSO('m365'); closeSpeedtestSSOModal(); runLiveSpeedtestBenchmark();" style="font-size: 0.82rem; cursor: pointer;">Sign In with Microsoft 365 &nearr;</button>
+          <button type="button" class="btn btn-secondary" onclick="unlockSSO('m365'); closeSpeedtestSSOModal();" style="font-size: 0.82rem; cursor: pointer;">Sign In with Microsoft 365 &nearr;</button>
           <button type="button" class="btn btn-secondary" onclick="closeSpeedtestSSOModal()" style="font-size: 0.82rem; cursor: pointer;">Cancel</button>
         </div>
       </div>
