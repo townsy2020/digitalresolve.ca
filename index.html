@@ -281,6 +281,10 @@
           <button type="button" onclick="openDisasterModal()" class="pill-btn pill-disaster pill-chaos" id="hero-disaster-btn" style="border-color: #f59e0b; background: rgba(245, 158, 11, 0.25); color: #fde68a; font-weight: 700; cursor: pointer; box-shadow: 0 0 14px rgba(245, 158, 11, 0.3);" title="Open Homelab Disaster Recovery & Resilience Test Workbench">
             <span>🚨</span> Disaster Test
           </button>
+          <button type="button" onclick="openHealthModal()" class="pill-btn pill-health" id="hero-health-btn" title="Open Homelab Health Radar &amp; Scorecard Modal">
+            <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+            <span>Health Radar (99% Optimal)</span>
+          </button>
           <a href="#ops-ai" class="pill-btn pill-outline" style="border-color: rgba(168, 85, 247, 0.4); color: #c084fc;">
             <span>🤖</span> AI &amp; Terminal Ops
           </a>
@@ -294,7 +298,7 @@
 
         <!-- Live Status Ribbon -->
         <div class="status-ribbon">
-          <div class="ribbon-item ribbon-health-radar" id="ribbon-health-card" onclick="openHealthModal()" style="cursor: pointer;" title="Homelab Health Index: 99% Optimal. Click for full radar breakdown.">
+          <div class="ribbon-item" id="ribbon-health-card">
             <span class="ribbon-label">Cluster Health Index</span>
             <span class="ribbon-value" id="ribbon-health-val" style="color: #34d399; display: inline-flex; align-items: center; gap: 6px;">
               <span class="pulse-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
@@ -347,13 +351,22 @@
               Traffic routed through Mullvad WireGuard &bull; Auto-unpacked to <code style="color: #60a5fa;">D:\Torrents</code>
             </div>
           </div>
-          <div class="quick-drop-form">
+          <!-- Unlocked Form (Shown when authenticated) -->
+          <div class="quick-drop-form" id="quick-drop-unlocked-form">
             <input type="text" id="quick-magnet-input" class="quick-drop-input" aria-label="Magnet link or torrent URL" placeholder="Paste magnet:?xt=... or .torrent link here">
             <select id="quick-magnet-target" style="background: rgba(11, 15, 23, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #f0f6fc; padding: 10px 14px; font-weight: 600; outline: none; font-size: 0.88rem;">
               <option value="nuc">NUC Server (24/7 &bull; D:\Torrents)</option>
               <option value="desktop">Desktop Workstation</option>
             </select>
             <button type="button" class="quick-drop-btn" onclick="submitQuickMagnet()" title="Inject Torrent Magnet into NUC qBittorrent via Mullvad VPN">Start Remote Download</button>
+          </div>
+          <!-- Locked SSO Gate (Shown when logged out) -->
+          <div id="quick-drop-sso-gate" style="display: none; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; background: rgba(59, 130, 246, 0.08); border: 1px dashed rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 12px 16px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-size: 1.2rem;">🔒</span>
+              <span style="font-size: 0.88rem; color: #cbd5e1;">Remote Torrent Magnet Ingestion is protected by Microsoft 365 Entra ID SSO.</span>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" style="font-size: 0.84rem; padding: 6px 14px;">Sign In with M365</button>
           </div>
         </div>
 
@@ -1141,9 +1154,9 @@
             <div class="fleet-card-header">
               <div class="fleet-title-group">
                 <span class="dropdown-dot dot-2" id="fleet-dot-nuc"></span>
-                <span class="fleet-title">NUC Core Server (24/7 Always-On)</span>
+                <span class="fleet-title">NUC Core Server</span>
               </div>
-              <span class="item-tag online" id="fleet-badge-nuc">24/7 Core Server (Online)</span>
+              <span class="item-tag online" id="fleet-badge-nuc">Online &bull; 24/7 Core</span>
             </div>
             <div class="fleet-metrics">
               <div class="metric-row">
@@ -1182,9 +1195,9 @@
             <div class="fleet-card-header">
               <div class="fleet-title-group">
                 <span class="dropdown-dot dot-1" id="fleet-dot-desktop"></span>
-                <span class="fleet-title">Desktop Workstation (Active Node)</span>
+                <span class="fleet-title">Desktop Workstation</span>
               </div>
-              <span class="item-tag online" id="fleet-badge-desktop">Active Workstation (Online)</span>
+              <span class="item-tag online" id="fleet-badge-desktop">Online &bull; Active</span>
             </div>
             <div class="fleet-metrics">
               <div class="metric-row">
@@ -2057,9 +2070,9 @@
     }
     const GATEWAY = 'https://wake.digitalresolve.ca';
     const devices = {
-      desktop: { name: 'Desktop', hostname: 'DESKTOP', mac: '70:85:C2:84:62:65', netbios: 'DESKTOP', dns: 'torrents.digitalresolve.ca' },
-      nuc:     { name: 'NUC',     hostname: 'NUC',     mac: '1C:69:7A:60:C7:0D', netbios: 'NUC',     dns: 'torrents2.digitalresolve.ca' },
-      both:    { name: 'Both Machines', mac: 'Subnet Broadcast' }
+      desktop: { name: 'Desktop PC', ip: '192.168.2.62', hostname: 'DESKTOP', mac: '70:85:C2:84:62:65', netbios: 'DESKTOP', dns: 'torrents.digitalresolve.ca' },
+      nuc:     { name: 'NUC Server', ip: '192.168.2.35', hostname: 'NUC',     mac: '1C:69:7A:60:C7:0D', netbios: 'NUC',     dns: 'torrents2.digitalresolve.ca' },
+      both:    { name: 'Both Machines', ip: '192.168.2.255', hostname: 'CLUSTER', mac: 'Subnet Broadcast', netbios: 'CLUSTER', dns: 'digitalresolve.ca' }
     };
 
     let pollInterval = null;
@@ -2234,7 +2247,9 @@
         return;
       }
       const dev = devices[target] || devices.nuc;
-      showToast('loading', `Pinging ${dev.name}...`, `${dev.ip} &bull; ${dev.dns}`, 0);
+      const ip = dev.ip || (target === 'desktop' ? '192.168.2.62' : '192.168.2.35');
+      const dns = dev.dns || 'digitalresolve.ca';
+      showToast('loading', `Pinging ${dev.name}...`, `${ip} &bull; ${dns}`, 0);
 
       fetch(`${GATEWAY}/status?target=${target}`)
         .then(r => r.json())
@@ -2244,7 +2259,7 @@
             showToast('success', `${dev.name} is Online`, `${data.latencyMs} ms latency${diskSub}`, 6000);
             updateStatusUI(target, true, data.latencyMs, data.disk);
           } else {
-            showToast('error', `${dev.name} is Offline`, `No ping response from ${data.ip}`, 5000);
+            showToast('error', `${dev.name} is Offline`, `No ping response from ${data.ip || ip}`, 5000);
             updateStatusUI(target, false);
           }
         })
@@ -2415,7 +2430,7 @@
         fDot.style.boxShadow = isOnline ? '0 0 8px #22c55e' : '0 0 8px #22c55e';
       }
       if (fBadge) {
-        fBadge.textContent = target === 'nuc' ? '24/7 Core Server (Online)' : 'Active Workstation (Online)';
+        fBadge.textContent = target === 'nuc' ? 'Online • 24/7 Core' : 'Online • Active';
         fBadge.className = 'item-tag online';
       }
       if (fLat && latencyMs !== null) {
@@ -2691,6 +2706,22 @@
         if (aiLock) aiLock.style.display = 'inline-block';
         if (aiPulse) { aiPulse.style.background = '#10b981'; aiPulse.style.boxShadow = '0 0 8px #10b981'; }
         if (aiStats) aiStats.textContent = 'Intel Core i5 &bull; Port 11434';
+
+        // Unlocked Quick Drop Magnet Console
+        const quickUnlocked = document.getElementById('quick-drop-unlocked-form');
+        const quickGate = document.getElementById('quick-drop-sso-gate');
+        if (quickUnlocked && quickGate) {
+          quickUnlocked.style.display = 'flex';
+          quickGate.style.display = 'none';
+        }
+
+        // Unlocked Magnet Modal
+        const magUnlocked = document.getElementById('magnet-modal-unlocked');
+        const magGate = document.getElementById('magnet-modal-sso-gate');
+        if (magUnlocked && magGate) {
+          magUnlocked.style.display = 'block';
+          magGate.style.display = 'none';
+        }
       } else {
         // Locked Terminal Card
         if (termTitle) termTitle.innerHTML = 'Live Interactive Terminal';
@@ -2722,6 +2753,22 @@
         if (aiLock) aiLock.style.display = 'none';
         if (aiPulse) { aiPulse.style.background = '#f59e0b'; aiPulse.style.boxShadow = '0 0 8px #f59e0b'; }
         if (aiStats) aiStats.textContent = 'Intel Core i5 &bull; Port 11434';
+
+        // Locked Quick Drop Magnet Console
+        const quickUnlocked = document.getElementById('quick-drop-unlocked-form');
+        const quickGate = document.getElementById('quick-drop-sso-gate');
+        if (quickUnlocked && quickGate) {
+          quickUnlocked.style.display = 'none';
+          quickGate.style.display = 'flex';
+        }
+
+        // Locked Magnet Modal
+        const magUnlocked = document.getElementById('magnet-modal-unlocked');
+        const magGate = document.getElementById('magnet-modal-sso-gate');
+        if (magUnlocked && magGate) {
+          magUnlocked.style.display = 'none';
+          magGate.style.display = 'flex';
+        }
       }
     }
 
@@ -4846,21 +4893,36 @@
         <div class="magnet-title">[+] Remote Torrent / Magnet Drop</div>
         <button type="button" class="magnet-close" onclick="closeMagnetModal()" title="Close Remote Magnet Modal" aria-label="Close magnet dialog">&times;</button>
       </div>
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.5;">
-        Inject any torrent or magnet link into your home server. Traffic is downloaded through Mullvad WireGuard VPN and auto-unpacked.
-      </p>
-      <textarea id="magnet-input" class="magnet-input" aria-label="Magnet link or torrent URL" placeholder="Paste magnet:?xt=... or .torrent HTTP URL here"></textarea>
-      <div class="magnet-targets">
-        <label class="magnet-target-label">
-          <input type="radio" name="magnet-target" value="nuc" checked>
-          <span>NUC Home Server (24/7 &bull; D:\Torrents)</span>
-        </label>
-        <label class="magnet-target-label">
-          <input type="radio" name="magnet-target" value="desktop">
-          <span>Desktop Workstation</span>
-        </label>
+      <div id="magnet-modal-unlocked">
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.5;">
+          Inject any torrent or magnet link into your home server. Traffic is downloaded through Mullvad WireGuard VPN and auto-unpacked.
+        </p>
+        <textarea id="magnet-input" class="magnet-input" aria-label="Magnet link or torrent URL" placeholder="Paste magnet:?xt=... or .torrent HTTP URL here"></textarea>
+        <div class="magnet-targets">
+          <label class="magnet-target-label">
+            <input type="radio" name="magnet-target" value="nuc" checked>
+            <span>NUC Home Server (24/7 &bull; D:\Torrents)</span>
+          </label>
+          <label class="magnet-target-label">
+            <input type="radio" name="magnet-target" value="desktop">
+            <span>Desktop Workstation</span>
+          </label>
+        </div>
+        <button type="button" class="magnet-submit-btn" id="magnet-submit-btn" onclick="submitMagnet()" title="Inject Torrent Magnet into qBittorrent via Mullvad VPN">Start Remote Download</button>
       </div>
-      <button type="button" class="magnet-submit-btn" id="magnet-submit-btn" onclick="submitMagnet()" title="Inject Torrent Magnet into qBittorrent via Mullvad VPN">Start Remote Download</button>
+      <!-- Locked SSO Gate Overlay for Magnet Modal -->
+      <div id="magnet-modal-sso-gate" style="display: none; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 24px 16px; text-align: center;">
+        <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.6rem;">
+          🔒
+        </div>
+        <div style="font-weight: 700; color: #f8fafc; font-size: 1.05rem;">Microsoft 365 Entra ID SSO Required</div>
+        <p style="font-size: 0.85rem; color: #94a3b8; max-width: 380px; margin: 0 auto; line-height: 1.4;">
+          Direct torrent and magnet ingestion to local storage drives requires authenticated administrator access.
+        </p>
+        <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" style="padding: 10px 22px; font-size: 0.92rem;">
+          🏢 Sign In with Microsoft 365
+        </button>
+      </div>
     </div>
   </div>
   <!-- Embedded Antigravity (AGY) Interactive Terminal Console Modal -->
