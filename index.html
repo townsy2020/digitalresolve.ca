@@ -5146,55 +5146,69 @@
             <table style="width: 100%; border-collapse: collapse; font-size: 0.76rem; text-align: left;">
               <thead>
                 <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.08); color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">
-                  <th style="padding: 6px 8px;">Domain Hostname</th>
-                  <th style="padding: 6px 8px;">Origin Target</th>
-                  <th style="padding: 6px 8px;">24h Requests</th>
-                  <th style="padding: 6px 8px;">Cache &bull; Latency</th>
-                  <th style="padding: 6px 8px;">Status</th>
+                  <th style="padding: 8px 10px;">Domain Hostname</th>
+                  <th style="padding: 8px 10px;">Origin Target</th>
+                  <th style="padding: 8px 10px;">24h Requests</th>
+                  <th style="padding: 8px 10px;">Edge Cache</th>
+                  <th style="padding: 8px 10px;">Edge Latency</th>
+                  <th style="padding: 8px 10px;">Security Policy</th>
+                  <th style="padding: 8px 10px;">Status</th>
                 </tr>
               </thead>
               <tbody style="color: #cbd5e1;">
                 <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
-                  <td style="padding: 8px;"><strong style="color: #38bdf8;">digitalresolve.ca</strong> (Apex)</td>
-                  <td style="padding: 8px; font-family: monospace;">NUC (192.168.2.35)</td>
-                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;">21,450</td>
-                  <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">94.6% Cache Hit</span></td>
-                  <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
+                  <td style="padding: 8px 10px;"><strong style="color: #38bdf8;">digitalresolve.ca</strong> (Apex)</td>
+                  <td style="padding: 8px 10px; font-family: monospace;">NUC (192.168.2.35)</td>
+                  <td style="padding: 8px 10px; font-family: monospace; color: #60a5fa;">21,450</td>
+                  <td style="padding: 8px 10px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">94.6% Cache Hit</span></td>
+                  <td style="padding: 8px 10px; font-family: monospace; color: #38bdf8;">0.8 ms</td>
+                  <td style="padding: 8px 10px; color: #94a3b8;">TLS 1.3 / HTTP/3</td>
+                  <td style="padding: 8px 10px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
                 </tr>
                 <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
-                  <td style="padding: 8px;"><strong style="color: #38bdf8;">cam.digitalresolve.ca</strong></td>
-                  <td style="padding: 8px; font-family: monospace;">NUC (:1984 WebRTC)</td>
-                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;">8,920</td>
-                  <td style="padding: 8px; color: #34d399;">&lt;50ms Hardware Stream</td>
-                  <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
+                  <td style="padding: 8px 10px;"><strong style="color: #38bdf8;">cam.digitalresolve.ca</strong></td>
+                  <td style="padding: 8px 10px; font-family: monospace;">NUC (:1984 WebRTC)</td>
+                  <td style="padding: 8px 10px; font-family: monospace; color: #60a5fa;">8,920</td>
+                  <td style="padding: 8px 10px; color: #64748b;">Dynamic Stream</td>
+                  <td style="padding: 8px 10px; font-family: monospace; color: #34d399;">&lt;50 ms</td>
+                  <td style="padding: 8px 10px; color: #94a3b8;">Zero Trust Tunnel</td>
+                  <td style="padding: 8px 10px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
                 </tr>
                 <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
-                  <td style="padding: 8px;"><strong style="color: #38bdf8;">torrents.digitalresolve.ca</strong></td>
-                  <td style="padding: 8px; font-family: monospace;">Desktop (192.168.2.62:8080)</td>
-                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;">6,340</td>
-                  <td style="padding: 8px; color: #fde68a;">M365 Entra ID SSO</td>
-                  <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
+                  <td style="padding: 8px 10px;"><strong style="color: #38bdf8;">torrents.digitalresolve.ca</strong></td>
+                  <td style="padding: 8px 10px; font-family: monospace;">Desktop (192.168.2.62:8080)</td>
+                  <td style="padding: 8px 10px; font-family: monospace; color: #60a5fa;">6,340</td>
+                  <td style="padding: 8px 10px; color: #64748b;">Dynamic Bypass</td>
+                  <td style="padding: 8px 10px; font-family: monospace; color: #38bdf8;">1.2 ms</td>
+                  <td style="padding: 8px 10px; color: #fde68a;">M365 Entra ID SSO</td>
+                  <td style="padding: 8px 10px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
                 </tr>
                 <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
-                  <td style="padding: 8px;"><strong style="color: #38bdf8;">torrents2.digitalresolve.ca</strong></td>
-                  <td style="padding: 8px; font-family: monospace;">NUC (192.168.2.35:8081)</td>
-                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;">5,110</td>
-                  <td style="padding: 8px; color: #fde68a;">M365 Entra ID SSO</td>
-                  <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
+                  <td style="padding: 8px 10px;"><strong style="color: #38bdf8;">torrents2.digitalresolve.ca</strong></td>
+                  <td style="padding: 8px 10px; font-family: monospace;">NUC (192.168.2.35:8081)</td>
+                  <td style="padding: 8px 10px; font-family: monospace; color: #60a5fa;">5,110</td>
+                  <td style="padding: 8px 10px; color: #64748b;">Dynamic Bypass</td>
+                  <td style="padding: 8px 10px; font-family: monospace; color: #38bdf8;">0.9 ms</td>
+                  <td style="padding: 8px 10px; color: #fde68a;">M365 Entra ID SSO</td>
+                  <td style="padding: 8px 10px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
                 </tr>
                 <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
-                  <td style="padding: 8px;"><strong style="color: #38bdf8;">stream.digitalresolve.ca</strong></td>
-                  <td style="padding: 8px; font-family: monospace;">NUC (:8088 / :13378)</td>
-                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;">4,280</td>
-                  <td style="padding: 8px; color: #c4b5fd;">MP4 Faststart 4K/HD</td>
-                  <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
+                  <td style="padding: 8px 10px;"><strong style="color: #38bdf8;">stream.digitalresolve.ca</strong></td>
+                  <td style="padding: 8px 10px; font-family: monospace;">NUC (:8088 / :13378)</td>
+                  <td style="padding: 8px 10px; font-family: monospace; color: #60a5fa;">4,280</td>
+                  <td style="padding: 8px 10px; color: #c4b5fd;">Stream Buffer</td>
+                  <td style="padding: 8px 10px; font-family: monospace; color: #38bdf8;">1.4 ms</td>
+                  <td style="padding: 8px 10px; color: #fde68a;">M365 Entra ID SSO</td>
+                  <td style="padding: 8px 10px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
                 </tr>
                 <tr>
-                  <td style="padding: 8px;"><strong style="color: #38bdf8;">files.digitalresolve.ca</strong></td>
-                  <td style="padding: 8px; font-family: monospace;">NUC (:8085 File Vault)</td>
-                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;">2,190</td>
-                  <td style="padding: 8px; color: #94a3b8;">SSL ECC CA-3 Encrypted</td>
-                  <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
+                  <td style="padding: 8px 10px;"><strong style="color: #38bdf8;">files.digitalresolve.ca</strong></td>
+                  <td style="padding: 8px 10px; font-family: monospace;">NUC (:8085 File Vault)</td>
+                  <td style="padding: 8px 10px; font-family: monospace; color: #60a5fa;">2,190</td>
+                  <td style="padding: 8px 10px; color: #64748b;">Dynamic Bypass</td>
+                  <td style="padding: 8px 10px; font-family: monospace; color: #38bdf8;">1.1 ms</td>
+                  <td style="padding: 8px 10px; color: #94a3b8;">SSL ECC Encrypted</td>
+                  <td style="padding: 8px 10px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
                 </tr>
               </tbody>
             </table>
