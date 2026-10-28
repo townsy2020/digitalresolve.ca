@@ -480,7 +480,7 @@ button.dropdown-item:active,
 /* Toast Notification */
 .wol-toast {
   position: fixed;
-  bottom: 28px;
+  bottom: 80px;
   right: 28px;
   background: rgba(15, 23, 42, 0.95);
   border: 1px solid rgba(59, 130, 246, 0.3);
@@ -5158,3 +5158,55 @@ html.mobile-layout .penny-hub-grid {
 }
 
 
+
+/* Floating Back to Top Button */
+.btn-floating-top {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(59, 130, 246, 0.45);
+  color: #60a5fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(14px) scale(0.9);
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.25s, border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), 0 0 10px rgba(59, 130, 246, 0.2);
+}
+
+.btn-floating-top.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.btn-floating-top:hover {
+  background: rgba(30, 58, 138, 0.95);
+  border-color: #93c5fd;
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.6), 0 6px 20px rgba(0, 0, 0, 0.6);
+  transform: translateY(-3px) scale(1.05);
+}
+
+.btn-floating-top:active {
+  transform: translateY(0) scale(0.95);
+}
+
+@media (max-width: 768px) {
+  .btn-floating-top {
+    bottom: 20px;
+    right: 20px;
+    width: 42px;
+    height: 42px;
+  }
+}

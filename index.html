@@ -40,9 +40,10 @@
   </script>
 </head>
 <body>
+  <div id="top" style="position: absolute; top: 0; left: 0; width: 1px; height: 1px; pointer-events: none; opacity: 0;" aria-hidden="true"></div>
   <div class="background-glow"></div>
   
-  <header class="header" id="top">
+  <header class="header" id="site-header">
     <div class="container nav-container">
       <a href="#deck" class="logo" title="DigitalResolve Homelab Deck">
         <span class="logo-text-group"><span class="logo-accent">Digital</span>Resolve</span>
@@ -2140,11 +2141,18 @@
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
-          <a href="#top">Back to top &uarr;</a>
+          <a href="#top" onclick="scrollToTop(event)" role="button" aria-label="Back to top">Back to top &uarr;</a>
         </div>
       </div>
     </div>
   </footer>
+
+  <!-- Floating Back to Top Button -->
+  <button type="button" id="btn-floating-top" class="btn-floating-top" onclick="scrollToTop(event)" title="Back to top" aria-label="Back to top">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 15l-6-6-6 6"/>
+    </svg>
+  </button>
 
   <!-- Notification Toast -->
   <div id="wol-toast" class="wol-toast" role="alert" aria-live="polite">
@@ -2161,6 +2169,44 @@
       window.location.replace('https://digitalresolve.ca' + window.location.pathname + window.location.search + window.location.hash);
     }
     const GATEWAY = 'https://wake.digitalresolve.ca';
+
+    // Back to top smooth scrolling controller
+    function scrollToTop(e) {
+      if (e) {
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        if (typeof e.stopPropagation === 'function') e.stopPropagation();
+      }
+      try {
+        if (window.location.hash) {
+          history.replaceState(null, document.title, window.location.pathname + window.location.search);
+        }
+      } catch (err) {}
+      
+      try {
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+      } catch (err) {
+        window.scrollTo(0, 0);
+      }
+      try {
+        document.documentElement.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+      } catch (err) {
+        document.documentElement.scrollTop = 0;
+      }
+      document.body.scrollTop = 0;
+      return false;
+    }
+    window.scrollToTop = scrollToTop;
+
+    // Toggle floating back-to-top button based on scroll depth
+    window.addEventListener('scroll', function() {
+      const btn = document.getElementById('btn-floating-top');
+      if (!btn) return;
+      if (window.scrollY > 350 || document.documentElement.scrollTop > 350) {
+        btn.classList.add('visible');
+      } else {
+        btn.classList.remove('visible');
+      }
+    }, { passive: true });
     const devices = {
       desktop: { name: 'Desktop PC', ip: '192.168.2.62', hostname: 'DESKTOP', mac: '70:85:C2:84:62:65', netbios: 'DESKTOP', dns: 'torrents.digitalresolve.ca' },
       nuc:     { name: 'NUC Server', ip: '192.168.2.35', hostname: 'NUC',     mac: '1C:69:7A:60:C7:0D', netbios: 'NUC',     dns: 'torrents2.digitalresolve.ca' },
