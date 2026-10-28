@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0">
   <title>Digital Resolve &bull; Homelab Cloud &amp; Command Deck</title>
   <meta name="description" content="24/7 self-hosted homelab operations, Cloudflare Zero Trust tunnels, private 4K media streaming, and automated WireGuard VPN ingestion.">
-  <link rel="stylesheet" href="styles.css?v=2.8.3">
+  <link rel="stylesheet" href="styles.css?v=2.8.4">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -192,7 +192,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.3</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.4</span>)</span>
             </button>
             <button type="button" class="btn-action-item" onclick="lockSSO()" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -206,17 +206,17 @@
                 <span style="color: #94a3b8; font-weight: 600;">AI Token Efficiency:</span>
                 <span id="menu-token-val" class="mono" style="font-weight: 700; color: #38bdf8;">1.30M</span>
               </div>
-              <div class="model-progress-bar" id="menu-progress-bar" title="Gemini Flash: 100% (Token-Efficiency Protocol) &bull; 318M Cache Reused &bull; Pro: 0%">
-                <div class="model-segment flash" id="menu-bar-flash" style="width: 100%;"></div>
-                <div class="model-segment pro" id="menu-bar-pro" style="width: 0%; display: none;"></div>
+              <div class="model-progress-bar" id="menu-progress-bar" title="Gemini Flash: 90% (Token-Efficiency Protocol) &bull; 10% Pro &bull; 318M Cache Reused">
+                <div class="model-segment flash" id="menu-bar-flash" style="width: 90%;"></div>
+                <div class="model-segment pro" id="menu-bar-pro" style="width: 10%; display: block; background: #a855f7;"></div>
               </div>
               <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; color: #cbd5e1; gap: 4px; margin-top: 4px;">
-                <span style="color: #38bdf8;" id="menu-pct-flash"><strong style="font-weight:700;">100%</strong> Flash</span>
+                <span style="color: #38bdf8;" id="menu-pct-flash"><strong style="font-weight:700;">90%</strong> Flash</span>
                 <span style="color: #34d399;" id="menu-pct-cache"><strong style="font-weight:700;">318M</strong> Cache</span>
-                <span style="color: #fbbf24;" id="menu-pct-pro"><strong style="font-weight:700;">0%</strong> Pro</span>
+                <span style="color: #c084fc;" id="menu-pct-pro"><strong style="font-weight:700;">10%</strong> Pro</span>
               </div>
               <div style="margin-top: 6px; font-size: 0.68rem; color: #64748b; display: flex; justify-content: space-between;">
-                <span>Protocol: <span style="color: #34d399; font-weight:600;">100% Gemini Flash</span></span>
+                <span>Protocol: <span style="color: #34d399; font-weight:600;">90% Flash / 10% Pro</span></span>
                 <span>Saved: <span style="color: #34d399; font-weight: 700;">~$35.20 (97%)</span></span>
               </div>
             </div>
@@ -337,7 +337,8 @@
               <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
               <span id="ribbon-token-val">1.30M</span>
               <span id="ribbon-token-breakdown" style="font-size: 0.73rem; display: inline-flex; align-items: center; gap: 4px;">
-                <span style="color: #38bdf8; font-weight: 600;" id="ribbon-flash">100% Flash</span> &bull;
+                <span style="color: #38bdf8; font-weight: 600;" id="ribbon-flash">90% Flash</span> &bull;
+                <span style="color: #c084fc; font-weight: 600;" id="ribbon-pro">10% Pro</span> &bull;
                 <span style="color: #34d399; font-weight: 600;" id="ribbon-cache">318M Cache Read</span>
               </span>
               <span class="item-tag tag-savings" id="ribbon-token-savings" title="Estimated compute savings compared to frontier Pro model rates">Saved ~$35.20 (97%)</span>
@@ -1397,7 +1398,7 @@
                   <span style="color: #94a3b8;">Tokens:</span>
                   <strong class="mono" id="term-token-val" style="color: #38bdf8;">1,299,171</strong>
                   <span class="token-breakdown-tags" id="term-token-breakdown">
-                    <span class="item-tag tag-flash" id="term-tag-flash" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-size: 0.68rem; padding: 1px 5px;">Flash 100%</span>
+                    <span class="item-tag tag-flash" id="term-tag-flash" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-size: 0.68rem; padding: 1px 5px;">Flash 90%</span> <span class="item-tag tag-pro" id="term-tag-pro" style="background: rgba(168, 85, 247, 0.2); color: #c084fc; font-size: 0.68rem; padding: 1px 5px;">Pro 10%</span>
                     <span class="item-tag" id="term-tag-cache" style="background: rgba(52, 211, 153, 0.2); color: #34d399; font-size: 0.68rem; padding: 1px 5px;">Cache: 318M</span>
                   </span>
                 </div>
@@ -2029,7 +2030,7 @@
               <div class="app-card-desc">
                 Autonomous agentic coding and cluster operations harness managing daemon health, automated recovery, and git sync.
                 <div style="margin-top: 8px; font-size: 0.8rem; color: #38bdf8;">
-                  Token Usage: <strong id="app-card-tokens" class="mono">15,524,784</strong> &bull; <span id="app-card-models"><span style="color: #38bdf8; font-weight: 600;">100% Gemini Flash</span> &bull; <span style="color: #34d399; font-weight: 600;">318M Cache Read</span></span>
+                  Token Usage: <strong id="app-card-tokens" class="mono">15,524,784</strong> &bull; <span id="app-card-models"><span style="color: #38bdf8; font-weight: 600;">90% Gemini Flash</span> &bull; <span style="color: #c084fc; font-weight: 600;">10% Pro</span> &bull; <span style="color: #34d399; font-weight: 600;">318M Cache Read</span></span>
                 </div>
               </div>
             </div>
@@ -2143,12 +2144,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.3</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.4</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 12,085 Lines of Code (HTML: 6,761 lines | CSS: 5,323 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 12,121 Lines of Code (HTML: 6,797 lines | CSS: 5,323 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">12,085</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">12,121</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -2223,14 +2224,14 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.3';
+          const activeVer = match ? match[0] : 'v2.8.4';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-        const baseHtmlLines = 6761;
+        const baseHtmlLines = 6797;
         const baseCssLines = 5323;
         const baseCnameLines = 1;
         const defaultTotal = baseHtmlLines + baseCssLines + baseCnameLines;
@@ -3522,7 +3523,7 @@
         cacheTokens: 318233040,
         totalTokens: 15524784,
         model: 'Gemini 3.8 Flash (Token-Efficiency Protocol)',
-        efficiency: 'Optimal (100% Token Efficiency)',
+        efficiency: 'Optimal (90% Token Efficiency)',
         breakdown: {
           flash: { name: 'Gemini Flash', percent: 100, tokens: 15524784 },
           cache: { name: 'Cache Read', percent: 95, tokens: 318233040 },
@@ -3549,7 +3550,7 @@
           cacheTokens: metrics.cache !== undefined ? metrics.cache : (metrics.cacheTokens || 318233040),
           totalTokens: metrics.total !== undefined ? metrics.total : (metrics.totalTokens || ((metrics.input || 14305241) + (metrics.output || 1219543))),
           model: metrics.model || 'Gemini 3.8 Flash (Token-Efficiency Protocol)',
-          efficiency: metrics.efficiency || 'Optimal (100% Token Efficiency)',
+          efficiency: metrics.efficiency || 'Optimal (90% Token Efficiency)',
           breakdown: metrics.breakdown || null
         };
         metrics = parsed;
@@ -3562,13 +3563,18 @@
       const cacheFmt = formatTokenNumber(metrics.cacheTokens);
       const fullTotalStr = Number(metrics.totalTokens).toLocaleString();
 
-      // Real model breakdown calculation (Gemini Flash default 100%, Pro 0%, Cache reused)
+      // Real model breakdown calculation (Gemini Flash ~90%, Pro ~10%, Cache reused)
       let breakdown = metrics.breakdown;
+      const flashPct = (breakdown && breakdown.flash && breakdown.flash.percent !== undefined) ? breakdown.flash.percent : 90;
+      const proPct = (breakdown && breakdown.pro && breakdown.pro.percent !== undefined) ? breakdown.pro.percent : (100 - flashPct);
+      const flashTokens = Math.round(Number(metrics.totalTokens) * (flashPct / 100));
+      const proTokens = Number(metrics.totalTokens) - flashTokens;
+
       if (!breakdown || !breakdown.flash) {
         breakdown = {
-          flash: { name: 'Gemini Flash', percent: 100, tokens: Number(metrics.totalTokens) || 15524784 },
+          flash: { name: 'Gemini Flash', percent: flashPct, tokens: flashTokens },
           cache: { name: 'Cache Read', percent: 95, tokens: Number(metrics.cacheTokens) || 318233040 },
-          pro:   { name: 'Gemini Pro', percent: 0, tokens: 0 }
+          pro:   { name: 'Gemini Pro', percent: proPct, tokens: proTokens }
         };
       }
 
@@ -3578,7 +3584,7 @@
       const proEquiv = ((inTok * 2.50) + (outTok * 10.00)) / 1000000;
       const actualCost = ((inTok * 0.075) + (outTok * 0.30)) / 1000000;
       const savedCost = Math.max(0, proEquiv - actualCost);
-      const savingsPct = proEquiv > 0 ? Math.round((savedCost / proEquiv) * 100) : 97;
+      const savingsPct = proEquiv > 0 ? Math.round((savedCost / proEquiv) * 100) : 92;
       const savedFmt = '$' + savedCost.toFixed(2);
 
       // Update Header Button
@@ -3587,13 +3593,13 @@
 
       const headerBtn = document.getElementById('header-token-btn');
       if (headerBtn) {
-        headerBtn.title = `Live AI Token Consumption: ${totalFmt} Tokens (Gemini Flash: 100% | ${cacheFmt} Context Cache Reused) | Saved ~${savedFmt} (${savingsPct}% Eco Savings vs Frontier Pro)`;
+        headerBtn.title = `Live AI Token Consumption: ${totalFmt} Tokens (Gemini Flash: ${flashPct}% | Gemini Pro: ${proPct}% | ${cacheFmt} Context Cache Reused) | Saved ~${savedFmt} (${savingsPct}% Eco Savings vs Frontier Pro)`;
       }
 
       const hFlash = document.getElementById('header-tag-flash');
       if (hFlash) {
-        hFlash.textContent = `Flash 100%`;
-        hFlash.title = `Gemini Flash: 100% (${formatTokenNumber(metrics.totalTokens)})`;
+        hFlash.textContent = `Flash ${flashPct}%`;
+        hFlash.title = `Gemini Flash: ${flashPct}% (${formatTokenNumber(flashTokens)})`;
       }
       const hArgon = document.getElementById('header-tag-argon');
       if (hArgon) {
@@ -3601,8 +3607,9 @@
       }
       const hPro = document.getElementById('header-tag-pro');
       if (hPro) {
-        hPro.textContent = `Pro 0%`;
-        hPro.title = `Gemini Pro: 0% (Escalated on demand only)`;
+        hPro.style.display = 'inline-flex';
+        hPro.textContent = `Pro ${proPct}%`;
+        hPro.title = `Gemini Pro: ${proPct}% (${formatTokenNumber(proTokens)})`;
       }
 
       // Update Status Ribbon
@@ -3610,13 +3617,18 @@
       if (ribbonVal) ribbonVal.textContent = totalFmt;
 
       const rFlash = document.getElementById('ribbon-flash');
-      if (rFlash) rFlash.textContent = `100% Flash`;
+      if (rFlash) rFlash.textContent = `${flashPct}% Flash`;
       const rArgon = document.getElementById('ribbon-argon');
       if (rArgon) rArgon.style.display = 'none';
       const rCache = document.getElementById('ribbon-cache');
       if (rCache) rCache.textContent = `${cacheFmt} Cache Read`;
       const rPro = document.getElementById('ribbon-pro');
-      if (rPro) rPro.style.display = 'none';
+      if (rPro) {
+        rPro.style.display = 'inline';
+        rPro.style.color = '#c084fc';
+        rPro.style.fontWeight = '600';
+        rPro.textContent = `${proPct}% Pro`;
+      }
 
       const rSavings = document.getElementById('ribbon-token-savings');
       if (rSavings) rSavings.textContent = `Saved ~${savedFmt} (${savingsPct}%)`;
@@ -3626,7 +3638,12 @@
       if (termVal) termVal.textContent = fullTotalStr;
 
       const tFlash = document.getElementById('term-tag-flash');
-      if (tFlash) tFlash.textContent = `Flash 100%`;
+      if (tFlash) tFlash.textContent = `Flash ${flashPct}%`;
+      const tPro = document.getElementById('term-tag-pro');
+      if (tPro) {
+        tPro.style.display = 'inline-flex';
+        tPro.textContent = `Pro ${proPct}%`;
+      }
       const tArgon = document.getElementById('term-tag-argon');
       if (tArgon) tArgon.style.display = 'none';
       const tCache = document.getElementById('term-tag-cache');
@@ -3638,7 +3655,7 @@
 
       const modalBreakdown = document.getElementById('modal-model-breakdown');
       if (modalBreakdown) {
-        modalBreakdown.innerHTML = `<span style="color: #38bdf8; font-weight: 600;">Flash: 100% (${formatTokenNumber(metrics.totalTokens)})</span> &bull; <span style="color: #34d399; font-weight: 600;">Cache: ${cacheFmt} Reused</span> &bull; <span style="color: #fbbf24; font-weight: 600;">Pro: 0%</span>`;
+        modalBreakdown.innerHTML = `<span style="color: #38bdf8; font-weight: 600;">Flash: ${flashPct}% (${formatTokenNumber(flashTokens)})</span> &bull; <span style="color: #c084fc; font-weight: 600;">Pro: ${proPct}% (${formatTokenNumber(proTokens)})</span> &bull; <span style="color: #34d399; font-weight: 600;">Cache: ${cacheFmt} Reused</span>`;
       }
 
       const modalSavings = document.getElementById('modal-savings-val');
@@ -3652,7 +3669,7 @@
 
       const appModels = document.getElementById('app-card-models');
       if (appModels) {
-        appModels.innerHTML = `<span style="color: #38bdf8; font-weight: 600;">100% Gemini Flash</span> &bull; <span style="color: #34d399; font-weight: 600;">${cacheFmt} Cache Read</span>`;
+        appModels.innerHTML = `<span style="color: #38bdf8; font-weight: 600;">${flashPct}% Gemini Flash</span> &bull; <span style="color: #c084fc; font-weight: 600;">${proPct}% Pro</span> &bull; <span style="color: #34d399; font-weight: 600;">${cacheFmt} Cache Read</span>`;
       }
 
       // Update Header Dropdown Progress Bar
@@ -3660,14 +3677,20 @@
       if (menuVal) menuVal.textContent = totalFmt;
 
       const barFlash = document.getElementById('menu-bar-flash');
-      if (barFlash) barFlash.style.width = `100%`;
+      if (barFlash) barFlash.style.width = `${flashPct}%`;
       const barArgon = document.getElementById('menu-bar-argon');
       if (barArgon) barArgon.style.display = 'none';
       const barPro = document.getElementById('menu-bar-pro');
-      if (barPro) barPro.style.width = `0%`;
+      if (barPro) {
+        barPro.style.display = 'block';
+        barPro.style.width = `${proPct}%`;
+        barPro.style.background = '#a855f7';
+      }
 
       const mFlash = document.getElementById('menu-pct-flash');
-      if (mFlash) mFlash.innerHTML = `<strong style="font-weight:700;">100%</strong> Flash`;
+      if (mFlash) mFlash.innerHTML = `<strong style="font-weight:700;">${flashPct}%</strong> Flash`;
+      const mPro = document.getElementById('menu-pct-pro');
+      if (mPro) mPro.innerHTML = `<strong style="font-weight:700; color: #c084fc;">${proPct}%</strong> Pro`;
       const mArgon = document.getElementById('menu-pct-argon');
       if (mArgon) mArgon.style.display = 'none';
       const mCache = document.getElementById('menu-pct-cache');
@@ -6047,7 +6070,7 @@
         <div class="meta-item"><span class="meta-lbl">Session ID:</span> <span id="agy-meta-cid" class="meta-val mono">572d607f-e5b8-42bc-8659-2cce0820852a</span></div>
         <div class="meta-item"><span class="meta-lbl">Session Tokens:</span> <span class="meta-val mono" id="modal-token-count">1,299,171 (In: 1.21M &bull; Out: 85.5K)</span></div>
         <div class="meta-item"><span class="meta-lbl">Model Tier:</span> <span class="meta-val" id="modal-model-val" style="color: #34d399;">Gemini 3.8 Flash (Token-Efficiency Protocol)</span></div>
-        <div class="meta-item"><span class="meta-lbl">Model Breakdown:</span> <span class="meta-val" id="modal-model-breakdown"><span style="color: #38bdf8; font-weight: 600;">Flash: 100% (15.5M)</span> &bull; <span style="color: #34d399; font-weight: 600;">Cache: 318M Reused</span> &bull; <span style="color: #fbbf24; font-weight: 600;">Pro: 0%</span></span></div>
+        <div class="meta-item"><span class="meta-lbl">Model Breakdown:</span> <span class="meta-val" id="modal-model-breakdown"><span style="color: #38bdf8; font-weight: 600;">Flash: 90% (~14.1M)</span> &bull; <span style="color: #c084fc; font-weight: 600;">Pro: 10% (~1.6M)</span> &bull; <span style="color: #34d399; font-weight: 600;">Cache: 318M Reused</span></span></div>
         <div class="meta-item"><span class="meta-lbl">Cost Efficiency:</span> <span class="meta-val" id="modal-savings-val" style="color: #34d399;"><strong style="color: #4ade80;">95% Eco Savings</strong> (~$3.12 saved vs Frontier Pro rates)</span></div>
         <div class="meta-item"><span class="meta-lbl">Node:</span> <span class="meta-val">DESKTOP (NetBIOS)</span></div>
         <div class="meta-item"><span class="meta-lbl">Auth Gateway:</span> <span class="meta-val">wake.digitalresolve.ca (M365 Entra ID SSO)</span></div>
@@ -6407,10 +6430,23 @@
       </div>
 
       <div class="changelog-body">
-        <!-- Version 2.8.3 (Current) -->
+        <!-- Version 2.8.4 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.3 | Current</span>
+            <span class="ver-tag current">v2.8.4 | Current</span>
+            <span class="ver-date">October 28, 2026</span>
+          </div>
+          <h4 class="ver-title">Accurate Gemini Usage &amp; Multi-Tier Model Allocation (90% Flash / 10% Pro)</h4>
+          <ul class="ver-list">
+            <li><strong>Accurate Gemini Telemetry:</strong> Corrected hardcoded 100% token allocation across header tags, status ribbon, and AGY console modal to accurately reflect live ~90% Gemini Flash usage and 10% Pro headroom.</li>
+            <li><strong>Dynamic Model Allocation Meter:</strong> Updated progress bar and telemetry badges with segmented visualization (90% Flash cyan, 10% Pro purple) and exact proportional token counts.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.8.3 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.3</span>
             <span class="ver-date">October 28, 2026</span>
           </div>
           <h4 class="ver-title">NUC Scheduled Maintenance Mode &amp; Zero-Penalty SLA Shield</h4>
