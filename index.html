@@ -746,11 +746,12 @@
                       <div>&bull; Protocol: <strong style="color: #cbd5e1;">Tuya IoT v3.3 &bull; 04:f4:d8:ba:e3:c7</strong></div>
                       <div>&bull; Last Dispense: <span id="feeder-last-time" style="color: #cbd5e1;">2 hours ago (Penny Feast 25g)</span></div>
                       <div>&bull; Next Scheduled: <strong style="color: #cbd5e1;">7:00 AM EST (Breakfast &bull; 25g)</strong></div>
+                      <div>&bull; Motor Actuation: <strong style="color: #fbbf24;">Hardware Bridge Setup Required</strong></div>
                     </div>
                   </div>
 
                   <div>
-                    <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700; margin-bottom: 6px;">Instant Dispense (SSO Protected):</div>
+                    <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700; margin-bottom: 6px;">Instant Dispense (SSO Protected &bull; Bridge Setup Required):</div>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px;">
                       <button type="button" class="btn btn-secondary" onclick="triggerCatTreat('10g Snack')" style="font-size: 0.74rem; padding: 6px 4px; color: #f472b6 !important; border-color: rgba(244, 114, 182, 0.4); text-align: center; justify-content: center; width: 100%;" title="Dispense 10g small snack">
                         10g Snack
@@ -5018,15 +5019,15 @@
       const logEl = document.getElementById('feeder-log-list');
       playChaosTone(784, 1046, 'sine', 0.22);
       const nowStr = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-      if (timeEl) timeEl.textContent = `Just Now (${portionLabel})`;
-      if (iotTimeEl) iotTimeEl.textContent = `Just Now (${portionLabel})`;
+      if (timeEl) timeEl.textContent = `Queued (${portionLabel})`;
+      if (iotTimeEl) iotTimeEl.textContent = `Queued (${portionLabel})`;
       if (logEl) {
         const item = document.createElement('div');
         item.style.cssText = 'display: flex; justify-content: space-between; padding: 4px 0; border-top: 1px solid rgba(255,255,255,0.06); color: #cbd5e1;';
-        item.innerHTML = `<span>${portionLabel} dispensed</span><span class="mono" style="color: #34d399;">${nowStr}</span>`;
+        item.innerHTML = `<span>${portionLabel} (Bridge Setup Required)</span><span class="mono" style="color: #fbbf24;">${nowStr}</span>`;
         logEl.prepend(item);
       }
-      showToast('success', 'Cat Food Dispensed!', `Penny's feeder (192.168.2.18) triggered via Tuya IoT [${portionLabel}].`);
+      showToast('warning', 'Physical Dispense Bridge Required', `Feeder 192.168.2.18 requires a Tuya Cloud API key or TinyTuya local daemon to spin the physical motor. Telemetry event logged [${portionLabel}].`, 7000);
     }
     window.triggerCatTreat = triggerCatTreat;
 
