@@ -2229,6 +2229,10 @@
     }
 
     function checkStatus(target) {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal(`Live Node Diagnostic (${target.toUpperCase()})`, () => checkStatus(target));
+        return;
+      }
       const dev = devices[target] || devices.nuc;
       showToast('loading', `Pinging ${dev.name}...`, `${dev.ip} &bull; ${dev.dns}`, 0);
 
@@ -2737,6 +2741,9 @@
       localStorage.setItem('dr_sso_pin', '2026'); // Background token for daemon compatibility
       showToast('success', 'Microsoft 365 SSO Active', 'Authenticated as Cory Townsend (cory.townsend@digitalresolve.ca)');
       updateSSOGateUI();
+
+      const cb = window.pendingSSOCallback;
+      window.pendingSSOCallback = null;
       closeSpeedtestSSOModal();
       loadLog(currentLogTab);
 
@@ -2746,10 +2753,8 @@
         startConsoleAutoPoll();
       }
 
-      if (window.pendingSSOCallback) {
-        const cb = window.pendingSSOCallback;
-        window.pendingSSOCallback = null;
-        try { cb(); } catch(e) {}
+      if (cb && typeof cb === 'function') {
+        try { cb(); } catch(e) { console.error('SSO callback execution error:', e); }
       }
     }
     window.unlockSSO = unlockSSO;
@@ -2813,6 +2818,10 @@
         if (term) term.scrollIntoView({ behavior: 'smooth' });
         showToast('info', 'AGY Live Terminal', 'Streaming active session 51f0adb8...');
       } else if (target === 'app') {
+        if (!isSSOAuthenticated()) {
+          openGlobalSSOModal('Antigravity Session Launcher', () => launchAgySession(target));
+          return;
+        }
         showToast('loading', 'Launching Antigravity App...', 'Connecting to conversation://51f0adb8-74d9...', 3000);
         window.location.href = `conversation://${cid}`;
         setTimeout(() => {
@@ -2835,7 +2844,7 @@
     // Send remote instruction / prompt to active AGY session
     function sendAgyPrompt() {
       if (!isSSOAuthenticated()) {
-        showToast('error', 'Authentication Required', 'Please authenticate via Microsoft 365 SSO.');
+        openGlobalSSOModal('Autonomous AGY Instruction Dispatch', sendAgyPrompt);
         return;
       }
       const input = document.getElementById('agy-prompt-input');
@@ -2866,7 +2875,7 @@
 
     function triggerInlineQuickChip(btn, text) {
       if (!isSSOAuthenticated()) {
-        showToast('error', 'Authentication Required', 'Please authenticate via Microsoft 365 SSO.');
+        openGlobalSSOModal('AGY Interactive Quick Prompt', () => triggerInlineQuickChip(btn, text));
         return;
       }
       const input = document.getElementById('agy-prompt-input');
@@ -2894,7 +2903,7 @@
 
     function startNewAgySession(target = 'desktop') {
       if (!isSSOAuthenticated()) {
-        showToast('error', 'Authentication Required', 'Please authenticate via Microsoft 365 SSO.');
+        openGlobalSSOModal(`Start New AGY Session (${target.toUpperCase()})`, () => startNewAgySession(target));
         return;
       }
       const hostLabel = target === 'nuc' ? 'NUC (Home Server)' : 'Desktop (Workstation)';
@@ -2924,6 +2933,10 @@
     }
 
     function sendControl(action, target = 'nuc') {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal(`Remote Command: ${action.toUpperCase()}`, () => sendControl(action, target));
+        return;
+      }
       const isSpeed = (action === 'run-speedtest');
       const speedBtn = document.getElementById('btn-probe-speed');
       const probeNowBtn = document.getElementById('btn-probe-now');
@@ -3402,6 +3415,10 @@
     }
 
     function testISPNow() {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal('Bell Gigabit Fiber Speedprobe', testISPNow);
+        return;
+      }
       const probeBtn = document.getElementById('btn-probe-now');
       if (probeBtn) {
         probeBtn.disabled = true;
@@ -3453,6 +3470,10 @@
 
     // Remote Magnet Ingestion Handlers
     function openMagnetModal() {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal('Remote Torrent Magnet Ingestion', openMagnetModal);
+        return;
+      }
       const modal = document.getElementById('magnet-modal-overlay');
       if (modal) {
         modal.style.display = 'flex';
@@ -3514,6 +3535,10 @@
     let camFeedLoaded = false;
 
     function loadLiveCameraFeed() {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal("Penny's Feeder Optical Stream", loadLiveCameraFeed);
+        return;
+      }
       camFeedLoaded = true;
       const frame = document.getElementById('camera-live-frame');
       const placeholder = document.getElementById('camera-placeholder');
@@ -3540,6 +3565,10 @@
     window.stopLiveCameraFeed = stopLiveCameraFeed;
 
     function selectCamera(cam) {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal("Penny's Feeder Optical Stream", () => selectCamera(cam));
+        return;
+      }
       currentCamTarget = cam;
       if (!camFeedLoaded) {
         loadLiveCameraFeed();
@@ -3549,6 +3578,10 @@
     }
 
     function selectCamQuality(res) {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal("Penny's Feeder Quality Selector", () => selectCamQuality(res));
+        return;
+      }
       currentCamRes = res;
       if (!camFeedLoaded) {
         loadLiveCameraFeed();
@@ -3558,6 +3591,10 @@
     }
 
     function toggleCamAi() {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal("Penny's Feeder AI Vision", toggleCamAi);
+        return;
+      }
       currentCamAi = !currentCamAi;
       if (currentCamAi) {
         showToast('info', 'AI Vision Activated', 'Running TensorFlow pet detection model.');
@@ -3738,6 +3775,10 @@
     const AGY_SESSION_ID = '51f0adb8-74d9-4ada-92d6-c532f19e0629';
 
     function openEmbeddedConsole(fullscreen = false) {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal('Antigravity Autonomous Terminal', () => openEmbeddedConsole(fullscreen));
+        return;
+      }
       const modal = document.getElementById('agy-console-modal-overlay');
       const win = document.getElementById('agy-console-window');
       if (modal) {
@@ -3749,12 +3790,10 @@
         win.classList.add('fullscreen');
       }
       updateSSOGateUI();
-      if (isSSOAuthenticated()) {
-        refreshAgyConsole();
-        startConsoleAutoPoll();
-        const input = document.getElementById('agy-modal-input');
-        if (input) setTimeout(() => input.focus(), 200);
-      }
+      refreshAgyConsole();
+      startConsoleAutoPoll();
+      const input = document.getElementById('agy-modal-input');
+      if (input) setTimeout(() => input.focus(), 200);
     }
 
     function closeAgyConsole() {
@@ -3877,7 +3916,7 @@
 
     function triggerQuickChip(btn, text) {
       if (!isSSOAuthenticated()) {
-        showToast('error', 'Authentication Required', 'Please authenticate via Microsoft 365 SSO.');
+        openGlobalSSOModal('AGY Interactive Quick Prompt', () => triggerQuickChip(btn, text));
         return;
       }
       const input = document.getElementById('agy-modal-input');
@@ -3905,7 +3944,7 @@
 
     function sendConsolePrompt() {
       if (!isSSOAuthenticated()) {
-        showToast('error', 'Authentication Required', 'Please authenticate via Microsoft 365 SSO.');
+        openGlobalSSOModal('Autonomous Console Dispatch', sendConsolePrompt);
         return;
       }
       const input = document.getElementById('agy-modal-input');
@@ -3987,6 +4026,10 @@
 
     // Homelab Health Radar Modal Controllers
     function openHealthModal() {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal('Cluster Health Radar & Scorecard', openHealthModal);
+        return;
+      }
       const modal = document.getElementById('health-modal-overlay');
       if (modal) {
         modal.style.display = 'flex';
@@ -4040,7 +4083,7 @@
         role: 'Physical Residential WAN Gateway',
         services: 'Direct Fiber SFP+ • Low Jitter (<2ms) • Gigabit Switch Fabric',
         btnText: 'Run ISP Speedprobe →',
-        action: () => { runSpeedprobe(); }
+        action: () => { triggerSpeedtest(); }
       },
       vpn: {
         icon: '⚡',
@@ -4151,12 +4194,21 @@
     }
 
     function schematicNodeAction() {
+      if (!isSSOAuthenticated()) {
+        const title = (schematicNodesData[selectedSchematicKey] && schematicNodesData[selectedSchematicKey].title) || 'Cluster Schematic Action';
+        openGlobalSSOModal(title, () => schematicNodeAction());
+        return;
+      }
       if (schematicNodesData[selectedSchematicKey] && typeof schematicNodesData[selectedSchematicKey].action === 'function') {
         schematicNodesData[selectedSchematicKey].action();
       }
     }
 
     function pulseSchematicTraces() {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal('ICMP Trace Telemetry Pulse', pulseSchematicTraces);
+        return;
+      }
       const wires = document.querySelectorAll('.circuit-wire, .circuit-stream');
       wires.forEach(w => w.classList.add('pulsing'));
       const btn = document.getElementById('btn-pulse-traces');
@@ -4249,6 +4301,10 @@
     }
 
     function openDisasterModal() {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal('Disaster Recovery & Chaos Lab', openDisasterModal);
+        return;
+      }
       const modal = document.getElementById('disaster-modal-overlay') || document.getElementById('chaos-modal-overlay');
       if (modal) {
         modal.style.setProperty('display', 'flex', 'important');
@@ -4322,6 +4378,10 @@
     }
 
     function triggerChaosFault(type) {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal('Chaos Engineering Fault Injection', () => triggerChaosFault(type));
+        return;
+      }
       if (type === 'bellFiber') {
         chaosState.faults.bellFiber = !chaosState.faults.bellFiber;
         const isFault = chaosState.faults.bellFiber;
@@ -4485,6 +4545,10 @@
     }
 
     function restoreAllChaos() {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal('Chaos Engineering Recovery', restoreAllChaos);
+        return;
+      }
       const hadFaults = Object.values(chaosState.faults).some(Boolean);
       chaosState.faults.bellFiber = false;
       chaosState.faults.desktopPower = false;
