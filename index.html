@@ -1587,90 +1587,85 @@
           <div class="nuc-pane" id="pane-dns">
             <div class="kpi-row-4">
               <div class="kpi-mini-card">
-                <div class="kpi-label">Queries Processed (24h)</div>
-                <div class="kpi-val" style="color: #60a5fa;">49,180</div>
-                <div class="kpi-sub"><span class="dropdown-dot dot-1" style="background:#38bdf8;"></span> Cluster-wide LAN DNS</div>
+                <div class="kpi-label">Upstream Protocol</div>
+                <div class="kpi-val" style="color: #60a5fa;">DNS-over-TLS</div>
+                <div class="kpi-sub"><span class="dropdown-dot dot-1" style="background:#38bdf8;"></span> Cloudflare (1.1.1.1) + Quad9 (9.9.9.9)</div>
               </div>
               <div class="kpi-mini-card success">
-                <div class="kpi-label">Trackers Blocked</div>
-                <div class="kpi-val" style="color: #34d399;">13,420 <span style="font-size: 0.85rem; color: #94a3b8;">(27.3%)</span></div>
-                <div class="kpi-sub"><span class="dropdown-dot dot-1" style="background:#10b981;"></span> Neutralized at Gateway</div>
+                <div class="kpi-label">Split-Horizon Rewrites</div>
+                <div class="kpi-val" style="color: #34d399;">6 LAN Routes</div>
+                <div class="kpi-sub"><span class="dropdown-dot dot-1" style="background:#10b981;"></span> Zero NAT Loopback</div>
               </div>
               <div class="kpi-mini-card purple">
-                <div class="kpi-label">Active Blocklists</div>
+                <div class="kpi-label">Curated Blocklists</div>
                 <div class="kpi-val" style="color: #c084fc;">412,850</div>
-                <div class="kpi-sub">8 Subscriptions &bull; OISD + HaGeZi</div>
+                <div class="kpi-sub">OISD Full + HaGeZi Multi PRO</div>
               </div>
               <div class="kpi-mini-card amber">
-                <div class="kpi-label">Upstream Average</div>
-                <div class="kpi-val" style="color: #fbbf24;">6.8 <span style="font-size: 0.85rem; color: #94a3b8;">ms</span></div>
-                <div class="kpi-sub">DNS over TLS (DoT) &bull; Cloudflare 1.1.1.1</div>
+                <div class="kpi-label">Service Daemon</div>
+                <div class="kpi-val" style="color: #fbbf24;">Awaiting Install</div>
+                <div class="kpi-sub">Intel NUC (192.168.2.35:3000)</div>
               </div>
             </div>
 
             <div class="dns-threat-box">
-              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-                <div style="font-weight: 700; color: #f8fafc; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
-                  <span class="pulse-dot" style="background:#10b981;"></span> Live Neutralized Telemetry &amp; Tracker Feed
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+                <div style="font-weight: 700; color: #f8fafc; font-size: 0.95rem;">
+                  Pre-Configured Split-Horizon DNS Rewrites
                 </div>
-                <span style="font-size: 0.74rem; color: #64748b; font-family: monospace;">Sinkhole: 0.0.0.0 &bull; Port 53 / 853</span>
+                <span style="font-size: 0.74rem; color: #94a3b8; font-family: monospace;">Local Cluster Resolution (Zero Internet Egress)</span>
               </div>
-              <div class="dns-threat-list" id="dns-threat-stream">
-                <div class="dns-threat-item">
-                  <span style="color: #94a3b8;">[20:54:12]</span>
-                  <span style="color: #f87171; font-weight: 600;">telemetry.microsoft.com</span>
-                  <span class="item-tag" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5;">OS Telemetry</span>
-                  <span style="color: #34d399; font-weight: 700;">[SINKHOLED &bull; 0ms]</span>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px;">
+                <div style="background: rgba(0, 0, 0, 0.4); padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem;">
+                  <div style="color: #cbd5e1; font-weight: 600; margin-bottom: 2px;">torrents.digitalresolve.ca</div>
+                  <div style="color: #38bdf8; font-family: monospace;">&rarr; 192.168.2.62 (Desktop Workstation)</div>
                 </div>
-                <div class="dns-threat-item">
-                  <span style="color: #94a3b8;">[20:53:48]</span>
-                  <span style="color: #f87171; font-weight: 600;">app-measurement.com</span>
-                  <span class="item-tag" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5;">Mobile Analytics</span>
-                  <span style="color: #34d399; font-weight: 700;">[BLOCKED]</span>
+                <div style="background: rgba(0, 0, 0, 0.4); padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem;">
+                  <div style="color: #cbd5e1; font-weight: 600; margin-bottom: 2px;">torrents2.digitalresolve.ca</div>
+                  <div style="color: #38bdf8; font-family: monospace;">&rarr; 192.168.2.35 (NUC Server)</div>
                 </div>
-                <div class="dns-threat-item">
-                  <span style="color: #94a3b8;">[20:52:19]</span>
-                  <span style="color: #f87171; font-weight: 600;">pagead2.googlesyndication.com</span>
-                  <span class="item-tag" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5;">Ad Network</span>
-                  <span style="color: #34d399; font-weight: 700;">[BLOCKED]</span>
+                <div style="background: rgba(0, 0, 0, 0.4); padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem;">
+                  <div style="color: #cbd5e1; font-weight: 600; margin-bottom: 2px;">cam.digitalresolve.ca</div>
+                  <div style="color: #38bdf8; font-family: monospace;">&rarr; 192.168.2.35 (Penny Feeder WebRTC)</div>
                 </div>
-                <div class="dns-threat-item">
-                  <span style="color: #94a3b8;">[20:50:02]</span>
-                  <span style="color: #f87171; font-weight: 600;">graph.instagram.com</span>
-                  <span class="item-tag" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5;">Social Tracker</span>
-                  <span style="color: #34d399; font-weight: 700;">[BLOCKED]</span>
+                <div style="background: rgba(0, 0, 0, 0.4); padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem;">
+                  <div style="color: #cbd5e1; font-weight: 600; margin-bottom: 2px;">files.digitalresolve.ca</div>
+                  <div style="color: #38bdf8; font-family: monospace;">&rarr; 192.168.2.35 (Kavita &amp; File Storage)</div>
+                </div>
+                <div style="background: rgba(0, 0, 0, 0.4); padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem;">
+                  <div style="color: #cbd5e1; font-weight: 600; margin-bottom: 2px;">stream.digitalresolve.ca</div>
+                  <div style="color: #38bdf8; font-family: monospace;">&rarr; 192.168.2.35 (Audiobookshelf)</div>
+                </div>
+                <div style="background: rgba(0, 0, 0, 0.4); padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem;">
+                  <div style="color: #cbd5e1; font-weight: 600; margin-bottom: 2px;">feeder.local</div>
+                  <div style="color: #f472b6; font-family: monospace;">&rarr; 192.168.2.18 (Smart Feeder Hardware)</div>
                 </div>
               </div>
             </div>
 
-            <!-- AdGuard Deployment & Configuration Controls -->
+            <!-- AdGuard Configuration & Status Controls -->
             <div style="margin-top: 16px; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 16px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
                 <div>
-                  <div style="font-weight: 800; color: #f8fafc; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
-                    <span style="color: #10b981;">&#x1F6E1;&#xFE0F;</span> AdGuard Home Auto-Configuration Suite
+                  <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <span style="font-weight: 800; color: #f8fafc; font-size: 0.95rem;">AdGuard Home DNS Configuration Suite</span>
+                    <span class="item-tag warning" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); font-size: 0.7rem;">Service Setup Required &bull; Port 3000 Inactive</span>
                   </div>
-                  <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 2px;">
-                    Pre-configured for Digital Resolve homelab: DoT upstreams (1.1.1.1 &bull; 9.9.9.9), HaGeZi + OISD lists, and LAN split-horizon rewrites.
+                  <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 3px;">
+                    Homelab DNS filtering and local rewrites ready. Configured for DoT upstreams (1.1.1.1 &bull; 9.9.9.9), HaGeZi + OISD blocklists, and LAN split-horizon.
                   </div>
                 </div>
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                  <button type="button" class="btn btn-secondary" onclick="openAdGuardConfigModal()" style="font-size: 0.76rem; padding: 5px 12px; color: #6ee7b7 !important; border-color: rgba(16, 185, 129, 0.4); display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
-                    <span>&#x2699;&#xFE0F; View Pre-Built Config</span>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                  <button type="button" class="btn btn-primary" onclick="openAdGuardConfigModal()" style="font-size: 0.78rem; padding: 7px 14px; background: linear-gradient(135deg, #10b981, #059669); border-color: #10b981; color: white !important; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-weight: 600;">
+                    AdGuard Configuration &amp; Rewrites
                   </button>
-                  <button type="button" class="btn btn-secondary" onclick="copyAdguardDeployCommand()" id="btn-copy-adguard" style="font-size: 0.76rem; padding: 5px 12px; color: #38bdf8 !important; border-color: rgba(56, 189, 248, 0.4); display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
-                    <span>&#x1F4CB; Copy 1-Click Deploy Command</span>
+                  <button type="button" class="btn btn-secondary" onclick="copyAdguardDeployCommand()" id="btn-copy-adguard" style="font-size: 0.78rem; padding: 7px 14px; color: #38bdf8 !important; border-color: rgba(56, 189, 248, 0.4); display: inline-flex; align-items: center; gap: 6px; cursor: pointer;" title="Copy PowerShell 1-liner to deploy natively on Windows NUC">
+                    Copy Windows Deploy Command
                   </button>
-                  <a href="http://192.168.2.35:3000" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.76rem; padding: 5px 12px; color: #cbd5e1 !important; border-color: rgba(255, 255, 255, 0.2); display: inline-flex; align-items: center; gap: 6px;">
-                    <span>&#x1F680; Web Dashboard (3000) &nearr;</span>
+                  <a href="http://192.168.2.35:3000" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.78rem; padding: 7px 14px; color: #64748b !important; border-color: rgba(255, 255, 255, 0.1); display: inline-flex; align-items: center; gap: 6px; opacity: 0.75;" title="Port 3000 web console is available after running the installer on NUC">
+                    Web Console (Port 3000) &nearr;
                   </a>
                 </div>
-              </div>
-
-              <!-- Quick Command Snippet -->
-              <div style="background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 10px 14px; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: #34d399; display: flex; justify-content: space-between; align-items: center; overflow-x: auto; gap: 10px;">
-                <span id="adguard-deploy-cmd">curl -fsSL https://raw.githubusercontent.com/townsy2020/digitalresolve.ca/main/deploy/adguard/deploy.sh | bash</span>
-                <span class="item-tag" style="background: rgba(16, 185, 129, 0.15); color: #6ee7b7; font-size: 0.7rem; white-space: nowrap;">Port 53 &bull; Port 3000</span>
               </div>
             </div>
           </div>
@@ -4984,27 +4979,27 @@
     window.closeAdGuardConfigModal = closeAdGuardConfigModal;
 
     function copyAdguardDeployCommand() {
-      const cmd = "curl -fsSL https://raw.githubusercontent.com/townsy2020/digitalresolve.ca/main/deploy/adguard/deploy.sh | bash";
+      const cmd = 'powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/townsy2020/digitalresolve.ca/main/deploy/adguard/deploy.ps1 | iex"';
       if (navigator.clipboard) {
         navigator.clipboard.writeText(cmd).then(() => {
-          showToast('success', 'Command Copied!', '1-Click AdGuard deploy command copied to clipboard.');
+          showToast('success', 'Command Copied', 'AdGuard Windows install command copied. Run in elevated PowerShell on NUC.');
           const btn = document.getElementById('btn-copy-adguard');
+          const modalBtn = document.getElementById('btn-copy-modal-cmd');
           if (btn) {
             const orig = btn.innerHTML;
             btn.innerHTML = '<span>&check; Copied!</span>';
             setTimeout(() => { btn.innerHTML = orig; }, 2000);
           }
-          const modalBtn = document.getElementById('btn-copy-modal-cmd');
           if (modalBtn) {
             const origM = modalBtn.innerHTML;
             modalBtn.innerHTML = '&check; Copied!';
             setTimeout(() => { modalBtn.innerHTML = origM; }, 2000);
           }
         }).catch(() => {
-          prompt('Copy command:', cmd);
+          prompt('Copy AdGuard install command:', cmd);
         });
       } else {
-        prompt('Copy command:', cmd);
+        prompt('Copy AdGuard install command:', cmd);
       }
     }
     window.copyAdguardDeployCommand = copyAdguardDeployCommand;
@@ -5189,40 +5184,37 @@
   <div id="adguard-modal-overlay" class="health-modal-overlay" style="display: none;" onclick="if(event.target===this)closeAdGuardConfigModal()">
     <div class="health-modal-window" role="dialog" aria-modal="true" aria-label="AdGuard Home Deployment &amp; Configuration" style="max-width: 760px; max-height: 88vh; display: flex; flex-direction: column;">
       <div class="health-modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 12px; margin-bottom: 14px;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span style="font-size: 1.4rem;">&#x1F6E1;&#xFE0F;</span>
-          <div>
-            <h3 style="font-size: 1.05rem; font-weight: 800; color: #f8fafc; margin: 0;">AdGuard Home Auto-Deployment &amp; Cluster Config</h3>
-            <div style="font-size: 0.76rem; color: #94a3b8;">1-Command deploy + pre-baked parallel DoT upstreams, HaGeZi/OISD filters, and split-horizon LAN rewrites.</div>
-          </div>
+        <div>
+          <h3 style="font-size: 1.05rem; font-weight: 800; color: #f8fafc; margin: 0;">AdGuard Home Deployment &amp; Cluster DNS Architecture</h3>
+          <div style="font-size: 0.76rem; color: #94a3b8; margin-top: 2px;">Pre-configured native Windows service deploy, Cloudflare/Quad9 DoT upstreams, and split-horizon LAN rewrites.</div>
         </div>
         <button type="button" class="btn btn-secondary" onclick="closeAdGuardConfigModal()" style="font-size: 0.8rem; padding: 4px 10px; cursor: pointer;">&times;</button>
       </div>
 
       <div style="overflow-y: auto; flex: 1; padding-right: 4px; display: flex; flex-direction: column; gap: 16px;">
-        <!-- Step 1: 1-Command Deploy -->
+        <!-- Step 1: Windows Native Deployment -->
         <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; padding: 14px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <div style="font-weight: 700; color: #6ee7b7; font-size: 0.86rem; display: flex; align-items: center; gap: 6px;">
-              <span>1&#xFE0F;&#x20E3;</span> 1-Command Auto-Deploy on NUC (Docker)
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+            <div style="font-weight: 700; color: #6ee7b7; font-size: 0.86rem;">
+              Step 1: Install &amp; Run Native Service on NUC (Windows PowerShell)
             </div>
             <button type="button" class="btn btn-secondary" onclick="copyAdguardDeployCommand()" id="btn-copy-modal-cmd" style="font-size: 0.74rem; padding: 3px 10px; color: #38bdf8 !important; border-color: rgba(56, 189, 248, 0.4); cursor: pointer;">
-              &#x1F4CB; Copy Command
+              Copy PowerShell Command
             </button>
           </div>
           <div style="font-size: 0.78rem; color: #94a3b8; margin-bottom: 8px;">
-            Run this on your Intel NUC terminal. It automatically pulls <code style="color: #6ee7b7;">adguard/adguardhome:latest</code>, writes the host network configuration, injects all rewrites, and launches the service:
+            Run this in an elevated PowerShell terminal on the NUC (192.168.2.35). It downloads the official Windows x64 binary, writes the pre-configured YAML, and starts the service:
           </div>
-          <pre style="background: #020617; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 10px; color: #34d399; font-size: 0.76rem; overflow-x: auto; margin: 0; font-family: 'JetBrains Mono', monospace;">curl -fsSL https://raw.githubusercontent.com/townsy2020/digitalresolve.ca/main/deploy/adguard/deploy.sh | bash</pre>
+          <pre style="background: #020617; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 10px; color: #38bdf8; font-size: 0.76rem; overflow-x: auto; margin: 0; font-family: 'JetBrains Mono', monospace;">powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/townsy2020/digitalresolve.ca/main/deploy/adguard/deploy.ps1 | iex"</pre>
         </div>
 
         <!-- Step 2: Local Split-Horizon Rewrites -->
         <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; padding: 14px;">
-          <div style="font-weight: 700; color: #38bdf8; font-size: 0.86rem; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-            <span>2&#xFE0F;&#x20E3;</span> Pre-Configured Local Cluster Rewrites (Included in YAML)
+          <div style="font-weight: 700; color: #38bdf8; font-size: 0.86rem; margin-bottom: 8px;">
+            Step 2: Pre-Configured Local Cluster Rewrites (Included in YAML)
           </div>
           <div style="font-size: 0.78rem; color: #94a3b8; margin-bottom: 10px;">
-            Prevents NAT loopback and keeps homelab traffic inside your gigabit LAN:
+            Prevents NAT loopback and routes homelab traffic directly inside your gigabit LAN:
           </div>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px;">
             <div style="background: rgba(0, 0, 0, 0.35); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); font-size: 0.75rem;">
@@ -5254,8 +5246,8 @@
 
         <!-- Step 3: Router DHCP DNS Pointing -->
         <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 8px; padding: 14px;">
-          <div style="font-weight: 700; color: #fbbf24; font-size: 0.86rem; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-            <span>3&#xFE0F;&#x20E3;</span> Route All Home Devices (Bell Router DHCP)
+          <div style="font-weight: 700; color: #fbbf24; font-size: 0.86rem; margin-bottom: 8px;">
+            Step 3: Route All Home Devices (Bell Router DHCP)
           </div>
           <div style="font-size: 0.78rem; color: #94a3b8; line-height: 1.5;">
             1. Open router at <a href="http://192.168.2.1" target="_blank" rel="noopener noreferrer" style="color: #fbbf24; text-decoration: underline;">http://192.168.2.1</a><br>
@@ -5268,7 +5260,7 @@
 
       <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 12px; margin-top: 14px; flex-wrap: wrap; gap: 8px;">
         <a href="https://github.com/townsy2020/digitalresolve.ca/tree/main/deploy/adguard" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.78rem; padding: 6px 12px; color: #cbd5e1 !important; border-color: rgba(255,255,255,0.2);">
-          &#x1F4C2; View Config Files in GitHub &rarr;
+          View Config Files in GitHub &rarr;
         </a>
         <div style="display: flex; gap: 8px;">
           <button type="button" class="btn btn-secondary" onclick="closeAdGuardConfigModal()" style="font-size: 0.8rem; padding: 6px 14px; cursor: pointer;">Close</button>
