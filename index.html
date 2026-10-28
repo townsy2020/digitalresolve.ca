@@ -695,12 +695,6 @@
                 </div>
               </div>
             </div>
-            <div style="font-size: 0.76rem; color: #94a3b8; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-              <span>&#128274; Stream protected by Cloudflare Zero Trust &amp; M365 SSO.</span>
-              <a href="https://cam.digitalresolve.ca/webrtc.html?src=pennys_feeder" id="cam-helper-link" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: underline;">
-                Seeing "Firefox Can't Open This Page"? Click here to authenticate in new window &rarr;
-              </a>
-            </div>
 
             <!-- Stream Switcher Toolbar -->
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 0.8rem; color: #94a3b8;">
@@ -1290,8 +1284,8 @@
           </div>
           <div class="kpi-mini-card">
             <div class="kpi-label">Privacy Guarantee</div>
-            <div class="kpi-val" style="color: #38bdf8; font-size: 1.15rem;">Air-Gapped</div>
-            <div class="kpi-sub">0% External Cloud Data Exfiltration</div>
+            <div class="kpi-val" style="color: #38bdf8; font-size: 1.15rem;">Zero Cloud Egress</div>
+            <div class="kpi-sub">100% Local Inference &bull; No Data Leakage</div>
           </div>
           <div class="kpi-mini-card amber">
             <div class="kpi-label">Secondary Code Model</div>
@@ -4793,7 +4787,7 @@
 
     // --- 2. Edge AI (Ollama Local) ---
     const edgeAiResponses = {
-      summarize: "The Digital Resolve homelab is an air-gapped, zero-trust private cloud running on an Intel Core i5 NUC (32 GB RAM) paired with a high-performance AMD Ryzen 9 workstation. It utilizes Cloudflare Zero Trust dual edge tunnels (0 open inbound ports), Microsoft 365 Entra ID SSO identity gating, Mullvad WireGuard privacy routing, and hardware-accelerated H.264 WebRTC video pipelines.",
+      summarize: "The Digital Resolve homelab is a zero-trust, local-first private cloud running on an Intel Core i5 NUC (32 GB RAM) paired with a high-performance AMD Ryzen 9 workstation. It utilizes Cloudflare Zero Trust dual edge tunnels (0 open inbound ports), Microsoft 365 Entra ID SSO identity gating, Mullvad WireGuard privacy routing, and hardware-accelerated H.264 WebRTC video pipelines.",
       bufferbloat: "Bell Gigabit Fiber achieves Grade A+ bufferbloat due to symmetrical GPON low-latency fiber transport combined with active queue management (FQ-CoDel/CAKE) and dedicated 2.5 GbE Intel LAN controllers, preventing buffer packet buildup during simultaneous 4K streams and high-bandwidth swarm downloads.",
       catcam: "Cat Cam leverages go2rtc compiled directly for Windows x64 on the NUC, binding to Tuya WebRTC H.264 feeds over local UDP. The stream is signaled via WebSocket (/api/ws) directly to the browser's hardware video decoder, resulting in <50ms glass-to-glass latency with 0% browser GPU/CPU strain.",
       security: "Perimeter audit verified 0 listening WAN ports. Inbound ingress is exclusively brokered via Cloudflare Edge Tunnels with CA/US geo-shielding, encrypted TLS 1.3 0-RTT handshakes, and strict Microsoft 365 Entra ID SAML authentication before any cluster service can be addressed.",
