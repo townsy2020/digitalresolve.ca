@@ -722,9 +722,24 @@
               </div>
             </div>
 
-            <!-- Video Stream Container -->
-            <div style="background: #020617; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 8px;">
-              <iframe id="camera-live-frame" src="https://cam.digitalresolve.ca/ai.html?src=pennys_feeder" style="width: 100%; height: 440px; border: none; display: block;" allow="autoplay; fullscreen; picture-in-picture" title="Live Camera Feed" loading="lazy"></iframe>
+            <!-- Video Stream Container with On-Demand Load -->
+            <div id="camera-stream-wrapper" style="position: relative; width: 100%; height: 440px; background: #020617; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 8px; display: flex; align-items: center; justify-content: center;">
+              <iframe id="camera-live-frame" style="width: 100%; height: 100%; border: none; display: none;" allow="autoplay; fullscreen; picture-in-picture" title="Live Camera Feed"></iframe>
+              <div id="camera-placeholder" style="text-align: center; padding: 24px; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                <span style="font-size: 2.4rem;">🐾</span>
+                <div style="font-weight: 800; color: #f8fafc; font-size: 1.05rem;">Penny's Feeder &bull; Live Optical Stream</div>
+                <div style="font-size: 0.8rem; color: #94a3b8; max-width: 440px; line-height: 1.5;">
+                  High-bandwidth WebRTC stream via 24/7 Intel NUC bridge. Click to stream on-demand without locking browser page loading or scrolling.
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 6px;">
+                  <button type="button" class="btn btn-primary" onclick="loadLiveCameraFeed()" style="font-size: 0.88rem; padding: 8px 22px; display: inline-flex; align-items: center; gap: 8px; font-weight: 700; background: linear-gradient(135deg, #10b981, #059669); border-color: #10b981; box-shadow: 0 0 16px rgba(16, 185, 129, 0.35); cursor: pointer;">
+                    <span>▶</span> Start Live Camera Stream
+                  </button>
+                  <a href="https://cam.digitalresolve.ca/ai.html?src=pennys_feeder" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.82rem; padding: 8px 16px;">
+                    Open in Pop-Out Tab &nearr;
+                  </a>
+                </div>
+              </div>
             </div>
             <div style="font-size: 0.76rem; color: #94a3b8; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
               <span>&#128274; Stream protected by Cloudflare Zero Trust &amp; M365 SSO.</span>
@@ -1457,9 +1472,9 @@
           <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;">v2.6.3</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" title="Project Codebase Scale: 8,993 Lines of Code (HTML: 4,402 lines &bull; CSS: 4,590 lines &bull; CNAME)">
+        <div class="footer-loc-badge" title="Project Codebase Scale: 9,036 Lines of Code (HTML: 4,445 lines &bull; CSS: 4,590 lines &bull; CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">8,993</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">9,036</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -2796,20 +2811,46 @@
     let currentCamTarget = 'pennys_feeder';
     let currentCamRes = 'hd';
     let currentCamAi = true;
+    let camFeedLoaded = false;
+
+    function loadLiveCameraFeed() {
+      camFeedLoaded = true;
+      const frame = document.getElementById('camera-live-frame');
+      const placeholder = document.getElementById('camera-placeholder');
+      if (placeholder) placeholder.style.display = 'none';
+      if (frame) {
+        frame.style.display = 'block';
+        updateCamFeed();
+      }
+      showToast('info', 'Live Optical Stream Initialized', "Streaming from 24/7 Intel NUC gateway...");
+    }
+    window.loadLiveCameraFeed = loadLiveCameraFeed;
 
     function selectCamera(cam) {
       currentCamTarget = cam;
-      updateCamFeed();
+      if (!camFeedLoaded) {
+        loadLiveCameraFeed();
+      } else {
+        updateCamFeed();
+      }
     }
 
     function selectCamQuality(res) {
       currentCamRes = res;
-      updateCamFeed();
+      if (!camFeedLoaded) {
+        loadLiveCameraFeed();
+      } else {
+        updateCamFeed();
+      }
     }
 
     function toggleCamAi() {
       currentCamAi = !currentCamAi;
-      updateCamFeed();
+      if (!camFeedLoaded) {
+        loadLiveCameraFeed();
+      } else {
+        updateCamFeed();
+      }
     }
 
     function updateCamFeed() {
@@ -2818,8 +2859,10 @@
       const frame = document.getElementById('camera-live-frame');
       const title = document.getElementById('cam-header-active-name');
       const targetUrl = `https://cam.digitalresolve.ca/${playerPage}?src=${src}`;
-      if (frame) {
-        frame.src = targetUrl;
+      if (frame && camFeedLoaded) {
+        if (frame.src !== targetUrl) {
+          frame.src = targetUrl;
+        }
       }
       const directLink = document.getElementById('cam-direct-link');
       if (directLink) {
