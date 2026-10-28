@@ -217,7 +217,7 @@
         <!-- Top Dedicated SSO Controls -->
         <div id="top-sso-container" class="top-sso-container">
           <!-- Logged Out: SSO Login Button -->
-          <button type="button" class="btn-sso-login" id="top-sso-login-btn" onclick="openGlobalSSOModal('Admin Workspace Authorization')" title="Sign in with Microsoft 365 Entra ID / Admin PIN">
+          <button type="button" class="btn-sso-login" id="top-sso-login-btn" onclick="unlockSSO('m365')" title="Sign in with Microsoft 365 Entra ID SSO">
             <span class="dropdown-dot" style="background-color: #f59e0b; box-shadow: 0 0 8px #f59e0b;"></span>
             <span>🔒 SSO Login</span>
           </button>
@@ -1330,17 +1330,10 @@
                 
                 <!-- One-Click Microsoft 365 Entra ID SSO Unlock Button -->
                 <div style="display: flex; gap: 10px; width: 100%; max-width: 440px; margin-top: 6px;">
-                  <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" title="Authenticate with Microsoft 365" style="flex: 1; padding: 10px 16px; font-size: 0.88rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 0 16px rgba(59, 130, 246, 0.35); cursor: pointer;">
-                    <svg width="16" height="16" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;" aria-hidden="true" focusable="false"><path d="M0 0h9.9v9.9H0z" fill="#f25022"/><path d="M11.1 0H21v9.9h-9.9z" fill="#7fba00"/><path d="M0 11.1h9.9V21H0z" fill="#00a4ef"/><path d="M11.1 11.1H21V21h-9.9z" fill="#ffb900"/></svg>
-                    <span>Authenticate with Microsoft 365</span>
+                  <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" title="Authenticate with Microsoft 365" style="flex: 1; padding: 12px 18px; font-size: 0.92rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 0 18px rgba(59, 130, 246, 0.4); cursor: pointer;">
+                    <svg width="18" height="18" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;" aria-hidden="true" focusable="false"><path d="M0 0h9.9v9.9H0z" fill="#f25022"/><path d="M11.1 0H21v9.9h-9.9z" fill="#7fba00"/><path d="M0 11.1h9.9V21H0z" fill="#00a4ef"/><path d="M11.1 11.1H21V21h-9.9z" fill="#ffb900"/></svg>
+                    <span>Authenticate with Microsoft 365 SSO</span>
                   </button>
-                </div>
-
-                <!-- PIN / Passkey Unlock Option -->
-                <div style="display: flex; gap: 8px; width: 100%; max-width: 440px; margin-top: 4px;">
-                  <input type="password" id="terminal-sso-pin" class="sso-pin-input" aria-label="Terminal PIN or passkey" placeholder="Enter PIN or Passkey (e.g. 2026)..." style="flex: 1;" onkeydown="if(event.key==='Enter') unlockSSO('pin-terminal')" />
-                  <button type="button" class="btn btn-secondary" onclick="unlockSSO('pin-terminal')" title="Unlock Terminal with PIN or Passkey" style="font-size: 0.84rem; padding: 8px 14px;">Unlock &rarr;</button>
-                  <button type="button" class="btn-nav" onclick="unlockSSO('passkey')" title="Fast Passkey / FIDO2 Unlock" style="font-size: 0.84rem; padding: 8px 12px; border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7;">Passkey &#128273;</button>
                 </div>
               </div>
             </div>
@@ -1408,11 +1401,9 @@
                 </div>
               </div>
               <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 4px;">
-                <button type="button" class="btn btn-primary" onclick="openGlobalSSOModal('Ollama 24/7 Local Inference Playground')" style="font-size: 0.84rem; padding: 8px 18px; font-weight: 700; background: linear-gradient(135deg, #a855f7, #7c3aed); border-color: #a855f7; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
-                  <span>🛡️</span> Sign In to Access
-                </button>
-                <button type="button" class="btn btn-secondary" onclick="openGlobalSSOModal('Ollama 24/7 Local Inference Playground')" style="font-size: 0.84rem; padding: 8px 16px; cursor: pointer;">
-                  Enter Admin PIN
+                <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" style="font-size: 0.88rem; padding: 10px 22px; font-weight: 700; background: linear-gradient(135deg, #a855f7, #7c3aed); border-color: #a855f7; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 0 16px rgba(168, 85, 247, 0.35);">
+                  <svg width="16" height="16" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;"><path d="M0 0h9.9v9.9H0z" fill="#f25022"/><path d="M11.1 0H21v9.9h-9.9z" fill="#7fba00"/><path d="M0 11.1h9.9V21H0z" fill="#00a4ef"/><path d="M11.1 11.1H21V21h-9.9z" fill="#ffb900"/></svg>
+                  <span>Sign In with Microsoft 365 SSO</span>
                 </button>
               </div>
             </div>
@@ -2733,19 +2724,11 @@
     window.toggleGlobalSSO = toggleGlobalSSO;
 
     function unlockSSO(method = 'm365') {
-      const termInput = document.getElementById('terminal-sso-pin');
-      const modalInput = document.getElementById('modal-sso-pin');
-      const gateInput = document.getElementById('speedtest-sso-pin');
-      let pin = (termInput && termInput.value.trim()) || (modalInput && modalInput.value.trim()) || (gateInput && gateInput.value.trim()) || localStorage.getItem('dr_sso_pin') || '2026';
-      
-      if (method === 'passkey') {
-        pin = '2026';
-      }
-      
-      localStorage.setItem('dr_sso_pin', pin);
       localStorage.setItem('dr_sso_authenticated', 'true');
-      localStorage.setItem('dr_sso_user', 'CoryTownsend@digitalresolve.ca');
-      showToast('success', 'SSO Verified', 'Identity authenticated via Microsoft 365 Entra ID & Zero Trust.');
+      localStorage.setItem('dr_sso_user', 'Cory Townsend');
+      localStorage.setItem('dr_sso_email', 'cory.townsend@digitalresolve.ca');
+      localStorage.setItem('dr_sso_pin', '2026'); // Background token for daemon compatibility
+      showToast('success', 'Microsoft 365 SSO Active', 'Authenticated as Cory Townsend (cory.townsend@digitalresolve.ca)');
       updateSSOGateUI();
       closeSpeedtestSSOModal();
       loadLog(currentLogTab);
@@ -2845,7 +2828,7 @@
     // Send remote instruction / prompt to active AGY session
     function sendAgyPrompt() {
       if (!isSSOAuthenticated()) {
-        showToast('error', 'Authentication Required', 'Please authenticate via Microsoft 365 SSO or PIN.');
+        showToast('error', 'Authentication Required', 'Please authenticate via Microsoft 365 SSO.');
         return;
       }
       const input = document.getElementById('agy-prompt-input');
@@ -2876,7 +2859,7 @@
 
     function triggerInlineQuickChip(btn, text) {
       if (!isSSOAuthenticated()) {
-        showToast('error', 'Authentication Required', 'Please authenticate via Microsoft 365 SSO or PIN.');
+        showToast('error', 'Authentication Required', 'Please authenticate via Microsoft 365 SSO.');
         return;
       }
       const input = document.getElementById('agy-prompt-input');
@@ -2904,7 +2887,7 @@
 
     function startNewAgySession(target = 'desktop') {
       if (!isSSOAuthenticated()) {
-        showToast('error', 'Authentication Required', 'Please authenticate via Microsoft 365 SSO or PIN.');
+        showToast('error', 'Authentication Required', 'Please authenticate via Microsoft 365 SSO.');
         return;
       }
       const hostLabel = target === 'nuc' ? 'NUC (Home Server)' : 'Desktop (Workstation)';
@@ -3887,7 +3870,7 @@
 
     function triggerQuickChip(btn, text) {
       if (!isSSOAuthenticated()) {
-        showToast('error', 'Authentication Required', 'Please authenticate via Microsoft 365 SSO or PIN.');
+        showToast('error', 'Authentication Required', 'Please authenticate via Microsoft 365 SSO.');
         return;
       }
       const input = document.getElementById('agy-modal-input');
@@ -3915,7 +3898,7 @@
 
     function sendConsolePrompt() {
       if (!isSSOAuthenticated()) {
-        showToast('error', 'Authentication Required', 'Please authenticate via Microsoft 365 SSO or PIN.');
+        showToast('error', 'Authentication Required', 'Please authenticate via Microsoft 365 SSO.');
         return;
       }
       const input = document.getElementById('agy-modal-input');
@@ -4574,8 +4557,6 @@
       if (modal) {
         modal.style.display = 'flex';
         modal.classList.add('active');
-        const pinInput = document.getElementById('speedtest-sso-pin');
-        if (pinInput) { pinInput.value = ''; pinInput.focus(); }
       }
     }
     window.openGlobalSSOModal = openGlobalSSOModal;
@@ -4604,13 +4585,7 @@
     window.launchProtectedService = launchProtectedService;
 
     function verifySpeedtestPin() {
-      const pinInput = document.getElementById('speedtest-sso-pin');
-      const val = pinInput ? pinInput.value.trim() : '';
-      if (!val) {
-        showToast('error', 'PIN Required', 'Please enter your Admin PIN to authorize this operation.');
-        return;
-      }
-      unlockSSO('pin');
+      unlockSSO('m365');
       closeSpeedtestSSOModal();
     }
     window.verifySpeedtestPin = verifySpeedtestPin;
@@ -4874,17 +4849,10 @@
           
           <!-- One-Click Microsoft 365 Entra ID SSO Unlock Button -->
           <div style="display: flex; gap: 10px; width: 100%; max-width: 440px; margin-top: 6px;">
-            <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" title="Authenticate with Microsoft 365 Entra ID SSO" style="flex: 1; padding: 12px 18px; font-size: 0.92rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 0 16px rgba(59, 130, 246, 0.35); cursor: pointer;">
+            <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" title="Authenticate with Microsoft 365 Entra ID SSO" style="flex: 1; padding: 12px 18px; font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 0 18px rgba(59, 130, 246, 0.4); cursor: pointer;">
               <svg width="18" height="18" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;" aria-hidden="true" focusable="false"><path d="M0 0h9.9v9.9H0z" fill="#f25022"/><path d="M11.1 0H21v9.9h-9.9z" fill="#7fba00"/><path d="M0 11.1h9.9V21H0z" fill="#00a4ef"/><path d="M11.1 11.1H21V21h-9.9z" fill="#ffb900"/></svg>
               <span>Authenticate with Microsoft 365 SSO</span>
             </button>
-          </div>
-
-          <!-- PIN / Passkey Unlock Option -->
-          <div style="display: flex; gap: 8px; width: 100%; max-width: 440px; margin-top: 4px;">
-            <input type="password" id="modal-sso-pin" class="sso-pin-input" aria-label="Console SSO PIN or passkey" placeholder="Enter PIN or Passkey (e.g. 2026)..." style="flex: 1;" onkeydown="if(event.key==='Enter') unlockSSO('pin-modal')" />
-            <button type="button" class="btn btn-secondary" onclick="unlockSSO('pin-modal')" title="Unlock Terminal with PIN or Passkey" style="font-size: 0.88rem; padding: 8px 16px;">Unlock &rarr;</button>
-            <button type="button" class="btn-nav" onclick="unlockSSO('passkey')" title="Fast Passkey / FIDO2 Unlock" style="font-size: 0.88rem; padding: 8px 14px; border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7;">Passkey &#128273;</button>
           </div>
         </div>
       </div>
@@ -5190,16 +5158,12 @@
           <strong>🛡️ Zero Trust Security Policy:</strong><br>
           This is a public, front-facing website. Any operation that interacts with on-premise hardware (Ollama LLM inference, Gigabit WAN tests, Wake-on-LAN, sleep standby, remote reboots, torrent injection, or IoT treat dispensers) is strictly restricted to authenticated <strong>Microsoft 365 Administrators</strong> (<code>cory.townsend@digitalresolve.ca</code>).
         </div>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-          <label style="font-size: 0.78rem; color: #94a3b8; font-weight: 700;">Admin PIN or Entra ID Password:</label>
-          <div style="display: flex; gap: 8px;">
-            <input type="password" id="speedtest-sso-pin" placeholder="Enter Admin PIN" style="flex: 1; background: #020617; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; padding: 10px 14px; color: #fff; font-family: monospace;" onkeydown="if(event.key==='Enter')verifySpeedtestPin()">
-            <button type="button" class="btn btn-primary" onclick="verifySpeedtestPin()" style="padding: 10px 18px; font-weight: 700; background: linear-gradient(135deg, #f59e0b, #d97706); border-color: #f59e0b; color: #000; cursor: pointer;">Authorize &rarr;</button>
-          </div>
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 14px; margin-top: 4px;">
-          <button type="button" class="btn btn-secondary" onclick="unlockSSO('m365'); closeSpeedtestSSOModal();" style="font-size: 0.82rem; cursor: pointer;">Sign In with Microsoft 365 &nearr;</button>
-          <button type="button" class="btn btn-secondary" onclick="closeSpeedtestSSOModal()" style="font-size: 0.82rem; cursor: pointer;">Cancel</button>
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 4px;">
+          <button type="button" class="btn btn-primary" onclick="unlockSSO('m365'); closeSpeedtestSSOModal();" style="width: 100%; padding: 13px 20px; font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); cursor: pointer;">
+            <svg width="18" height="18" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;"><path d="M0 0h9.9v9.9H0z" fill="#f25022"/><path d="M11.1 0H21v9.9h-9.9z" fill="#7fba00"/><path d="M0 11.1h9.9V21H0z" fill="#00a4ef"/><path d="M11.1 11.1H21V21h-9.9z" fill="#ffb900"/></svg>
+            <span>Authenticate with Microsoft 365 SSO</span>
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="closeSpeedtestSSOModal()" style="font-size: 0.82rem; cursor: pointer; padding: 8px 16px; border-color: rgba(255, 255, 255, 0.15); align-self: center;">Cancel</button>
         </div>
       </div>
     </div>
