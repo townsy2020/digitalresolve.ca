@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Digital Resolve &bull; Homelab Cloud &amp; Command Deck</title>
   <meta name="description" content="24/7 self-hosted homelab operations, Cloudflare Zero Trust tunnels, private 4K media streaming, and automated WireGuard VPN ingestion.">
-  <link rel="stylesheet" href="styles.css?v=2.6.3">
+  <link rel="stylesheet" href="styles.css?v=2.7.4">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -177,7 +180,11 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>📋 Release Changelog (v2.7.2)</span>
+              <span>📋 Release Changelog (v2.7.4)</span>
+            </button>
+            <button type="button" class="btn-action-item" onclick="lockSSO(true)" style="color: #fca5a5;" title="Perform complete Microsoft 365 Entra ID &amp; Cloudflare Access session logout and browser cache purge">
+              <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
+              <span>🔒 Full SSO &amp; M365 Sign-Out</span>
             </button>
             <div class="dropdown-divider"></div>
             <!-- Embedded AI Token Widget -->
@@ -2005,9 +2012,9 @@
           <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;">v2.6.3</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" title="Project Codebase Scale: 10,420 Lines of Code (HTML: 5,345 lines &bull; CSS: 5,074 lines &bull; CNAME)">
+        <div class="footer-loc-badge" title="Project Codebase Scale: 10,470 Lines of Code (HTML: 5,395 lines &bull; CSS: 5,074 lines &bull; CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">10,420</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">10,470</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -2736,14 +2743,57 @@
         try { cb(); } catch(e) {}
       }
     }
+    window.unlockSSO = unlockSSO;
+    window.isSSOAuthenticated = isSSOAuthenticated;
 
-    function lockSSO() {
-      localStorage.removeItem('dr_sso_authenticated');
-      localStorage.removeItem('dr_sso_pin');
-      stopConsoleAutoPoll();
+    function lockSSO(fullIdpLogout = false) {
+      // 1. Explicitly clear all localStorage authentication keys
+      try {
+        localStorage.removeItem('dr_sso_authenticated');
+        localStorage.removeItem('dr_sso_pin');
+        localStorage.removeItem('dr_sso_user');
+        localStorage.removeItem('dr_sso_email');
+        localStorage.setItem('dr_sso_authenticated', 'false');
+      } catch(e) {}
+
+      // 2. Clear all sessionStorage cache
+      try {
+        sessionStorage.clear();
+      } catch(e) {}
+
+      // 3. Clear relevant domain auth cookies
+      try {
+        const host = window.location.hostname;
+        const cookieList = ['dr_sso_authenticated', 'dr_sso_pin', 'dr_sso_user', 'dr_sso', 'CF_Authorization', 'CF_AppSession'];
+        cookieList.forEach(name => {
+          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${host};`;
+          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${host};`;
+          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.digitalresolve.ca;`;
+        });
+      } catch(e) {}
+
+      // 4. Terminate background pollers and reset memory states
+      window.pendingSSOCallback = null;
+      if (typeof stopConsoleAutoPoll === 'function') stopConsoleAutoPoll();
+
+      // 5. Instantly force UI updates across all gates and header buttons
       updateSSOGateUI();
-      showToast('info', 'SSO Session Locked', 'All system-interacting operations secured behind Microsoft 365 Entra ID SSO.');
+
+      // 6. Ping Cloudflare Zero Trust Access logout endpoint in background
+      try {
+        fetch('/cdn-cgi/access/logout', { method: 'GET', credentials: 'include', mode: 'no-cors' }).catch(() => {});
+      } catch(e) {}
+
+      // 7. Show confirmation toast
+      showToast('info', 'SSO Session Locked', 'Admin credentials & browser storage cleared. Zero Trust gate engaged.');
+
+      // 8. If requested or triggered with Shift key, redirect to Microsoft Entra ID global logout
+      if (fullIdpLogout) {
+        window.location.href = 'https://login.microsoftonline.com/common/oauth2/v2.0/logout?post_logout_redirect_uri=' + encodeURIComponent(window.location.origin);
+      }
     }
+    window.lockSSO = lockSSO;
 
     // Multi-modal AGY session launcher
     function launchAgySession(target) {
