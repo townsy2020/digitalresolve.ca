@@ -72,15 +72,10 @@
               <span>📁 Browse Media &amp; Files (NUC)</span>
               <span class="item-tag">Vault</span>
             </a>
-            <a href="#camera-feed-card" class="btn-action-item" title="View Penny's Feeder Live Camera">
-              <span class="dropdown-dot dot-2"></span>
-              <span>🐾 Penny's Feeder Optical Stream</span>
-              <span class="item-tag online">WebRTC</span>
-            </a>
-            <a href="#nuc-services" onclick="switchNucTab('iot')" class="btn-action-item" title="Penny's Smart Feeder IoT (192.168.2.18) &amp; Portion Dispenser">
+            <a href="#camera-feed-card" class="btn-action-item" title="Penny's Cat Hub • Live Optical Stream &amp; Smart Feeder IoT">
               <span class="dropdown-dot" style="background-color: #f472b6; box-shadow: 0 0 8px #f472b6;"></span>
-              <span>🐾 Penny's Smart Feeder IoT</span>
-              <span class="item-tag online">192.168.2.18</span>
+              <span>🐾 Penny's Cat Hub (Stream &amp; Feeder)</span>
+              <span class="item-tag online">Live &bull; 192.168.2.18</span>
             </a>
             <div class="dropdown-divider"></div>
             <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents.digitalresolve.ca', 'qBittorrent Workstation (torrents.digitalresolve.ca)')" class="btn-action-item" title="Open Workstation qBittorrent">
@@ -659,21 +654,24 @@
           </div>
         </div>
 
-        <!-- Live Camera Stream (24/7 NUC Bridge & SSO) -->
-        <div class="control-matrix-card" id="camera-feed-card" style="margin-top: 24px; margin-bottom: 40px; border-color: rgba(16, 185, 129, 0.25);">
+        <!-- Unified Penny's Cat Hub (Stream & Smart Feeder IoT) -->
+        <div class="control-matrix-card" id="camera-feed-card" style="margin-top: 24px; margin-bottom: 40px; border-color: rgba(244, 114, 182, 0.35);">
             <div class="control-matrix-header">
-              <div class="control-matrix-title" style="color: #6ee7b7;">
-                <span>[LIVE]</span> Optical Feeds &bull; <span id="cam-header-active-name">Penny's Feeder</span>
+              <div class="control-matrix-title" style="color: #f472b6;">
+                <span>🐾</span> Penny's Cat Hub &bull; <span id="cam-header-active-name" style="color: #6ee7b7;">Penny's Feeder Cam &amp; Feeder IoT</span>
               </div>
               <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                 <span class="item-tag online" id="camera-status-tag">
-                  <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span> 2 Cameras Active (NUC)
+                  <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span> 2 Cameras Active &bull; Feeder Online
+                </span>
+                <span class="item-tag" style="background: rgba(244, 114, 182, 0.15); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.3);">
+                  Tuya IoT &bull; 192.168.2.18
                 </span>
                 <span class="item-tag" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">
-                  Microsoft 365 Entra ID SSO
+                  SSO Protected
                 </span>
                 <a href="https://cam.digitalresolve.ca/webrtc.html?src=pennys_feeder" id="cam-direct-link" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.78rem; padding: 4px 12px; background: rgba(59, 130, 246, 0.2); color: #93c5fd !important; border-color: rgba(59, 130, 246, 0.5);" title="Open live camera feed in a new window to authenticate Cloudflare Access SSO">
-                  &#x2197; Open in New Window / Authenticate
+                  &#x2197; Direct WebRTC
                 </a>
                 <a href="https://cam.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.78rem; padding: 4px 12px; background: rgba(16, 185, 129, 0.2); color: #6ee7b7 !important; border-color: rgba(16, 185, 129, 0.5);" title="Open full streaming console in new tab">
                   Full Console &rarr;
@@ -681,48 +679,90 @@
               </div>
             </div>
 
-            <!-- Video Stream Container with Non-Blocking Hardware WebRTC -->
-            <div id="camera-stream-wrapper" style="position: relative; width: 100%; height: 440px; background: #020617; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 8px; display: flex; align-items: center; justify-content: center; contain: paint; will-change: transform;">
-              <iframe id="camera-live-frame" style="width: 100%; height: 100%; border: none; display: none; contain: strict;" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" title="Live Camera Feed"></iframe>
-              <div id="camera-placeholder" style="text-align: center; padding: 24px; display: flex; flex-direction: column; align-items: center; gap: 12px;">
-                <span style="font-size: 2.4rem;">🐾</span>
-                <div style="font-weight: 800; color: #f8fafc; font-size: 1.05rem;">Penny's Feeder &bull; Live Optical Stream</div>
-                <div style="font-size: 0.8rem; color: #94a3b8; max-width: 460px; line-height: 1.5;">
-                  Instant zero-latency WebRTC hardware stream via 24/7 Intel NUC gateway. Pure H.264 video decode with 0% browser GPU/CPU overhead.
+            <div class="penny-hub-grid">
+              <!-- Left Column: Live Optical Stream Player -->
+              <div class="penny-hub-stream-col">
+                <div id="camera-stream-wrapper" style="position: relative; width: 100%; height: 410px; background: #020617; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 10px; display: flex; align-items: center; justify-content: center; contain: paint; will-change: transform;">
+                  <iframe id="camera-live-frame" style="width: 100%; height: 100%; border: none; display: none; contain: strict;" loading="lazy" allow="autoplay; fullscreen; picture-in-picture" title="Live Camera Feed"></iframe>
+                  <div id="camera-placeholder" style="text-align: center; padding: 24px; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                    <span style="font-size: 2.4rem;">🐾</span>
+                    <div style="font-weight: 800; color: #f8fafc; font-size: 1.05rem;">Penny's Feeder &bull; Live Optical Stream</div>
+                    <div style="font-size: 0.8rem; color: #94a3b8; max-width: 440px; line-height: 1.5;">
+                      Instant zero-latency WebRTC hardware stream via 24/7 Intel NUC gateway. Pure H.264 video decode with 0% browser GPU/CPU overhead.
+                    </div>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 6px;">
+                      <button type="button" class="btn btn-primary" onclick="loadLiveCameraFeed()" style="font-size: 0.88rem; padding: 8px 22px; display: inline-flex; align-items: center; gap: 8px; font-weight: 700; background: linear-gradient(135deg, #10b981, #059669); border-color: #10b981; box-shadow: 0 0 16px rgba(16, 185, 129, 0.35); cursor: pointer;">
+                        <span>▶</span> Start Live WebRTC Stream
+                      </button>
+                      <a href="https://cam.digitalresolve.ca/ai.html?src=pennys_feeder" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.82rem; padding: 8px 16px;" title="Open live feed with TensorFlow AI object detection in an isolated tab">
+                        Launch AI Vision Tab &nearr;
+                      </a>
+                    </div>
+                  </div>
                 </div>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 6px;">
-                  <button type="button" class="btn btn-primary" onclick="loadLiveCameraFeed()" style="font-size: 0.88rem; padding: 8px 22px; display: inline-flex; align-items: center; gap: 8px; font-weight: 700; background: linear-gradient(135deg, #10b981, #059669); border-color: #10b981; box-shadow: 0 0 16px rgba(16, 185, 129, 0.35); cursor: pointer;">
-                    <span>▶</span> Start Live WebRTC Stream
-                  </button>
-                  <a href="https://cam.digitalresolve.ca/ai.html?src=pennys_feeder" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.82rem; padding: 8px 16px;" title="Open live feed with TensorFlow AI object detection in an isolated tab">
-                    Launch AI Vision Tab &nearr;
-                  </a>
-                </div>
-              </div>
-            </div>
 
-            <!-- Stream Switcher Toolbar -->
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 0.8rem; color: #94a3b8;">
-              <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700;">Camera:</span>
-                <button type="button" class="btn btn-secondary" id="btn-cam-feeder" style="font-size: 0.75rem; padding: 4px 10px; background: rgba(16, 185, 129, 0.25); border-color: #10b981; color: #6ee7b7;" onclick="selectCamera('pennys_feeder')">Penny's Feeder</button>
-                <button type="button" class="btn btn-secondary" id="btn-cam-bedroom" style="font-size: 0.75rem; padding: 4px 10px;" onclick="selectCamera('bedroom')">Bedroom</button>
-                <span style="color: rgba(255,255,255,0.15); margin: 0 4px;">|</span>
-                <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700;">Quality:</span>
-                <button type="button" class="btn btn-secondary" id="btn-cam-hd" style="font-size: 0.75rem; padding: 4px 10px; background: rgba(56, 189, 248, 0.25); border-color: #38bdf8; color: #93c5fd;" onclick="selectCamQuality('hd')">HD</button>
-                <button type="button" class="btn btn-secondary" id="btn-cam-sd" style="font-size: 0.75rem; padding: 4px 10px;" onclick="selectCamQuality('sd')">SD (Low-BW)</button>
-                <span style="color: rgba(255,255,255,0.15); margin: 0 4px;">|</span>
-                <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700;">Mode:</span>
-                <button type="button" class="btn btn-secondary" id="btn-cam-ai" style="font-size: 0.75rem; padding: 4px 10px; background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.35); color: #6ee7b7;" onclick="toggleCamAi()" title="Toggle between lightweight WebRTC stream (0% CPU) and client-side AI object detection (TensorFlow)">&#9889; Fast WebRTC (0% CPU)</button>
-                <button type="button" class="btn btn-secondary" id="btn-cam-stop" style="font-size: 0.75rem; padding: 4px 10px; border-color: rgba(239, 68, 68, 0.35); color: #f87171;" onclick="stopLiveCameraFeed()" title="Unload WebRTC stream to save bandwidth">⏹ Stop Stream</button>
-                <span style="color: rgba(255,255,255,0.15); margin: 0 4px;">|</span>
-                <button type="button" class="btn btn-secondary" onclick="triggerCatTreat('15g Snack')" style="font-size: 0.75rem; padding: 4px 12px; background: rgba(244, 114, 182, 0.15); border-color: rgba(244, 114, 182, 0.4); color: #f472b6;" title="Dispense treat to Penny's smart feeder via Tuya IoT (192.168.2.18)">🐱 Dispense Treat</button>
+                <!-- Stream Switcher Toolbar -->
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 0.8rem; color: #94a3b8;">
+                  <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                    <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700;">Cam:</span>
+                    <button type="button" class="btn btn-secondary" id="btn-cam-feeder" style="font-size: 0.75rem; padding: 4px 10px; background: rgba(16, 185, 129, 0.25); border-color: #10b981; color: #6ee7b7;" onclick="selectCamera('pennys_feeder')">Penny's Feeder</button>
+                    <button type="button" class="btn btn-secondary" id="btn-cam-bedroom" style="font-size: 0.75rem; padding: 4px 10px;" onclick="selectCamera('bedroom')">Bedroom</button>
+                    <span style="color: rgba(255,255,255,0.15); margin: 0 2px;">|</span>
+                    <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700;">Res:</span>
+                    <button type="button" class="btn btn-secondary" id="btn-cam-hd" style="font-size: 0.75rem; padding: 4px 10px; background: rgba(56, 189, 248, 0.25); border-color: #38bdf8; color: #93c5fd;" onclick="selectCamQuality('hd')">HD</button>
+                    <button type="button" class="btn btn-secondary" id="btn-cam-sd" style="font-size: 0.75rem; padding: 4px 10px;" onclick="selectCamQuality('sd')">SD</button>
+                    <span style="color: rgba(255,255,255,0.15); margin: 0 2px;">|</span>
+                    <button type="button" class="btn btn-secondary" id="btn-cam-ai" style="font-size: 0.75rem; padding: 4px 10px; background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.35); color: #6ee7b7;" onclick="toggleCamAi()" title="Toggle WebRTC stream mode">&#9889; Fast WebRTC (0% CPU)</button>
+                    <button type="button" class="btn btn-secondary" id="btn-cam-stop" style="font-size: 0.75rem; padding: 4px 10px; border-color: rgba(239, 68, 68, 0.35); color: #f87171;" onclick="stopLiveCameraFeed()" title="Unload WebRTC stream to save bandwidth">⏹ Stop</button>
+                  </div>
+                  <div style="font-family: monospace; font-size: 0.73rem; color: #64748b;">
+                    Ingested by NUC (192.168.2.35) &bull; Hardware WebRTC H.264
+                  </div>
+                </div>
               </div>
-              <div style="font-family: monospace; font-size: 0.75rem; color: #64748b;">
-                Ingested by NUC (192.168.2.35) &bull; Hardware WebRTC H.264
+
+              <!-- Right Column: Smart Feeder IoT Controls & Telemetry -->
+              <div class="penny-hub-feeder-col">
+                <div class="iot-card" id="cat-feeder-suite" style="border-color: rgba(244, 114, 182, 0.35); height: 100%; display: flex; flex-direction: column; justify-content: space-between; background: rgba(15, 23, 42, 0.75); padding: 18px; border-radius: 8px;">
+                  <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;">
+                      <span style="font-size: 0.78rem; text-transform: uppercase; color: #f472b6; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+                        🐾 Penny's Smart Feeder IoT
+                      </span>
+                      <span class="item-tag online" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">192.168.2.18 &bull; Online</span>
+                    </div>
+                    <div style="font-size: 1.8rem; font-weight: 800; color: #f472b6; font-family: 'JetBrains Mono', monospace; margin: 8px 0 4px 0;">
+                      84% <span style="font-size: 0.85rem; color: #94a3b8; font-weight: 600;">(1.2 kg Dry Kibble)</span>
+                    </div>
+                    <div class="disk-bar-bg" style="margin-bottom: 12px;">
+                      <div class="disk-bar-fill" style="width: 84%; background: linear-gradient(90deg, #ec4899, #f472b6);"></div>
+                    </div>
+                    <div style="font-size: 0.78rem; color: #94a3b8; line-height: 1.6; background: rgba(0, 0, 0, 0.25); padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.04); margin-bottom: 14px;">
+                      <div>&bull; Protocol: <strong style="color: #cbd5e1;">Tuya IoT v3.3 &bull; 04:f4:d8:ba:e3:c7</strong></div>
+                      <div>&bull; Last Dispense: <span id="feeder-last-time" style="color: #cbd5e1;">2 hours ago (Penny Feast 25g)</span></div>
+                      <div>&bull; Next Scheduled: <strong style="color: #cbd5e1;">7:00 AM EST (Breakfast &bull; 25g)</strong></div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700; margin-bottom: 6px;">Instant Dispense (SSO Protected):</div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px;">
+                      <button type="button" class="btn btn-secondary" onclick="triggerCatTreat('10g Snack')" style="font-size: 0.74rem; padding: 6px 4px; color: #f472b6 !important; border-color: rgba(244, 114, 182, 0.4); text-align: center; justify-content: center; width: 100%;" title="Dispense 10g small snack">
+                        🐟 10g Snack
+                      </button>
+                      <button type="button" class="btn btn-secondary" onclick="triggerCatTreat('25g Meal')" style="font-size: 0.74rem; padding: 6px 4px; color: #ec4899 !important; border-color: rgba(236, 72, 153, 0.4); text-align: center; justify-content: center; width: 100%;" title="Dispense 25g regular meal">
+                        🥣 25g Meal
+                      </button>
+                      <button type="button" class="btn btn-secondary" onclick="triggerCatTreat('50g Feast')" style="font-size: 0.74rem; padding: 6px 4px; color: #c084fc !important; border-color: rgba(192, 132, 252, 0.4); text-align: center; justify-content: center; width: 100%;" title="Dispense 50g double portion">
+                        🍗 50g Feast
+                      </button>
+                    </div>
+                    <div id="feeder-log-list" style="font-size: 0.72rem; color: #64748b; min-height: 20px;"></div>
+                  </div>
+                </div>
               </div>
             </div>
-            </div>
+        </div>
           </div>
       </div>
     </section>
@@ -1714,7 +1754,7 @@
                 </div>
               </div>
 
-              <div class="iot-card" id="cat-feeder-suite" style="border-color: rgba(244, 114, 182, 0.35);">
+              <div class="iot-card" style="border-color: rgba(244, 114, 182, 0.35);">
                 <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;">
                   <span style="font-size: 0.75rem; text-transform: uppercase; color: #f472b6; font-weight: 700;">🐾 Penny's Smart Feeder IoT</span>
                   <span class="item-tag online" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">192.168.2.18 &bull; Online</span>
@@ -1726,25 +1766,15 @@
                   <div class="disk-bar-fill" style="width: 84%; background: linear-gradient(90deg, #ec4899, #f472b6);"></div>
                 </div>
                 <div style="font-size: 0.78rem; color: #94a3b8; line-height: 1.5;">
+                  &bull; Consolidated into <strong>🐾 Penny's Cat Hub</strong> alongside optical cam stream.<br>
                   &bull; Protocol: <strong>Tuya IoT v3.3 &bull; 04:f4:d8:ba:e3:c7</strong><br>
-                  &bull; Last Dispense: <span id="feeder-last-time" style="color: #cbd5e1;">2 hours ago (Penny Feast 25g)</span><br>
-                  &bull; Next Scheduled: <strong>7:00 AM EST (Breakfast &bull; 25g)</strong>
+                  &bull; Last Dispense: <span id="feeder-iot-last-time" style="color: #cbd5e1;">2 hours ago (Penny Feast 25g)</span>
                 </div>
-                <div style="margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap;">
-                  <button type="button" class="btn btn-secondary" onclick="triggerCatTreat('10g Snack')" style="font-size: 0.76rem; padding: 4px 10px; color: #f472b6 !important; border-color: rgba(244, 114, 182, 0.4);" title="Dispense 10g small snack">
-                    🐟 10g Snack
-                  </button>
-                  <button type="button" class="btn btn-secondary" onclick="triggerCatTreat('25g Meal')" style="font-size: 0.76rem; padding: 4px 10px; color: #ec4899 !important; border-color: rgba(236, 72, 153, 0.4);" title="Dispense 25g regular meal">
-                    🥣 25g Meal
-                  </button>
-                  <button type="button" class="btn btn-secondary" onclick="triggerCatTreat('50g Feast')" style="font-size: 0.76rem; padding: 4px 10px; color: #c084fc !important; border-color: rgba(192, 132, 252, 0.4);" title="Dispense 50g double portion">
-                    🍗 50g Feast
-                  </button>
-                  <a href="#camera-feed-card" onclick="selectCamera('pennys_feeder')" class="btn btn-secondary" style="font-size: 0.76rem; padding: 4px 10px; color: #38bdf8 !important; border-color: rgba(56, 189, 248, 0.4);" title="View Optical Stream for Feeding Station">
-                    📹 Live Cam &rarr;
+                <div style="margin-top: 10px;">
+                  <a href="#camera-feed-card" class="btn btn-secondary" style="font-size: 0.76rem; padding: 5px 12px; color: #f472b6 !important; border-color: rgba(244, 114, 182, 0.4); display: inline-flex; align-items: center; gap: 6px;" title="Open Penny's Cat Hub (Stream &amp; Feeder)">
+                    <span>🐾 Open Penny's Cat Hub (Stream &amp; Controls) &rarr;</span>
                   </a>
                 </div>
-                <div id="feeder-log-list" style="margin-top: 8px; font-size: 0.72rem; color: #64748b;"></div>
               </div>
             </div>
           </div>
@@ -3690,7 +3720,7 @@
         helperLink.href = targetUrl;
       }
       if (title) {
-        title.innerText = currentCamTarget === 'bedroom' ? 'Bedroom' : "Penny's Feeder";
+        title.innerText = currentCamTarget === 'bedroom' ? 'Bedroom Cam' : "Penny's Feeder Cam & Feeder IoT";
       }
 
       const bFeeder = document.getElementById('btn-cam-feeder');
@@ -4879,10 +4909,12 @@
         return;
       }
       const timeEl = document.getElementById('feeder-last-time');
+      const iotTimeEl = document.getElementById('feeder-iot-last-time');
       const logEl = document.getElementById('feeder-log-list');
       playChaosTone(784, 1046, 'sine', 0.22);
       const nowStr = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
       if (timeEl) timeEl.textContent = `Just Now (${portionLabel})`;
+      if (iotTimeEl) iotTimeEl.textContent = `Just Now (${portionLabel})`;
       if (logEl) {
         const item = document.createElement('div');
         item.style.cssText = 'display: flex; justify-content: space-between; padding: 4px 0; border-top: 1px solid rgba(255,255,255,0.06); color: #cbd5e1;';
