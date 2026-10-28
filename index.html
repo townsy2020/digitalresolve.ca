@@ -2132,12 +2132,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.1</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.2</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 11,460 Lines of Code (HTML: 6,245 lines | CSS: 5,214 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 11,638 Lines of Code (HTML: 6,375 lines | CSS: 5,262 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">11,460</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">11,638</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -2212,41 +2212,40 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.1';
+          const activeVer = match ? match[0] : 'v2.8.2';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-        // Dynamically compute exact Lines of Code (HTML + CSS + CNAME)
-        const htmlDoc = document.documentElement.outerHTML || '';
-        const htmlLines = htmlDoc.split(/\r?\n/).length;
+        const baseHtmlLines = 6375;
+        const baseCssLines = 5262;
+        const baseCnameLines = 1;
+        const defaultTotal = baseHtmlLines + baseCssLines + baseCnameLines;
 
-        fetch('styles.css')
-          .then(res => {
-            if (!res.ok) throw new Error('CSS fetch failed');
-            return res.text();
-          })
-          .then(cssText => {
-            const cssLines = cssText.split(/\r?\n/).length;
-            const cnameLines = 1;
-            const totalLines = htmlLines + cssLines + cnameLines;
-            const totalFormatted = totalLines.toLocaleString();
+        // Asynchronously count exact live lines via parallel cache-busted fetch
+        Promise.all([
+          fetch('index.html?_t=' + Date.now()).then(r => r.ok ? r.text() : null).catch(() => null),
+          fetch('styles.css?_t=' + Date.now()).then(r => r.ok ? r.text() : null).catch(() => null)
+        ]).then(([htmlSrc, cssSrc]) => {
+          const hLines = htmlSrc ? htmlSrc.split(/\r?\n/).length : baseHtmlLines;
+          const cLines = cssSrc ? cssSrc.split(/\r?\n/).length : baseCssLines;
+          const total = hLines + cLines + baseCnameLines;
+          const totalFormatted = total.toLocaleString();
 
-            const locEl = document.getElementById('project-loc-count');
-            if (locEl) locEl.textContent = totalFormatted;
+          const locEl = document.getElementById('project-loc-count');
+          if (locEl) locEl.textContent = totalFormatted;
 
-            const locBadge = document.getElementById('footer-loc-badge');
-            if (locBadge) {
-              locBadge.title = `Project Codebase Scale: ${totalFormatted} Lines of Code (HTML: ${htmlLines.toLocaleString()} lines | CSS: ${cssLines.toLocaleString()} lines | CNAME)`;
-            }
-          })
-          .catch(() => {
-            const fallbackLoc = 11460;
-            const locEl = document.getElementById('project-loc-count');
-            if (locEl) locEl.textContent = fallbackLoc.toLocaleString();
-          });
+          const locBadge = document.getElementById('footer-loc-badge');
+          if (locBadge) {
+            locBadge.title = `Project Codebase Scale: ${totalFormatted} Lines of Code (HTML: ${hLines.toLocaleString()} lines | CSS: ${cLines.toLocaleString()} lines | CNAME)`;
+          }
+        }).catch(() => {
+          const totalFormatted = defaultTotal.toLocaleString();
+          const locEl = document.getElementById('project-loc-count');
+          if (locEl) locEl.textContent = totalFormatted;
+        });
       } catch(err) {
         console.error('Error updating codebase metrics:', err);
       }
@@ -6116,10 +6115,25 @@
       </div>
 
       <div class="changelog-body">
-        <!-- Version 2.8.1 (Current) -->
+        <!-- Version 2.8.2 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.1 | Current</span>
+            <span class="ver-tag current">v2.8.2 | Current</span>
+            <span class="ver-date">October 28, 2026</span>
+          </div>
+          <h4 class="ver-title">Topology Circuit Flows, Heartbeat Sparkline &amp; Dynamic Codebase Metrics</h4>
+          <ul class="ver-list">
+            <li><strong>Hardware Topology Schematic Packet Flows:</strong> Restored and enhanced animated glowing SVG packet streams (Edge, Fiber, VPN, LAN) with hardware-accelerated <code>stroke-dashoffset</code> keyframes, explicit starting offsets, and luminous drop-shadow filters across Firefox, Chrome, and Edge.</li>
+            <li><strong>Dynamic Real-Time Heartbeat Oscilloscope:</strong> Activated dynamic multi-tier waveform rendering on the 24-Hour SLA Latency Sparkline canvas with tab-visibility management.</li>
+            <li><strong>System-Wide Animation Keyframes:</strong> Defined <code>@keyframes spin</code>, <code>@keyframes fadeIn</code>, and <code>@keyframes modalScaleIn</code> to power button dispatch spinners, node inspector panels, and modal dialogs.</li>
+            <li><strong>Dynamic Codebase Scale &amp; Version Synchronizer:</strong> Real-time automated line counter and version tags synchronized across navigation header, changelog modal, and footer.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.8.1 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.1</span>
             <span class="ver-date">October 28, 2026</span>
           </div>
           <h4 class="ver-title">Live Token Telemetry, Zero-PIN Security &amp; Dynamic Codebase Metrics</h4>
