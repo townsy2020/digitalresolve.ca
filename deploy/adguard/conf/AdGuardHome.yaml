@@ -1,0 +1,124 @@
+bind_host: 0.0.0.0
+bind_port: 3000
+beta_bind_port: 0
+users: []
+auth_attempts: 5
+block_auth_min: 15
+http_proxy: ""
+language: en
+theme: dark
+debug_pprof: false
+web_session_ttl: 720
+dns:
+  bind_hosts:
+    - 0.0.0.0
+  port: 53
+  statistics_interval: 1
+  querylog_enabled: true
+  querylog_file_enabled: true
+  querylog_interval: 24h
+  querylog_size_memory: 1000
+  anonymize_client_ip: false
+  protection_enabled: true
+  blocking_mode: default
+  blocking_ipv4: ""
+  blocking_ipv6: ""
+  blocked_response_ttl: 10
+  parental_block_host: parental-block.adguard.org
+  safebrowsing_block_host: standard-block.adguard.org
+  ratelimit: 0
+  ratelimit_whitelist: []
+  refuse_any: true
+  upstream_dns:
+    - tls://1.1.1.1
+    - tls://1.0.0.1
+    - tls://9.9.9.9
+    - https://dns.quad9.net/dns-query
+  upstream_dns_file: ""
+  bootstrap_dns:
+    - 9.9.9.9
+    - 1.1.1.1
+  all_servers: true
+  fastest_addr: true
+  fastest_timeout: 1s
+  allowed_clients: []
+  disallowed_clients: []
+  blocked_hosts: []
+  trusted_proxies:
+    - 127.0.0.0/8
+    - ::1/128
+  cache_size: 4194304
+  cache_ttl_min: 0
+  cache_ttl_max: 0
+  cache_optimistic: true
+  bogus_nxdomain: []
+  aaaa_disabled: false
+  enable_dnssec: true
+  edns_client_subnet:
+    custom_ip: ""
+    enabled: false
+    use_custom: false
+  max_goroutines: 300
+  handle_ddr: true
+  ipset: []
+  ipset_file: ""
+  filtering_enabled: true
+  filters_update_interval: 24
+  parental_enabled: false
+  safesearch_enabled: false
+  safebrowsing_enabled: true
+  rewrites:
+    - domain: torrents.digitalresolve.ca
+      answer: 192.168.2.62
+    - domain: torrents2.digitalresolve.ca
+      answer: 192.168.2.35
+    - domain: cam.digitalresolve.ca
+      answer: 192.168.2.35
+    - domain: files.digitalresolve.ca
+      answer: 192.168.2.35
+    - domain: stream.digitalresolve.ca
+      answer: 192.168.2.35
+    - domain: feeder.local
+      answer: 192.168.2.18
+    - domain: nuc.local
+      answer: 192.168.2.35
+filters:
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt
+    name: AdGuard DNS filter
+    id: 1
+  - enabled: true
+    url: https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.txt
+    name: HaGeZi's Multi PRO
+    id: 2
+  - enabled: true
+    url: https://big.oisd.nl
+    name: OISD Blocklist Full
+    id: 3
+clients:
+  runtime_sources:
+    whois: true
+    arp: true
+    rdns: true
+    dhcp: true
+    hosts: true
+  persistent:
+    - name: "Penny's Smart Feeder IoT"
+      ids:
+        - 192.168.2.18
+        - 04:f4:d8:ba:e3:c7
+      upstreams: []
+      tags:
+        - user_regular
+    - name: "Desktop Workstation"
+      ids:
+        - 192.168.2.62
+      upstreams: []
+      tags:
+        - user_admin
+    - name: "Intel NUC Active Compute"
+      ids:
+        - 192.168.2.35
+      upstreams: []
+      tags:
+        - user_admin
