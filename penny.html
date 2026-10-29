@@ -96,12 +96,12 @@
             <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents.digitalresolve.ca', 'qBittorrent Workstation (torrents.digitalresolve.ca)')" class="btn-action-item" title="Open Workstation qBittorrent">
               <span class="dropdown-dot dot-1"></span>
               <span>Torrents (Desktop qBit)</span>
-              <span class="item-tag" id="desktop-disk-tag">C: 375G &bull; D: 5.4T</span>
+              <span class="item-tag" id="desktop-disk-tag">Checking...</span>
             </a>
             <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents2.digitalresolve.ca', 'qBittorrent NUC (torrents2.digitalresolve.ca)')" class="btn-action-item" title="Open NUC qBittorrent">
               <span class="dropdown-dot dot-2"></span>
               <span>Torrents (NUC qBit)</span>
-              <span class="item-tag online" id="nuc-disk-tag">D: 489 GB free</span>
+              <span class="item-tag" id="nuc-disk-tag">Checking...</span>
             </a>
             <a href="javascript:void(0)" onclick="openMagnetModal()" class="btn-action-item" title="Open Rapid Torrent &amp; Magnet Ingestion Console">
               <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
@@ -112,22 +112,22 @@
             <div class="disk-widget" id="nuc-disk-widget">
               <div class="disk-widget-header">
                 <span class="disk-label">NUC Storage (D:)</span>
-                <span class="disk-val" id="nuc-disk-val">489.2 GB Free</span>
+                <span class="disk-val" id="nuc-disk-val">-- Free</span>
               </div>
               <div class="disk-bar-bg">
                 <div class="disk-bar-fill" id="nuc-disk-bar" style="width: 73.7%;"></div>
               </div>
-              <div class="disk-subtext" id="nuc-disk-sub">1373.8 GB used of 1863 GB (73.7%)</div>
+              <div class="disk-subtext" id="nuc-disk-sub">Calculating storage...</div>
             </div>
             <div class="disk-widget" id="desktop-disk-widget" style="margin-top: 10px;">
               <div class="disk-widget-header">
                 <span class="disk-label">Desktop Storage (C: + D:)</span>
-                <span class="disk-val" id="desktop-disk-val">5,751 GB Free</span>
+                <span class="disk-val" id="desktop-disk-val">-- Free</span>
               </div>
               <div class="disk-bar-bg">
                 <div class="disk-bar-fill" id="desktop-disk-bar" style="width: 5.0%; background: linear-gradient(90deg, #38bdf8, #10b981);"></div>
               </div>
-              <div class="disk-subtext" id="desktop-disk-sub">303 GB used of 6,054 GB (5.0%) &bull; C: 465G | D: 5.6T</div>
+              <div class="disk-subtext" id="desktop-disk-sub">Checking workstation...</div>
             </div>
           </div>
         </div>
@@ -177,7 +177,7 @@
             <button type="button" class="btn-action-item" onclick="checkStatus('nuc')" title="Query Live Status and Latency for NUC Server">
               <span class="dropdown-dot dot-2"></span>
               <span>Ping NUC Server</span>
-              <span class="item-tag online" id="latency-nuc">0.2 ms | D: 489 GB</span>
+              <span class="item-tag" id="latency-nuc">Checking...</span>
             </button>
             <button type="button" class="btn-action-item" onclick="checkStatus('desktop')" title="Query Live Status and Latency for Desktop">
               <span class="dropdown-dot dot-1"></span>
@@ -608,7 +608,7 @@
         <div class="health-radar-row">
           <div class="health-radar-header">
             <span><strong style="color: #f1f5f9;">Intel NUC Core Server (24/7 Node)</strong> &bull; 192.168.2.35</span>
-            <span style="color: #34d399; font-weight: 700;">100% (0.4 ms)</span>
+            <span style="color: #34d399; font-weight: 700;">Checking...</span>
           </div>
           <div class="health-meter-bar"><div class="health-meter-fill" style="width: 100%;"></div></div>
           <div style="font-size: 0.72rem; color: #64748b;">Services: Swarm Engine, CatCam Proxy, StreamHub 8088, WireGuard Tunnel</div>
@@ -617,7 +617,7 @@
         <div class="health-radar-row">
           <div class="health-radar-header">
             <span><strong style="color: #f1f5f9;">Desktop Workstation (Cory-Desktop)</strong> &bull; 192.168.2.62</span>
-            <span style="color: #34d399; font-weight: 700;">100% (Bell Fiber)</span>
+            <span style="color: #34d399; font-weight: 700;">Checking...</span>
           </div>
           <div class="health-meter-bar"><div class="health-meter-fill" style="width: 100%;"></div></div>
           <div style="font-size: 0.72rem; color: #64748b;">Services: Antigravity Autonomous Agent, High-Speed Torrenting, Git Sync</div>
@@ -635,16 +635,16 @@
         <div class="health-radar-row">
           <div class="health-radar-header">
             <span><strong style="color: #f1f5f9;">Bell Canada Gigabit Fiber Telemetry</strong></span>
-            <span style="color: #38bdf8; font-weight: 700;">98% (1.2 ms &bull; 0 ms Jitter)</span>
+            <span style="color: #38bdf8; font-weight: 700;">Measuring...</span>
           </div>
           <div class="health-meter-bar"><div class="health-meter-fill" style="width: 98%; background: linear-gradient(90deg, #0ea5e9, #38bdf8);"></div></div>
-          <div style="font-size: 0.72rem; color: #64748b;">ISP Performance: 1000 Mbps Down / 1000 Mbps Up &bull; Zero Packet Loss</div>
+          <div style="font-size: 0.72rem; color: #64748b;">ISP Performance: Bell Gigabit Fiber &bull; Telemetry Probe Active</div>
         </div>
 
         <div class="health-radar-row">
           <div class="health-radar-header">
             <span><strong style="color: #f1f5f9;">Media Storage Capacity (D:\Torrents)</strong></span>
-            <span style="color: #60a5fa; font-weight: 700;">96% (496 GB Free)</span>
+            <span style="color: #60a5fa; font-weight: 700;">Scanning...</span>
           </div>
           <div class="health-meter-bar"><div class="health-meter-fill" style="width: 96%; background: linear-gradient(90deg, #3b82f6, #60a5fa);"></div></div>
           <div style="font-size: 0.72rem; color: #64748b;">File System: Healthy &bull; Auto-Unpack Enabled &bull; Eco Cleanup Configured</div>
