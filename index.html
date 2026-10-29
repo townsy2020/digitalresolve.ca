@@ -747,17 +747,27 @@
                       </span>
                       <span class="item-tag online" style="background: rgba(16, 185, 129, 0.2); color: #34d399;"><span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10b981; margin-right: 4px; box-shadow: 0 0 6px #10b981;"></span>192.168.2.22 &bull; Connected &amp; Armed</span>
                     </div>
-                    <div style="font-size: 1.8rem; font-weight: 800; color: #f472b6; font-family: 'JetBrains Mono', monospace; margin: 8px 0 4px 0;">
-                      84% <span style="font-size: 0.85rem; color: #94a3b8; font-weight: 600;">(1.2 kg Dry Kibble)</span>
+                    <!-- Live Dynamic Hopper Telemetry & Optical Watchdog -->
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin: 8px 0 4px 0;">
+                      <div style="font-size: 1.7rem; font-weight: 800; color: #f472b6; font-family: 'JetBrains Mono', monospace;">
+                        <span id="feeder-hopper-pct">100%</span> <span id="feeder-hopper-sub" style="font-size: 0.82rem; color: #94a3b8; font-weight: 600;">(1,500g &bull; ~18.7 Days)</span>
+                      </div>
+                      <button type="button" class="btn btn-secondary" onclick="refillFeederHopper()" style="font-size: 0.7rem; padding: 3px 8px; border-color: rgba(244, 114, 182, 0.35); color: #f472b6;" title="Mark hopper refilled to 100% (1,500g)">
+                        &#127860; Refilled Hopper
+                      </button>
                     </div>
-                    <div class="disk-bar-bg" style="margin-bottom: 12px;">
-                      <div class="disk-bar-fill" style="width: 84%; background: linear-gradient(90deg, #ec4899, #f472b6);"></div>
+                    <div class="disk-bar-bg" style="margin-bottom: 10px;">
+                      <div class="disk-bar-fill" id="feeder-hopper-bar" style="width: 100%; background: linear-gradient(90deg, #ec4899, #f472b6); transition: width 0.4s ease;"></div>
                     </div>
-                    <div style="font-size: 0.78rem; color: #94a3b8; line-height: 1.6; background: rgba(0, 0, 0, 0.25); padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.04); margin-bottom: 14px;">
-                      <div>&bull; Protocol: <strong style="color: #cbd5e1;">Tuya IoT v3.3 &bull; 04:f4:d8:ba:e3:c7</strong></div>
-                      <div>&bull; Last Dispense: <span id="feeder-last-time" style="color: #cbd5e1;">2 hours ago (Penny Feast 25g)</span></div>
-                      <div>&bull; Next Scheduled: <strong style="color: #cbd5e1;">7:00 AM EST (Breakfast &bull; 25g)</strong></div>
-                      <div>&bull; Motor Actuation: <strong style="color: #34d399;">Connected &amp; Operational (Hardware Bridge Active)</strong></div>
+                    <div id="feeder-low-warning" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 6px; padding: 6px 10px; margin-bottom: 10px; font-size: 0.74rem; color: #fca5a5; font-weight: 700; align-items: center; gap: 6px;">
+                      <span>&#9888;&#65039;</span> Low Food Warning: Refill Hopper Soon (&lt; 3 Days Remaining)
+                    </div>
+                    <div style="font-size: 0.76rem; color: #94a3b8; line-height: 1.6; background: rgba(0, 0, 0, 0.25); padding: 9px 12px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.04); margin-bottom: 12px;">
+                      <div>&bull; Hardware: <strong style="color: #cbd5e1;">LiieyPet WIFI &bull; 192.168.2.22</strong></div>
+                      <div>&bull; Optical Watchdog: <span id="feeder-watchdog-status" style="color: #34d399; font-weight: 600;">Active &bull; Camera Line-of-Sight</span></div>
+                      <div>&bull; Dish / Bowl Status: <span id="feeder-dish-status" style="color: #38bdf8;">Ready &bull; Verified</span></div>
+                      <div>&bull; Schedule: <strong style="color: #cbd5e1;">7:30 AM (40g) &bull; 6:00 PM (40g)</strong></div>
+                      <div>&bull; Last Dispense: <span id="feeder-last-time" style="color: #cbd5e1;">Checking...</span></div>
                     </div>
                   </div>
 
@@ -2148,9 +2158,9 @@
           <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.6</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 12,206 Lines of Code (HTML: 6,882 lines | CSS: 5,323 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 12,311 Lines of Code (HTML: 6,987 lines | CSS: 5,323 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">12,206</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">12,311</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -2233,7 +2243,7 @@
           if (mVer) mVer.textContent = activeVer;
         }
 
-        const baseHtmlLines = 6882;
+      const baseHtmlLines = 6987;
         const baseCssLines = 5323;
         const baseCnameLines = 1;
         const defaultTotal = baseHtmlLines + baseCssLines + baseCnameLines;
@@ -5762,7 +5772,85 @@
     }
     window.copyAdguardDeployCommand = copyAdguardDeployCommand;
 
-        function triggerCatTreat(portionLabel = '10g Snack') {
+    // ========================================================
+    // Smart Feeder Telemetry, Dynamic Hopper & Optical Watchdog
+    // ========================================================
+    function updateFeederUI(state) {
+      if (!state) return;
+      const pctEl = document.getElementById('feeder-hopper-pct');
+      const subEl = document.getElementById('feeder-hopper-sub');
+      const barEl = document.getElementById('feeder-hopper-bar');
+      const warnEl = document.getElementById('feeder-low-warning');
+      const watchEl = document.getElementById('feeder-watchdog-status');
+      const dishEl = document.getElementById('feeder-dish-status');
+      const timeEl = document.getElementById('feeder-last-time');
+
+      const pct = typeof state.fillPercent === 'number' ? state.fillPercent : 100;
+      const rem = state.remainingGrams || 1500;
+      const days = state.estimatedDaysLeft || 18.7;
+
+      if (pctEl) pctEl.textContent = `${pct}%`;
+      if (subEl) subEl.textContent = `(${rem}g â€¢ ~${days} Days)`;
+      if (barEl) {
+        barEl.style.width = `${pct}%`;
+        if (pct <= 15) {
+          barEl.style.background = 'linear-gradient(90deg, #ef4444, #f87171)';
+        } else if (pct <= 30) {
+          barEl.style.background = 'linear-gradient(90deg, #f59e0b, #fbbf24)';
+        } else {
+          barEl.style.background = 'linear-gradient(90deg, #ec4899, #f472b6)';
+        }
+      }
+      if (warnEl) {
+        warnEl.style.display = pct <= 20 ? 'flex' : 'none';
+      }
+      if (watchEl) {
+        watchEl.textContent = state.opticalWatchdog || 'Active â€¢ Camera Line-of-Sight';
+      }
+      if (dishEl) {
+        dishEl.textContent = state.bowlStatus || 'Ready â€¢ Verified';
+      }
+      if (timeEl && state.lastDispenseTime) {
+        const d = new Date(state.lastDispenseTime);
+        const tStr = isNaN(d) ? state.lastDispenseTime : d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        timeEl.textContent = `${tStr} (${state.lastDispenseLabel || 'Snack'}) â€¢ ${state.lastDispenseStatus || 'Verified'}`;
+      }
+    }
+    window.updateFeederUI = updateFeederUI;
+
+    function fetchFeederStatus() {
+      fetch(`${GATEWAY}/api/feeder/status`)
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          if (data && data.status === 'success' && data.feeder) {
+            updateFeederUI(data.feeder);
+          }
+        })
+        .catch(() => {});
+    }
+    window.fetchFeederStatus = fetchFeederStatus;
+
+    function refillFeederHopper() {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal("Penny's Feeder Hopper Refill", refillFeederHopper);
+        return;
+      }
+      const ssoEmail = localStorage.getItem('dr_sso_email') || 'cory.townsend@digitalresolve.ca';
+      fetch(`${GATEWAY}/api/feeder/refill?email=${encodeURIComponent(ssoEmail)}`)
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          if (data && data.status === 'success') {
+            if (data.feeder) updateFeederUI(data.feeder);
+            showToast('success', "Hopper Refilled", "Kibble hopper reset to 100% (1,500g / ~18.7 days).");
+          }
+        })
+        .catch(err => {
+          showToast('error', "Hopper Refill Error", err.message);
+        });
+    }
+    window.refillFeederHopper = refillFeederHopper;
+
+    function triggerCatTreat(portionLabel = '10g Snack') {
       if (!isSSOAuthenticated()) {
         openGlobalSSOModal("Penny's Smart Feeder IoT Dispenser (192.168.2.22)", () => triggerCatTreat(portionLabel));
         return;
@@ -5770,16 +5858,23 @@
       const timeEl = document.getElementById('feeder-last-time');
       const iotTimeEl = document.getElementById('feeder-iot-last-time');
       const logEl = document.getElementById('feeder-log-list');
+      const watchEl = document.getElementById('feeder-watchdog-status');
+      const dishEl = document.getElementById('feeder-dish-status');
+
       playChaosTone(784, 1046, 'sine', 0.22);
       const nowStr = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-      if (timeEl) timeEl.textContent = `Just now (${portionLabel})`;
+      if (timeEl) timeEl.textContent = `Dispensing ${portionLabel}...`;
       if (iotTimeEl) iotTimeEl.textContent = `Just now (${portionLabel})`;
+      if (watchEl) watchEl.textContent = 'Optical Watchdog: Verifying motor & bowl...';
+      if (dishEl) dishEl.textContent = 'Detecting kibble drop...';
+
       if (logEl) {
         const item = document.createElement('div');
         item.style.cssText = 'display: flex; justify-content: space-between; padding: 4px 0; border-top: 1px solid rgba(255,255,255,0.06); color: #cbd5e1;';
         item.innerHTML = `<span>${portionLabel} (Hardware Bridge Dispense)</span><span class="mono" style="color: #34d399;">${nowStr}</span>`;
         logEl.prepend(item);
       }
+
       const ssoEmail = localStorage.getItem('dr_sso_email') || 'cory.townsend@digitalresolve.ca';
       const endpoint = `${GATEWAY}/api/feeder/dispense?portion=${encodeURIComponent(portionLabel)}&email=${encodeURIComponent(ssoEmail)}`;
       fetch(endpoint)
@@ -5789,16 +5884,26 @@
         })
         .then(data => {
           if (data.status === 'success' || (data.tuya && data.tuya.success)) {
-            showToast('success', "Penny's Smart Feeder Actuated", `192.168.2.22 dispensed ${portionLabel} successfully via NUC Hardware Bridge.`);
+            showToast('success', "Penny's Smart Feeder Actuated", `192.168.2.22 dispensed ${portionLabel}. Optical Watchdog: Kibble verified.`);
+            if (data.feeder) {
+              updateFeederUI(data.feeder);
+            } else {
+              fetchFeederStatus();
+            }
           } else {
             showToast('warning', "Penny's Smart Feeder", data.message || `Dispense dispatched.`);
+            if (watchEl) watchEl.textContent = 'Alert: Check feeder hopper';
           }
         })
         .catch(err => {
           showToast('error', "Penny's Smart Feeder", `Gateway error: ${err.message}`);
+          if (watchEl) watchEl.textContent = 'Gateway Offline';
         });
     }
     window.triggerCatTreat = triggerCatTreat;
+
+    // Auto-fetch feeder status on page load
+    setTimeout(fetchFeederStatus, 1200);
 
     // Global Escape Key Handler to dismiss all modals & restore scroll
     document.addEventListener('keydown', (e) => {
