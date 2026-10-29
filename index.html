@@ -865,7 +865,7 @@
                       Instant zero-latency WebRTC hardware stream via 24/7 Intel NUC gateway. Pure H.264 video decode with 0% browser GPU/CPU overhead.
                     </div>
                     <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 6px;">
-                      <button type="button" class="btn btn-primary" onclick="loadLiveCameraFeed()" style="font-size: 0.88rem; padding: 8px 22px; display: inline-flex; align-items: center; gap: 8px; font-weight: 700; background: linear-gradient(135deg, #10b981, #059669); border-color: #10b981; box-shadow: 0 0 16px rgba(16, 185, 129, 0.35); cursor: pointer;">
+                      <button type="button" class="btn btn-primary" id="btn-start-stream" onclick="loadLiveCameraFeed()" style="font-size: 0.88rem; padding: 8px 22px; display: inline-flex; align-items: center; gap: 8px; font-weight: 700; background: linear-gradient(135deg, #10b981, #059669); border-color: #10b981; box-shadow: 0 0 16px rgba(16, 185, 129, 0.35); cursor: pointer;">
                         <span>[PLAY]</span> Start Live WebRTC Stream
                       </button>
                       <a href="https://cam.digitalresolve.ca/ai.html?src=pennys_feeder" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.82rem; padding: 8px 16px;" title="Open live feed with TensorFlow AI object detection in an isolated tab">
@@ -3515,5 +3515,6 @@
       </div>
     </div>
   </div>
+  <script src="app.js?v=2.8.20"></script>
 </body>
 </html>

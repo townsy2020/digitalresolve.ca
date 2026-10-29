@@ -81,7 +81,7 @@
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 12996;
+      const baseHtmlLines = 13003;
         const baseCssLines = 5901;
         const baseJsLines = 4010;
         const baseCnameLines = 1;
