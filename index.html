@@ -193,7 +193,7 @@
             <span>Ops &amp; Tools</span> <span class="dropdown-arrow">&#9662;</span>
           </button>
           <div class="dropdown-menu">
-            <button type="button" class="btn-action-item" onclick="openEmbeddedConsole()" title="Open Live Interactive Terminal for Active Session 572d607f">
+            <button type="button" class="btn-action-item agy-session-link-btn" onclick="openEmbeddedConsole()" title="Open Live Interactive Terminal for Active Session 53c2a1ff">
               <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
               <span>Open AGY Terminal (webdev1.0)</span>
               <span class="item-tag online">Live</span>
@@ -1775,7 +1775,7 @@
                 <span id="terminal-title-text">Live Interactive Terminal</span>
               </div>
               <div class="terminal-tabs" id="terminal-tabs-group" style="display: none;">
-                <button type="button" class="terminal-tab active" id="tab-agy" onclick="loadLog('agy')" title="View Active Antigravity Autonomous Agent Stream (webdev1.0 &bull; 572d607f)">[AGY] webdev1.0 (572d607f)</button>
+                <button type="button" class="terminal-tab active" id="tab-agy" onclick="loadLog('agy')" title="View Active Antigravity Autonomous Agent Stream (webdev1.0 &bull; 53c2a1ff)">[AGY] webdev1.0 (53c2a1ff)</button>
                 <button type="button" class="terminal-tab" id="tab-sentinel" onclick="loadLog('sentinel')" title="View Sentinel Watchdog Security &amp; Fleet Health Audit Log">Sentinel</button>
                 <button type="button" class="terminal-tab" id="tab-power" onclick="loadLog('power')" title="View Smart Power Optimizer &amp; Dynamic Standby Log">Power</button>
                 <button type="button" class="terminal-tab" id="tab-report" onclick="loadLog('report')" title="View Comprehensive Daily Homelab Morning Briefing">Briefing</button>
@@ -2176,29 +2176,29 @@
               <div class="iot-card">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                   <span style="font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: 700;">Cluster Power Draw</span>
-                  <span class="item-tag online" style="background: rgba(34, 197, 94, 0.2); color: #4ade80;">Energy Star</span>
+                  <span class="item-tag online" id="iot-power-tag" style="background: rgba(34, 197, 94, 0.2); color: #4ade80;">Energy Star</span>
                 </div>
-                <div style="font-size: 1.8rem; font-weight: 800; color: #34d399; font-family: 'JetBrains Mono', monospace;">
+                <div id="iot-total-watts" style="font-size: 1.8rem; font-weight: 800; color: #34d399; font-family: 'JetBrains Mono', monospace;">
                   68 <span style="font-size: 0.9rem; color: #94a3b8;">Watts</span>
                 </div>
                 <div style="font-size: 0.78rem; color: #94a3b8; line-height: 1.5;">
-                  &bull; NUC 24/7 Server: <strong>18 Watts</strong><br>
-                  &bull; Desktop Active Workstation: <strong>50 Watts</strong><br>
-                  &bull; Estimated Monthly Grid Cost: <strong>~$5.88 CAD</strong>
+                  &bull; NUC 24/7 Server: <strong id="iot-nuc-watts">18 Watts</strong><br>
+                  &bull; Desktop Active Workstation: <strong id="iot-desk-watts">50 Watts</strong><br>
+                  &bull; Estimated Monthly Grid Cost: <strong id="iot-grid-cost">~$5.88 CAD</strong>
                 </div>
               </div>
 
               <div class="iot-card">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                   <span style="font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: 700;">Home Lab Thermals</span>
-                  <span class="item-tag online" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8;">Nominal</span>
+                  <span class="item-tag online" id="iot-thermal-tag" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8;">Nominal</span>
                 </div>
-                <div style="font-size: 1.8rem; font-weight: 800; color: #38bdf8; font-family: 'JetBrains Mono', monospace;">
+                <div id="iot-ambient-temp" style="font-size: 1.8rem; font-weight: 800; color: #38bdf8; font-family: 'JetBrains Mono', monospace;">
                   21.4&deg;C <span style="font-size: 0.9rem; color: #94a3b8;">/ 42% RH</span>
                 </div>
                 <div style="font-size: 0.78rem; color: #94a3b8; line-height: 1.5;">
-                  &bull; NUC Core CPU: <strong>42&deg;C</strong> (Fan 1200 RPM)<br>
-                  &bull; Desktop Ryzen CPU: <strong>46&deg;C</strong> (AIO Liquid Cooled)<br>
+                  &bull; NUC Core CPU: <strong id="iot-nuc-cpu-temp">42&deg;C</strong> (Fan 1200 RPM)<br>
+                  &bull; Desktop Ryzen CPU: <strong id="iot-desk-cpu-temp">46&deg;C</strong> (AIO Liquid Cooled)<br>
                   &bull; Ambient Room Thermostat: <strong>21.2&deg;C</strong><br>
                   &bull; Air Circulation: Active &bull; Zero Thermal Throttling
                 </div>
@@ -2247,49 +2247,49 @@
                   <tr>
                     <td><strong>Review &amp; Watch Library</strong> (StreamHub :8088)</td>
                     <td>NUC (192.168.2.35)</td>
-                    <td><span class="mono" style="color: #34d399;">1.1 ms</span></td>
+                    <td><span class="mono" id="kuma-lat-stream" style="color: #34d399;">0.2 ms</span></td>
                     <td>100.0%</td>
-                    <td><span class="item-tag online">Healthy</span></td>
+                    <td><span class="item-tag online" id="kuma-status-stream">Healthy</span></td>
                   </tr>
                   <tr>
                     <td><strong>FileBrowser Media Cloud</strong> (:8085)</td>
                     <td>NUC (192.168.2.35)</td>
-                    <td><span class="mono" style="color: #34d399;">0.9 ms</span></td>
+                    <td><span class="mono" id="kuma-lat-files" style="color: #34d399;">0.2 ms</span></td>
                     <td>100.0%</td>
-                    <td><span class="item-tag online">Healthy</span></td>
+                    <td><span class="item-tag online" id="kuma-status-files">Healthy</span></td>
                   </tr>
                   <tr>
                     <td><strong>qBittorrent VPN Daemon</strong> (:8081)</td>
                     <td>NUC (WireGuard Mullvad)</td>
-                    <td><span class="mono" style="color: #34d399;">1.4 ms</span></td>
+                    <td><span class="mono" id="kuma-lat-qbit" style="color: #34d399;">0.3 ms</span></td>
                     <td>100.0%</td>
-                    <td><span class="item-tag online">Healthy</span></td>
+                    <td><span class="item-tag online" id="kuma-status-qbit">Healthy</span></td>
                   </tr>
                   <tr>
                     <td><strong>WoL &amp; Power Orchestration Gateway</strong> (:8082)</td>
                     <td>NUC / Desktop Cluster</td>
-                    <td><span class="mono" style="color: #34d399;">0.8 ms</span></td>
+                    <td><span class="mono" id="kuma-lat-wol" style="color: #34d399;">0.2 ms</span></td>
                     <td>100.0%</td>
-                    <td><span class="item-tag online">Healthy</span></td>
+                    <td><span class="item-tag online" id="kuma-status-wol">Healthy</span></td>
                   </tr>
                   <tr>
                     <td><strong>Optical Cat Cam WebRTC Engine</strong> (:8089)</td>
                     <td>NUC (Hardware go2rtc)</td>
-                    <td><span class="mono" style="color: #34d399;">2.1 ms</span></td>
+                    <td><span class="mono" id="kuma-lat-catcam" style="color: #34d399;">1.9 ms</span></td>
                     <td>100.0%</td>
-                    <td><span class="item-tag online">Healthy</span></td>
+                    <td><span class="item-tag online" id="kuma-status-catcam">Healthy</span></td>
                   </tr>
                   <tr>
                     <td><strong>Cloudflare Zero Trust Edge Mesh</strong> (Tunnel)</td>
                     <td>Global Edge Anycast</td>
-                    <td><span class="mono" style="color: #38bdf8;">14.2 ms</span></td>
+                    <td><span class="mono" id="kuma-lat-cf" style="color: #38bdf8;">4.2 ms</span></td>
                     <td>100.0%</td>
-                    <td><span class="item-tag online">Shield Active</span></td>
+                    <td><span class="item-tag online" id="kuma-status-cf">Shield Active</span></td>
                   </tr>
                 </tbody>
               </table>
               <div style="background: rgba(2, 6, 23, 0.9); padding: 12px 18px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 0.78rem; color: #94a3b8;">
-                <span>SSL Certificate: <strong>digitalresolve.ca</strong> (Cloudflare ECC CA-3) &bull; <strong style="color: #34d399;">82 Days Remaining</strong> (Auto-Renews)</span>
+                <span>SSL Certificate: <strong>digitalresolve.ca</strong> (Cloudflare ECC CA-3) &bull; <strong style="color: #34d399;" class="ssl-cert-days">85 Days Remaining</strong> (Auto-Renews)</span>
                 <span class="mono">TLS 1.3 &bull; 0-RTT &bull; HTTP/3 Ready</span>
               </div>
             </div>
@@ -2321,7 +2321,7 @@
               </div>
             </div>
             <div class="app-card-footer" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
-              <button type="button" id="agy-header-session-btn" onclick="openEmbeddedConsole()" class="btn-nav" title="Open In-Browser Live Interactive Terminal for Active Session webdev1.0 (572d607f)" style="font-size: 0.82rem; height: 32px; padding: 4px 14px; background: rgba(16, 185, 129, 0.25); border-color: #10b981; color: #a7f3d0; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+              <button type="button" id="agy-header-session-btn" onclick="openEmbeddedConsole()" class="btn-nav" title="Open In-Browser Live Interactive Terminal for Active Session webdev1.0 (53c2a1ff)" style="font-size: 0.82rem; height: 32px; padding: 4px 14px; background: rgba(16, 185, 129, 0.25); border-color: #10b981; color: #a7f3d0; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
                 <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span> Open Live Console: webdev1.0 &rarr;
               </button>
               <button type="button" onclick="resumeAgySessionOnDesktop()" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px; color: #34d399 !important; border-color: rgba(52, 211, 153, 0.4);" title="Resume Active Session webdev1.0 in Windows Terminal on Desktop">
@@ -2635,7 +2635,7 @@
       <!-- Quick Session Bar -->
       <div class="agy-session-meta-bar" id="agy-session-meta-bar" style="display: none;">
         <div class="meta-item"><span class="meta-lbl">Session:</span> <span class="meta-val"><strong style="color: #60a5fa;" id="agy-meta-name">webdev1.0</strong></span></div>
-        <div class="meta-item"><span class="meta-lbl">Session ID:</span> <span id="agy-meta-cid" class="meta-val mono">572d607f-e5b8-42bc-8659-2cce0820852a</span></div>
+        <div class="meta-item"><span class="meta-lbl">Session ID:</span> <span id="agy-meta-cid" class="meta-val mono">53c2a1ff-4c8c-4051-aae0-8bf4e62f57b3</span></div>
         <div class="meta-item"><span class="meta-lbl">Session Tokens:</span> <span class="meta-val mono" id="modal-token-count">1,299,171 (In: 1.21M &bull; Out: 85.5K)</span></div>
         <div class="meta-item"><span class="meta-lbl">Model Tier:</span> <span class="meta-val" id="modal-model-val" style="color: #34d399;">Gemini 3.8 Flash (Token-Efficiency Protocol)</span></div>
         <div class="meta-item"><span class="meta-lbl">Model Breakdown:</span> <span class="meta-val" id="modal-model-breakdown"><span style="color: #38bdf8; font-weight: 600;">Flash: 92.32% (~18.7M)</span> &bull; <span style="color: #c084fc; font-weight: 600;">Pro: 7.68% (~1.56M)</span> &bull; <span style="color: #34d399; font-weight: 600;">Cache: 412M Reused</span></span></div>
@@ -2677,7 +2677,7 @@
       <!-- Live Terminal Stream Output Screen -->
       <div class="agy-console-screen" id="agy-console-screen" style="display: none;">
         <div class="agy-line system">[SYSTEM] Establishing encrypted tunnel to Cory-Desktop (Port 8082 via M365 SSO)...</div>
-        <div class="agy-line system">[SYSTEM] Connected to AGY conversation stream: 572d607f-e5b8-42bc-8659-2cce0820852a</div>
+        <div class="agy-line system">[SYSTEM] Connected to AGY conversation stream: 53c2a1ff-4c8c-4051-aae0-8bf4e62f57b3</div>
       </div>
 
       <!-- Command Quick Chips -->
@@ -2894,7 +2894,7 @@
             <div style="color: #f8fafc; font-weight: 700; margin-bottom: 4px;">Edge Transport &amp; Security</div>
             <div>&bull; Transport Protocol: <strong style="color: #cbd5e1;">HTTP/3 (QUIC) &bull; HTTP/2</strong></div>
             <div>&bull; TLS Version: <strong style="color: #34d399;">TLS 1.3 (0-RTT Session Resumption)</strong></div>
-            <div>&bull; SSL Certificate: <strong style="color: #cbd5e1;">Cloudflare ECC CA-3 (82 Days Left)</strong></div>
+            <div>&bull; SSL Certificate: <strong style="color: #cbd5e1;" class="ssl-cert-days">Cloudflare ECC CA-3 (85 Days Left)</strong></div>
             <div>&bull; DNSSEC: <strong style="color: #34d399;">Enabled &amp; Validated (100% Authenticated)</strong></div>
           </div>
           <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 12px; font-size: 0.78rem; line-height: 1.6; color: #94a3b8;">
@@ -3354,7 +3354,7 @@
           </div>
           <h4 class="ver-title">Bidirectional Agent Prompt Pipeline &amp; One-Click Diagnostics</h4>
           <ul class="ver-list">
-            <li><strong>Bidirectional Agent Dispatch:</strong> Connected web dispatchers directly to active AGY session 572d607f via dual-path queue ingestion (Desktop background daemon + NUC SMB relay).</li>
+            <li><strong>Bidirectional Agent Dispatch:</strong> Connected web dispatchers directly to active AGY session 53c2a1ff via dual-path queue ingestion (Desktop background daemon + NUC SMB relay).</li>
             <li><strong>One-Click Quick Action Chips:</strong> Interactive tactile blue buttons for Cluster Health, Code Audit, ISP Diagnostics, and Git Status with active spinning dispatch states.</li>
             <li><strong>Dual-Interface Terminal Experience:</strong> Added quick action chips and prompt dispatchers to both the in-page Live Daemon Terminal card and fullscreen Embedded Console modal.</li>
             <li><strong>Encoding &amp; Auth Resilience:</strong> Hardened HTTP listener against null ContentEncoding traps, with Microsoft 365 Entra ID SSO token enforcement.</li>
@@ -3414,7 +3414,7 @@
           </div>
           <h4 class="ver-title">Live Embedded AGY Terminal Console &amp; Apex Redirection</h4>
           <ul class="ver-list">
-            <li><strong>Interactive Embedded Console:</strong> Full-screen in-browser terminal connected to active session (<code>572d607f-e5b8</code>) with verbose turn streaming, command chip shortcuts, and 2.5s auto-polling.</li>
+            <li><strong>Interactive Embedded Console:</strong> Full-screen in-browser terminal connected to active session (<code>53c2a1ff-4c8c</code>) with verbose turn streaming, command chip shortcuts, and 2.5s auto-polling.</li>
             <li><strong>Bi-Directional NUC &harr; Desktop Proxy:</strong> Zero-latency background sync daemon and Entra ID SSO authorization for prompt injection.</li>
             <li><strong>Apex Domain Enforcement:</strong> Seamless canonical routing ensuring <code>www.digitalresolve.ca</code> immediately redirects to <code>https://digitalresolve.ca</code>.</li>
             <li><strong>Clickable Footer Versioning:</strong> Integrated system release changelog accessible directly from the operations deck.</li>
