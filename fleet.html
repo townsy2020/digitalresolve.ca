@@ -96,7 +96,7 @@
             <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents.digitalresolve.ca', 'qBittorrent Workstation (torrents.digitalresolve.ca)')" class="btn-action-item" title="Open Workstation qBittorrent">
               <span class="dropdown-dot dot-1"></span>
               <span>Torrents (Desktop qBit)</span>
-              <span class="item-tag" id="desktop-disk-tag">C: 375 GB free</span>
+              <span class="item-tag" id="desktop-disk-tag">C: 375G &bull; D: 5.4T</span>
             </a>
             <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents2.digitalresolve.ca', 'qBittorrent NUC (torrents2.digitalresolve.ca)')" class="btn-action-item" title="Open NUC qBittorrent">
               <span class="dropdown-dot dot-2"></span>
@@ -121,13 +121,13 @@
             </div>
             <div class="disk-widget" id="desktop-disk-widget" style="margin-top: 10px;">
               <div class="disk-widget-header">
-                <span class="disk-label">Desktop Storage (C:)</span>
-                <span class="disk-val" id="desktop-disk-val">375.4 GB Free</span>
+                <span class="disk-label">Desktop Storage (C: + D:)</span>
+                <span class="disk-val" id="desktop-disk-val">5,751 GB Free</span>
               </div>
               <div class="disk-bar-bg">
-                <div class="disk-bar-fill" id="desktop-disk-bar" style="width: 19.2%; background: linear-gradient(90deg, #10b981, #34d399);"></div>
+                <div class="disk-bar-fill" id="desktop-disk-bar" style="width: 5.0%; background: linear-gradient(90deg, #38bdf8, #10b981);"></div>
               </div>
-              <div class="disk-subtext" id="desktop-disk-sub">374.6 GB used of 1950 GB (19.2%)</div>
+              <div class="disk-subtext" id="desktop-disk-sub">303 GB used of 6,054 GB (5.0%) &bull; C: 465G | D: 5.6T</div>
             </div>
           </div>
         </div>
@@ -679,11 +679,11 @@
                 <span class="metric-val" id="fleet-latency-desktop">192.168.2.62 &bull; Bell Gigabit</span>
               </div>
               <div class="metric-row">
-                <span class="metric-name">System Storage (C:)</span>
-                <span class="metric-val" id="fleet-storage-desktop">375.4 GB Free (19.2% used)</span>
+                <span class="metric-name">Desktop Storage (C: &amp; D:)</span>
+                <span class="metric-val" id="fleet-storage-desktop">5,751 GB Free (5.0% used) &bull; C: 375G | D: 5.4T</span>
               </div>
               <div class="disk-bar-bg">
-                <div class="disk-bar-fill" id="fleet-bar-desktop" style="width: 19.2%; background: linear-gradient(90deg, #10b981, #34d399);"></div>
+                <div class="disk-bar-fill" id="fleet-bar-desktop" style="width: 5.0%; background: linear-gradient(90deg, #38bdf8, #10b981);"></div>
               </div>
               <div class="metric-row">
                 <span class="metric-name">Memory Allocation</span>

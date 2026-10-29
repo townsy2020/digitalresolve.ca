@@ -96,7 +96,7 @@
             <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents.digitalresolve.ca', 'qBittorrent Workstation (torrents.digitalresolve.ca)')" class="btn-action-item" title="Open Workstation qBittorrent">
               <span class="dropdown-dot dot-1"></span>
               <span>Torrents (Desktop qBit)</span>
-              <span class="item-tag" id="desktop-disk-tag">C: 375 GB free</span>
+              <span class="item-tag" id="desktop-disk-tag">C: 375G &bull; D: 5.4T</span>
             </a>
             <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents2.digitalresolve.ca', 'qBittorrent NUC (torrents2.digitalresolve.ca)')" class="btn-action-item" title="Open NUC qBittorrent">
               <span class="dropdown-dot dot-2"></span>
@@ -121,13 +121,13 @@
             </div>
             <div class="disk-widget" id="desktop-disk-widget" style="margin-top: 10px;">
               <div class="disk-widget-header">
-                <span class="disk-label">Desktop Storage (C:)</span>
-                <span class="disk-val" id="desktop-disk-val">375.4 GB Free</span>
+                <span class="disk-label">Desktop Storage (C: + D:)</span>
+                <span class="disk-val" id="desktop-disk-val">5,751 GB Free</span>
               </div>
               <div class="disk-bar-bg">
-                <div class="disk-bar-fill" id="desktop-disk-bar" style="width: 19.2%; background: linear-gradient(90deg, #10b981, #34d399);"></div>
+                <div class="disk-bar-fill" id="desktop-disk-bar" style="width: 5.0%; background: linear-gradient(90deg, #38bdf8, #10b981);"></div>
               </div>
-              <div class="disk-subtext" id="desktop-disk-sub">374.6 GB used of 1950 GB (19.2%)</div>
+              <div class="disk-subtext" id="desktop-disk-sub">303 GB used of 6,054 GB (5.0%) &bull; C: 465G | D: 5.6T</div>
             </div>
           </div>
         </div>
@@ -559,26 +559,31 @@
                   </div>
                 </div>
 
-                <!-- Desktop Storage Safeguard Subcard -->
+                <!-- Desktop Storage Safeguard Subcard (C: NVMe + D: Apps) -->
                 <div class="node-metric-subcard">
                   <div>
                     <div class="stat-card-header" style="margin-bottom: 8px;">
-                      <span class="stat-card-title" style="font-size: 0.8rem; color: #94a3b8;">C: Drive Storage (Desktop)</span>
-                      <span class="item-tag online" style="font-size: 0.68rem; padding: 2px 7px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3);">NVMe Primary</span>
+                      <span class="stat-card-title" style="font-size: 0.8rem; color: #94a3b8;">Desktop Storage (C: &amp; D:)</span>
+                      <span class="item-tag online" style="font-size: 0.68rem; padding: 2px 7px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3);">Dual Drive (6.05 TB)</span>
                     </div>
-                    <div class="stat-big-val" id="stat-desktop-disk-free" style="color: #34d399;">375.4 GB <span style="font-size: 0.85rem; color: #8b949e;">Free</span></div>
+                    <div class="stat-big-val" id="stat-desktop-disk-free" style="color: #38bdf8;">5,751 GB <span style="font-size: 0.85rem; color: #8b949e;">Free</span></div>
                     <div class="stat-subtext" id="stat-desktop-disk-sub" style="margin-top: 4px;">
-                      <span>Total 1950 GB (19.2% Used)</span>
+                      <span>Total 6,054 GB (5.0% Used &bull; 303 GB)</span>
                     </div>
                   </div>
+                  <!-- Multi-Segment Storage Bar showing C: and D: drives -->
                   <div class="storage-segments-wrap" style="margin-top: 12px;">
                     <div class="storage-segments-bar">
-                      <div style="width: 19.2%; background: #10b981;" title="Used Space: 374 GB"></div>
-                      <div style="width: 80.8%; background: rgba(16, 185, 129, 0.25);" title="Free Space: 1576 GB"></div>
+                      <div style="width: 8%; background: #38bdf8;" title="C: NVMe Used: 90 GB (19.4%)"></div>
+                      <div style="width: 32%; background: rgba(56, 189, 248, 0.35);" title="C: NVMe Free: 375 GB (80.6%)"></div>
+                      <div style="width: 4%; background: #10b981;" title="D: Apps Used: 213 GB (3.8%)"></div>
+                      <div style="width: 56%; background: rgba(16, 185, 129, 0.25);" title="D: Apps Free: 5,376 GB (96.2%)"></div>
                     </div>
                     <div class="storage-legend">
-                      <span><span class="legend-dot" style="background: #10b981;"></span> Used (374 GB &bull; 19.2%)</span>
-                      <span><span class="legend-dot" style="background: rgba(16, 185, 129, 0.35);"></span> Free (1576 GB &bull; 80.8%)</span>
+                      <span><span class="legend-dot" style="background: #38bdf8;"></span> C: 90G Used</span>
+                      <span><span class="legend-dot" style="background: rgba(56, 189, 248, 0.45);"></span> C: 375G Free</span>
+                      <span><span class="legend-dot" style="background: #10b981;"></span> D: 213G Used</span>
+                      <span><span class="legend-dot" style="background: rgba(16, 185, 129, 0.35);"></span> D: 5.38T Free</span>
                     </div>
                   </div>
                 </div>
