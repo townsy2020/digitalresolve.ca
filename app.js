@@ -82,8 +82,8 @@
         }
 
       const baseHtmlLines = 12871;
-        const baseCssLines = 5901;
-        const baseJsLines = 4038;
+        const baseCssLines = 5922;
+        const baseJsLines = 4067;
         const baseCnameLines = 1;
         const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
@@ -339,6 +339,7 @@
       const lNuc = document.getElementById('label-target-nuc');
       const descEl = document.getElementById('power-target-desc');
       const dotEl = document.getElementById('power-target-dot');
+      const pillEl = document.getElementById('power-target-status-pill');
       const feedbackEl = document.getElementById('pwr-feedback-text');
 
       if (target === 'desktop') {
@@ -346,20 +347,48 @@
         if (btnNuc) btnNuc.classList.remove('active');
         if (lDesk) lDesk.classList.add('active');
         if (lNuc) lNuc.classList.remove('active');
+        if (pillEl) {
+          pillEl.classList.add('target-desktop');
+          pillEl.classList.remove('target-nuc');
+          pillEl.setAttribute('aria-label', 'Active Target: Desktop Workstation. Click to switch to NUC Server.');
+        }
         if (descEl) descEl.innerHTML = 'AMD Ryzen 7 &bull; RTX Workstation &bull; Online';
-        if (dotEl) { dotEl.className = 'status-indicator online'; }
+        if (dotEl) {
+          dotEl.className = 'status-indicator online';
+          dotEl.style.backgroundColor = '#38bdf8';
+          dotEl.style.boxShadow = '0 0 8px #38bdf8';
+        }
         if (feedbackEl) feedbackEl.textContent = 'Ready | Target: Desktop Workstation (192.168.2.62)';
       } else {
         if (btnNuc) btnNuc.classList.add('active');
         if (btnDesk) btnDesk.classList.remove('active');
         if (lNuc) lNuc.classList.add('active');
         if (lDesk) lDesk.classList.remove('active');
+        if (pillEl) {
+          pillEl.classList.add('target-nuc');
+          pillEl.classList.remove('target-desktop');
+          pillEl.setAttribute('aria-label', 'Active Target: NUC Core Server. Click to switch to Desktop Node.');
+        }
         if (descEl) descEl.innerHTML = 'Intel Core i5 &bull; 24/7 Core Server &bull; Online';
-        if (dotEl) { dotEl.className = 'status-indicator online'; }
+        if (dotEl) {
+          dotEl.className = 'status-indicator online';
+          dotEl.style.backgroundColor = '#10b981';
+          dotEl.style.boxShadow = '0 0 8px #10b981';
+        }
         if (feedbackEl) feedbackEl.textContent = 'Ready | Target: NUC Server (192.168.2.35)';
       }
     }
     window.onPowerTargetChange = onPowerTargetChange;
+
+    function togglePowerTarget() {
+      const next = (currentPowerTarget === 'desktop') ? 'nuc' : 'desktop';
+      onPowerTargetChange(next);
+      if (typeof showToast === 'function') {
+        const name = next === 'desktop' ? 'Desktop Workstation (192.168.2.62)' : 'NUC Core Server (192.168.2.35)';
+        showToast('info', 'Active Target Switched', "Now controlling: " + name);
+      }
+    }
+    window.togglePowerTarget = togglePowerTarget;
 
     function triggerNodePower(action) {
       const target = currentPowerTarget || 'desktop';
