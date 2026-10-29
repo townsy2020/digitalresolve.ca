@@ -301,6 +301,63 @@
         });
     }
 
+    let currentPowerTarget = 'desktop';
+
+    function onPowerTargetChange(target) {
+      currentPowerTarget = target;
+      const lDesk = document.getElementById('label-target-desktop');
+      const lNuc = document.getElementById('label-target-nuc');
+      const descEl = document.getElementById('power-target-desc');
+      const dotEl = document.getElementById('power-target-dot');
+      const feedbackEl = document.getElementById('pwr-feedback-text');
+
+      if (target === 'desktop') {
+        if (lDesk) lDesk.classList.add('active');
+        if (lNuc) lNuc.classList.remove('active');
+        if (descEl) descEl.innerHTML = 'AMD Ryzen 7 &bull; RTX Workstation &bull; Online';
+        if (dotEl) { dotEl.className = 'status-indicator online'; }
+        if (feedbackEl) feedbackEl.textContent = 'Ready | Target: Desktop Workstation (192.168.2.62)';
+      } else {
+        if (lNuc) lNuc.classList.add('active');
+        if (lDesk) lDesk.classList.remove('active');
+        if (descEl) descEl.innerHTML = 'Intel Core i5 &bull; 24/7 Core Server &bull; Online';
+        if (dotEl) { dotEl.className = 'status-indicator online'; }
+        if (feedbackEl) feedbackEl.textContent = 'Ready | Target: NUC Server (192.168.2.35)';
+      }
+    }
+    window.onPowerTargetChange = onPowerTargetChange;
+
+    function triggerNodePower(action) {
+      const target = currentPowerTarget || 'desktop';
+      const targetName = target === 'desktop' ? 'Desktop Workstation' : 'NUC Core Server';
+      const feedbackEl = document.getElementById('pwr-feedback-text');
+
+      if (action === 'wake') {
+        if (feedbackEl) feedbackEl.textContent = `Dispatching WoL Magic Packet to ${targetName}...`;
+        sendWol(target);
+      } else if (action === 'sleep') {
+        if (feedbackEl) feedbackEl.textContent = `Dispatching Sleep Standby signal to ${targetName}...`;
+        sendSleep(target);
+      } else if (action === 'reboot') {
+        if (feedbackEl) feedbackEl.textContent = `Dispatching Reboot instruction to ${targetName}...`;
+        if (typeof sendControl === 'function') {
+          sendControl('reboot', target);
+        } else {
+          fetch(`${GATEWAY}/reboot?target=${target}`)
+            .then(r => r.json())
+            .then(() => showToast('info', 'Reboot Dispatched', `Reboot signal sent to ${targetName}.`))
+            .catch(() => showToast('error', 'Reboot Error', `Could not reach ${GATEWAY}`));
+        }
+      }
+    }
+    window.triggerNodePower = triggerNodePower;
+
+    function triggerBroadcastWoL() {
+      const feedbackEl = document.getElementById('pwr-feedback-text');
+      if (feedbackEl) feedbackEl.textContent = 'Transmitting Broadcast WoL Magic Packet to all nodes (NUC & Desktop)...';
+      sendWol('both');
+    }
+    window.triggerBroadcastWoL = triggerBroadcastWoL;
     function sendWol(target) {
       if (!isSSOAuthenticated()) {
         openGlobalSSOModal(`Wake-on-LAN: ${target.toUpperCase()}`, () => sendWol(target));
@@ -502,7 +559,41 @@
         if (rDesk) {
           rDesk.innerHTML = `<span class="dropdown-dot dot-1"></span> Bell Fiber | ${isOnline ? 'Online' : 'Standby'}`;
         }
-      }
+        if (disk) {
+          const fStorage = document.getElementById('fleet-storage-desktop');
+          const fBar = document.getElementById('fleet-bar-desktop');
+          if (fStorage) fStorage.textContent = `${disk.freeGB} GB Free (${disk.usedPercent}% used)`;
+          if (fBar) fBar.style.width = `${disk.usedPercent}%`;
+          
+          const dTag = document.getElementById('desktop-disk-tag');
+          const dVal = document.getElementById('desktop-disk-val');
+          const dBar = document.getElementById('desktop-disk-bar');
+          const dSub = document.getElementById('desktop-disk-sub');
+          if (dTag) dTag.textContent = `C: ${Math.round(disk.freeGB)} GB free`;
+          if (dVal) dVal.textContent = `${disk.freeGB} GB Free`;
+          if (dBar) dBar.style.width = `${disk.usedPercent}%`;
+          if (dSub) dSub.textContent = `${disk.usedGB} GB used of ${disk.totalGB} GB (${disk.usedPercent}%)`;
+          
+          const sDeskFree = document.getElementById('stat-desktop-disk-free');
+          const sDeskSub = document.getElementById('stat-desktop-disk-sub');
+          if (sDeskFree) sDeskFree.innerHTML = `${disk.freeGB} GB <span style="font-size: 0.9rem; color: #8b949e;">Free</span>`;
+          if (sDeskSub) sDeskSub.innerHTML = `<span>Total ${disk.totalGB} GB (${disk.usedPercent}% Used)</span>`;
+
+          const rDeskStorage = document.getElementById('ribbon-desktop-storage');
+          if (rDeskStorage) rDeskStorage.textContent = `${Math.round(disk.freeGB)} GB Free (${disk.usedPercent}%)`;
+        }
+        if (vitals) {
+          const fVitals = document.getElementById('fleet-vitals-desktop');
+          const fCpu = document.getElementById('fleet-cpu-desktop');
+          if (fVitals) fVitals.textContent = `${vitals.ramUsedGB} GB / ${vitals.ramTotalGB} GB (${vitals.ramPercent}%) | Active`;
+          if (fCpu && vitals.cpuLoad !== undefined) fCpu.textContent = `AMD Ryzen 7 | ${vitals.cpuLoad}% Load (8C / 16T)`;
+
+          const sDeskCpu = document.getElementById('stat-desktop-cpu-val');
+          const sDeskRam = document.getElementById('stat-desktop-ram-sub');
+          if (sDeskCpu && vitals.cpuLoad !== undefined) sDeskCpu.innerHTML = `${vitals.cpuLoad}% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>`;
+          if (sDeskRam) sDeskRam.textContent = `Memory: ${vitals.ramUsedGB} GB / ${vitals.ramTotalGB} GB (${vitals.ramPercent}%) | Active Session`;
+        }
+    }
     }
 
     // Check status on load
@@ -514,7 +605,7 @@
 
       // Immediate live telemetry baseline before background polling
       updateStatusUI('nuc', true, 0.2, { freeGB: 489.2, totalGB: 1863, usedGB: 1373.8, usedPercent: 73.7 });
-      updateStatusUI('desktop', true, 0.4);
+      updateStatusUI('desktop', true, 0.4, { freeGB: 375.4, totalGB: 1950, usedGB: 1574.6, usedPercent: 19.2 }, null, { ramUsedGB: 15.6, ramTotalGB: 31.9, ramPercent: 48.9, cpuLoad: 12 });
 
       // Ensure all modal overlays are strictly hidden on load
       ['magnet-modal-overlay', 'agy-console-modal-overlay', 'changelog-modal-overlay', 'health-modal-overlay', 'chaos-modal-overlay', 'disaster-modal-overlay', 'speedtest-sso-modal-overlay', 'cloudflare-stats-modal-overlay', 'adguard-modal-overlay'].forEach(id => {
@@ -1891,10 +1982,6 @@
     let camFeedLoaded = false;
 
     function loadLiveCameraFeed() {
-      if (!isSSOAuthenticated()) {
-        openGlobalSSOModal("Penny's Feeder Optical Stream", loadLiveCameraFeed);
-        return;
-      }
       camFeedLoaded = true;
       const frame = document.getElementById('camera-live-frame');
       const placeholder = document.getElementById('camera-placeholder');
@@ -1906,7 +1993,6 @@
       showToast('info', 'Live WebRTC Connected', "Ultra-fast zero-lag hardware stream connected to Intel NUC.");
     }
     window.loadLiveCameraFeed = loadLiveCameraFeed;
-
     function stopLiveCameraFeed() {
       camFeedLoaded = false;
       const frame = document.getElementById('camera-live-frame');
@@ -1921,10 +2007,6 @@
     window.stopLiveCameraFeed = stopLiveCameraFeed;
 
     function selectCamera(cam) {
-      if (!isSSOAuthenticated()) {
-        openGlobalSSOModal("Penny's Feeder Optical Stream", () => selectCamera(cam));
-        return;
-      }
       currentCamTarget = cam;
       if (!camFeedLoaded) {
         loadLiveCameraFeed();
@@ -1932,12 +2014,8 @@
         updateCamFeed();
       }
     }
-
+    window.selectCamera = selectCamera;
     function selectCamQuality(res) {
-      if (!isSSOAuthenticated()) {
-        openGlobalSSOModal("Penny's Feeder Quality Selector", () => selectCamQuality(res));
-        return;
-      }
       currentCamRes = res;
       if (!camFeedLoaded) {
         loadLiveCameraFeed();
@@ -1945,12 +2023,8 @@
         updateCamFeed();
       }
     }
-
+    window.selectCamQuality = selectCamQuality;
     function toggleCamAi() {
-      if (!isSSOAuthenticated()) {
-        openGlobalSSOModal("Penny's Feeder AI Vision", toggleCamAi);
-        return;
-      }
       currentCamAi = !currentCamAi;
       if (currentCamAi) {
         showToast('info', 'AI Vision Activated', 'Running TensorFlow pet detection model.');
@@ -1963,7 +2037,7 @@
         updateCamFeed();
       }
     }
-
+    window.toggleCamAi = toggleCamAi;
     function updateCamFeed() {
       const src = currentCamRes === 'sd' ? `${currentCamTarget}_sd` : currentCamTarget;
       const playerPage = currentCamAi ? 'ai.html' : 'webrtc.html';

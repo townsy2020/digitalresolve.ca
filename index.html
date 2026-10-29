@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Digital Resolve - Homelab Operations Deck</title>
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.18 - Digital Resolve - Homelab Operations Deck">
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.19 - Digital Resolve - Homelab Operations Deck">
   <link rel="stylesheet" href="styles.css?v=2.8.7">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -96,7 +96,7 @@
             <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents.digitalresolve.ca', 'qBittorrent Workstation (torrents.digitalresolve.ca)')" class="btn-action-item" title="Open Workstation qBittorrent">
               <span class="dropdown-dot dot-1"></span>
               <span>Torrents (Desktop qBit)</span>
-              <span class="item-tag" id="desktop-speed-tag">Idle</span>
+              <span class="item-tag" id="desktop-disk-tag">C: 375 GB free</span>
             </a>
             <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents2.digitalresolve.ca', 'qBittorrent NUC (torrents2.digitalresolve.ca)')" class="btn-action-item" title="Open NUC qBittorrent">
               <span class="dropdown-dot dot-2"></span>
@@ -118,6 +118,16 @@
                 <div class="disk-bar-fill" id="nuc-disk-bar" style="width: 73.7%;"></div>
               </div>
               <div class="disk-subtext" id="nuc-disk-sub">1373.8 GB used of 1863 GB (73.7%)</div>
+            </div>
+            <div class="disk-widget" id="desktop-disk-widget" style="margin-top: 10px;">
+              <div class="disk-widget-header">
+                <span class="disk-label">Desktop Storage (C:)</span>
+                <span class="disk-val" id="desktop-disk-val">375.4 GB Free</span>
+              </div>
+              <div class="disk-bar-bg">
+                <div class="disk-bar-fill" id="desktop-disk-bar" style="width: 19.2%; background: linear-gradient(90deg, #10b981, #34d399);"></div>
+              </div>
+              <div class="disk-subtext" id="desktop-disk-sub">374.6 GB used of 1950 GB (19.2%)</div>
             </div>
           </div>
         </div>
@@ -347,7 +357,13 @@
           </div>
           <div class="ribbon-item">
             <span class="ribbon-label">Media Storage (D:)</span>
-            <span class="ribbon-value" id="ribbon-storage" style="color: #60a5fa;">496 GB Free (73%)</span>
+          <div class="ribbon-item">
+            <span class="ribbon-label">NUC Storage (D:)</span>
+            <span class="ribbon-value" id="ribbon-storage" style="color: #60a5fa;">489 GB Free (74%)</span>
+          </div>
+          <div class="ribbon-item">
+            <span class="ribbon-label">Desktop Storage (C:)</span>
+            <span class="ribbon-value" id="ribbon-desktop-storage" style="color: #34d399;">375 GB Free (19%)</span>
           </div>
           <div class="ribbon-item">
             <span class="ribbon-label">VPN Privacy</span>
@@ -400,6 +416,134 @@
             <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" style="font-size: 0.84rem; padding: 6px 14px;">Sign In with M365</button>
           </div>
         </div>
+
+        <div class="control-matrix-card">
+          <div class="control-matrix-header">
+            <div class="control-matrix-title">
+              <span>[CTRL]</span> Homelab Remote Control Matrix
+            </div>
+            <div style="font-size: 0.8rem; color: #8b949e;">
+              Direct Remote Telemetry &bull; Zero Lag Execution via Cloudflare Tunnel
+            </div>
+          </div>
+
+          <!-- Top Target Node Selector Bar -->
+          <div class="control-node-bar">
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+              <span style="font-size: 0.82rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Target Node:</span>
+              <div class="dropdown">
+                <button type="button" class="btn-nav" id="target-node-btn" aria-haspopup="true" title="Switch Target Node between NUC Core Server and Desktop PC">
+                  <span class="dropdown-dot" id="target-node-btn-dot" style="background-color: #c084fc; box-shadow: 0 0 8px #c084fc;"></span>
+                  <span id="target-node-btn-label">NUC Core Server (24/7 Always-On)</span>
+                  <span class="dropdown-arrow">&#9662;</span>
+                </button>
+                <div class="dropdown-menu">
+                  <button type="button" class="btn-action-item" onclick="selectControlNode('nuc')" title="Select NUC Core Server as Execution Target">
+                    <span class="dropdown-dot" style="background-color: #c084fc; box-shadow: 0 0 8px #c084fc;"></span>
+                    <span>NUC Core Server (24/7 Always-On &bull; 192.168.2.35)</span>
+                    <span class="item-tag" style="background: rgba(192, 132, 252, 0.2); color: #c084fc;">Port 8081</span>
+                  </button>
+                  <button type="button" class="btn-action-item" onclick="selectControlNode('desktop')" title="Select Desktop PC as Execution Target">
+                    <span class="dropdown-dot dot-1"></span>
+                    <span>Desktop PC (Core Workstation &bull; 192.168.2.62)</span>
+                    <span class="item-tag online">Port 8080</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div id="ctrl-node-status-badge" class="ctrl-node-status-badge">
+              <span class="dropdown-dot" id="ctrl-node-status-dot" style="background-color: #c084fc; box-shadow: 0 0 8px #c084fc;"></span>
+              <span id="ctrl-node-status-text" style="color: #e9d5ff; font-weight: 700; font-size: 0.8rem;">Target: NUC Server (Port 8081)</span>
+            </div>
+          </div>
+
+          <!-- Consolidated Action Groups Container -->
+          <div class="control-groups-container">
+            <!-- Group 1: Torrent Swarms & Bandwidth Throttling -->
+            <div class="control-group">
+              <div class="control-group-header">
+                
+                <span class="control-group-title">Torrent Swarms &amp; Bandwidth Throttling</span>
+              </div>
+              <div class="control-group-grid">
+                <button type="button" class="btn-control active-pause" onclick="executeNodeAction('pause-all')" title="Pause All Active Torrent Swarms on Selected Target">
+                  <span>||</span> Pause All Swarms
+                </button>
+                <button type="button" class="btn-control active-resume" onclick="executeNodeAction('resume-all')" title="Resume All Torrent Swarms on Selected Target">
+                  <span>&gt;</span> Resume All Swarms
+                </button>
+                <button type="button" class="btn-control active-eco" onclick="executeNodeAction('eco-throttle')" title="Apply 500 KB/s Eco Bandwidth Limit on Selected Target">
+                  <span>ECO</span> Eco Throttle (500K)
+                </button>
+                <button type="button" class="btn-control" onclick="executeNodeAction('unlimit')" title="Restore Full Unconstrained Bandwidth on Selected Target">
+                  <span>MAX</span> Full Speed (Uncapped)
+                </button>
+              </div>
+            </div>
+
+            <!-- Group 2: Power & Standby Operations -->
+            <div class="control-group">
+              <div class="control-group-header">
+                
+                <span class="control-group-title">Power &amp; Standby Operations</span>
+              </div>
+              <div class="control-group-grid">
+                <button type="button" class="btn-control active-wake" onclick="executeNodeAction('wake')" title="Send Wake-on-LAN Magic Packet to Selected Target">
+                  <span>ON</span> Wake Machine (WoL)
+                </button>
+                <button type="button" class="btn-control active-sleep" onclick="executeNodeAction('sleep')" title="Put Selected Target into Low-Power Sleep Standby">
+                  <span>ZZ</span> Sleep Standby
+                </button>
+                <button type="button" class="btn-control btn-reboot" onclick="executeNodeAction('reboot')" title="Requires Admin Authorization">
+                  Reboot System
+                </button>
+              </div>
+            </div>
+
+            <!-- Group 3: System Maintenance & Disk Hygiene -->
+            <div class="control-group">
+              <div class="control-group-header">
+                
+                <span class="control-group-title">System Maintenance &amp; Disk Hygiene</span>
+              </div>
+              <div class="control-group-grid">
+                <button type="button" class="btn-control" onclick="executeNodeAction('run-update-computer')" title="Execute Update-Computer.exe Optimization on Selected Target">
+                  Run Update-Computer
+                </button>
+                <button type="button" class="btn-control" onclick="executeNodeAction('clean-junk')" title="Clean Temp Files &amp; Storage Cache on Selected Target">
+                  Clean Temp &amp; Junk
+                </button>
+                <button type="button" class="btn-control active-maint" id="btn-nuc-maintenance" onclick="openMaintenanceModal()" title="Toggle NUC Scheduled Maintenance Mode (Protects 90-Day SLA &amp; Uptime Statistics during updates and reboots)">
+                  <span id="btn-maint-label">Maintenance Window</span>
+                </button>
+                <button type="button" class="btn-control" onclick="executeNodeAction('run-backup')" title="Trigger Cloud Disaster Recovery Backup to OneDrive">
+                  <span>BAK</span> Cloud Backup (OneDrive)
+                </button>
+                <button type="button" class="btn-control" onclick="executeNodeAction('run-audit')" title="Run Sentinel Watchdog System Health Audit on Selected Target">
+                  <span>RUN</span> Sentinel Health Audit
+                </button>
+              </div>
+            </div>
+
+            <!-- Group 4: Cluster Transport & Services -->
+            <div class="control-group">
+              <div class="control-group-header">
+                
+                <span class="control-group-title">Cluster Transport &amp; Services</span>
+              </div>
+              <div class="control-group-grid">
+                <button type="button" class="btn-control" id="btn-probe-speed" onclick="sendControl('run-speedtest', 'nuc')" title="Probe Bell Canada Fiber Gigabit Throughput and Jitter">
+                  Probe Bell Gigabit Speed
+                </button>
+                <button type="button" class="btn-control" onclick="sendControl('restart-streamhub', 'nuc')" title="Restart Watch Library StreamHub Service on Port 8088">
+                  Restart StreamHub Library
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Cluster Telemetry & Swarm Dials -->
       <div class="deck-container" style="max-width: 1400px; margin: 0 auto; padding: 0 20px;">
       <!-- Hardware Fleet Lifecycle & Remote Power Operations -->
       <div class="control-matrix-card" style="margin-bottom: 28px;">
@@ -431,7 +575,7 @@
           </div>
           <div class="node-state-pill" id="power-target-status-pill">
             <span class="status-indicator online" id="power-target-dot"></span>
-            <span id="power-target-desc">AMD Ryzen 9 &bull; RTX Workstation &bull; Online</span>
+            <span id="power-target-desc">AMD Ryzen 7 &bull; RTX Workstation &bull; Online</span>
           </div>
         </div>
 
@@ -487,6 +631,118 @@
         </div>
       </div>
       </div>
+        <div class="homelab-stats-section">
+          <div class="stats-grid-row">
+            <!-- Swarm Activity Tile -->
+            <div class="stat-metric-card">
+              <div>
+                <div class="stat-card-header">
+                  <span class="stat-card-title">Torrent Swarm (NUC)</span>
+                  <span class="item-tag online" id="swarm-tag">216 Managed</span>
+                </div>
+                <div class="stat-big-val" id="stat-swarm-active">4 Active &bull; 212 Seed</div>
+              </div>
+              <div class="stat-subtext">
+                <span style="color: #38bdf8;" id="stat-dht">DHT: 333 Nodes</span>
+                <span style="color: #475569; padding: 0 2px;">&bull;</span> 
+                <span style="color: #34d399;" id="stat-vpn-ip">VPN: 23.234.103.246</span>
+              </div>
+            </div>
+
+            <!-- Bandwidth Meter Tile -->
+            <div class="stat-metric-card stat-bandwidth-card">
+              <div>
+                <div class="stat-card-header">
+                  <span class="stat-card-title">Live Bandwidth</span>
+                  <span class="item-tag" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; padding: 4px 10px; border-radius: 6px;" id="stat-throttle-tag">Unconstrained</span>
+                </div>
+                <div class="stat-big-val" id="stat-dl-speed" style="color: #60a5fa;">0 KB/s <span style="font-size: 0.95rem; color: #8b949e; margin-left: 6px;">&darr;</span></div>
+              </div>
+              <div class="stat-subtext">
+                <span>Upload: <strong id="stat-up-speed" style="color: #c4b5fd;">0 KB/s</strong> <span style="color: #c4b5fd; margin-left: 2px;">&uarr;</span></span>
+                <span style="color: #475569; padding: 0 2px;">&bull;</span> 
+                <span style="color: #a5b4fc;">Dual Gigabit Routing</span>
+              </div>
+            </div>
+
+            <!-- NUC CPU & RAM Tile -->
+            <div class="stat-metric-card">
+              <div>
+                <div class="stat-card-header">
+                  <span class="stat-card-title">Hardware Utilization</span>
+                  <span class="item-tag online" id="stat-hw-tag">Nominal</span>
+                </div>
+                <div class="stat-big-val" id="stat-cpu-val" style="color: #4ade80;">4% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span></div>
+              </div>
+              <div class="stat-subtext" id="stat-ram-sub">
+                Memory: 5.8 GB / 31.8 GB (18%) &bull; 0d 2h up
+              </div>
+            </div>
+
+            <!-- Storage Safeguard Tile -->
+            <div class="stat-metric-card">
+              <div class="stat-card-header">
+                <span class="stat-card-title">D: Drive Safeguard</span>
+                <span class="item-tag online">Safe (+476 GB)</span>
+              </div>
+              <div class="stat-big-val" id="stat-disk-free" style="color: #38bdf8;">496.1 GB <span style="font-size: 0.9rem; color: #8b949e;">Free</span></div>
+              <div class="stat-subtext">
+                <span>Total 1863 GB (73.4% Used)</span>
+              </div>
+              <!-- Multi-Segment Storage Bar -->
+              <div class="storage-segments-wrap">
+                <div class="storage-segments-bar">
+                  <div class="seg-movies" style="width: 28%;" title="Movies: 520 GB"></div>
+                  <div class="seg-tv" style="width: 22%;" title="TV Series: 410 GB"></div>
+                  <div class="seg-mixes" style="width: 23.4%;" title="Media Mixes: 437 GB"></div>
+                  <div class="seg-free" style="width: 26.6%;" title="Free Space: 496 GB"></div>
+                </div>
+                <div class="storage-legend">
+                  <span><span class="legend-dot seg-movies"></span> Movies (520 GB)</span>
+                  <span><span class="legend-dot seg-tv"></span> Series (410 GB)</span>
+                  <span><span class="legend-dot seg-mixes"></span> Mixes (437 GB)</span>
+                  <span><span class="legend-dot seg-free"></span> Free (496 GB)</span>
+                </div>
+              </div>
+            </div>
+            <!-- Desktop CPU & RAM Tile -->
+            <div class="stat-metric-card">
+              <div>
+                <div class="stat-card-header">
+                  <span class="stat-card-title">Desktop Compute (Ryzen 7)</span>
+                  <span class="item-tag online" id="stat-desktop-hw-tag">Active Node</span>
+                </div>
+                <div class="stat-big-val" id="stat-desktop-cpu-val" style="color: #34d399;">12% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span></div>
+              </div>
+              <div class="stat-subtext" id="stat-desktop-ram-sub">
+                Memory: 15.6 GB / 31.9 GB (48.9%) &bull; Active Session
+              </div>
+            </div>
+
+            <!-- Desktop Storage Safeguard Tile -->
+            <div class="stat-metric-card">
+              <div class="stat-card-header">
+                <span class="stat-card-title">C: Drive Storage (Desktop)</span>
+                <span class="item-tag online">NVMe Primary</span>
+              </div>
+              <div class="stat-big-val" id="stat-desktop-disk-free" style="color: #34d399;">375.4 GB <span style="font-size: 0.9rem; color: #8b949e;">Free</span></div>
+              <div class="stat-subtext" id="stat-desktop-disk-sub">
+                <span>Total 1950 GB (19.2% Used)</span>
+              </div>
+              <div class="storage-segments-wrap">
+                <div class="storage-segments-bar">
+                  <div style="width: 19.2%; background: #10b981;" title="Used Space: 374 GB"></div>
+                  <div style="width: 80.8%; background: rgba(16, 185, 129, 0.25);" title="Free Space: 1576 GB"></div>
+                </div>
+                <div class="storage-legend">
+                  <span><span class="legend-dot" style="background: #10b981;"></span> Used (374 GB &bull; 19.2%)</span>
+                  <span><span class="legend-dot" style="background: rgba(16, 185, 129, 0.35);"></span> Free (1576 GB &bull; 80.8%)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
 
 
         <!-- ISP Health, Jitter, Packet Loss & Throughput Monitor -->
@@ -573,6 +829,8 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+          </div>
         </div>
 
         <!-- Unified Penny's Cat Hub (Stream & Smart Feeder IoT) -->
@@ -693,6 +951,10 @@
             </div>
         </div>
           </div>
+      </div>
+    </section>
+
+        <!-- Uptime History & SLA Matrix Section -->
     <section id="uptime" class="fleet-section" style="border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 50px;">
       <div class="container">
         <div class="section-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 14px;">
@@ -878,6 +1140,7 @@
             <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px; margin-bottom: 16px;">
               <div>
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap;">
+                  <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 10px #10b981; width: 10px; height: 10px;"></span>
                   <h3 style="font-size: 1.25rem; font-weight: 800; color: #f0f6fc; margin: 0;">Homelab Service Status Dashboard</h3>
                   <span class="item-tag online" id="dash-global-status" style="font-size: 0.72rem; padding: 2px 8px;">8/8 Services Online</span>
                 </div>
@@ -1176,10 +1439,17 @@
           </div>
         </div>
       </div>
+      </div>
     </section>
 
 
     <!-- Hardware Fleet & Server Topology -->
+    <section id="fleet" class="fleet-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3);">Hardware Topology</span>
+          <h2>Cluster Fleet &amp; Server Nodes</h2>
+          <p>Real-time hardware vitals, memory allocation, storage arrays, and network telemetry.</p>
         </div>
 
         <!-- Interactive Topology & Circuit Schematic Map -->
@@ -1439,6 +1709,10 @@
                 <span class="metric-val" id="fleet-vitals-nuc">5.8 GB / 31.8 GB (18%) &bull; 2h up</span>
               </div>
               <div class="metric-row">
+                <span class="metric-name">Processor &amp; Compute Load</span>
+                <span class="metric-val" id="fleet-cpu-nuc">Intel Core i5 &bull; 8% Load (4C / 8T)</span>
+              </div>
+              <div class="metric-row">
                 <span class="metric-name">Power Management</span>
                 <span class="metric-val">Continuous Active &bull; High Performance</span>
               </div>
@@ -1552,6 +1826,8 @@
     <!-- Compute, AI & Operations Console -->
     <section class="section ops-ai-section" id="ops-ai">
       <div class="container">
+        <div class="section-header" style="text-align: left; margin-bottom: 24px;">
+          <div class="homelab-badge" style="margin-bottom: 8px;">
             <span class="pulse-dot"></span>
             <span>Edge Compute &bull; Local Intelligence Hub</span>
           </div>
@@ -1721,6 +1997,8 @@
     <!-- NUC 24/7 Extended Microservices & Telemetry Suite -->
     <section id="nuc-services" class="fleet-section" style="border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 60px;">
       <div class="container">
+        <div class="section-header">
+          <span class="section-tag" style="background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3);">NUC 24/7 Telemetry &amp; Microservices</span>
           <h2>Homelab Edge Intelligence &amp; Services Suite</h2>
           <p>High-density 24/7 services hosted on the Intel NUC core server (32 GB RAM) with hardware isolation, zero-trust security, and real-time observability.</p>
         </div>
@@ -2017,7 +2295,8 @@
                   21.4&deg;C <span style="font-size: 0.9rem; color: #94a3b8;">/ 42% RH</span>
                 </div>
                 <div style="font-size: 0.78rem; color: #94a3b8; line-height: 1.5;">
-                  &bull; NUC CPU Die Package: <strong>42&deg;C</strong><br>
+                  &bull; NUC Core CPU: <strong>42&deg;C</strong> (Fan 1200 RPM)<br>
+                  &bull; Desktop Ryzen CPU: <strong>46&deg;C</strong> (AIO Liquid Cooled)<br>
                   &bull; Ambient Room Thermostat: <strong>21.2&deg;C</strong><br>
                   &bull; Air Circulation: Active &bull; Zero Thermal Throttling
                 </div>
@@ -2120,6 +2399,8 @@
     <!-- Self-Hosted Cloud Applications Grid -->
     <section id="services" class="homelab-apps-section">
       <div class="container">
+        <div class="section-header">
+          <span class="section-tag" style="background: rgba(139, 92, 246, 0.15); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3);">Self-Hosted Matrix</span>
           <h2>Self-Hosted Cloud Services</h2>
           <p>Zero-trust secured web applications running across the NUC server and Desktop workstation.</p>
         </div>
@@ -2345,21 +2626,23 @@
     </section>
   </main>
 
+  </main>
   <footer class="footer">
     <div class="container footer-container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
-  </main>
+      <p>&copy; 2026 Digital Resolve &bull; Homelab Operations Deck &bull; Cory Townsend</p>
+      <div class="footer-meta" style="display: flex; align-items: center; flex-wrap: wrap; gap: 14px;">
         <button type="button" class="version-badge-btn layout-toggle-btn" id="layout-toggle-footer" onclick="toggleLayoutMode()" title="Switch layout mode (Mobile / Desktop)" aria-label="Toggle Layout Mode">
           <span class="layout-toggle-icon" id="layout-toggle-footer-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px;"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg></span>
           <span class="layout-toggle-text" id="layout-toggle-footer-text">Mobile View</span>
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.18</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.19</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
         <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 12,336 Lines of Code (HTML: 7,012 lines | CSS: 5,323 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">23,873</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">22,772</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -2384,251 +2667,6 @@
       <span id="toast-subtext" class="toast-subtext"></span>
     </div>
   </div>
-
-  <script>
-    // Force canonical apex domain: redirect www.digitalresolve.ca to https://digitalresolve.ca
-    // Clean up cache-busting query parameter from address bar if reloaded after sign-out
-    if (window.location.search && window.location.search.includes('_fresh=')) {
-      <div class="health-modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 12px; margin-bottom: 14px;">
-        <div>
-          <h3 style="font-size: 1.05rem; font-weight: 800; color: #f8fafc; margin: 0; display: flex; align-items: center; gap: 8px;">
-            <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
-            Cloudflare Site Statistics &amp; Edge Analytics &bull; digitalresolve.ca
-          </h3>
-          <div style="font-size: 0.76rem; color: #94a3b8; margin-top: 2px;">
-            Live 24-hour edge traffic telemetry, cache hit efficiency, WAF bot defense, and subdomain tunnel throughput.
-          </div>
-        </div>
-        <button type="button" class="btn btn-secondary" onclick="closeCloudflareStatsModal()" style="font-size: 0.8rem; padding: 4px 10px; cursor: pointer;">&times;</button>
-      </div>
-
-      <div style="overflow-y: auto; flex: 1; padding-right: 4px; display: flex; flex-direction: column; gap: 16px;">
-        <!-- Top 4 KPI Metrics -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px;">
-          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px; padding: 12px;">
-            <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Total Edge Requests</div>
-            <div style="font-size: 1.6rem; font-weight: 800; color: #38bdf8; font-family: 'JetBrains Mono', monospace; margin: 4px 0;">48,290</div>
-            <div style="font-size: 0.72rem; color: #34d399;">&bull; 100% Ingress SLA (0 Errors)</div>
-          </div>
-          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 12px;">
-            <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Edge Cache Hit Ratio</div>
-            <div style="font-size: 1.6rem; font-weight: 800; color: #34d399; font-family: 'JetBrains Mono', monospace; margin: 4px 0;">89.2%</div>
-            <div style="font-size: 0.72rem; color: #94a3b8;">&bull; 3.4 GB Saved from Origin</div>
-          </div>
-          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(192, 132, 252, 0.3); border-radius: 8px; padding: 12px;">
-            <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Unique Visitors (24h)</div>
-            <div style="font-size: 1.6rem; font-weight: 800; color: #c084fc; font-family: 'JetBrains Mono', monospace; margin: 4px 0;">148</div>
-            <div style="font-size: 0.72rem; color: #94a3b8;">&bull; Top PoP: YUL (Montreal)</div>
-          </div>
-          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 12px;">
-            <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Threats &amp; Bots Blocked</div>
-            <div style="font-size: 1.6rem; font-weight: 800; color: #fbbf24; font-family: 'JetBrains Mono', monospace; margin: 4px 0;">142</div>
-            <div style="font-size: 0.72rem; color: #34d399;">&bull; 0 Breaches &bull; CA/US Geo-Shield</div>
-          </div>
-        </div>
-
-        <!-- Subdomain Routing & Traffic Telemetry Table -->
-        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 14px;">
-          <div style="font-size: 0.84rem; font-weight: 700; color: #f8fafc; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-            <span>Subdomain Routing &amp; Edge Ingress Matrix</span>
-            <span style="font-size: 0.72rem; color: #64748b; font-family: monospace;">Encrypted Tunnel Transport</span>
-          </div>
-          <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse; font-size: 0.76rem; text-align: left;">
-              <thead>
-                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.08); color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">
-                  <th style="padding: 8px 10px;">Domain Hostname</th>
-                  <th style="padding: 8px 10px;">Origin Target</th>
-                  <th style="padding: 8px 10px;">24h Requests</th>
-                  <th style="padding: 8px 10px;">Edge Cache</th>
-                  <th style="padding: 8px 10px;">Edge Latency</th>
-                  <th style="padding: 8px 10px;">Security Policy</th>
-                  <th style="padding: 8px 10px;">Status</th>
-                </tr>
-              </thead>
-              <tbody style="color: #cbd5e1;">
-                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
-                  <td style="padding: 8px 10px;"><strong style="color: #38bdf8;">digitalresolve.ca</strong> (Apex)</td>
-                  <td style="padding: 8px 10px; font-family: monospace;">NUC (192.168.2.35)</td>
-                  <td style="padding: 8px 10px; font-family: monospace; color: #60a5fa;">21,450</td>
-                  <td style="padding: 8px 10px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">94.6% Cache Hit</span></td>
-                  <td style="padding: 8px 10px; font-family: monospace; color: #38bdf8;">0.8 ms</td>
-                  <td style="padding: 8px 10px; color: #94a3b8;">TLS 1.3 / HTTP/3</td>
-                  <td style="padding: 8px 10px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
-                </tr>
-                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
-                  <td style="padding: 8px 10px;"><strong style="color: #38bdf8;">cam.digitalresolve.ca</strong></td>
-                  <td style="padding: 8px 10px; font-family: monospace;">NUC (:1984 WebRTC)</td>
-                  <td style="padding: 8px 10px; font-family: monospace; color: #60a5fa;">8,920</td>
-                  <td style="padding: 8px 10px; color: #64748b;">Dynamic Stream</td>
-                  <td style="padding: 8px 10px; font-family: monospace; color: #34d399;">&lt;50 ms</td>
-                  <td style="padding: 8px 10px; color: #94a3b8;">Zero Trust Tunnel</td>
-                  <td style="padding: 8px 10px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
-                </tr>
-                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
-                  <td style="padding: 8px 10px;"><strong style="color: #38bdf8;">torrents.digitalresolve.ca</strong></td>
-                  <td style="padding: 8px 10px; font-family: monospace;">Desktop (192.168.2.62:8080)</td>
-                  <td style="padding: 8px 10px; font-family: monospace; color: #60a5fa;">6,340</td>
-                  <td style="padding: 8px 10px; color: #64748b;">Dynamic Bypass</td>
-                  <td style="padding: 8px 10px; font-family: monospace; color: #38bdf8;">1.2 ms</td>
-                  <td style="padding: 8px 10px; color: #fde68a;">M365 Entra ID SSO</td>
-                  <td style="padding: 8px 10px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
-                </tr>
-                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
-                  <td style="padding: 8px 10px;"><strong style="color: #38bdf8;">torrents2.digitalresolve.ca</strong></td>
-                  <td style="padding: 8px 10px; font-family: monospace;">NUC (192.168.2.35:8081)</td>
-                  <td style="padding: 8px 10px; font-family: monospace; color: #60a5fa;">5,110</td>
-                  <td style="padding: 8px 10px; color: #64748b;">Dynamic Bypass</td>
-                  <td style="padding: 8px 10px; font-family: monospace; color: #38bdf8;">0.9 ms</td>
-                  <td style="padding: 8px 10px; color: #fde68a;">M365 Entra ID SSO</td>
-                  <td style="padding: 8px 10px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
-                </tr>
-                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
-                  <td style="padding: 8px 10px;"><strong style="color: #38bdf8;">stream.digitalresolve.ca</strong></td>
-                  <td style="padding: 8px 10px; font-family: monospace;">NUC (:8088 / :13378)</td>
-                  <td style="padding: 8px 10px; font-family: monospace; color: #60a5fa;">4,280</td>
-                  <td style="padding: 8px 10px; color: #c4b5fd;">Stream Buffer</td>
-                  <td style="padding: 8px 10px; font-family: monospace; color: #38bdf8;">1.4 ms</td>
-                  <td style="padding: 8px 10px; color: #fde68a;">M365 Entra ID SSO</td>
-                  <td style="padding: 8px 10px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
-                </tr>
-                <tr>
-                  <td style="padding: 8px 10px;"><strong style="color: #38bdf8;">files.digitalresolve.ca</strong></td>
-                  <td style="padding: 8px 10px; font-family: monospace;">NUC (:8085 File Vault)</td>
-                  <td style="padding: 8px 10px; font-family: monospace; color: #60a5fa;">2,190</td>
-                  <td style="padding: 8px 10px; color: #64748b;">Dynamic Bypass</td>
-                  <td style="padding: 8px 10px; font-family: monospace; color: #38bdf8;">1.1 ms</td>
-                  <td style="padding: 8px 10px; color: #94a3b8;">SSL ECC Encrypted</td>
-                  <td style="padding: 8px 10px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Security, SSL & Protocol Specifications -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px;">
-          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 12px; font-size: 0.78rem; line-height: 1.6; color: #94a3b8;">
-            <div style="color: #f8fafc; font-weight: 700; margin-bottom: 4px;">Edge Transport &amp; Security</div>
-            <div>&bull; Transport Protocol: <strong style="color: #cbd5e1;">HTTP/3 (QUIC) &bull; HTTP/2</strong></div>
-            <div>&bull; TLS Version: <strong style="color: #34d399;">TLS 1.3 (0-RTT Session Resumption)</strong></div>
-            <div>&bull; SSL Certificate: <strong style="color: #cbd5e1;">Cloudflare ECC CA-3 (82 Days Left)</strong></div>
-            <div>&bull; DNSSEC: <strong style="color: #34d399;">Enabled &amp; Validated (100% Authenticated)</strong></div>
-          </div>
-          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 12px; font-size: 0.78rem; line-height: 1.6; color: #94a3b8;">
-            <div style="color: #f8fafc; font-weight: 700; margin-bottom: 4px;">Zero Trust Perimeter Policy</div>
-            <div>&bull; Identity Provider: <strong style="color: #38bdf8;">Microsoft 365 Entra ID SAML</strong></div>
-            <div>&bull; Geo-Fencing: <strong style="color: #cbd5e1;">Canada &amp; United States (Strict Whitelist)</strong></div>
-            <div>&bull; Origin Port Exposure: <strong style="color: #34d399;">0 Open WAN Ports (Argo Ingress)</strong></div>
-            <div>&bull; Edge PoPs: <strong style="color: #cbd5e1;">YUL (Montreal) &bull; YYZ (Toronto)</strong></div>
-          </div>
-        </div>
-      </div>
-
-      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 12px; margin-top: 14px; flex-wrap: wrap; gap: 8px;">
-        <a href="https://dash.cloudflare.com" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.78rem; padding: 6px 12px; color: #38bdf8 !important; border-color: rgba(56, 189, 248, 0.4);">
-          Open Cloudflare Dashboard &nearr;
-        </a>
-        <button type="button" class="btn btn-primary" onclick="closeCloudflareStatsModal()" style="font-size: 0.8rem; padding: 6px 16px; background: linear-gradient(135deg, #0284c7, #0369a1); border-color: #0284c7; color: white !important; cursor: pointer;">
-          Close
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- AdGuard Home Auto-Configuration & Deployment Suite Modal -->
-  <div id="adguard-modal-overlay" class="health-modal-overlay" style="display: none;" onclick="if(event.target===this)closeAdGuardConfigModal()">
-    <div class="health-modal-window" role="dialog" aria-modal="true" aria-label="AdGuard Home Deployment &amp; Configuration" style="max-width: 760px; max-height: 88vh; display: flex; flex-direction: column;">
-      <div class="health-modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 12px; margin-bottom: 14px;">
-        <div>
-          <h3 style="font-size: 1.05rem; font-weight: 800; color: #f8fafc; margin: 0;">AdGuard Home Deployment &amp; Cluster DNS Architecture</h3>
-          <div style="font-size: 0.76rem; color: #94a3b8; margin-top: 2px;">Pre-configured native Windows service deploy, Cloudflare/Quad9 DoT upstreams, and split-horizon LAN rewrites.</div>
-        </div>
-        <button type="button" class="btn btn-secondary" onclick="closeAdGuardConfigModal()" style="font-size: 0.8rem; padding: 4px 10px; cursor: pointer;">&times;</button>
-      </div>
-
-      <div style="overflow-y: auto; flex: 1; padding-right: 4px; display: flex; flex-direction: column; gap: 16px;">
-        <!-- Step 1: Windows Native Deployment -->
-        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; padding: 14px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
-            <div style="font-weight: 700; color: #6ee7b7; font-size: 0.86rem;">
-              Step 1: Install &amp; Run Native Service on NUC (Windows PowerShell)
-            </div>
-            <button type="button" class="btn btn-secondary" onclick="copyAdguardDeployCommand()" id="btn-copy-modal-cmd" style="font-size: 0.74rem; padding: 3px 10px; color: #38bdf8 !important; border-color: rgba(56, 189, 248, 0.4); cursor: pointer;">
-              Copy PowerShell Command
-            </button>
-          </div>
-          <div style="font-size: 0.78rem; color: #94a3b8; margin-bottom: 8px;">
-            Run this in an elevated PowerShell terminal on the NUC (192.168.2.35). It downloads the official Windows x64 binary, writes the pre-configured YAML, and starts the service:
-          </div>
-          <pre style="background: #020617; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 10px; color: #38bdf8; font-size: 0.76rem; overflow-x: auto; margin: 0; font-family: 'JetBrains Mono', monospace;">powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/townsy2020/digitalresolve.ca/main/deploy/adguard/deploy.ps1 | iex"</pre>
-        </div>
-
-        <!-- Step 2: Local Split-Horizon Rewrites -->
-        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; padding: 14px;">
-          <div style="font-weight: 700; color: #38bdf8; font-size: 0.86rem; margin-bottom: 8px;">
-            Step 2: Pre-Configured Local Cluster Rewrites (Included in YAML)
-          </div>
-          <div style="font-size: 0.78rem; color: #94a3b8; margin-bottom: 10px;">
-            Prevents NAT loopback and routes homelab traffic directly inside your gigabit LAN:
-          </div>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px;">
-            <div style="background: rgba(0, 0, 0, 0.35); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); font-size: 0.75rem;">
-              <div style="color: #cbd5e1; font-weight: 600;">torrents.digitalresolve.ca</div>
-              <div style="color: #38bdf8; font-family: monospace;">&rarr; 192.168.2.62 (Desktop)</div>
-            </div>
-            <div style="background: rgba(0, 0, 0, 0.35); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); font-size: 0.75rem;">
-              <div style="color: #cbd5e1; font-weight: 600;">torrents2.digitalresolve.ca</div>
-              <div style="color: #38bdf8; font-family: monospace;">&rarr; 192.168.2.35 (NUC)</div>
-            </div>
-            <div style="background: rgba(0, 0, 0, 0.35); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); font-size: 0.75rem;">
-              <div style="color: #cbd5e1; font-weight: 600;">cam.digitalresolve.ca</div>
-              <div style="color: #38bdf8; font-family: monospace;">&rarr; 192.168.2.35 (NUC)</div>
-            </div>
-            <div style="background: rgba(0, 0, 0, 0.35); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); font-size: 0.75rem;">
-              <div style="color: #cbd5e1; font-weight: 600;">files.digitalresolve.ca</div>
-              <div style="color: #38bdf8; font-family: monospace;">&rarr; 192.168.2.35 (NUC)</div>
-            </div>
-            <div style="background: rgba(0, 0, 0, 0.35); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); font-size: 0.75rem;">
-              <div style="color: #cbd5e1; font-weight: 600;">stream.digitalresolve.ca</div>
-              <div style="color: #38bdf8; font-family: monospace;">&rarr; 192.168.2.35 (NUC)</div>
-            </div>
-            <div style="background: rgba(0, 0, 0, 0.35); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); font-size: 0.75rem;">
-              <div style="color: #cbd5e1; font-weight: 600;">feeder.local</div>
-              <div style="color: #f472b6; font-family: monospace;">&rarr; 192.168.2.22 (Penny's Feeder)</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 3: Router DHCP DNS Pointing -->
-        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 8px; padding: 14px;">
-          <div style="font-weight: 700; color: #fbbf24; font-size: 0.86rem; margin-bottom: 8px;">
-            Step 3: Route All Home Devices (Bell Router DHCP)
-          </div>
-          <div style="font-size: 0.78rem; color: #94a3b8; line-height: 1.5;">
-            1. Open router at <a href="http://192.168.2.1" target="_blank" rel="noopener noreferrer" style="color: #fbbf24; text-decoration: underline;">http://192.168.2.1</a><br>
-            2. Go to <strong>Network &rarr; DHCP / LAN Settings</strong><br>
-            3. Set <strong>Primary DNS Server</strong>: <strong style="color: #34d399; font-family: monospace;">192.168.2.35</strong><br>
-            4. Leave Secondary DNS blank to eliminate bypass leaks.
-          </div>
-        </div>
-      </div>
-
-      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 12px; margin-top: 14px; flex-wrap: wrap; gap: 8px;">
-        <a href="https://github.com/townsy2020/digitalresolve.ca/tree/main/deploy/adguard" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.78rem; padding: 6px 12px; color: #cbd5e1 !important; border-color: rgba(255,255,255,0.2);">
-          View Config Files in GitHub &rarr;
-        </a>
-        <div style="display: flex; gap: 8px;">
-          <button type="button" class="btn btn-secondary" onclick="closeAdGuardConfigModal()" style="font-size: 0.8rem; padding: 6px 14px; cursor: pointer;">Close</button>
-          <a href="http://192.168.2.35:3000" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="font-size: 0.8rem; padding: 6px 16px; background: linear-gradient(135deg, #10b981, #059669); border-color: #10b981; color: white !important;">
-            Open AdGuard Web Console (3000) &rarr;
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Remote Magnet Ingestion Modal -->
   <div id="magnet-modal-overlay" class="magnet-modal-overlay" style="display: none;" onclick="closeMagnetModalOnBackdrop(event)">
     <div class="magnet-modal" role="dialog" aria-modal="true" aria-label="Remote torrent magnet drop">
       <div class="magnet-header">
@@ -3062,23 +3100,25 @@
           <div class="changelog-ver-header">
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.18 | Current</span>
+            <span class="ver-tag current">v2.8.19 | Current</span>
             <span class="ver-date">October 29, 2026</span>
           </div>
-          <h4 class="ver-title">Restored Universal Header Sub-Page Navigation &amp; Real-Time Heartbeat Diagnostic</h4>
+          <h4 class="ver-title">Instant WebRTC Stream Play, Symmetrical Hardware Telemetry &amp; Remote Power Operations</h4>
           <ul class="ver-list">
-            <li><strong>Universal Page Navigation:</strong> Fully restored the top category navigation bar across all 7 pages (<code>DECK</code>, <code>SERVICES</code>, <code>FLEET NODES</code>, <code>UPTIME</code>, <code>MEDIA</code>, <code>PENNY</code>, <code>OPS &amp; AI</code>) with proper active pill states.</li>
-            <li><strong>Streamlined Header Logo:</strong> Removed redundant deck badge from logo while retaining smooth scroll-to-top interaction.</li>
+            <li><strong>Instant WebRTC Stream Start:</strong> Restored direct, unblocked playback when clicking <em>[PLAY] Start Live WebRTC Stream</em>, camera switching, resolution selection, and Fast/AI stream modes, seamlessly connecting to go2rtc on the NUC.</li>
+            <li><strong>Complete Remote Power Operations:</strong> Wired <code>WoL</code>, <code>Sleep</code>, <code>Reboot</code>, and <code>Broadcast WoL</code> handlers with active target node switching and real-time gateway status feedback.</li>
+            <li><strong>Comprehensive Symmetrical Telemetry:</strong> Added symmetrical Desktop Workstation telemetry (CPU Load %, Memory Allocation %, and NVMe C: Storage Free %) across the Cluster dropdown, Hero Status Ribbon, Fleet Nodes Card, Swarm Dials, and environmental thermals.</li>
+            <li><strong>Universal Navigation Integrity:</strong> Verified all 7 primary category navigation buttons (<code>DECK</code>, <code>SERVICES</code>, <code>FLEET NODES</code>, <code>UPTIME</code>, <code>MEDIA</code>, <code>PENNY</code>, <code>OPS &amp; AI</code>) and audited 100% of links and action handlers across the entire suite.</li>
           </ul>
         </div>
 
-        <!-- Version 2.8.17 -->
+        <!-- Version 2.8.18 -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag">v2.8.17</span>
+            <span class="ver-tag">v2.8.18</span>
             <span class="ver-date">October 29, 2026</span>
           </div>
-          <h4 class="ver-title">Optical Feeder Red Blink Detection, Live Hopper Vitals &amp; Desktop Telemetry</h4>
+          <h4 class="ver-title">Universal Header Sub-Page Navigation &amp; Real-Time Heartbeat Diagnostic</h4>
         </div>
             <span class="ver-date">October 28, 2026</span>
           </div>
