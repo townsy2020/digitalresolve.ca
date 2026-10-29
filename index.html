@@ -417,134 +417,6 @@
           </div>
         </div>
 
-        <div class="control-matrix-card">
-          <div class="control-matrix-header">
-            <div class="control-matrix-title">
-              <span>[CTRL]</span> Homelab Remote Control Matrix
-            </div>
-            <div style="font-size: 0.8rem; color: #8b949e;">
-              Direct Remote Telemetry &bull; Zero Lag Execution via Cloudflare Tunnel
-            </div>
-          </div>
-
-          <!-- Top Target Node Selector Bar -->
-          <div class="control-node-bar">
-            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-              <span style="font-size: 0.82rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Target Node:</span>
-              <div class="dropdown">
-                <button type="button" class="btn-nav" id="target-node-btn" aria-haspopup="true" title="Switch Target Node between NUC Core Server and Desktop PC">
-                  <span class="dropdown-dot" id="target-node-btn-dot" style="background-color: #c084fc; box-shadow: 0 0 8px #c084fc;"></span>
-                  <span id="target-node-btn-label">NUC Core Server (24/7 Always-On)</span>
-                  <span class="dropdown-arrow">&#9662;</span>
-                </button>
-                <div class="dropdown-menu">
-                  <button type="button" class="btn-action-item" onclick="selectControlNode('nuc')" title="Select NUC Core Server as Execution Target">
-                    <span class="dropdown-dot" style="background-color: #c084fc; box-shadow: 0 0 8px #c084fc;"></span>
-                    <span>NUC Core Server (24/7 Always-On &bull; 192.168.2.35)</span>
-                    <span class="item-tag" style="background: rgba(192, 132, 252, 0.2); color: #c084fc;">Port 8081</span>
-                  </button>
-                  <button type="button" class="btn-action-item" onclick="selectControlNode('desktop')" title="Select Desktop PC as Execution Target">
-                    <span class="dropdown-dot dot-1"></span>
-                    <span>Desktop PC (Core Workstation &bull; 192.168.2.62)</span>
-                    <span class="item-tag online">Port 8080</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div id="ctrl-node-status-badge" class="ctrl-node-status-badge">
-              <span class="dropdown-dot" id="ctrl-node-status-dot" style="background-color: #c084fc; box-shadow: 0 0 8px #c084fc;"></span>
-              <span id="ctrl-node-status-text" style="color: #e9d5ff; font-weight: 700; font-size: 0.8rem;">Target: NUC Server (Port 8081)</span>
-            </div>
-          </div>
-
-          <!-- Consolidated Action Groups Container -->
-          <div class="control-groups-container">
-            <!-- Group 1: Torrent Swarms & Bandwidth Throttling -->
-            <div class="control-group">
-              <div class="control-group-header">
-                
-                <span class="control-group-title">Torrent Swarms &amp; Bandwidth Throttling</span>
-              </div>
-              <div class="control-group-grid">
-                <button type="button" class="btn-control active-pause" onclick="executeNodeAction('pause-all')" title="Pause All Active Torrent Swarms on Selected Target">
-                  <span>||</span> Pause All Swarms
-                </button>
-                <button type="button" class="btn-control active-resume" onclick="executeNodeAction('resume-all')" title="Resume All Torrent Swarms on Selected Target">
-                  <span>&gt;</span> Resume All Swarms
-                </button>
-                <button type="button" class="btn-control active-eco" onclick="executeNodeAction('eco-throttle')" title="Apply 500 KB/s Eco Bandwidth Limit on Selected Target">
-                  <span>ECO</span> Eco Throttle (500K)
-                </button>
-                <button type="button" class="btn-control" onclick="executeNodeAction('unlimit')" title="Restore Full Unconstrained Bandwidth on Selected Target">
-                  <span>MAX</span> Full Speed (Uncapped)
-                </button>
-              </div>
-            </div>
-
-            <!-- Group 2: Power & Standby Operations -->
-            <div class="control-group">
-              <div class="control-group-header">
-                
-                <span class="control-group-title">Power &amp; Standby Operations</span>
-              </div>
-              <div class="control-group-grid">
-                <button type="button" class="btn-control active-wake" onclick="executeNodeAction('wake')" title="Send Wake-on-LAN Magic Packet to Selected Target">
-                  <span>ON</span> Wake Machine (WoL)
-                </button>
-                <button type="button" class="btn-control active-sleep" onclick="executeNodeAction('sleep')" title="Put Selected Target into Low-Power Sleep Standby">
-                  <span>ZZ</span> Sleep Standby
-                </button>
-                <button type="button" class="btn-control btn-reboot" onclick="executeNodeAction('reboot')" title="Requires Admin Authorization">
-                  Reboot System
-                </button>
-              </div>
-            </div>
-
-            <!-- Group 3: System Maintenance & Disk Hygiene -->
-            <div class="control-group">
-              <div class="control-group-header">
-                
-                <span class="control-group-title">System Maintenance &amp; Disk Hygiene</span>
-              </div>
-              <div class="control-group-grid">
-                <button type="button" class="btn-control" onclick="executeNodeAction('run-update-computer')" title="Execute Update-Computer.exe Optimization on Selected Target">
-                  Run Update-Computer
-                </button>
-                <button type="button" class="btn-control" onclick="executeNodeAction('clean-junk')" title="Clean Temp Files &amp; Storage Cache on Selected Target">
-                  Clean Temp &amp; Junk
-                </button>
-                <button type="button" class="btn-control active-maint" id="btn-nuc-maintenance" onclick="openMaintenanceModal()" title="Toggle NUC Scheduled Maintenance Mode (Protects 90-Day SLA &amp; Uptime Statistics during updates and reboots)">
-                  <span id="btn-maint-label">Maintenance Window</span>
-                </button>
-                <button type="button" class="btn-control" onclick="executeNodeAction('run-backup')" title="Trigger Cloud Disaster Recovery Backup to OneDrive">
-                  <span>BAK</span> Cloud Backup (OneDrive)
-                </button>
-                <button type="button" class="btn-control" onclick="executeNodeAction('run-audit')" title="Run Sentinel Watchdog System Health Audit on Selected Target">
-                  <span>RUN</span> Sentinel Health Audit
-                </button>
-              </div>
-            </div>
-
-            <!-- Group 4: Cluster Transport & Services -->
-            <div class="control-group">
-              <div class="control-group-header">
-                
-                <span class="control-group-title">Cluster Transport &amp; Services</span>
-              </div>
-              <div class="control-group-grid">
-                <button type="button" class="btn-control" id="btn-probe-speed" onclick="sendControl('run-speedtest', 'nuc')" title="Probe Bell Canada Fiber Gigabit Throughput and Jitter">
-                  Probe Bell Gigabit Speed
-                </button>
-                <button type="button" class="btn-control" onclick="sendControl('restart-streamhub', 'nuc')" title="Restart Watch Library StreamHub Service on Port 8088">
-                  Restart StreamHub Library
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Live Cluster Telemetry & Swarm Dials -->
-      <div class="deck-container" style="max-width: 1400px; margin: 0 auto; padding: 0 20px;">
       <!-- Hardware Fleet Lifecycle & Remote Power Operations -->
       <div class="control-matrix-card" style="margin-bottom: 28px;">
         <div class="control-matrix-header">
@@ -627,7 +499,6 @@
             <span style="color: #34d399; font-weight: 600;">Direct LAN Bridge</span>
           </div>
         </div>
-      </div>
       </div>
         <div class="homelab-stats-section">
           <div class="stats-grid-row">
@@ -2624,7 +2495,6 @@
     </section>
   </main>
 
-  </main>
   <footer class="footer">
     <div class="container footer-container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
       <p>&copy; 2026 Digital Resolve &bull; Homelab Operations Deck &bull; Cory Townsend</p>

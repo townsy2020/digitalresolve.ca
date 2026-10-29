@@ -81,9 +81,9 @@
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 13003;
+      const baseHtmlLines = 12873;
         const baseCssLines = 5901;
-        const baseJsLines = 4010;
+        const baseJsLines = 4038;
         const baseCnameLines = 1;
         const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
@@ -152,6 +152,34 @@
       }
     }
 
+
+    function updateLayoutToggleButtons(mode) {
+      const isMobile = mode === 'mobile';
+      const actionText = isMobile ? 'Desktop View' : 'Mobile View';
+      const icon = isMobile ? '[DESK]' : '[MOB]';
+      const currentModeText = isMobile ? 'Mobile' : 'Desktop';
+      const title = 'Currently in ' + currentModeText + ' View. Click to switch to ' + actionText + '.';
+
+      const navBtn = document.getElementById('layout-toggle-nav');
+      const navText = document.getElementById('layout-toggle-nav-text');
+      const navIcon = document.getElementById('layout-toggle-nav-icon');
+      if (navBtn) {
+        navBtn.setAttribute('title', title);
+        navBtn.setAttribute('aria-label', title);
+      }
+      if (navText) navText.textContent = actionText;
+      if (navIcon) navIcon.textContent = icon;
+
+      const footerBtn = document.getElementById('layout-toggle-footer');
+      const footerText = document.getElementById('layout-toggle-footer-text');
+      const footerIcon = document.getElementById('layout-toggle-footer-icon');
+      if (footerBtn) {
+        footerBtn.setAttribute('title', title);
+        footerBtn.setAttribute('aria-label', title);
+      }
+      if (footerText) footerText.textContent = actionText;
+      if (footerIcon) footerIcon.textContent = icon;
+    }
 
     function setLayoutMode(mode, savePreference = true) {
       const html = document.documentElement;
