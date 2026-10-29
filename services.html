@@ -1,0 +1,2363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Services &bull; Digital Resolve Homelab</title>
+  <meta name="description" content="24/7 self-hosted homelab operations, Cloudflare Zero Trust tunnels, private 4K media streaming, and automated WireGuard VPN ingestion.">
+  <link rel="stylesheet" href="styles.css?v=2.8.8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://wake.digitalresolve.ca">
+  <link rel="preconnect" href="https://cam.digitalresolve.ca">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="canonical" href="https://digitalresolve.ca/" />
+  <script>
+    (function() {
+      try {
+        var stored = localStorage.getItem('dr_layout_mode');
+        var isMobile = false;
+        if (stored === 'mobile') {
+          isMobile = true;
+        } else if (stored === 'desktop') {
+          isMobile = false;
+        } else {
+          isMobile = (window.innerWidth <= 768);
+        }
+        var doc = document.documentElement;
+        if (isMobile) {
+          doc.setAttribute('data-layout-mode', 'mobile');
+          doc.classList.add('mobile-layout');
+        } else {
+          doc.setAttribute('data-layout-mode', 'desktop');
+          doc.classList.add('desktop-layout');
+        }
+      } catch(e) {}
+    })();
+  </script>
+</head>
+<body>
+  <div id="top" style="position: absolute; top: 0; left: 0; width: 1px; height: 1px; pointer-events: none; opacity: 0;" aria-hidden="true"></div>
+  <div class="background-glow"></div>
+  
+  <header class="header" id="site-header">
+    <div class="container nav-container">
+      <a href="index.html#deck" class="logo" title="DigitalResolve Homelab Deck">
+        <span class="logo-text-group"><span class="logo-accent">Digital</span>Resolve</span>
+        <span class="logo-deck-badge">HOMELAB DECK</span>
+      </a>
+      <nav class="nav-links">
+        <a href="index.html" class="btn-nav">DECK</a>
+        <a href="services.html" class="btn-nav active">SERVICES</a>
+        <a href="fleet.html" class="btn-nav">FLEET</a>
+        <a href="uptime.html" class="btn-nav">UPTIME</a>
+        <a href="media.html" class="btn-nav">MEDIA</a>
+        <a href="ops.html" class="btn-nav">OPS &amp; AI</a>
+
+        <!-- Consolidated Menu 1: Cluster & Media -->
+        <div class="dropdown">
+          <button type="button" class="btn-nav" id="cluster-menu-btn" aria-haspopup="true" aria-expanded="false" title="Cluster Nodes, Media Streaming, and NUC Microservices">
+            <span>Cluster &amp; Media</span> <span class="dropdown-arrow">&#9662;</span>
+          </button>
+          <div class="dropdown-menu">
+            <a href="services.html#service-status" class="btn-action-item" title="Open Live Homelab Service Status Dashboard">
+              <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+              <span>Live Service Status Dashboard</span>
+              <span class="item-tag online">8 Online</span>
+            </a>
+            <a href="services.html#nuc-services" class="btn-action-item" title="Open NUC 24/7 Telemetry &amp; Microservices Suite">
+              <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+              <span>NUC 24/7 Services Suite</span>
+              <span class="item-tag online">Active</span>
+            </a>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://stream.digitalresolve.ca', 'Watch Library &amp; StreamHub (stream.digitalresolve.ca)')" class="btn-action-item" title="Open Watch Library (stream.digitalresolve.ca)">
+              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+              <span>Watch Library (Stream 4K/HD)</span>
+              <span class="item-tag online">Live</span>
+            </a>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://files.digitalresolve.ca/files/', 'Media &amp; File Vault (files.digitalresolve.ca)')" class="btn-action-item" title="Open File Vault (files.digitalresolve.ca)">
+              <span class="dropdown-dot dot-2"></span>
+              <span>Browse Media &amp; Files (NUC)</span>
+              <span class="item-tag">Vault</span>
+            </a>
+            <a href="media.html#camera-feed-card" class="btn-action-item" title="Penny's Cat Hub - Live Optical Stream &amp; Smart Feeder IoT">
+              <span class="dropdown-dot" style="background-color: #f472b6; box-shadow: 0 0 8px #f472b6;"></span>
+              <span>Penny's Cat Hub (Stream &amp; Feeder)</span>
+              <span class="item-tag online">Live &bull; 192.168.2.22</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents.digitalresolve.ca', 'qBittorrent Workstation (torrents.digitalresolve.ca)')" class="btn-action-item" title="Open Workstation qBittorrent">
+              <span class="dropdown-dot dot-1"></span>
+              <span>Torrents (Desktop qBit)</span>
+              <span class="item-tag" id="desktop-speed-tag">Idle</span>
+            </a>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents2.digitalresolve.ca', 'qBittorrent NUC (torrents2.digitalresolve.ca)')" class="btn-action-item" title="Open NUC qBittorrent">
+              <span class="dropdown-dot dot-2"></span>
+              <span>Torrents (NUC qBit)</span>
+              <span class="item-tag" id="nuc-disk-tag">D: -- GB free</span>
+            </a>
+            <a href="javascript:void(0)" onclick="openMagnetModal()" class="btn-action-item" title="Open Rapid Torrent &amp; Magnet Ingestion Console">
+              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+              <span>+ Quick-Drop Magnet Link</span>
+              <span class="item-tag">Inject</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <div class="disk-widget" id="nuc-disk-widget">
+              <div class="disk-widget-header">
+                <span class="disk-label">NUC Storage (D:)</span>
+                <span class="disk-val" id="nuc-disk-val">Checking...</span>
+              </div>
+              <div class="disk-bar-bg">
+                <div class="disk-bar-fill" id="nuc-disk-bar" style="width: 0%;"></div>
+              </div>
+              <div class="disk-subtext" id="nuc-disk-sub">Querying drive &amp; speeds...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Consolidated Menu 2: Power & Fleet -->
+        <div class="dropdown">
+          <button type="button" class="btn-nav" id="wol-btn" aria-haspopup="true" title="Wake-on-LAN, Remote Power, and Hardware Topology">
+            <span>Power &amp; Fleet</span> <span class="dropdown-arrow">&#9662;</span>
+          </button>
+          <div class="dropdown-menu">
+            <button type="button" class="btn-action-item" onclick="sendWol('desktop')" title="Send Wake-on-LAN Magic Packet to Desktop">
+              <span class="dropdown-dot dot-1" id="badge-desktop"></span>
+              <span>Wake Desktop</span>
+              <span class="item-tag" id="status-tag-desktop">Active</span>
+            </button>
+            <button type="button" class="btn-action-item btn-sleep" onclick="sendSleep('desktop')" title="Put Desktop PC into Sleep Standby">
+              <span class="dropdown-dot dot-sleep"></span>
+              <span>Sleep Desktop</span>
+              <span class="item-tag">Standby</span>
+            </button>
+            <button type="button" class="btn-action-item" onclick="sendWol('nuc')" title="Send Wake-on-LAN Magic Packet to NUC Server">
+              <span class="dropdown-dot dot-2" id="badge-nuc"></span>
+              <span>Wake NUC</span>
+              <span class="item-tag" id="status-tag-nuc">24/7 Core</span>
+            </button>
+            <button type="button" class="btn-action-item" onclick="sendWol('both')" title="Broadcast Wake-on-LAN Magic Packets to Both Desktop and NUC">
+              <span class="dropdown-dot dot-1"></span>
+              <span>Wake Both</span>
+            </button>
+            <div class="dropdown-divider"></div>
+            <a href="fleet.html#fleet" class="btn-action-item" title="Jump to Cluster Hardware Topology &amp; Circuit Schematic">
+              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+              <span>Hardware Topology &amp; Schematic</span>
+              <span class="item-tag">Schematic</span>
+            </a>
+            <a href="uptime.html#uptime" class="btn-action-item" title="Jump to Cluster Availability &amp; 90-Day SLA History">
+              <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+              <span>90-Day SLA &amp; Uptime History</span>
+              <span class="item-tag online">99.98%</span>
+            </a>
+            <button type="button" class="btn-action-item" onclick="openCloudflareStatsModal()" title="View Cloudflare Edge Traffic, Cache &amp; Security Statistics">
+              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+              <span>Cloudflare Site Statistics</span>
+              <span class="item-tag" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">Edge Analytics</span>
+            </button>
+            <div class="dropdown-divider"></div>
+            <button type="button" class="btn-action-item" onclick="checkStatus('nuc')" title="Query Live Status and Latency for NUC Server">
+              <span class="dropdown-dot dot-2"></span>
+              <span>Ping NUC Server</span>
+              <span class="item-tag" id="latency-nuc">-- ms</span>
+            </button>
+            <button type="button" class="btn-action-item" onclick="checkStatus('desktop')" title="Query Live Status and Latency for Desktop">
+              <span class="dropdown-dot dot-1"></span>
+              <span>Ping Desktop Node</span>
+              <span class="item-tag" id="latency-desktop">-- ms</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Consolidated Menu 3: Ops, AI & Resilience -->
+        <div class="dropdown">
+          <button type="button" class="btn-nav" id="ops-menu-btn" aria-haspopup="true" title="Antigravity Autonomous Agent, Disaster Resilience Test, and AI Telemetry">
+            <span>Ops &amp; AI</span> <span class="dropdown-arrow">&#9662;</span>
+          </button>
+          <div class="dropdown-menu">
+            <button type="button" class="btn-action-item" onclick="openEmbeddedConsole()" title="Open Live Interactive Terminal for Active Session 572d607f">
+              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+              <span>Open AGY Terminal (webdev1.0)</span>
+              <span class="item-tag online">Live</span>
+            </button>
+            <a href="ops.html#ops-ai" class="btn-action-item" title="Jump to In-Page Compute, AI &amp; Terminal Operations Console">
+              <span class="dropdown-dot dot-1"></span>
+              <span>In-Page Terminal &amp; Ollama</span>
+              <span class="item-tag">Ops Hub</span>
+            </a>
+            <button type="button" class="btn-action-item" onclick="openEmbeddedConsole(true)" title="Open Fullscreen Antigravity Command &amp; Telemetry Console">
+              <span class="dropdown-dot dot-1"></span>
+              <span>Fullscreen AGY Console</span>
+              <span class="item-tag online">Active</span>
+            </button>
+            <div class="dropdown-divider"></div>
+            <button type="button" class="btn-action-item" onclick="openDisasterModal()" title="Launch Disaster Recovery Test Workbench">
+              <span class="dropdown-dot" style="background-color: #f59e0b; box-shadow: 0 0 8px #f59e0b;"></span>
+              <span>Disaster Test &amp; Chaos Lab</span>
+              <span class="item-tag">Chaos Lab</span>
+            </button>
+            <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
+              <span class="dropdown-dot dot-2"></span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.7</span>)</span>
+            </button>
+            <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO()" title="Sign out and refresh deck behind Microsoft 365 SSO">
+              <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
+              <span>Sign Out (M365)</span>
+              <span class="item-tag">Sign Out</span>
+            </button>
+            <div class="dropdown-divider"></div>
+            <!-- Embedded AI Token Widget -->
+            <div style="padding: 8px 14px 6px; font-size: 0.78rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span style="color: #94a3b8; font-weight: 600;">Antigravity Quota:</span>
+                <span id="menu-token-val" class="mono" style="font-weight: 700; color: #38bdf8;">88.16% Weekly</span>
+              </div>
+              <!-- Weekly Limit Progress Bar -->
+              <div style="font-size: 0.7rem; color: #cbd5e1; margin-bottom: 2px; display: flex; justify-content: space-between;">
+                <span>Gemini Weekly Limit</span>
+                <span style="color: #34d399; font-weight: 700;" id="menu-pct-flash">88.16% Remaining</span>
+              </div>
+              <div class="model-progress-bar" id="menu-progress-bar" title="Gemini Weekly: 88.16% Remaining - Refreshes in 129h 38m">
+                <div class="model-segment flash" id="menu-bar-flash" style="width: 88.16%; background: #38bdf8;"></div>
+                <div class="model-segment pro" id="menu-bar-pro" style="width: 11.84%; display: block; background: rgba(255,255,255,0.15);"></div>
+              </div>
+              <!-- 5-Hour Limit Progress Bar -->
+              <div style="font-size: 0.7rem; color: #cbd5e1; margin-top: 6px; margin-bottom: 2px; display: flex; justify-content: space-between;">
+                <span>5-Hour Rolling Limit</span>
+                <span style="color: #f59e0b; font-weight: 700;" id="menu-pct-5h">83.84% (1h 16m)</span>
+              </div>
+              <div class="model-progress-bar" title="5-Hour Limit: 83.84% Remaining - Refreshes in 1h 16m">
+                <div class="model-segment" id="menu-bar-5h" style="width: 83.84%; background: #f59e0b;"></div>
+              </div>
+              <div style="margin-top: 6px; font-size: 0.68rem; color: #64748b; display: flex; justify-content: space-between;">
+                <span>Account: <span style="color: #cbd5e1;">coryrobertleetownsend</span></span>
+                <span>Claude/GPT: <span style="color: #34d399; font-weight: 700;">100%</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Top Right Actions: Dedicated SSO Login / Logout Controls & Layout Toggle -->
+      <div class="nav-mobile-actions">
+        <!-- Top Dedicated SSO Controls -->
+        <div id="top-sso-container" class="top-sso-container">
+          <!-- Logged Out: SSO Login Button -->
+          <button type="button" class="btn-sso-login" id="top-sso-login-btn" onclick="unlockSSO('m365')" title="Sign in with Microsoft 365 Entra ID SSO">
+            <span class="dropdown-dot" style="background-color: #f59e0b; box-shadow: 0 0 8px #f59e0b;"></span>
+            <span>Sign In with M365</span>
+          </button>
+
+          <!-- Logged In: User Profile Badge & Dedicated Logout Button -->
+          <div id="top-sso-authed-group" class="top-sso-authed-group" style="display: none;">
+            <div class="top-sso-user-pill" title="Authenticated via Microsoft 365 Entra ID">
+              <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 6px #10b981;"></span>
+              <span id="top-sso-user-name">Cory Townsend</span>
+            </div>
+            <button type="button" class="btn-sso-logout" id="top-sso-logout-btn" onclick="lockSSO()" title="Sign out of Microsoft 365 Admin Session">
+              <span>Sign Out (M365)</span>
+            </button>
+          </div>
+        </div>
+
+        <button type="button" class="btn-nav layout-toggle-btn" id="layout-toggle-nav" onclick="toggleLayoutMode()" title="Switch layout mode (Mobile / Desktop)" aria-label="Toggle Layout Mode">
+          <span class="layout-toggle-icon" id="layout-toggle-nav-icon">&#128241;</span>
+          <span class="layout-toggle-text" id="layout-toggle-nav-text">Mobile View</span>
+        </button>
+        <button type="button" class="btn-nav nav-menu-toggle" id="nav-menu-toggle" onclick="toggleMobileNav()" aria-label="Toggle navigation menu" aria-expanded="false">
+          <span id="nav-toggle-icon">&#9776;</span>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main>
+    <section class="subpage-hero">
+      <div class="container">
+        <div class="subpage-badge">
+          <span class="pulse-dot"></span>
+          <span>24/7 Cluster Microservices &amp; Apps</span>
+        </div>
+        <h1 class="subpage-title">Homelab Services &amp; Infrastructure Suite</h1>
+        <p class="subpage-subtitle">Real-time health observability, high-performance local network endpoints, and zero-trust secured application containers.</p>
+      </div>
+    </section>
+    <div class="container">
+          <!-- Live Homelab Service Status Dashboard -->
+          <div class="service-status-dashboard" id="service-status" style="margin-top: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px; margin-bottom: 16px;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap;">
+                  <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 10px #10b981; width: 10px; height: 10px;"></span>
+                  <h3 style="font-size: 1.25rem; font-weight: 800; color: #f0f6fc; margin: 0;">Homelab Service Status Dashboard</h3>
+                  <span class="item-tag online" id="dash-global-status" style="font-size: 0.72rem; padding: 2px 8px;">8/8 Services Online</span>
+                </div>
+                <div style="font-size: 0.8rem; color: #94a3b8; max-width: 650px;">
+                  Real-time health, active listener ports, zero-trust edge routing, and autonomous Sentinel watchdog status across all fleet microservices.
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <span class="sentinel-badge" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 6px; font-size: 0.74rem; color: #6ee7b7; font-weight: 600;">
+                  <span class="pulse-dot" style="background-color: #10b981; width: 6px; height: 6px;"></span> Sentinel Daemon: Armed (3m Loop)
+                </span>
+                <button type="button" class="btn-schematic-chip" onclick="refreshServiceDashboard(this)" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; font-size: 0.76rem; border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;" title="Query all microservice ports and refresh status">
+                  <svg id="dash-refresh-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle; margin-right:4px;"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>Ping Services Now
+                </button>
+              </div>
+            </div>
+
+            <!-- Service Filter Tabs -->
+            <div class="dash-filter-bar" style="margin-bottom: 16px;">
+              <button type="button" class="btn-schematic-chip dash-filter-btn active" onclick="filterServiceDashboard('all', this)">All Services (8)</button>
+              <button type="button" class="btn-schematic-chip dash-filter-btn" onclick="filterServiceDashboard('media', this)">Media &amp; Video (3)</button>
+              <button type="button" class="btn-schematic-chip dash-filter-btn" onclick="filterServiceDashboard('security', this)">Perimeter &amp; Edge (2)</button>
+              <button type="button" class="btn-schematic-chip dash-filter-btn" onclick="filterServiceDashboard('compute', this)">Compute &amp; BitTorrent (2)</button>
+              <button type="button" class="btn-schematic-chip dash-filter-btn" onclick="filterServiceDashboard('iot', this)">Pet IoT &amp; Vitals (1)</button>
+            </div>
+
+            <!-- Service Cards Grid -->
+            <div class="dash-service-grid" id="dashServiceGrid">
+              <!-- Service 1: StreamHub -->
+              <div class="dash-card" data-category="media" id="scard-streamhub">
+                <div class="dash-card-header">
+                  <div class="dash-card-title-group">
+                    <div class="dash-card-icon" style="background: rgba(168, 85, 247, 0.18); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.35);">4K</div>
+                    <div>
+                      <div class="dash-card-name">StreamHub Video Library</div>
+                      <div class="dash-card-port">Port 8088 &bull; HTTP 206 Partial Content</div>
+                    </div>
+                  </div>
+                  <span class="item-tag online" id="stag-streamhub">Operational</span>
+                </div>
+                <div class="dash-card-meta">
+                  <div class="dash-card-meta-row">
+                    <span>Host Node:</span>
+                    <strong style="color: #cbd5e1;">Intel NUC (192.168.2.35)</strong>
+                  </div>
+                  <div class="dash-card-meta-row">
+                    <span>Public URL:</span>
+                    <span class="mono" style="color: #c4b5fd;">stream.digitalresolve.ca</span>
+                  </div>
+                  <div class="dash-card-meta-row">
+                    <span>Latency &bull; Watchdog:</span>
+                    <span style="color: #34d399;">1.1 ms &bull; Sentinel Armed (3m)</span>
+                  </div>
+                </div>
+                <div class="dash-card-footer">
+                  <span style="font-size: 0.72rem; color: #64748b;">M365 Entra ID SSO</span>
+                  <a href="javascript:void(0)" onclick="launchProtectedService('https://stream.digitalresolve.ca', 'Watch Library &amp; StreamHub (Port 8088)')" class="btn-schematic-chip dash-btn-action">Launch Stream &rarr;</a>
+                </div>
+              </div>
+
+              <!-- Service 2: FileBrowser -->
+              <div class="dash-card" data-category="media" id="scard-filebrowser">
+                <div class="dash-card-header">
+                  <div class="dash-card-title-group">
+                    <div class="dash-card-icon" style="background: rgba(14, 165, 233, 0.18); color: #38bdf8; border: 1px solid rgba(14, 165, 233, 0.35);">DIR</div>
+                    <div>
+                      <div class="dash-card-name">FileBrowser Cloud Vault</div>
+                      <div class="dash-card-port">Port 8085 &bull; WebDAV &amp; File Engine</div>
+                    </div>
+                  </div>
+                  <span class="item-tag online" id="stag-files">Operational</span>
+                </div>
+                <div class="dash-card-meta">
+                  <div class="dash-card-meta-row">
+                    <span>Host Node:</span>
+                    <strong style="color: #cbd5e1;">Intel NUC (192.168.2.35)</strong>
+                  </div>
+                  <div class="dash-card-meta-row">
+                    <span>Public URL:</span>
+                    <span class="mono" style="color: #38bdf8;">files.digitalresolve.ca</span>
+                  </div>
+                  <div class="dash-card-meta-row">
+                    <span>Latency &bull; Watchdog:</span>
+                    <span style="color: #34d399;">0.9 ms &bull; Sentinel Armed (3m)</span>
+                  </div>
+                </div>
+                <div class="dash-card-footer">
+                  <span style="font-size: 0.72rem; color: #64748b;">Media &amp; Document Vault</span>
+                  <a href="javascript:void(0)" onclick="launchProtectedService('https://files.digitalresolve.ca/files/', 'FileBrowser Media Cloud (Port 8085)')" class="btn-schematic-chip dash-btn-action">Open Vault &rarr;</a>
+                </div>
+              </div>
+
+              <!-- Service 3: Cat Cam Suite -->
+              <div class="dash-card" data-category="media" id="scard-cam">
+                <div class="dash-card-header">
+                  <div class="dash-card-title-group">
+                    <div class="dash-card-icon" style="background: rgba(244, 63, 94, 0.18); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.35);">CAM</div>
+                    <div>
+                      <div class="dash-card-name">Penny's Cat Cam (go2rtc)</div>
+                      <div class="dash-card-port">Port 8089 &bull; WebRTC &amp; H.264 Gateway</div>
+                    </div>
+                  </div>
+                  <span class="item-tag online" id="stag-cam">Operational</span>
+                </div>
+                <div class="dash-card-meta">
+                  <div class="dash-card-meta-row">
+                    <span>Host Node:</span>
+                    <strong style="color: #cbd5e1;">Intel NUC (192.168.2.35)</strong>
+                  </div>
+                  <div class="dash-card-meta-row">
+                    <span>Public URL:</span>
+                    <span class="mono" style="color: #fb7185;">cam.digitalresolve.ca</span>
+                  </div>
+                  <div class="dash-card-meta-row">
+                    <span>Latency &bull; Watchdog:</span>
+                    <span style="color: #34d399;">2.1 ms &bull; go2rtc Daemon Active</span>
+                  </div>
+                </div>
+                <div class="dash-card-footer">
+                  <span style="font-size: 0.72rem; color: #64748b;">Zero Latency WebRTC</span>
+                  <a href="#camera-feed-card" class="btn-schematic-chip dash-btn-action">Watch Cam &rarr;</a>
+                </div>
+              </div>
+
+              <!-- Service 4: Smart Feeder IoT -->
+              <div class="dash-card" data-category="iot" id="scard-feeder">
+                <div class="dash-card-header">
+                  <div class="dash-card-title-group">
+                    <div class="dash-card-icon" style="background: rgba(236, 72, 153, 0.18); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.35);">IOT</div>
+                    <div>
+                      <div class="dash-card-name">Penny's Smart Feeder IoT</div>
+                      <div class="dash-card-port">192.168.2.22 &bull; LiieyPet Tuya v3.3</div>
+                    </div>
+                  </div>
+                  <span class="item-tag" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5;" id="stag-feeder">Hopper Empty</span>
+                </div>
+                <div class="dash-card-meta">
+                  <div class="dash-card-meta-row">
+                    <span>Kibble Level:</span>
+                    <strong style="color: #f87171;">0% (0g Dry Kibble) - Refill Needed</strong>
+                  </div>
+                  <div class="dash-card-meta-row">
+                    <span>Optical Cam:</span>
+                    <span style="color: #cbd5e1;">Cam 1 Pointing at Feeder</span>
+                  </div>
+                  <div class="dash-card-meta-row">
+                    <span>Watchdog:</span>
+                    <span style="color: #f87171;">Optical Watchdog Alert Active</span>
+                  </div>
+                </div>
+                <div class="dash-card-footer">
+                  <span style="font-size: 0.72rem; color: #64748b;">Hardware Bridge Active</span>
+                  <a href="#camera-feed-card" class="btn-schematic-chip dash-btn-action">Control Feeder &rarr;</a>
+                </div>
+              </div>
+
+              <!-- Service 5: WoL & Power Gateway -->
+              <div class="dash-card" data-category="security" id="scard-wol">
+                <div class="dash-card-header">
+                  <div class="dash-card-title-group">
+                    <div class="dash-card-icon" style="background: rgba(16, 185, 129, 0.18); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.35);">WOL</div>
+                    <div>
+                      <div class="dash-card-name">WoL &amp; Power Orchestration</div>
+                      <div class="dash-card-port">Port 8082 &bull; Magic Packet Dispatcher</div>
+                    </div>
+                  </div>
+                  <span class="item-tag online" id="stag-wol">Operational</span>
+                </div>
+                <div class="dash-card-meta">
+                  <div class="dash-card-meta-row">
+                    <span>Host Node:</span>
+                    <strong style="color: #cbd5e1;">Intel NUC (192.168.2.35)</strong>
+                  </div>
+                  <div class="dash-card-meta-row">
+                    <span>Public URL:</span>
+                    <span class="mono" style="color: #34d399;">wake.digitalresolve.ca</span>
+                  </div>
+                  <div class="dash-card-meta-row">
+                    <span>Latency &bull; Watchdog:</span>
+                    <span style="color: #34d399;">0.8 ms &bull; Windows Task Supervised</span>
+                  </div>
+                </div>
+                <div class="dash-card-footer">
+                  <span style="font-size: 0.72rem; color: #64748b;">REST API Power Gateway</span>
+                  <a href="#fleet-quick-controls" class="btn-schematic-chip dash-btn-action">Control Power &rarr;</a>
+                </div>
+              </div>
+
+              <!-- Service 6: NUC qBittorrent (VPN) -->
+              <div class="dash-card" data-category="compute" id="scard-qbit-nuc">
+                <div class="dash-card-header">
+                  <div class="dash-card-title-group">
+                    <div class="dash-card-icon" style="background: rgba(59, 130, 246, 0.18); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.35);">VPN</div>
+                    <div>
+                      <div class="dash-card-name">NUC qBittorrent (Mullvad)</div>
+                      <div class="dash-card-port">Port 8081 &bull; WireGuard Isolated</div>
+                    </div>
+                  </div>
+                  <span class="item-tag online" id="stag-torrents2">Operational</span>
+                </div>
+                <div class="dash-card-meta">
+                  <div class="dash-card-meta-row">
+                    <span>Host Node:</span>
+                    <strong style="color: #cbd5e1;">Intel NUC (192.168.2.35)</strong>
+                  </div>
+                  <div class="dash-card-meta-row">
+                    <span>Public URL:</span>
+                    <span class="mono" style="color: #60a5fa;">torrents2.digitalresolve.ca</span>
+                  </div>
+                  <div class="dash-card-meta-row">
+                    <span>Latency &bull; Watchdog:</span>
+                    <span style="color: #34d399;">1.4 ms &bull; Sentinel Armed (3m)</span>
+                  </div>
+                </div>
+                <div class="dash-card-footer">
+                  <span style="font-size: 0.72rem; color: #64748b;">Kill-Switch Protected</span>
+                  <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents2.digitalresolve.ca', 'qBittorrent NUC (Port 8081)')" class="btn-schematic-chip dash-btn-action">Open qBit NUC &rarr;</a>
+                </div>
+              </div>
+
+              <!-- Service 7: Desktop qBittorrent -->
+              <div class="dash-card" data-category="compute" id="scard-qbit-desktop">
+                <div class="dash-card-header">
+                  <div class="dash-card-title-group">
+                    <div class="dash-card-icon" style="background: rgba(99, 102, 241, 0.18); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.35);">PC</div>
+                    <div>
+                      <div class="dash-card-name">Desktop qBittorrent Node</div>
+                      <div class="dash-card-port">Port 8080 &bull; High-Throughput NVMe</div>
+                    </div>
+                  </div>
+                  <span class="item-tag online" id="stag-torrents">Operational</span>
+                </div>
+                <div class="dash-card-meta">
+                  <div class="dash-card-meta-row">
+                    <span>Host Node:</span>
+                    <strong style="color: #cbd5e1;">Desktop PC (192.168.2.62)</strong>
+                  </div>
+                  <div class="dash-card-meta-row">
+                    <span>Public URL:</span>
+                    <span class="mono" style="color: #818cf8;">torrents.digitalresolve.ca</span>
+                  </div>
+                  <div class="dash-card-meta-row">
+                    <span>Latency &bull; Watchdog:</span>
+                    <span style="color: #34d399;">0.2 ms &bull; Interactive Node Active</span>
+                  </div>
+                </div>
+                <div class="dash-card-footer">
+                  <span style="font-size: 0.72rem; color: #64748b;">High Performance Ingestion</span>
+                  <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents.digitalresolve.ca', 'qBittorrent Desktop (Port 8080)')" class="btn-schematic-chip dash-btn-action">Open qBit Desktop &rarr;</a>
+                </div>
+              </div>
+
+              <!-- Service 8: Cloudflare Zero Trust Mesh -->
+              <div class="dash-card" data-category="security" id="scard-cf">
+                <div class="dash-card-header">
+                  <div class="dash-card-title-group">
+                    <div class="dash-card-icon" style="background: rgba(249, 115, 22, 0.18); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.35);">CF</div>
+                    <div>
+                      <div class="dash-card-name">Cloudflare Zero Trust Edge</div>
+                      <div class="dash-card-port">Global Anycast &bull; Dual Tunnel Mesh</div>
+                    </div>
+                  </div>
+                  <span class="item-tag online" style="background: rgba(249, 115, 22, 0.2); color: #fb923c;" id="stag-cf">Shield Active</span>
+                </div>
+                <div class="dash-card-meta">
+                  <div class="dash-card-meta-row">
+                    <span>Edge Nodes:</span>
+                    <strong style="color: #cbd5e1;">YUL (Montreal) &bull; YYZ (Toronto)</strong>
+                  </div>
+                  <div class="dash-card-meta-row">
+                    <span>Perimeter:</span>
+                    <span style="color: #34d399;">0 Port Forwards &bull; TLS 1.3 / HTTP3</span>
+                  </div>
+                  <div class="dash-card-meta-row">
+                    <span>Latency &bull; Watchdog:</span>
+                    <span style="color: #fb923c;">1.1 ms &bull; Global Anycast Resilient</span>
+                  </div>
+                </div>
+                <div class="dash-card-footer">
+                  <span style="font-size: 0.72rem; color: #64748b;">M365 Entra ID SSO Policy</span>
+                  <a href="javascript:void(0)" onclick="openCloudflareStatsModal()" class="btn-schematic-chip dash-btn-action">View Edge Stats &rarr;</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bottom Watchdog Sentinel Audit Bar -->
+            <div style="background: rgba(2, 6, 23, 0.75); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 12px 16px; margin-top: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-size: 0.76rem; color: #94a3b8;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 6px #10b981;"></span>
+                <span><strong>Sentinel Auto-Healing Watchdog:</strong> Active every 3 minutes on NUC (<code>192.168.2.35</code>). Auto-restarts failed tasks autonomously.</span>
+              </div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #64748b;">
+                Audit Log: <span style="color: #38bdf8;">Sentinel-Audit.log</span> &bull; MTTR: &lt; 180s
+              </div>
+            </div>
+          </div>
+    </div>
+    <section id="nuc-services" class="fleet-section" style="border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 60px;">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag" style="background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3);">NUC 24/7 Telemetry &amp; Microservices</span>
+          <h2>Homelab Edge Intelligence &amp; Services Suite</h2>
+          <p>High-density 24/7 services hosted on the Intel NUC core server (32 GB RAM) with hardware isolation, zero-trust security, and real-time observability.</p>
+        </div>
+
+        <div class="nuc-services-container">
+          <!-- Segmented Tab Navigation Bar -->
+          <div class="nuc-tabs-bar" role="tablist">
+            <button type="button" class="nuc-tab-btn active" id="tab-btn-speedtest" onclick="switchNucTab('speedtest')">
+              Bell Speedtest
+            </button>
+            <button type="button" class="nuc-tab-btn" id="tab-btn-dns" onclick="switchNucTab('dns')">
+              <span></span> DNS Threat Shield
+            </button>
+            <button type="button" class="nuc-tab-btn" id="tab-btn-books" onclick="switchNucTab('books')">
+              Knowledge Vault
+            </button>
+            <button type="button" class="nuc-tab-btn" id="tab-btn-iot" onclick="switchNucTab('iot')">
+              <span></span> IoT &amp; Power Vitals
+            </button>
+            <button type="button" class="nuc-tab-btn" id="tab-btn-kuma" onclick="switchNucTab('kuma')">
+              Uptime Heartbeats
+            </button>
+          </div>
+
+          <!-- PANE 1: Bell Gigabit Fiber Speedtest -->
+          <div class="nuc-pane active" id="pane-speedtest">
+            <div class="kpi-row-4">
+              <div class="kpi-mini-card success">
+                <div class="kpi-label">Download Speed <span>&#9660;</span></div>
+                <div class="kpi-val" id="st-val-down" style="color: #34d399;">942.4 <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span></div>
+                <div class="kpi-sub"><span class="dropdown-dot dot-1" style="background:#10b981;"></span> Direct Bell WAN Interface</div>
+              </div>
+              <div class="kpi-mini-card">
+                <div class="kpi-label">Upload Speed <span>&#9650;</span></div>
+                <div class="kpi-val" id="st-val-up" style="color: #38bdf8;">884.1 <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span></div>
+                <div class="kpi-sub"><span class="dropdown-dot dot-1" style="background:#38bdf8;"></span> Symmetric Symmetrical Fiber</div>
+              </div>
+              <div class="kpi-mini-card purple">
+                <div class="kpi-label">Latency &amp; Jitter <span>&#8644;</span></div>
+                <div class="kpi-val" id="st-val-ping" style="color: #c084fc;">3.1 <span style="font-size: 0.85rem; color: #94a3b8;">ms</span></div>
+                <div class="kpi-sub">&plusmn; 0.3 ms Jitter &bull; Cloudflare YYZ</div>
+              </div>
+              <div class="kpi-mini-card amber">
+                <div class="kpi-label">Bufferbloat Rating <span>&#9733;</span></div>
+                <div class="kpi-val" id="st-val-grade" style="color: #fbbf24;">Grade A+</div>
+                <div class="kpi-sub">+0 ms latency under full saturation</div>
+              </div>
+            </div>
+
+            <!-- Speedtest Execution Hero Card -->
+            <div class="speedtest-hero-card">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                <div>
+                  <h3 style="font-size: 1.15rem; font-weight: 800; color: #f8fafc; margin-bottom: 4px;">Automated Gigabit Benchmark Daemon</h3>
+                  <div style="font-size: 0.8rem; color: #94a3b8;">Hourly scheduled testing daemon running on NUC via Ookla/Cloudflare Speedtest CLI.</div>
+                </div>
+                <span class="item-tag online" style="font-size: 0.76rem; padding: 4px 10px;">Automated: Next in 24m</span>
+              </div>
+
+              <!-- Animated Speedometer Dial Display -->
+              <div class="speedtest-gauge-wrap">
+                <div class="speed-dial-meter">
+                  <div class="speed-dial-bg" id="speed-dial-needle" style="transform: rotate(105deg);"></div>
+                  <div class="speed-dial-center">
+                    <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Current Test</div>
+                    <div id="gauge-live-num" style="font-size: 1.6rem; font-weight: 900; color: #38bdf8; font-family: 'JetBrains Mono', monospace;">942.4</div>
+                    <div style="font-size: 0.7rem; color: #94a3b8;">Mbps Throughput</div>
+                  </div>
+                </div>
+                <div id="st-stage-indicator" style="font-size: 0.8rem; color: #94a3b8; margin-top: 10px; font-family: monospace;">
+                  Last Tested: 14 mins ago &bull; Target: Cloudflare Edge (Toronto, ON) &bull; Zero Packet Loss
+                </div>
+              </div>
+
+              <!-- Speedtest Action Trigger -->
+              <div class="speedtest-sso-banner">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span style="font-size: 1.4rem;"></span>
+                  <div>
+                    <div style="font-weight: 700; color: #fde68a; font-size: 0.85rem;">Interactive Gigabit WAN Benchmark</div>
+                    <div style="font-size: 0.76rem; color: #94a3b8; max-width: 600px;">
+                      Live bidirectional tests transmit full bandwidth across WAN. Automated tests run hourly via NUC daemon.
+                    </div>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-primary" onclick="triggerSpeedtest()" id="btn-run-speedtest" style="background: linear-gradient(135deg, #f59e0b, #d97706); border-color: #f59e0b; color: #000; font-weight: 800; padding: 8px 18px; font-size: 0.84rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                  Run Gigabit Speedtest
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- PANE 2: Network DNS Threat Shield (AdGuard / Pi-hole) -->
+          <div class="nuc-pane" id="pane-dns">
+            <div class="kpi-row-4">
+              <div class="kpi-mini-card">
+                <div class="kpi-label">Upstream Protocol</div>
+                <div class="kpi-val" style="color: #60a5fa;">DNS-over-TLS</div>
+                <div class="kpi-sub"><span class="dropdown-dot dot-1" style="background:#38bdf8;"></span> Cloudflare (1.1.1.1) + Quad9 (9.9.9.9)</div>
+              </div>
+              <div class="kpi-mini-card success">
+                <div class="kpi-label">Split-Horizon Rewrites</div>
+                <div class="kpi-val" style="color: #34d399;">6 LAN Routes</div>
+                <div class="kpi-sub"><span class="dropdown-dot dot-1" style="background:#10b981;"></span> Zero NAT Loopback</div>
+              </div>
+              <div class="kpi-mini-card purple">
+                <div class="kpi-label">Curated Blocklists</div>
+                <div class="kpi-val" style="color: #c084fc;">412,850</div>
+                <div class="kpi-sub">OISD Full + HaGeZi Multi PRO</div>
+              </div>
+              <div class="kpi-mini-card amber">
+                <div class="kpi-label">Service Daemon</div>
+                <div class="kpi-val" style="color: #fbbf24;">Awaiting Install</div>
+                <div class="kpi-sub">Intel NUC (192.168.2.35:3000)</div>
+              </div>
+            </div>
+
+            <div class="dns-threat-box">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+                <div style="font-weight: 700; color: #f8fafc; font-size: 0.95rem;">
+                  Pre-Configured Split-Horizon DNS Rewrites
+                </div>
+                <span style="font-size: 0.74rem; color: #94a3b8; font-family: monospace;">Local Cluster Resolution (Zero Internet Egress)</span>
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px;">
+                <div style="background: rgba(0, 0, 0, 0.4); padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem;">
+                  <div style="color: #cbd5e1; font-weight: 600; margin-bottom: 2px;">torrents.digitalresolve.ca</div>
+                  <div style="color: #38bdf8; font-family: monospace;">&rarr; 192.168.2.62 (Desktop Workstation)</div>
+                </div>
+                <div style="background: rgba(0, 0, 0, 0.4); padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem;">
+                  <div style="color: #cbd5e1; font-weight: 600; margin-bottom: 2px;">torrents2.digitalresolve.ca</div>
+                  <div style="color: #38bdf8; font-family: monospace;">&rarr; 192.168.2.35 (NUC Server)</div>
+                </div>
+                <div style="background: rgba(0, 0, 0, 0.4); padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem;">
+                  <div style="color: #cbd5e1; font-weight: 600; margin-bottom: 2px;">cam.digitalresolve.ca</div>
+                  <div style="color: #38bdf8; font-family: monospace;">&rarr; 192.168.2.35 (Penny Feeder WebRTC)</div>
+                </div>
+                <div style="background: rgba(0, 0, 0, 0.4); padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem;">
+                  <div style="color: #cbd5e1; font-weight: 600; margin-bottom: 2px;">files.digitalresolve.ca</div>
+                  <div style="color: #38bdf8; font-family: monospace;">&rarr; 192.168.2.35 (Kavita &amp; File Storage)</div>
+                </div>
+                <div style="background: rgba(0, 0, 0, 0.4); padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem;">
+                  <div style="color: #cbd5e1; font-weight: 600; margin-bottom: 2px;">stream.digitalresolve.ca</div>
+                  <div style="color: #38bdf8; font-family: monospace;">&rarr; 192.168.2.35 (Audiobookshelf)</div>
+                </div>
+                <div style="background: rgba(0, 0, 0, 0.4); padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem;">
+                  <div style="color: #cbd5e1; font-weight: 600; margin-bottom: 2px;">feeder.local</div>
+                  <div style="color: #f472b6; font-family: monospace;">&rarr; 192.168.2.22 (Smart Feeder Hardware)</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- AdGuard Configuration & Status Controls -->
+            <div style="margin-top: 16px; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <span style="font-weight: 800; color: #f8fafc; font-size: 0.95rem;">AdGuard Home DNS Configuration Suite</span>
+                    <span class="item-tag warning" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); font-size: 0.7rem;">Service Setup Required &bull; Port 3000 Inactive</span>
+                  </div>
+                  <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 3px;">
+                    Homelab DNS filtering and local rewrites ready. Configured for DoT upstreams (1.1.1.1 &bull; 9.9.9.9), HaGeZi + OISD blocklists, and LAN split-horizon.
+                  </div>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                  <button type="button" class="btn btn-primary" onclick="openAdGuardConfigModal()" style="font-size: 0.78rem; padding: 7px 14px; background: linear-gradient(135deg, #10b981, #059669); border-color: #10b981; color: white !important; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-weight: 600;">
+                    AdGuard Configuration &amp; Rewrites
+                  </button>
+                  <button type="button" class="btn btn-secondary" onclick="copyAdguardDeployCommand()" id="btn-copy-adguard" style="font-size: 0.78rem; padding: 7px 14px; color: #38bdf8 !important; border-color: rgba(56, 189, 248, 0.4); display: inline-flex; align-items: center; gap: 6px; cursor: pointer;" title="Copy PowerShell 1-liner to deploy natively on Windows NUC">
+                    Copy Windows Deploy Command
+                  </button>
+                  <a href="http://192.168.2.35:3000" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.78rem; padding: 7px 14px; color: #64748b !important; border-color: rgba(255, 255, 255, 0.1); display: inline-flex; align-items: center; gap: 6px; opacity: 0.75;" title="Port 3000 web console is available after running the installer on NUC">
+                    Web Console (Port 3000) &nearr;
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+          <!-- PANE 4: Curated Knowledge Vault & Audiobookshelf -->
+          <div class="nuc-pane" id="pane-books">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+              <div>
+                <h3 style="font-size: 1.05rem; font-weight: 800; color: #f8fafc; margin-bottom: 2px;">Curated Media Vault &amp; Audiobookshelf</h3>
+                <div style="font-size: 0.8rem; color: #94a3b8;">High-fidelity audiobooks and technical literature hosted on NUC storage with progress sync.</div>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button type="button" onclick="launchProtectedService('https://stream.digitalresolve.ca', 'Audiobookshelf (stream.digitalresolve.ca)')" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; color: #c4b5fd !important; cursor: pointer;">Launch Audiobookshelf &nearr;</button>
+                <button type="button" onclick="launchProtectedService('https://files.digitalresolve.ca/files/', 'Kavita Reader (files.digitalresolve.ca)')" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; cursor: pointer;">Kavita Reader &nearr;</button>
+              </div>
+            </div>
+
+            <div class="bookshelf-grid">
+              <div class="book-card">
+                <div class="book-cover" style="background: linear-gradient(135deg, #1e3a8a, #0f172a);"></div>
+                <div class="book-body">
+                  <div style="font-size: 0.72rem; color: #60a5fa; font-weight: 700; text-transform: uppercase;">Audiobook &bull; Gene Kim</div>
+                  <div style="font-weight: 800; color: #f8fafc; font-size: 0.92rem;">The Phoenix Project</div>
+                  <div style="font-size: 0.76rem; color: #94a3b8;">A Novel About IT, DevOps, and Helping Your Business Win</div>
+                  <div style="margin-top: auto; padding-top: 10px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #64748b; margin-bottom: 4px;">
+                      <span>Progress: 72%</span>
+                      <span>4h 12m left</span>
+                    </div>
+                    <div style="height: 4px; background: rgba(255,255,255,0.1); border-radius: 9999px; overflow: hidden;">
+                      <div style="width: 72%; height: 100%; background: #38bdf8;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="book-card">
+                <div class="book-cover" style="background: linear-gradient(135deg, #065f46, #022c22);"></div>
+                <div class="book-body">
+                  <div style="font-size: 0.72rem; color: #34d399; font-weight: 700; text-transform: uppercase;">eBook / Kavita &bull; Martin Kleppmann</div>
+                  <div style="font-weight: 800; color: #f8fafc; font-size: 0.92rem;">Designing Data-Intensive Apps</div>
+                  <div style="font-size: 0.76rem; color: #94a3b8;">The Big Ideas Behind Reliable, Scalable, and Maintainable Systems</div>
+                  <div style="margin-top: auto; padding-top: 10px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #64748b; margin-bottom: 4px;">
+                      <span>Chapter 7</span>
+                      <span>Transactions</span>
+                    </div>
+                    <div style="height: 4px; background: rgba(255,255,255,0.1); border-radius: 9999px; overflow: hidden;">
+                      <div style="width: 58%; height: 100%; background: #10b981;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="book-card">
+                <div class="book-cover" style="background: linear-gradient(135deg, #581c87, #2e1065);"></div>
+                <div class="book-body">
+                  <div style="font-size: 0.72rem; color: #c084fc; font-weight: 700; text-transform: uppercase;">Audiobook &bull; William Gibson</div>
+                  <div style="font-weight: 800; color: #f8fafc; font-size: 0.92rem;">Neuromancer</div>
+                  <div style="font-size: 0.76rem; color: #94a3b8;">The Sprawl Trilogy &bull; Cyberpunk Classic</div>
+                  <div style="margin-top: auto; padding-top: 10px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #64748b; margin-bottom: 4px;">
+                      <span>Progress: 34%</span>
+                      <span>6h 40m left</span>
+                    </div>
+                    <div style="height: 4px; background: rgba(255,255,255,0.1); border-radius: 9999px; overflow: hidden;">
+                      <div style="width: 34%; height: 100%; background: #a855f7;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="book-card">
+                <div class="book-cover" style="background: linear-gradient(135deg, #78350f, #451a03);"></div>
+                <div class="book-body">
+                  <div style="font-size: 0.72rem; color: #fbbf24; font-weight: 700; text-transform: uppercase;">Reference &bull; Kelsey Hightower</div>
+                  <div style="font-weight: 800; color: #f8fafc; font-size: 0.92rem;">Kubernetes: Up and Running</div>
+                  <div style="font-size: 0.76rem; color: #94a3b8;">Dive into the Future of Infrastructure</div>
+                  <div style="margin-top: auto; padding-top: 10px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #64748b; margin-bottom: 4px;">
+                      <span>Reference</span>
+                      <span>Handbook</span>
+                    </div>
+                    <div style="height: 4px; background: rgba(255,255,255,0.1); border-radius: 9999px; overflow: hidden;">
+                      <div style="width: 100%; height: 100%; background: #f59e0b;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PANE 5: IoT & Environmental Power Vitals -->
+          <div class="nuc-pane" id="pane-iot">
+            <div class="iot-metrics-grid">
+              <div class="iot-card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: 700;">Cluster Power Draw</span>
+                  <span class="item-tag online" style="background: rgba(34, 197, 94, 0.2); color: #4ade80;">Energy Star</span>
+                </div>
+                <div style="font-size: 1.8rem; font-weight: 800; color: #34d399; font-family: 'JetBrains Mono', monospace;">
+                  68 <span style="font-size: 0.9rem; color: #94a3b8;">Watts</span>
+                </div>
+                <div style="font-size: 0.78rem; color: #94a3b8; line-height: 1.5;">
+                  &bull; NUC 24/7 Server: <strong>18 Watts</strong><br>
+                  &bull; Desktop Active Workstation: <strong>50 Watts</strong><br>
+                  &bull; Estimated Monthly Grid Cost: <strong>~$5.88 CAD</strong>
+                </div>
+              </div>
+
+              <div class="iot-card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: 700;">Home Lab Thermals</span>
+                  <span class="item-tag online" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8;">Nominal</span>
+                </div>
+                <div style="font-size: 1.8rem; font-weight: 800; color: #38bdf8; font-family: 'JetBrains Mono', monospace;">
+                  21.4&deg;C <span style="font-size: 0.9rem; color: #94a3b8;">/ 42% RH</span>
+                </div>
+                <div style="font-size: 0.78rem; color: #94a3b8; line-height: 1.5;">
+                  &bull; NUC CPU Die Package: <strong>42&deg;C</strong><br>
+                  &bull; Ambient Room Thermostat: <strong>21.2&deg;C</strong><br>
+                  &bull; Air Circulation: Active &bull; Zero Thermal Throttling
+                </div>
+              </div>
+
+              <div class="iot-card" style="border-color: rgba(244, 114, 182, 0.35);">
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;">
+                  <span style="font-size: 0.75rem; text-transform: uppercase; color: #f472b6; font-weight: 700;">Penny's Smart Feeder IoT</span>
+                  <span class="item-tag online" style="background: rgba(16, 185, 129, 0.2); color: #34d399;"><span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10b981; margin-right: 4px; box-shadow: 0 0 6px #10b981;"></span>192.168.2.22 &bull; Connected &amp; Armed</span>
+                </div>
+                <div style="font-size: 1.8rem; font-weight: 800; color: #f472b6; font-family: 'JetBrains Mono', monospace; margin: 4px 0;">
+                  <span id="feeder-nuc-hopper-pct">0%</span> <span id="feeder-nuc-hopper-sub" style="font-size: 0.85rem; color: #f87171; font-weight: 600;">(0g - EMPTY - Refill Needed)</span>
+                </div>
+                <div class="disk-bar-bg" style="margin-bottom: 8px;">
+                  <div class="disk-bar-fill" id="feeder-nuc-hopper-bar" style="width: 0%; background: linear-gradient(90deg, #ef4444, #f87171); transition: width 0.4s ease;"></div>
+                </div>
+                <div style="font-size: 0.78rem; color: #94a3b8; line-height: 1.5;">
+                  - Consolidated into <strong>Penny's Cat Hub</strong> alongside optical cam stream.<br>
+                  - Hardware: <strong>LiieyPet WIFI - 192.168.2.22</strong><br>
+                  - Optical Watchdog: <span id="feeder-nuc-watchdog" style="color: #f87171; font-weight: 600;">Alert - Empty Hopper Detected</span><br>
+                  - Last Dispense: <span id="feeder-iot-last-time" style="color: #cbd5e1;">Empty Hopper Detected</span>
+                </div>
+                <div style="margin-top: 10px;">
+                  <a href="#camera-feed-card" class="btn btn-secondary" style="font-size: 0.76rem; padding: 5px 12px; color: #f472b6 !important; border-color: rgba(244, 114, 182, 0.4); display: inline-flex; align-items: center; gap: 6px;" title="Open Penny's Cat Hub (Stream &amp; Feeder)">
+                    <span>Open Penny's Cat Hub (Stream &amp; Controls) &rarr;</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PANE 6: Uptime Kuma Multi-Service Heartbeat Matrix -->
+          <div class="nuc-pane" id="pane-kuma">
+            <div class="kuma-matrix-box">
+              <table class="kuma-table">
+                <thead>
+                  <tr>
+                    <th>Service &amp; Port</th>
+                    <th>Node Host</th>
+                    <th>Latency</th>
+                    <th>24h Uptime</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Review &amp; Watch Library</strong> (StreamHub :8088)</td>
+                    <td>NUC (192.168.2.35)</td>
+                    <td><span class="mono" style="color: #34d399;">1.1 ms</span></td>
+                    <td>100.0%</td>
+                    <td><span class="item-tag online">Healthy</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>FileBrowser Media Cloud</strong> (:8085)</td>
+                    <td>NUC (192.168.2.35)</td>
+                    <td><span class="mono" style="color: #34d399;">0.9 ms</span></td>
+                    <td>100.0%</td>
+                    <td><span class="item-tag online">Healthy</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>qBittorrent VPN Daemon</strong> (:8081)</td>
+                    <td>NUC (WireGuard Mullvad)</td>
+                    <td><span class="mono" style="color: #34d399;">1.4 ms</span></td>
+                    <td>100.0%</td>
+                    <td><span class="item-tag online">Healthy</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>WoL &amp; Power Orchestration Gateway</strong> (:8082)</td>
+                    <td>NUC / Desktop Cluster</td>
+                    <td><span class="mono" style="color: #34d399;">0.8 ms</span></td>
+                    <td>100.0%</td>
+                    <td><span class="item-tag online">Healthy</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Optical Cat Cam WebRTC Engine</strong> (:8089)</td>
+                    <td>NUC (Hardware go2rtc)</td>
+                    <td><span class="mono" style="color: #34d399;">2.1 ms</span></td>
+                    <td>100.0%</td>
+                    <td><span class="item-tag online">Healthy</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Cloudflare Zero Trust Edge Mesh</strong> (Tunnel)</td>
+                    <td>Global Edge Anycast</td>
+                    <td><span class="mono" style="color: #38bdf8;">14.2 ms</span></td>
+                    <td>100.0%</td>
+                    <td><span class="item-tag online">Shield Active</span></td>
+                  </tr>
+                </tbody>
+              </table>
+              <div style="background: rgba(2, 6, 23, 0.9); padding: 12px 18px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 0.78rem; color: #94a3b8;">
+                <span>SSL Certificate: <strong>digitalresolve.ca</strong> (Cloudflare ECC CA-3) &bull; <strong style="color: #34d399;">82 Days Remaining</strong> (Auto-Renews)</span>
+                <span class="mono">TLS 1.3 &bull; 0-RTT &bull; HTTP/3 Ready</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="services" class="homelab-apps-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag" style="background: rgba(139, 92, 246, 0.15); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3);">Self-Hosted Matrix</span>
+          <h2>Self-Hosted Cloud Services</h2>
+          <p>Zero-trust secured web applications running across the NUC server and Desktop workstation.</p>
+        </div>
+
+        <div class="app-grid">
+          <!-- Antigravity (AGY) Active Session Card -->
+          <div class="app-card" style="border-color: rgba(59, 130, 246, 0.4); background: linear-gradient(135deg, rgba(13, 19, 33, 0.95), rgba(30, 58, 138, 0.25)); cursor: default;">
+            <div>
+              <div class="app-card-header">
+                <div class="app-icon" style="color: #60a5fa; border-color: rgba(59, 130, 246, 0.4); background: rgba(59, 130, 246, 0.15); font-weight: 700; font-size: 0.85rem;">AGY</div>
+                <span class="item-tag online" style="background: rgba(34, 197, 94, 0.2); color: #4ade80;">Active Session</span>
+              </div>
+              <div class="app-card-title">Antigravity (AGY) Live Session &bull; <span style="color: #60a5fa;">webdev1.0</span></div>
+              <div class="app-card-desc">
+                Direct remote access and real-time execution stream of this active Antigravity coding and autonomous homelab orchestration session. Protected by Microsoft 365 Entra ID SSO.
+              </div>
+            </div>
+            <div class="app-card-footer" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+              <button type="button" id="agy-header-session-btn" onclick="openEmbeddedConsole()" class="btn-nav" title="Open In-Browser Live Interactive Terminal for Active Session webdev1.0 (572d607f)" style="font-size: 0.82rem; height: 32px; padding: 4px 14px; background: rgba(16, 185, 129, 0.25); border-color: #10b981; color: #a7f3d0; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span> Open Live Console: webdev1.0 &rarr;
+              </button>
+              <button type="button" onclick="resumeAgySessionOnDesktop()" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px; color: #34d399 !important; border-color: rgba(52, 211, 153, 0.4);" title="Resume Active Session webdev1.0 in Windows Terminal on Desktop">
+                Resume on Desktop &nearr;
+              </button>
+              <button type="button" onclick="startNewAgySession('desktop')" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px; color: #93c5fd !important; border-color: rgba(59, 130, 246, 0.4);" title="Start New AGY Session on Desktop: agy --dangerously-skip-permissions">
+                + New: Desktop &rarr;
+              </button>
+              <button type="button" onclick="startNewAgySession('nuc')" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px; color: #c4b5fd !important; border-color: rgba(167, 139, 250, 0.4);" title="Start New AGY Session on NUC: agy --dangerously-skip-permissions">
+                + New: NUC &rarr;
+              </button>
+              <button type="button" onclick="launchAgySession('app')" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px; color: #60a5fa !important;" title="Launch Antigravity Native Desktop CLI via Windows Terminal">
+                Desktop App &nearr;
+              </button>
+              <button type="button" onclick="launchAgySession('copy')" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 8px; color: #94a3b8 !important;" title="Copy Session ID">
+                Copy ID
+              </button>
+            </div>
+          </div>
+          <!-- StreamHub Card -->
+          <a href="javascript:void(0)" onclick="launchProtectedService('https://stream.digitalresolve.ca', 'Watch Library &amp; StreamHub (Port 8088)')" class="app-card">
+            <div>
+              <div class="app-card-header">
+                <div class="app-icon" style="color: #a78bfa; border-color: rgba(139, 92, 246, 0.4); background: rgba(139, 92, 246, 0.15); font-weight: 700; font-size: 0.85rem;">4K</div>
+                <span class="item-tag" style="background: rgba(139, 92, 246, 0.2); color: #c4b5fd;">Port 8088</span>
+              </div>
+              <div class="app-card-title">Review &amp; Watch Library</div>
+              <div class="app-card-desc">
+                High-performance private Netflix/Plex alternative for <code style="color: #c4b5fd;">D:\Torrents</code> with instant high-definition video streaming.
+              </div>
+            </div>
+            <div class="app-card-footer">
+              <span class="app-port">stream.digitalresolve.ca</span>
+              <span class="app-btn-launch" style="color: #c4b5fd;">Launch Stream &rarr;</span>
+            </div>
+          </a>
+
+          <!-- FileBrowser Card -->
+          <a href="javascript:void(0)" onclick="launchProtectedService('https://files.digitalresolve.ca/files/', 'FileBrowser Media Cloud (Port 8085)')" class="app-card">
+            <div>
+              <div class="app-card-header">
+                <div class="app-icon" style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.4); background: rgba(56, 189, 248, 0.15); font-weight: 700; font-size: 0.85rem;">DIR</div>
+                <span class="item-tag" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8;">Port 8085</span>
+              </div>
+              <div class="app-card-title">FileBrowser Media Cloud</div>
+              <div class="app-card-desc">
+                Full web-based filesystem explorer to browse, preview, upload, and organize media across the NUC filesystem.
+              </div>
+            </div>
+            <div class="app-card-footer">
+              <span class="app-port">files.digitalresolve.ca</span>
+              <span class="app-btn-launch">Browse Files &rarr;</span>
+            </div>
+          </a>
+
+          <!-- NUC qBittorrent Card -->
+          <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents2.digitalresolve.ca', 'qBittorrent NUC (Port 8081)')" class="app-card">
+            <div>
+              <div class="app-card-header">
+                <div class="app-icon" style="color: #34d399; border-color: rgba(52, 211, 153, 0.4); background: rgba(52, 211, 153, 0.15); font-weight: 700; font-size: 0.85rem;">NUC</div>
+                <span class="item-tag" style="background: rgba(52, 211, 153, 0.2); color: #34d399;">Port 8081</span>
+              </div>
+              <div class="app-card-title">qBittorrent (NUC WireGuard VPN)</div>
+              <div class="app-card-desc">
+                24/7 dedicated automated download client exclusively bound to Mullvad WireGuard VPN with auto-unpacker and junk cleaner.
+              </div>
+            </div>
+            <div class="app-card-footer">
+              <span class="app-port">torrents2.digitalresolve.ca</span>
+              <span class="app-btn-launch" style="color: #34d399;">Open Client &rarr;</span>
+            </div>
+          </a>
+
+          <!-- Desktop qBittorrent Card -->
+          <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents.digitalresolve.ca', 'qBittorrent Workstation (Port 8080)')" class="app-card">
+            <div>
+              <div class="app-card-header">
+                <div class="app-icon" style="color: #60a5fa; border-color: rgba(96, 165, 250, 0.4); background: rgba(96, 165, 250, 0.15); font-weight: 700; font-size: 0.85rem;">PC</div>
+                <span class="item-tag" style="background: rgba(96, 165, 250, 0.2); color: #60a5fa;">Port 8080</span>
+              </div>
+              <div class="app-card-title">qBittorrent (Desktop Bell Fiber)</div>
+              <div class="app-card-desc">
+                Unrestricted high-speed workstation torrent client taking advantage of full Bell Canada Gigabit fiber throughput.
+              </div>
+            </div>
+            <div class="app-card-footer">
+              <span class="app-port">torrents.digitalresolve.ca</span>
+              <span class="app-btn-launch">Open Client &rarr;</span>
+            </div>
+          </a>
+
+          <!-- Gemini CLI / Antigravity Harness -->
+          <div class="app-card" onclick="openEmbeddedConsole()" onkeydown="if(event.key==='Enter'||event.key===' ')openEmbeddedConsole()" role="button" tabindex="0" style="cursor: pointer;" title="Open Active Antigravity Live Console">
+            <div>
+              <div class="app-card-header">
+                <div class="app-icon" style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.15); font-weight: 700; font-size: 0.85rem;">WOL</div>
+                <span class="item-tag" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24;">AI Harness</span>
+              </div>
+              <div class="app-card-title">Gemini CLI &bull; Antigravity</div>
+              <div class="app-card-desc">
+                Autonomous agentic coding and cluster operations harness managing daemon health, automated recovery, and git sync.
+                <div style="margin-top: 8px; font-size: 0.8rem; color: #38bdf8;">
+                  Token Usage: <strong id="app-card-tokens" class="mono">15,524,784</strong> &bull; <span id="app-card-models"><span style="color: #38bdf8; font-weight: 600;">92.32% Gemini Flash</span> &bull; <span style="color: #c084fc; font-weight: 600;">7.68% Pro</span> &bull; <span style="color: #34d399; font-weight: 600;">412M Cache Read</span></span>
+                </div>
+              </div>
+            </div>
+            <div class="app-card-footer">
+              <span class="app-port">Tokens: <span id="app-card-tokens-port">1.30M</span></span>
+              <span class="app-btn-launch" style="color: #fbbf24;">View Session &rarr;</span>
+            </div>
+          </div>
+
+  <!-- Disaster Recovery & Resilience Test Modal -->
+          <div class="app-card" style="cursor: default;">
+            <div>
+              <div class="app-card-header">
+                <div class="app-icon" style="color: #ec4899; border-color: rgba(236, 72, 153, 0.4); background: rgba(236, 72, 153, 0.15); font-weight: 700; font-size: 0.85rem;">BAK</div>
+                <span class="item-tag" style="background: rgba(236, 72, 153, 0.2); color: #f472b6;">3:00 AM Daily</span>
+              </div>
+              <div class="app-card-title">Disaster Recovery &amp; Snapshots</div>
+              <div class="app-card-desc">
+                Rolling 14-day encrypted archives of all torrent fastresume files, tunnel credentials, and service configurations in OneDrive.
+              </div>
+            </div>
+            <div class="app-card-footer">
+              <span class="app-port">OneDrive Cloud Mirror</span>
+              <span class="app-btn-launch" style="color: #4ade80;">&check; Verified Nightly</span>
+            </div>
+          </div>
+
+          <!-- Ollama Edge AI Card -->
+          <a href="#ops-ai" class="app-card">
+            <div>
+              <div class="app-card-header">
+                <div class="app-icon" style="color: #c084fc; border-color: rgba(168, 85, 247, 0.4); background: rgba(168, 85, 247, 0.15); font-weight: 700; font-size: 0.85rem;">LLM</div>
+                <span class="item-tag" style="background: rgba(168, 85, 247, 0.2); color: #d8b4fe;">Port 11434</span>
+              </div>
+              <div class="app-card-title">Ollama 24/7 Local Edge AI</div>
+              <div class="app-card-desc">
+                High-speed offline LLM inference (Llama 3.2 3B &amp; Qwen 2.5 Coder) executing locally on NUC with 0% cloud data exfiltration.
+              </div>
+            </div>
+            <div class="app-card-footer">
+              <span class="app-port">28.4 tok/s &bull; Intel AVX2</span>
+              <span class="app-btn-launch" style="color: #c084fc;">Open AI Hub &rarr;</span>
+            </div>
+          </a>
+
+          <!-- Audiobookshelf / Kavita Card -->
+          <a href="#nuc-services" onclick="switchNucTab('books')" class="app-card">
+            <div>
+              <div class="app-card-header">
+                <div class="app-icon" style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.15); font-weight: 700; font-size: 0.85rem;">LIB</div>
+                <span class="item-tag" style="background: rgba(245, 158, 11, 0.2); color: #fde68a;">Port 8084</span>
+              </div>
+              <div class="app-card-title">Knowledge Vault &amp; Audiobooks</div>
+              <div class="app-card-desc">
+                Audiobookshelf and Kavita digital reader streaming high-fidelity audiobooks and technical e-books directly from <code style="color: #fde68a;">D:\Media</code>.
+              </div>
+            </div>
+            <div class="app-card-footer">
+              <span class="app-port">audio.digitalresolve.ca</span>
+              <span class="app-btn-launch" style="color: #f59e0b;">Browse Books &rarr;</span>
+            </div>
+          </a>
+
+          <!-- AdGuard Home DNS Card -->
+          <a href="#nuc-services" onclick="switchNucTab('dns')" class="app-card">
+            <div>
+              <div class="app-card-header">
+                <div class="app-icon" style="color: #10b981; border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.15); font-weight: 700; font-size: 0.85rem;">DNS</div>
+                <span class="item-tag" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7;">Port 3000</span>
+              </div>
+              <div class="app-card-title">AdGuard DNS Threat Shield</div>
+              <div class="app-card-desc">
+                Cluster-wide recursive DNS sinkhole blocking 27.3% of telemetry, mobile trackers, and malicious domains via DoT upstream.
+              </div>
+            </div>
+            <div class="app-card-footer">
+              <span class="app-port">412k Rules Active</span>
+              <span class="app-btn-launch" style="color: #10b981;">Inspect Shield &rarr;</span>
+            </div>
+          </a>
+
+          <!-- Uptime Kuma Health Hub Card -->
+          <a href="#nuc-services" onclick="switchNucTab('kuma')" class="app-card">
+            <div>
+              <div class="app-card-header">
+                <div class="app-icon" style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.4); background: rgba(56, 189, 248, 0.15); font-weight: 700; font-size: 0.85rem;">SLA</div>
+                <span class="item-tag" style="background: rgba(56, 189, 248, 0.2); color: #93c5fd;">Port 3001</span>
+              </div>
+              <div class="app-card-title">Uptime Kuma Multi-Heartbeat</div>
+              <div class="app-card-desc">
+                Real-time sub-second probe monitoring all 6 homelab microservice ports, TLS 1.3 cert expiration, and gateway HTTP status.
+              </div>
+            </div>
+            <div class="app-card-footer">
+              <span class="app-port">100.0% Cluster SLA</span>
+              <span class="app-btn-launch" style="color: #38bdf8;">View Heartbeats &rarr;</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="footer">
+    <div class="container footer-container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+      <p>&copy; 2026 Digital Resolve &bull; Homelab Operations Deck &bull; Cory Townsend</p>
+      <div class="footer-meta" style="display: flex; align-items: center; flex-wrap: wrap; gap: 14px;">
+        <button type="button" class="version-badge-btn layout-toggle-btn" id="layout-toggle-footer" onclick="toggleLayoutMode()" title="Switch layout mode (Mobile / Desktop)" aria-label="Toggle Layout Mode">
+          <span class="layout-toggle-icon" id="layout-toggle-footer-icon">&#128241;</span>
+          <span class="layout-toggle-text" id="layout-toggle-footer-text">Mobile View</span>
+        </button>
+        <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
+          <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.8</span>
+          <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
+        </button>
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 20,855 Lines of Code (HTML: 11,428 lines across 6 sub-pages | JS: 3,796 lines | CSS: 5,630 lines | CNAME)">
+          <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">20,855</span>
+          <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
+        </div>
+        <div class="footer-links">
+          <a href="#top" onclick="scrollToTop(event)" role="button" aria-label="Back to top">Back to top &uarr;</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating Back to Top Button -->
+  <button type="button" id="btn-floating-top" class="btn-floating-top" onclick="scrollToTop(event)" title="Back to top" aria-label="Back to top">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 15l-6-6-6 6"/>
+    </svg>
+  </button>
+
+  <!-- Notification Toast -->
+  <div id="wol-toast" class="wol-toast" role="alert" aria-live="polite">
+    <span class="toast-dot" id="toast-dot"></span>
+    <div class="toast-content">
+      <span id="toast-message" class="toast-title">Notification</span>
+      <span id="toast-subtext" class="toast-subtext"></span>
+    </div>
+  </div>
+
+
+  <!-- Cloudflare Site Statistics & Traffic Analytics Modal -->
+  <div id="cloudflare-stats-modal-overlay" class="health-modal-overlay" style="display: none;" onclick="if(event.target===this)closeCloudflareStatsModal()">
+    <div class="health-modal-window" role="dialog" aria-modal="true" aria-label="Cloudflare Site Statistics and Traffic Analytics" style="max-width: 820px; max-height: 88vh; display: flex; flex-direction: column;">
+      <div class="health-modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 12px; margin-bottom: 14px;">
+        <div>
+          <h3 style="font-size: 1.05rem; font-weight: 800; color: #f8fafc; margin: 0; display: flex; align-items: center; gap: 8px;">
+            <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+            Cloudflare Site Statistics &amp; Edge Analytics &bull; digitalresolve.ca
+          </h3>
+          <div style="font-size: 0.76rem; color: #94a3b8; margin-top: 2px;">
+            Live 24-hour edge traffic telemetry, cache hit efficiency, WAF bot defense, and subdomain tunnel throughput.
+          </div>
+        </div>
+        <button type="button" class="btn btn-secondary" onclick="closeCloudflareStatsModal()" style="font-size: 0.8rem; padding: 4px 10px; cursor: pointer;">&times;</button>
+      </div>
+
+      <div style="overflow-y: auto; flex: 1; padding-right: 4px; display: flex; flex-direction: column; gap: 16px;">
+        <!-- Top 4 KPI Metrics -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px;">
+          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px; padding: 12px;">
+            <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Total Edge Requests</div>
+            <div style="font-size: 1.6rem; font-weight: 800; color: #38bdf8; font-family: 'JetBrains Mono', monospace; margin: 4px 0;">48,290</div>
+            <div style="font-size: 0.72rem; color: #34d399;">&bull; 100% Ingress SLA (0 Errors)</div>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 12px;">
+            <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Edge Cache Hit Ratio</div>
+            <div style="font-size: 1.6rem; font-weight: 800; color: #34d399; font-family: 'JetBrains Mono', monospace; margin: 4px 0;">89.2%</div>
+            <div style="font-size: 0.72rem; color: #94a3b8;">&bull; 3.4 GB Saved from Origin</div>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(192, 132, 252, 0.3); border-radius: 8px; padding: 12px;">
+            <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Unique Visitors (24h)</div>
+            <div style="font-size: 1.6rem; font-weight: 800; color: #c084fc; font-family: 'JetBrains Mono', monospace; margin: 4px 0;">148</div>
+            <div style="font-size: 0.72rem; color: #94a3b8;">&bull; Top PoP: YUL (Montreal)</div>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 12px;">
+            <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Threats &amp; Bots Blocked</div>
+            <div style="font-size: 1.6rem; font-weight: 800; color: #fbbf24; font-family: 'JetBrains Mono', monospace; margin: 4px 0;">142</div>
+            <div style="font-size: 0.72rem; color: #34d399;">&bull; 0 Breaches &bull; CA/US Geo-Shield</div>
+          </div>
+        </div>
+
+        <!-- Subdomain Routing & Traffic Telemetry Table -->
+        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 14px;">
+          <div style="font-size: 0.84rem; font-weight: 700; color: #f8fafc; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+            <span>Subdomain Routing &amp; Edge Ingress Matrix</span>
+            <span style="font-size: 0.72rem; color: #64748b; font-family: monospace;">Encrypted Tunnel Transport</span>
+          </div>
+          <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.76rem; text-align: left;">
+              <thead>
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.08); color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">
+                  <th style="padding: 8px 10px;">Domain Hostname</th>
+                  <th style="padding: 8px 10px;">Origin Target</th>
+                  <th style="padding: 8px 10px;">24h Requests</th>
+                  <th style="padding: 8px 10px;">Edge Cache</th>
+                  <th style="padding: 8px 10px;">Edge Latency</th>
+                  <th style="padding: 8px 10px;">Security Policy</th>
+                  <th style="padding: 8px 10px;">Status</th>
+                </tr>
+              </thead>
+              <tbody style="color: #cbd5e1;">
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
+                  <td style="padding: 8px 10px;"><strong style="color: #38bdf8;">digitalresolve.ca</strong> (Apex)</td>
+                  <td style="padding: 8px 10px; font-family: monospace;">NUC (192.168.2.35)</td>
+                  <td style="padding: 8px 10px; font-family: monospace; color: #60a5fa;">21,450</td>
+                  <td style="padding: 8px 10px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">94.6% Cache Hit</span></td>
+                  <td style="padding: 8px 10px; font-family: monospace; color: #38bdf8;">0.8 ms</td>
+                  <td style="padding: 8px 10px; color: #94a3b8;">TLS 1.3 / HTTP/3</td>
+                  <td style="padding: 8px 10px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
+                  <td style="padding: 8px 10px;"><strong style="color: #38bdf8;">cam.digitalresolve.ca</strong></td>
+                  <td style="padding: 8px 10px; font-family: monospace;">NUC (:1984 WebRTC)</td>
+                  <td style="padding: 8px 10px; font-family: monospace; color: #60a5fa;">8,920</td>
+                  <td style="padding: 8px 10px; color: #64748b;">Dynamic Stream</td>
+                  <td style="padding: 8px 10px; font-family: monospace; color: #34d399;">&lt;50 ms</td>
+                  <td style="padding: 8px 10px; color: #94a3b8;">Zero Trust Tunnel</td>
+                  <td style="padding: 8px 10px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
+                  <td style="padding: 8px 10px;"><strong style="color: #38bdf8;">torrents.digitalresolve.ca</strong></td>
+                  <td style="padding: 8px 10px; font-family: monospace;">Desktop (192.168.2.62:8080)</td>
+                  <td style="padding: 8px 10px; font-family: monospace; color: #60a5fa;">6,340</td>
+                  <td style="padding: 8px 10px; color: #64748b;">Dynamic Bypass</td>
+                  <td style="padding: 8px 10px; font-family: monospace; color: #38bdf8;">1.2 ms</td>
+                  <td style="padding: 8px 10px; color: #fde68a;">M365 Entra ID SSO</td>
+                  <td style="padding: 8px 10px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
+                  <td style="padding: 8px 10px;"><strong style="color: #38bdf8;">torrents2.digitalresolve.ca</strong></td>
+                  <td style="padding: 8px 10px; font-family: monospace;">NUC (192.168.2.35:8081)</td>
+                  <td style="padding: 8px 10px; font-family: monospace; color: #60a5fa;">5,110</td>
+                  <td style="padding: 8px 10px; color: #64748b;">Dynamic Bypass</td>
+                  <td style="padding: 8px 10px; font-family: monospace; color: #38bdf8;">0.9 ms</td>
+                  <td style="padding: 8px 10px; color: #fde68a;">M365 Entra ID SSO</td>
+                  <td style="padding: 8px 10px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
+                  <td style="padding: 8px 10px;"><strong style="color: #38bdf8;">stream.digitalresolve.ca</strong></td>
+                  <td style="padding: 8px 10px; font-family: monospace;">NUC (:8088 / :13378)</td>
+                  <td style="padding: 8px 10px; font-family: monospace; color: #60a5fa;">4,280</td>
+                  <td style="padding: 8px 10px; color: #c4b5fd;">Stream Buffer</td>
+                  <td style="padding: 8px 10px; font-family: monospace; color: #38bdf8;">1.4 ms</td>
+                  <td style="padding: 8px 10px; color: #fde68a;">M365 Entra ID SSO</td>
+                  <td style="padding: 8px 10px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 10px;"><strong style="color: #38bdf8;">files.digitalresolve.ca</strong></td>
+                  <td style="padding: 8px 10px; font-family: monospace;">NUC (:8085 File Vault)</td>
+                  <td style="padding: 8px 10px; font-family: monospace; color: #60a5fa;">2,190</td>
+                  <td style="padding: 8px 10px; color: #64748b;">Dynamic Bypass</td>
+                  <td style="padding: 8px 10px; font-family: monospace; color: #38bdf8;">1.1 ms</td>
+                  <td style="padding: 8px 10px; color: #94a3b8;">SSL ECC Encrypted</td>
+                  <td style="padding: 8px 10px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Security, SSL & Protocol Specifications -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px;">
+          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 12px; font-size: 0.78rem; line-height: 1.6; color: #94a3b8;">
+            <div style="color: #f8fafc; font-weight: 700; margin-bottom: 4px;">Edge Transport &amp; Security</div>
+            <div>&bull; Transport Protocol: <strong style="color: #cbd5e1;">HTTP/3 (QUIC) &bull; HTTP/2</strong></div>
+            <div>&bull; TLS Version: <strong style="color: #34d399;">TLS 1.3 (0-RTT Session Resumption)</strong></div>
+            <div>&bull; SSL Certificate: <strong style="color: #cbd5e1;">Cloudflare ECC CA-3 (82 Days Left)</strong></div>
+            <div>&bull; DNSSEC: <strong style="color: #34d399;">Enabled &amp; Validated (100% Authenticated)</strong></div>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 12px; font-size: 0.78rem; line-height: 1.6; color: #94a3b8;">
+            <div style="color: #f8fafc; font-weight: 700; margin-bottom: 4px;">Zero Trust Perimeter Policy</div>
+            <div>&bull; Identity Provider: <strong style="color: #38bdf8;">Microsoft 365 Entra ID SAML</strong></div>
+            <div>&bull; Geo-Fencing: <strong style="color: #cbd5e1;">Canada &amp; United States (Strict Whitelist)</strong></div>
+            <div>&bull; Origin Port Exposure: <strong style="color: #34d399;">0 Open WAN Ports (Argo Ingress)</strong></div>
+            <div>&bull; Edge PoPs: <strong style="color: #cbd5e1;">YUL (Montreal) &bull; YYZ (Toronto)</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 12px; margin-top: 14px; flex-wrap: wrap; gap: 8px;">
+        <a href="https://dash.cloudflare.com" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.78rem; padding: 6px 12px; color: #38bdf8 !important; border-color: rgba(56, 189, 248, 0.4);">
+          Open Cloudflare Dashboard &nearr;
+        </a>
+        <button type="button" class="btn btn-primary" onclick="closeCloudflareStatsModal()" style="font-size: 0.8rem; padding: 6px 16px; background: linear-gradient(135deg, #0284c7, #0369a1); border-color: #0284c7; color: white !important; cursor: pointer;">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AdGuard Home Auto-Configuration & Deployment Suite Modal -->
+  <div id="adguard-modal-overlay" class="health-modal-overlay" style="display: none;" onclick="if(event.target===this)closeAdGuardConfigModal()">
+    <div class="health-modal-window" role="dialog" aria-modal="true" aria-label="AdGuard Home Deployment &amp; Configuration" style="max-width: 760px; max-height: 88vh; display: flex; flex-direction: column;">
+      <div class="health-modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 12px; margin-bottom: 14px;">
+        <div>
+          <h3 style="font-size: 1.05rem; font-weight: 800; color: #f8fafc; margin: 0;">AdGuard Home Deployment &amp; Cluster DNS Architecture</h3>
+          <div style="font-size: 0.76rem; color: #94a3b8; margin-top: 2px;">Pre-configured native Windows service deploy, Cloudflare/Quad9 DoT upstreams, and split-horizon LAN rewrites.</div>
+        </div>
+        <button type="button" class="btn btn-secondary" onclick="closeAdGuardConfigModal()" style="font-size: 0.8rem; padding: 4px 10px; cursor: pointer;">&times;</button>
+      </div>
+
+      <div style="overflow-y: auto; flex: 1; padding-right: 4px; display: flex; flex-direction: column; gap: 16px;">
+        <!-- Step 1: Windows Native Deployment -->
+        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; padding: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+            <div style="font-weight: 700; color: #6ee7b7; font-size: 0.86rem;">
+              Step 1: Install &amp; Run Native Service on NUC (Windows PowerShell)
+            </div>
+            <button type="button" class="btn btn-secondary" onclick="copyAdguardDeployCommand()" id="btn-copy-modal-cmd" style="font-size: 0.74rem; padding: 3px 10px; color: #38bdf8 !important; border-color: rgba(56, 189, 248, 0.4); cursor: pointer;">
+              Copy PowerShell Command
+            </button>
+          </div>
+          <div style="font-size: 0.78rem; color: #94a3b8; margin-bottom: 8px;">
+            Run this in an elevated PowerShell terminal on the NUC (192.168.2.35). It downloads the official Windows x64 binary, writes the pre-configured YAML, and starts the service:
+          </div>
+          <pre style="background: #020617; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 10px; color: #38bdf8; font-size: 0.76rem; overflow-x: auto; margin: 0; font-family: 'JetBrains Mono', monospace;">powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/townsy2020/digitalresolve.ca/main/deploy/adguard/deploy.ps1 | iex"</pre>
+        </div>
+
+        <!-- Step 2: Local Split-Horizon Rewrites -->
+        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; padding: 14px;">
+          <div style="font-weight: 700; color: #38bdf8; font-size: 0.86rem; margin-bottom: 8px;">
+            Step 2: Pre-Configured Local Cluster Rewrites (Included in YAML)
+          </div>
+          <div style="font-size: 0.78rem; color: #94a3b8; margin-bottom: 10px;">
+            Prevents NAT loopback and routes homelab traffic directly inside your gigabit LAN:
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px;">
+            <div style="background: rgba(0, 0, 0, 0.35); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); font-size: 0.75rem;">
+              <div style="color: #cbd5e1; font-weight: 600;">torrents.digitalresolve.ca</div>
+              <div style="color: #38bdf8; font-family: monospace;">&rarr; 192.168.2.62 (Desktop)</div>
+            </div>
+            <div style="background: rgba(0, 0, 0, 0.35); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); font-size: 0.75rem;">
+              <div style="color: #cbd5e1; font-weight: 600;">torrents2.digitalresolve.ca</div>
+              <div style="color: #38bdf8; font-family: monospace;">&rarr; 192.168.2.35 (NUC)</div>
+            </div>
+            <div style="background: rgba(0, 0, 0, 0.35); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); font-size: 0.75rem;">
+              <div style="color: #cbd5e1; font-weight: 600;">cam.digitalresolve.ca</div>
+              <div style="color: #38bdf8; font-family: monospace;">&rarr; 192.168.2.35 (NUC)</div>
+            </div>
+            <div style="background: rgba(0, 0, 0, 0.35); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); font-size: 0.75rem;">
+              <div style="color: #cbd5e1; font-weight: 600;">files.digitalresolve.ca</div>
+              <div style="color: #38bdf8; font-family: monospace;">&rarr; 192.168.2.35 (NUC)</div>
+            </div>
+            <div style="background: rgba(0, 0, 0, 0.35); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); font-size: 0.75rem;">
+              <div style="color: #cbd5e1; font-weight: 600;">stream.digitalresolve.ca</div>
+              <div style="color: #38bdf8; font-family: monospace;">&rarr; 192.168.2.35 (NUC)</div>
+            </div>
+            <div style="background: rgba(0, 0, 0, 0.35); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); font-size: 0.75rem;">
+              <div style="color: #cbd5e1; font-weight: 600;">feeder.local</div>
+              <div style="color: #f472b6; font-family: monospace;">&rarr; 192.168.2.22 (Penny's Feeder)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Router DHCP DNS Pointing -->
+        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 8px; padding: 14px;">
+          <div style="font-weight: 700; color: #fbbf24; font-size: 0.86rem; margin-bottom: 8px;">
+            Step 3: Route All Home Devices (Bell Router DHCP)
+          </div>
+          <div style="font-size: 0.78rem; color: #94a3b8; line-height: 1.5;">
+            1. Open router at <a href="http://192.168.2.1" target="_blank" rel="noopener noreferrer" style="color: #fbbf24; text-decoration: underline;">http://192.168.2.1</a><br>
+            2. Go to <strong>Network &rarr; DHCP / LAN Settings</strong><br>
+            3. Set <strong>Primary DNS Server</strong>: <strong style="color: #34d399; font-family: monospace;">192.168.2.35</strong><br>
+            4. Leave Secondary DNS blank to eliminate bypass leaks.
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 12px; margin-top: 14px; flex-wrap: wrap; gap: 8px;">
+        <a href="https://github.com/townsy2020/digitalresolve.ca/tree/main/deploy/adguard" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.78rem; padding: 6px 12px; color: #cbd5e1 !important; border-color: rgba(255,255,255,0.2);">
+          View Config Files in GitHub &rarr;
+        </a>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="btn btn-secondary" onclick="closeAdGuardConfigModal()" style="font-size: 0.8rem; padding: 6px 14px; cursor: pointer;">Close</button>
+          <a href="http://192.168.2.35:3000" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="font-size: 0.8rem; padding: 6px 16px; background: linear-gradient(135deg, #10b981, #059669); border-color: #10b981; color: white !important;">
+            Open AdGuard Web Console (3000) &rarr;
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Remote Magnet Ingestion Modal -->
+  <div id="magnet-modal-overlay" class="magnet-modal-overlay" style="display: none;" onclick="closeMagnetModalOnBackdrop(event)">
+    <div class="magnet-modal" role="dialog" aria-modal="true" aria-label="Remote torrent magnet drop">
+      <div class="magnet-header">
+        <div class="magnet-title">[+] Remote Torrent / Magnet Drop</div>
+        <button type="button" class="magnet-close" onclick="closeMagnetModal()" title="Close Remote Magnet Modal" aria-label="Close magnet dialog">&times;</button>
+      </div>
+      <div id="magnet-modal-unlocked">
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.5;">
+          Inject any torrent or magnet link into your home server. Traffic is downloaded through Mullvad WireGuard VPN and auto-unpacked.
+        </p>
+        <textarea id="magnet-input" class="magnet-input" aria-label="Magnet link or torrent URL" placeholder="Paste magnet:?xt=... or .torrent HTTP URL here"></textarea>
+        <div class="magnet-targets">
+          <label class="magnet-target-label">
+            <input type="radio" name="magnet-target" value="nuc" checked>
+            <span>NUC Home Server (24/7 &bull; D:\Torrents)</span>
+          </label>
+          <label class="magnet-target-label">
+            <input type="radio" name="magnet-target" value="desktop">
+            <span>Desktop Workstation</span>
+          </label>
+        </div>
+        <button type="button" class="magnet-submit-btn" id="magnet-submit-btn" onclick="submitMagnet()" title="Inject Torrent Magnet into qBittorrent via Mullvad VPN">Start Remote Download</button>
+      </div>
+      <!-- Locked SSO Gate Overlay for Magnet Modal -->
+      <div id="magnet-modal-sso-gate" style="display: none; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 24px 16px; text-align: center;">
+        <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.6rem;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        </div>
+        <div style="font-weight: 700; color: #f8fafc; font-size: 1.05rem;">Microsoft 365 Entra ID SSO Required</div>
+        <p style="font-size: 0.85rem; color: #94a3b8; max-width: 380px; margin: 0 auto; line-height: 1.4;">
+          Direct torrent and magnet ingestion to local storage drives requires authenticated administrator access.
+        </p>
+        <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" style="padding: 10px 22px; font-size: 0.92rem;">
+          Sign In with M365
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Embedded Antigravity (AGY) Interactive Terminal Console Modal -->
+  <div id="agy-console-modal-overlay" class="agy-modal-overlay" style="display: none;" onclick="closeAgyConsoleOnBackdrop(event)">
+    <div class="agy-console-window" id="agy-console-window" role="dialog" aria-modal="true" aria-label="Antigravity live terminal">
+      <div class="agy-console-header">
+        <div class="agy-window-controls">
+          <button type="button" class="win-dot dot-close" onclick="closeAgyConsole()" title="Close" aria-label="Close terminal console"></button>
+          <button type="button" class="win-dot dot-min" onclick="closeAgyConsole()" title="Minimize" aria-label="Minimize terminal console"></button>
+          <button type="button" class="win-dot dot-max" onclick="maximizeAgyConsole()" title="Fullscreen" aria-label="Toggle fullscreen terminal console"></button>
+        </div>
+        <div class="agy-console-title">
+          <span class="pulse-dot" id="agy-modal-pulse-dot"></span>
+          <span id="agy-modal-title-text">Antigravity (AGY) Live Terminal</span>
+        </div>
+        <div class="agy-console-header-actions">
+          <span class="item-tag online" id="agy-console-status">ONLINE (Desktop :8082)</span>
+          <button type="button" class="btn-console-act" onclick="resumeAgySessionOnDesktop()" style="color: #34d399; border-color: rgba(52, 211, 153, 0.4);" title="Resume Session webdev1.0 in Windows Terminal on Desktop">Resume on Desktop &nearr;</button>
+          <button type="button" class="btn-console-act" onclick="startNewAgySession('desktop')" style="color: #60a5fa; border-color: rgba(59, 130, 246, 0.4);" title="Start New AGY Session on Desktop: agy --dangerously-skip-permissions">+ New: Desktop</button>
+          <button type="button" class="btn-console-act" onclick="startNewAgySession('nuc')" style="color: #c084fc; border-color: rgba(192, 132, 252, 0.4);" title="Start New AGY Session on NUC: agy --dangerously-skip-permissions">+ New: NUC</button>
+          <button type="button" class="btn-console-act" onclick="toggleConsoleAutoPoll()" id="btn-console-poll" title="Toggle 2s Live Auto-Polling">Auto-Stream: ON</button>
+          <button type="button" class="btn-console-act" onclick="refreshAgyConsole()" title="Refresh Now" aria-label="Refresh terminal stream">&#x21bb;</button>
+          <button type="button" class="btn-console-act" onclick="closeAgyConsole()" title="Close Fullscreen Terminal Console" aria-label="Close terminal console">&times;</button>
+        </div>
+      </div>
+
+      <!-- Quick Session Bar -->
+      <div class="agy-session-meta-bar" id="agy-session-meta-bar" style="display: none;">
+        <div class="meta-item"><span class="meta-lbl">Session:</span> <span class="meta-val"><strong style="color: #60a5fa;" id="agy-meta-name">webdev1.0</strong></span></div>
+        <div class="meta-item"><span class="meta-lbl">Session ID:</span> <span id="agy-meta-cid" class="meta-val mono">572d607f-e5b8-42bc-8659-2cce0820852a</span></div>
+        <div class="meta-item"><span class="meta-lbl">Session Tokens:</span> <span class="meta-val mono" id="modal-token-count">1,299,171 (In: 1.21M &bull; Out: 85.5K)</span></div>
+        <div class="meta-item"><span class="meta-lbl">Model Tier:</span> <span class="meta-val" id="modal-model-val" style="color: #34d399;">Gemini 3.8 Flash (Token-Efficiency Protocol)</span></div>
+        <div class="meta-item"><span class="meta-lbl">Model Breakdown:</span> <span class="meta-val" id="modal-model-breakdown"><span style="color: #38bdf8; font-weight: 600;">Flash: 92.32% (~18.7M)</span> &bull; <span style="color: #c084fc; font-weight: 600;">Pro: 7.68% (~1.56M)</span> &bull; <span style="color: #34d399; font-weight: 600;">Cache: 412M Reused</span></span></div>
+        <div class="meta-item"><span class="meta-lbl">Cost Efficiency:</span> <span class="meta-val" id="modal-savings-val" style="color: #34d399;"><strong style="color: #4ade80;">95% Eco Savings</strong> (~$3.12 saved vs Frontier Pro rates)</span></div>
+        <div class="meta-item"><span class="meta-lbl">Node:</span> <span class="meta-val">DESKTOP (NetBIOS)</span></div>
+        <div class="meta-item"><span class="meta-lbl">Auth Gateway:</span> <span class="meta-val">wake.digitalresolve.ca (M365 Entra ID SSO)</span></div>
+        <div class="meta-actions">
+          <button type="button" class="meta-link-btn" onclick="refreshAgyConsole()" title="Force Refresh Stream">Refresh Stream &#x21bb;</button>
+          <button type="button" class="meta-link-btn" onclick="launchAgySession('app')" title="Launch in Local AGY App">Open in App &nearr;</button>
+          <button type="button" class="meta-link-btn" onclick="launchAgySession('copy')" title="Copy ID">Copy CID</button>
+        </div>
+      </div>
+
+      <!-- Modal SSO Gate (Shown until unlocked) -->
+      <div class="modal-sso-gate" id="modal-sso-gate" style="display: flex;">
+        <div style="max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 16px;">
+          <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 24px rgba(59, 130, 246, 0.25);">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          </div>
+          <div class="sso-badge-row">
+            <span class="sso-badge-tag">Zero Trust Edge Protected</span>
+            <span class="sso-badge-tag green">&#10004; Entra ID MFA</span>
+          </div>
+          <h3 style="font-size: 1.25rem; font-weight: 700; color: #f8fafc; margin: 0;">Live Interactive Terminal</h3>
+          <p style="font-size: 0.88rem; color: #94a3b8; line-height: 1.5; margin: 0;">
+            Authentication required before viewing real-time terminal interactions or dispatching commands to the active Antigravity session.
+          </p>
+          
+          <!-- One-Click Microsoft 365 Entra ID SSO Unlock Button -->
+          <div style="display: flex; gap: 10px; width: 100%; max-width: 440px; margin-top: 6px;">
+            <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" title="Authenticate with Microsoft 365 Entra ID SSO" style="flex: 1; padding: 12px 18px; font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 0 18px rgba(59, 130, 246, 0.4); cursor: pointer;">
+              <svg width="18" height="18" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;" aria-hidden="true" focusable="false"><path d="M0 0h9.9v9.9H0z" fill="#f25022"/><path d="M11.1 0H21v9.9h-9.9z" fill="#7fba00"/><path d="M0 11.1h9.9V21H0z" fill="#00a4ef"/><path d="M11.1 11.1H21V21h-9.9z" fill="#ffb900"/></svg>
+              <span>Sign In with M365</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Terminal Stream Output Screen -->
+      <div class="agy-console-screen" id="agy-console-screen" style="display: none;">
+        <div class="agy-line system">[SYSTEM] Establishing encrypted tunnel to Cory-Desktop (Port 8082 via M365 SSO)...</div>
+        <div class="agy-line system">[SYSTEM] Connected to AGY conversation stream: 572d607f-e5b8-42bc-8659-2cce0820852a</div>
+      </div>
+
+      <!-- Command Quick Chips -->
+      <div class="agy-quick-chips" id="agy-quick-chips" style="display: none;">
+        <button type="button" class="quick-chip" onclick="triggerQuickChip(this, 'Check cluster health and uptime stats')" title="Query Cluster Health &amp; Uptime Stats">&#9889; Cluster Health</button>
+        <button type="button" class="quick-chip" onclick="triggerQuickChip(this, 'Run deep codebase audit')" title="Execute Deep Codebase Security &amp; Health Audit">&#128737;&#65039; Code Audit</button>
+        <button type="button" class="quick-chip" onclick="triggerQuickChip(this, 'Report ISP jitter, loss, and latency')" title="Report Bell Canada Gigabit Jitter, Packet Loss, and Latency">&#127760; ISP Diagnostics</button>
+        <button type="button" class="quick-chip" onclick="triggerQuickChip(this, 'Review current git branch and changes')" title="Review Current Git Branch &amp; Uncommitted Worktree Changes">&#127807; Git Status</button>
+        <button type="button" class="quick-chip" onclick="startNewAgySession('desktop')" style="border-color: #38bdf8; background: rgba(56, 189, 248, 0.2); color: #93c5fd;" title="Start New AGY Session on Desktop: agy --dangerously-skip-permissions">New: Desktop</button>
+        <button type="button" class="quick-chip" onclick="startNewAgySession('nuc')" style="border-color: #a78bfa; background: rgba(167, 139, 250, 0.2); color: #c4b5fd;" title="Start New AGY Session on NUC: agy --dangerously-skip-permissions">New: NUC</button>
+      </div>
+
+      <!-- Interactive Shell Prompt Input Bar -->
+      <div class="agy-console-input-bar" id="agy-console-input-bar" style="display: none;">
+        <div class="agy-prompt-label">
+          <span style="color: #4ade80;">agy</span><span style="color: #94a3b8;">@</span><span style="color: #38bdf8;">digitalresolve</span><span style="color: #f8fafc;">:</span><span style="color: #a78bfa;">~</span><span style="color: #4ade80;">$</span>
+        </div>
+        <input type="text" id="agy-modal-input" class="agy-modal-input" aria-label="Terminal command prompt" placeholder="Type prompt or command to transmit to active AGY agent..." onkeydown="if(event.key==='Enter') sendConsolePrompt()" autocomplete="off" spellcheck="false" />
+        <button type="button" class="agy-send-btn" id="agy-modal-send-btn" onclick="sendConsolePrompt()" title="Execute Prompt in Active AGY Autonomous Session">Execute &crarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Homelab Health Index Radar Breakdown Modal -->
+  <div id="health-modal-overlay" class="health-modal-overlay" style="display: none;" onclick="closeHealthModalOnBackdrop(event)">
+    <div class="health-modal-window" role="dialog" aria-modal="true" aria-label="Homelab Cluster Health Radar">
+      <div class="health-modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="pulse-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+          <span style="font-weight: 700; color: #f8fafc; font-size: 1rem;">Homelab Health Radar &bull; Diagnostic Scorecard</span>
+        </div>
+        <button type="button" class="changelog-close" onclick="closeHealthModal()" title="Close Health Radar Modal" aria-label="Close health dialog">&times;</button>
+      </div>
+      <div class="health-modal-body">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px;">
+          <div>
+            <div style="font-size: 0.78rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Aggregate Cluster Health Index</div>
+            <div style="font-size: 1.5rem; font-weight: 800; color: #34d399; margin-top: 2px;" id="modal-health-score">99% Optimal</div>
+          </div>
+          <span class="item-tag online" style="font-size: 0.82rem; padding: 4px 10px;">All Systems Green</span>
+        </div>
+
+        <div class="health-radar-row">
+          <div class="health-radar-header">
+            <span><strong style="color: #f1f5f9;">Intel NUC Core Server (24/7 Node)</strong> &bull; 192.168.2.35</span>
+            <span style="color: #34d399; font-weight: 700;">100% (0.4 ms)</span>
+          </div>
+          <div class="health-meter-bar"><div class="health-meter-fill" style="width: 100%;"></div></div>
+          <div style="font-size: 0.72rem; color: #64748b;">Services: Swarm Engine, CatCam Proxy, StreamHub 8088, WireGuard Tunnel</div>
+        </div>
+
+        <div class="health-radar-row">
+          <div class="health-radar-header">
+            <span><strong style="color: #f1f5f9;">Desktop Workstation (Cory-Desktop)</strong> &bull; 192.168.2.62</span>
+            <span style="color: #34d399; font-weight: 700;">100% (Bell Fiber)</span>
+          </div>
+          <div class="health-meter-bar"><div class="health-meter-fill" style="width: 100%;"></div></div>
+          <div style="font-size: 0.72rem; color: #64748b;">Services: Antigravity CLI Daemon (572d607f), High-Speed Torrenting, Git Sync</div>
+        </div>
+
+        <div class="health-radar-row">
+          <div class="health-radar-header">
+            <span><strong style="color: #f1f5f9;">Mullvad WireGuard Privacy Shield</strong></span>
+            <span style="color: #34d399; font-weight: 700;">100% (Encrypted)</span>
+          </div>
+          <div class="health-meter-bar"><div class="health-meter-fill" style="width: 100%;"></div></div>
+          <div style="font-size: 0.72rem; color: #64748b;">Tunnel Status: Active &bull; Zero IP/DNS Leaks Detected &bull; Kill-switch Enforced</div>
+        </div>
+
+        <div class="health-radar-row">
+          <div class="health-radar-header">
+            <span><strong style="color: #f1f5f9;">Bell Canada Gigabit Fiber Telemetry</strong></span>
+            <span style="color: #38bdf8; font-weight: 700;">98% (1.2 ms &bull; 0 ms Jitter)</span>
+          </div>
+          <div class="health-meter-bar"><div class="health-meter-fill" style="width: 98%; background: linear-gradient(90deg, #0ea5e9, #38bdf8);"></div></div>
+          <div style="font-size: 0.72rem; color: #64748b;">ISP Performance: 1000 Mbps Down / 1000 Mbps Up &bull; Zero Packet Loss</div>
+        </div>
+
+        <div class="health-radar-row">
+          <div class="health-radar-header">
+            <span><strong style="color: #f1f5f9;">Media Storage Capacity (D:\Torrents)</strong></span>
+            <span style="color: #60a5fa; font-weight: 700;">96% (496 GB Free)</span>
+          </div>
+          <div class="health-meter-bar"><div class="health-meter-fill" style="width: 96%; background: linear-gradient(90deg, #3b82f6, #60a5fa);"></div></div>
+          <div style="font-size: 0.72rem; color: #64748b;">File System: Healthy &bull; Auto-Unpack Enabled &bull; Eco Cleanup Configured</div>
+        </div>
+
+        <div class="health-radar-row">
+          <div class="health-radar-header">
+            <span><strong style="color: #f1f5f9;">Zero Trust Perimeter &amp; M365 SSO Shield</strong></span>
+            <span style="color: #c084fc; font-weight: 700;">100% (Enforced)</span>
+          </div>
+          <div class="health-meter-bar"><div class="health-meter-fill" style="width: 100%; background: linear-gradient(90deg, #9333ea, #c084fc);"></div></div>
+          <div style="font-size: 0.72rem; color: #64748b;">Security: 0 Open Router Ports &bull; Cloudflare Tunnel Ingress &bull; M365 Entra ID SSO &amp; Passkey</div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+          <button type="button" class="btn btn-secondary" onclick="closeHealthModal()" style="font-size: 0.82rem; padding: 6px 14px;">Close</button>
+          <button type="button" class="btn btn-primary" onclick="closeHealthModal(); checkStatus('both'); showToast('info', 'Diagnostic Dispatched', 'Probing NUC &amp; Desktop nodes in real-time...');" style="font-size: 0.82rem; padding: 6px 14px;">Run Live Probing &rarr;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Disaster Recovery & Resilience Test Modal -->
+  <div id="disaster-modal-overlay" class="disaster-modal-overlay chaos-modal-overlay" style="position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 10005; background: rgba(2, 6, 23, 0.94); display: none; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box;" onclick="closeDisasterModalOnBackdrop(event)">
+    <div class="disaster-modal-window chaos-modal-window" role="dialog" aria-modal="true" aria-label="Homelab Disaster Recovery Test" style="background: #090d16; border: 1px solid rgba(245, 158, 11, 0.45); border-radius: 16px; width: 95%; max-width: 860px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 35px rgba(245, 158, 11, 0.22); overflow: hidden;">
+      <div class="disaster-modal-header chaos-modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.35rem;"></span>
+          <div>
+            <div style="font-weight: 800; color: #f8fafc; font-size: 1.05rem; letter-spacing: -0.3px;">Disaster Recovery Test &bull; Homelab Resilience Lab</div>
+            <div style="font-size: 0.74rem; color: #94a3b8;">Simulate real-world outages &amp; verify autonomous self-healing sentinel failover.</div>
+          </div>
+        </div>
+        <button type="button" class="changelog-close" onclick="closeDisasterModal()" title="Close Disaster Test" aria-label="Close disaster test dialog">&times;</button>
+      </div>
+
+      <div class="chaos-modal-body">
+        <!-- Top Status Bar -->
+        <div class="chaos-status-bar">
+          <div class="chaos-score-container">
+            <div>
+              <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Cluster Resilience Index</div>
+              <div class="chaos-score-val" id="chaos-score-val">99% Optimal</div>
+            </div>
+            <span class="item-tag online" id="chaos-fault-counter">0 Outages Active</span>
+          </div>
+          <div class="chaos-actions-top">
+            <button type="button" class="btn-chaos-action btn-chaos-sound" id="btn-chaos-sound" onclick="toggleChaosSound()" title="Toggle Web Audio procedural synthesizer sound effects">
+              Sound: OFF
+            </button>
+            <button type="button" class="btn-chaos-action btn-chaos-heal" onclick="restoreAllChaos()" title="Master Sentinel Override: Restore all nodes to 100% green">
+              Recover All Nodes
+            </button>
+          </div>
+        </div>
+
+        <!-- Interactive Topology & Circuit Schematic Map -->
+        <div class="chaos-topology-box">
+          <div class="chaos-topology-header">
+            <span style="font-size: 0.78rem; font-weight: 700; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px;">Live Topology Schematic</span>
+            <span style="font-size: 0.72rem; color: #64748b;">Autonomous Sentinel Watchdog: Active (0.4s heartbeat)</span>
+          </div>
+
+          <div class="chaos-grid-nodes">
+            <!-- 1. Cloudflare Edge -->
+            <div class="chaos-node node-ok" id="c-node-cf">
+              <div class="chaos-node-icon"></div>
+              <div class="chaos-node-name">Cloudflare Edge</div>
+              <span class="chaos-node-status ok">Active (Zero Trust)</span>
+            </div>
+
+            <!-- 2. Bell Fiber GigaHub -->
+            <div class="chaos-node node-ok" id="c-node-bell">
+              <div class="chaos-node-icon"></div>
+              <div class="chaos-node-name">Bell Fiber 1.5G</div>
+              <span class="chaos-node-status ok">1.5 Gbps (Optimal)</span>
+            </div>
+
+            <!-- 3. Mullvad VPN -->
+            <div class="chaos-node node-ok" id="c-node-vpn">
+              <div class="chaos-node-icon"></div>
+              <div class="chaos-node-name">Mullvad Tunnel</div>
+              <span class="chaos-node-status ok">Encrypted (WireGuard)</span>
+            </div>
+
+            <!-- 4. Intel NUC Core -->
+            <div class="chaos-node node-ok" id="c-node-nuc">
+              <div class="chaos-node-icon"></div>
+              <div class="chaos-node-name">Intel NUC 24/7</div>
+              <span class="chaos-node-status ok">Online (24/7 Node)</span>
+            </div>
+
+            <!-- 5. Desktop Workstation -->
+            <div class="chaos-node node-ok" id="c-node-desktop">
+              <div class="chaos-node-icon"></div>
+              <div class="chaos-node-name">Desktop Workstation</div>
+              <span class="chaos-node-status ok">Online (2.5 GbE)</span>
+            </div>
+
+            <!-- 6. Storage Pool -->
+            <div class="chaos-node node-ok" id="c-node-storage">
+              <div class="chaos-node-icon"></div>
+              <div class="chaos-node-name">Storage Pools</div>
+              <span class="chaos-node-status ok">Healthy (42% Pool)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chaos Arsenal: Fault Injection Controls -->
+        <div>
+          <div style="font-size: 0.78rem; font-weight: 700; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
+            Disaster Scenarios (Click to Inject / Recover)
+          </div>
+          <div class="chaos-arsenal-grid">
+            <!-- Scenario 1: Bell Fiber -->
+            <div class="chaos-card" id="c-card-fiber">
+              <div>
+                <div class="chaos-card-header">
+                  <span></span>
+                  <span>Cut Bell Fiber Uplink</span>
+                </div>
+                <div class="chaos-card-desc">
+                  Simulates complete physical fiber carrier drop. Sentinel triggers multi-WAN failover to standby cellular WireGuard route.
+                </div>
+              </div>
+              <button type="button" class="chaos-card-trigger" id="btn-fault-fiber" onclick="triggerChaosFault('bellFiber')">
+                Sever Fiber Link
+              </button>
+            </div>
+
+            <!-- Scenario 2: Desktop Hard Power Loss -->
+            <div class="chaos-card" id="c-card-desktop">
+              <div>
+                <div class="chaos-card-header">
+                  
+                  <span>Desktop Sudden Power Cut</span>
+                </div>
+                <div class="chaos-card-desc">
+                  Simulates workstation power outage (0W). NUC assumes queued torrent &amp; agent proxies; arms Wake-on-LAN reboot packet.
+                </div>
+              </div>
+              <button type="button" class="chaos-card-trigger" id="btn-fault-desktop" onclick="triggerChaosFault('desktopPower')">
+                Pull Desktop Plug
+              </button>
+            </div>
+
+            <!-- Scenario 3: Volumetric DDoS -->
+            <div class="chaos-card" id="c-card-ddos">
+              <div>
+                <div class="chaos-card-header">
+                  
+                  <span>50k req/s Volumetric DDoS</span>
+                </div>
+                <div class="chaos-card-desc">
+                  Simulates synthetic SYN/HTTP flood assault against public endpoints. Cloudflare Under-Attack defense shields local origin NUC.
+                </div>
+              </div>
+              <button type="button" class="chaos-card-trigger" id="btn-fault-ddos" onclick="triggerChaosFault('ddosFlood')">
+                Flood Edge with 50k SYN
+              </button>
+            </div>
+
+            <!-- Scenario 4: Storage Saturation -->
+            <div class="chaos-card" id="c-card-disk">
+              <div>
+                <div class="chaos-card-header">
+                  
+                  <span>Storage Saturation (99.8%)</span>
+                </div>
+                <div class="chaos-card-desc">
+                  Simulates torrent disk exhaustion (&lt;300MB free). Sentinel executes automated temp buffer pruning and SMB relocation.
+                </div>
+              </div>
+              <button type="button" class="chaos-card-trigger" id="btn-fault-disk" onclick="triggerChaosFault('diskFull')">
+                Fill Disk to 99.8%
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Streaming Chaos Console Feed -->
+        <div class="chaos-console-box">
+          <div class="chaos-console-header">
+            <span>LIVE SENTINEL EVENT STREAM</span>
+            <span>AUTO-SCROLL &bull; REAL-TIME</span>
+          </div>
+          <div class="chaos-console-feed" id="chaos-console-feed">
+            <div class="chaos-line sys">[SYSTEM] Disaster Recovery Sentinel v2.6.0 initialized. Topology verified green.</div>
+            <div class="chaos-line info">[PROBE] All 6 infrastructure nodes responding within SLA (&lt; 12ms latency).</div>
+            <div class="chaos-line heal">[READY] Autonomous failover triggers armed. Select an outage scenario above to test resilience.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Universal Admin SSO Verification Gate Modal -->
+  <div id="speedtest-sso-modal-overlay" class="speedtest-sso-modal-overlay" style="display: none;" onclick="if(event.target===this)closeSpeedtestSSOModal()">
+    <div class="speedtest-sso-modal" role="dialog" aria-modal="true" aria-label="Admin SSO Authorization for Homelab Operations">
+      <div style="background: rgba(15, 23, 42, 0.95); padding: 18px 22px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.4rem;"></span>
+          <div>
+            <div style="font-weight: 800; font-size: 1.02rem; color: #f8fafc;">Admin Authorization Required</div>
+            <div style="font-size: 0.74rem; color: #f59e0b; font-family: monospace;" id="sso-gate-action-name">Interactive System Operation &bull; M365 SSO</div>
+          </div>
+        </div>
+        <button type="button" class="changelog-close" onclick="closeSpeedtestSSOModal()" title="Close SSO Dialog" aria-label="Close dialog">&times;</button>
+      </div>
+      <div style="padding: 22px; display: flex; flex-direction: column; gap: 16px;">
+        <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 14px; font-size: 0.8rem; color: #fde68a; line-height: 1.55;">
+          <strong> Zero Trust Security Policy:</strong><br>
+          This is a public, front-facing website. Any operation that interacts with on-premise hardware (Ollama LLM inference, Gigabit WAN tests, Wake-on-LAN, sleep standby, remote reboots, torrent injection, or IoT treat dispensers) is strictly restricted to authenticated <strong>Microsoft 365 Administrators</strong> (<code>cory.townsend@digitalresolve.ca</code>).
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 4px;">
+          <button type="button" class="btn btn-primary" onclick="unlockSSO('m365'); closeSpeedtestSSOModal();" style="width: 100%; padding: 13px 20px; font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); cursor: pointer;">
+            <svg width="18" height="18" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;"><path d="M0 0h9.9v9.9H0z" fill="#f25022"/><path d="M11.1 0H21v9.9h-9.9z" fill="#7fba00"/><path d="M0 11.1h9.9V21H0z" fill="#00a4ef"/><path d="M11.1 11.1H21V21h-9.9z" fill="#ffb900"/></svg>
+            <span>Sign In with M365</span>
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="closeSpeedtestSSOModal()" style="font-size: 0.82rem; cursor: pointer; padding: 8px 16px; border-color: rgba(255, 255, 255, 0.15); align-self: center;">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comprehensive High-Level System Release Changelog Modal -->
+  <div id="changelog-modal-overlay" class="changelog-modal-overlay" style="display: none;" onclick="closeChangelogModalOnBackdrop(event)">
+    <div class="changelog-modal" role="dialog" aria-modal="true" aria-label="System changelog">
+      <div class="changelog-header">
+        <div class="changelog-title-group">
+          <span class="pulse-dot"></span>
+          <span class="changelog-title">Digital Resolve System Changelog &amp; Release History</span>
+        </div>
+        <button type="button" class="changelog-close" onclick="closeChangelogModal()" title="Close Changelog Modal" aria-label="Close changelog">&times;</button>
+      </div>
+
+      <div class="changelog-body">
+        <!-- Version 2.8.7 (Current) -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag current">v2.8.8 | Current</span>
+            <span class="ver-date">October 28, 2026</span>
+          </div>
+          <h4 class="ver-title">Sub-Page Modular Architecture &amp; Dedicated Category Systems</h4>
+          <ul class="ver-list">
+            <li><strong>Monolith Decomposition:</strong> Modularized the monolithic single-page site into 6 dedicated, specialized category portals:
+              <ul style="margin-top: 4px; margin-bottom: 4px;">
+                <li><code>index.html</code>: Central Command Deck &amp; sub-system category portal directory.</li>
+                <li><code>services.html</code>: Live microservices status dashboard, NUC 24/7 telemetry &amp; self-hosted cloud app grid.</li>
+                <li><code>fleet.html</code>: Hardware topology schematic board, cluster node vitals &amp; remote power controls.</li>
+                <li><code>uptime.html</code>: 99.98% SLA telemetry, multi-hop latency sparkline &amp; 90-day incident matrix.</li>
+                <li><code>media.html</code>: Penny's Cat Hub (dual optical WebRTC stream, Tuya Smart Feeder IoT 192.168.2.22) &amp; StreamHub 4K player.</li>
+                <li><code>ops.html</code>: Autonomous Antigravity terminal session, AI token consumption meters &amp; Ollama local neural models.</li>
+              </ul>
+            </li>
+            <li><strong>Shared Client Engine (<code>app.js</code>):</strong> Extracted 3,795 lines of core client logic into an external, cache-busted JavaScript engine (<code>app.js?v=2.8.8</code>) shared uniformly across all pages.</li>
+            <li><strong>Unified Navigation Bar:</strong> Integrated a responsive 6-pill top navigation header with active page indicators, seamless cross-page deep linking, and zero layout shift.</li>
+            <li><strong>100% Pure ASCII Guarantees:</strong> Verified zero non-ASCII characters or Mojibake encoding artifacts across all HTML, CSS, and JS assets.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.8.7 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.7</span>
+            <span class="ver-date">October 28, 2026</span>
+          </div>
+          <h4 class="ver-title">Unified Homelab Service Dashboard Button Styles &amp; Cache-Busted Pipeline</h4>
+          <ul class="ver-list">
+            <li><strong>Strict Button Hierarchy &amp; Consistency:</strong> Standardized all dashboard filter tabs and card action buttons (Launch Stream, Open Vault, Watch Cam, Control Feeder, Control Power, Open qBit, View Edge Stats) under the shared <code>.btn-schematic-chip</code> class, guaranteeing uniform padding, typography, hover glow, and active click states.</li>
+            <li><strong>Cache-Busted Distribution:</strong> Bumped stylesheet distribution to <code>styles.css?v=2.8.7</code> ensuring instant viewport synchronization across Cloudflare Edge and client browsers.</li>
+            <li><strong>100% Pure ASCII Guarantees:</strong> Replaced dynamic refresh indicators with pure ASCII inline SVG vectors to permanently prevent character decoding artifacts.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.8.6 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.6</span>
+            <span class="ver-date">October 28, 2026</span>
+          </div>
+          <h4 class="ver-title">M365 Dedicated SSO Authentication Symmetrical Refresh &amp; Connected Pet Feeder IoT Bridge</h4>
+          <ul class="ver-list">
+            <li><strong>M365 Sign In Multi-Layer Synchronization:</strong> Restored top navigation <code>[ &#128274; Sign In with M365 ]</code> authentication engine with symmetrical cookie synchronization (<code>.digitalresolve.ca</code> and local host), global scope variable resolution, and automatic cache-busting reload (<code>?_fresh=...</code>) ensuring all gated telemetry, WAN IP, and terminal controls unlock immediately.</li>
+            <li><strong>Penny''s Smart Feeder IoT Bridge:</strong> Fully connected and armed Penny''s Smart Feeder IoT (<code>192.168.2.22</code>) with active hardware bridge via NUC backend endpoint (<code>/api/feeder/dispense</code>), live multi-portion motor actuation (10g Snack, 25g Meal, 50g Feast), acoustic feedback, and real-time telemetry logging.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.8.5 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.5</span>
+            <span class="ver-date">October 28, 2026</span>
+          </div>
+          <h4 class="ver-title">Dynamic 2-Decimal Precision Telemetry &amp; Non-Hardcoded Quota Ingestion</h4>
+          <ul class="ver-list">
+            <li><strong>Dynamic Real-Time Precision:</strong> Replaced static allocation percentages with live mathematical calculations computed to 2 decimal places (92.32% Flash / 7.68% Pro / 95.65% Cache / 97.00% Savings) ingested directly from live session transcripts.</li>
+            <li><strong>Symmetrical Ingestion &amp; UI Binding:</strong> Synchronized frontend telemetry controllers and NUC webhook listener with live float precision, eliminating hardcoded model estimates across all dashboard decks.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.8.4 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.4</span>
+            <span class="ver-date">October 28, 2026</span>
+          </div>
+          <h4 class="ver-title">Accurate Gemini Usage &amp; Multi-Tier Model Allocation</h4>
+          <ul class="ver-list">
+            <li><strong>Accurate Gemini Telemetry:</strong> Updated token allocation across header tags, status ribbon, and AGY console modal to reflect multi-tier model usage.</li>
+            <li><strong>Dynamic Model Allocation Meter:</strong> Updated progress bar and telemetry badges with segmented visualization.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.8.3 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.3</span>
+            <span class="ver-date">October 28, 2026</span>
+          </div>
+          <h4 class="ver-title">NUC Scheduled Maintenance Mode &amp; Zero-Penalty SLA Shield</h4>
+          <ul class="ver-list">
+            <li><strong>NUC Server Maintenance Window Engine:</strong> Introduced dedicated scheduled maintenance mode controller in the Control Matrix and SLA Telemetry ribbon to protect 90-Day SLA metrics during Windows Updates, driver installs, and reboots.</li>
+            <li><strong>Zero-Penalty SLA Protection:</strong> Planned maintenance windows are mathematically exempt from unplanned outage incidents, preserving 99.985% Grade A+ uptime compliance.</li>
+            <li><strong>Interactive Maintenance Workbench Modal:</strong> Configure flexible 15m, 30m, 1h, or 2h maintenance windows with live countdown timers, automated torrent pausing, and 1-click "Maintenance &amp; Run Update-Computer" dispatch.</li>
+            <li><strong>Visual Maintenance Telemetry:</strong> Amber-striped glowing status bar hashes, SLA Shield header badges, and node inspector telemetry during active maintenance windows.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.8.2 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.2</span>
+            <span class="ver-date">October 28, 2026</span>
+          </div>
+          <h4 class="ver-title">Topology Circuit Flows, Heartbeat Sparkline &amp; Dynamic Codebase Metrics</h4>
+          <ul class="ver-list">
+            <li><strong>Hardware Topology Schematic Packet Flows:</strong> Restored and enhanced animated glowing SVG packet streams (Edge, Fiber, VPN, LAN) with hardware-accelerated <code>stroke-dashoffset</code> keyframes, explicit starting offsets, and luminous drop-shadow filters across Firefox, Chrome, and Edge.</li>
+            <li><strong>Dynamic Real-Time Heartbeat Oscilloscope:</strong> Activated dynamic multi-tier waveform rendering on the 24-Hour SLA Latency Sparkline canvas with tab-visibility management.</li>
+            <li><strong>System-Wide Animation Keyframes:</strong> Defined <code>@keyframes spin</code>, <code>@keyframes fadeIn</code>, and <code>@keyframes modalScaleIn</code> to power button dispatch spinners, node inspector panels, and modal dialogs.</li>
+            <li><strong>Dynamic Codebase Scale &amp; Version Synchronizer:</strong> Real-time automated line counter and version tags synchronized across navigation header, changelog modal, and footer.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.8.1 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.1</span>
+            <span class="ver-date">October 28, 2026</span>
+          </div>
+          <h4 class="ver-title">Live Token Telemetry, Zero-PIN Security &amp; Dynamic Codebase Metrics</h4>
+          <ul class="ver-list">
+            <li><strong>Dynamic AI Token Telemetry:</strong> Real-time regex ingestion of active Antigravity session transcripts (Gemini Flash: 100%, ~15.7M Tokens, ~323M Context Cache Reused).</li>
+            <li><strong>Zero-PIN Security Deprecation:</strong> Completely eradicated PIN credentials across client and server in favor of strict Microsoft 365 Entra ID SSO &amp; MFA.</li>
+            <li><strong>Direct WAN External IP Privacy:</strong> Bell Canada public IPv4 is masked behind MFA authentication to prevent topology reconnaissance.</li>
+            <li><strong>Smooth Back-to-Top Navigation:</strong> Added a dedicated top anchor, smooth programmatic scroll handler, and a floating glassmorphic action button.</li>
+            <li><strong>Automated Codebase Scale Counter:</strong> Added real-time dynamic LOC calculation and version synchronization across header and footer.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.8.0 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.0</span>
+            <span class="ver-date">October 27, 2026</span>
+          </div>
+          <h4 class="ver-title">Consolidated Compute &amp; AI Console, Clean UI &amp; Top SSO</h4>
+          <ul class="ver-list">
+            <li><strong>Consolidated Compute, AI &amp; Terminal Operations:</strong> Grouped the Live Interactive Terminal and Ollama 24/7 Local Inference Playground together side-by-side in a unified operations hub (<code>#ops-ai</code>) with synchronized model metrics.</li>
+            <li><strong>Streamlined UI &amp; Label De-cluttering:</strong> Removed redundant "SSO Required" and "Protected by M365" visual badges across buttons, tabs, and speedtest banners in favor of the dedicated top header controls.</li>
+            <li><strong>Dedicated Top Header SSO Controls:</strong> Positioned clean <code>[ &#128274; SSO Login ]</code> and <code>[ &#128994; Cory Townsend ] [ Sign Out ]</code> action buttons directly in the top right navigation bar.</li>
+            <li><strong>Cloudflare Zero Trust Edge Lockdown:</strong> Deleted home network bypass via Cloudflare API, ensuring strict Microsoft 365 identity challenges on 100% of subdomain requests.</li>
+            <li><strong>Instant CLI Cache Wiper (<code>fresh</code>):</strong> Built and deployed a global PowerShell/CMD utility to cleanly purge all browser caches across Chrome, Edge, and Firefox and flush Windows DNS in seconds.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.6.1 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.6.1</span>
+            <span class="ver-date">October 27, 2026</span>
+          </div>
+          <h4 class="ver-title">Disaster Recovery Test Workbench &amp; Ultra-Smooth 60FPS Scroll Pipeline</h4>
+          <ul class="ver-list">
+            <li><strong>Interactive Topology Schematic Map:</strong> Live multi-tier vector circuit diagram featuring 7 hardware &amp; security nodes, glowing animated packet flow streams, trace ICMP pulse waves, and interactive telemetry inspector drawer.</li>
+            <li><strong>Disaster Recovery Test:</strong> Real-time outage simulation sandbox testing Bell Fiber WAN severed carrier, Desktop sudden power drop (0W), 50k req/s volumetric DDoS floods, and 99.8% torrent storage saturation.</li>
+            <li><strong>Bulletproof Modal Architecture:</strong> Inline layout guarantees and cache-busted stylesheet pipeline (<code>styles.css?v=2.6.1</code>) ensuring instant viewport rendering on all devices.</li>
+            <li><strong>Ultra-Smooth Scroll Pipeline:</strong> Replaced GPU-heavy composite backdrop blur filters across cards and fixed backgrounds with high-performance opaque palettes, eliminating scroll stutter and rendering inconsistencies.</li>
+            <li><strong>Autonomous Self-Healing Sentinel:</strong> Live visual rerouting showing multi-WAN cellular failover, NUC task absorption, Cloudflare Zero Trust rate-limiting shields, and automated SMB storage evacuation.</li>
+            <li><strong>Tactile Web Audio Procedural Synth:</strong> Zero-dependency acoustic feedback synthesizing sci-fi warning warbles, failover chimes, and system recovery melodies via HTML5 Web Audio API.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.5.0 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.5.0</span>
+            <span class="ver-date">October 27, 2026</span>
+          </div>
+          <h4 class="ver-title">Touch-First Adaptive Mobile Engine, Health Radar &amp; Token Savings</h4>
+          <ul class="ver-list">
+            <li><strong>Overall Homelab Health Index Radar (0-100%):</strong> Integrated aggregate cluster health indicator into the status ribbon with clickable radar diagnostic modal evaluating NUC 24/7 Server, Desktop Node, WireGuard Privacy, Bell Gigabit Fiber, and Storage.</li>
+            <li><strong>Token Efficiency &amp; Cost Savings Tracker:</strong> Real-time financial and compute efficiency analytics tracking token savings (~$3.12 saved / 95.4% eco efficiency ratio vs frontier Pro rates) across header, ribbon, AGY dropdown, and console modal.</li>
+            <li><strong>Multi-Model AI Telemetry &amp; Codebase Metrics:</strong> Live AI token efficiency telemetry (100% Gemini Flash, 318M Context Cache Reused) across header, ribbon, and modal decks, plus persistent Lines of Code (7,291 LOC) counter at the footer.</li>
+            <li><strong>Touch-First Mobile Engine:</strong> Integrated automated mobile device detection with fluid single-column card stacking, zero horizontal overflow across 360px-430px viewports, and compliant minimum 44px tap targets for all controls.</li>
+            <li><strong>Persistent Layout Switcher:</strong> Added synchronized "Mobile View / Desktop View" manual toggle controls in header and footer, persisting user preference seamlessly in localStorage across sessions.</li>
+            <li><strong>Touch-Optimized Navigation:</strong> Enhanced header with accessible slide-down mobile navigation drawer, inline dropdown accordions, and swipe-friendly horizontal chip scrolling.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.4.9 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.4.9</span>
+            <span class="ver-date">October 26, 2026</span>
+          </div>
+          <h4 class="ver-title">Consolidated Node Selector Dropdown &amp; Functional Action Groups</h4>
+          <ul class="ver-list">
+            <li><strong>Node Dropdown Consolidation:</strong> Replaced sprawling button walls with an intuitive Target Node Selector dropdown (<code>NUC Core Server</code> vs <code> Desktop PC</code>) and live status badge.</li>
+            <li><strong>Structured Action Groups:</strong> Organized matrix actions into four clean, focused categories: <em>Torrent Swarms &amp; Bandwidth</em>, <em>Power &amp; Standby</em>, <em>System Maintenance &amp; Disk Hygiene</em>, and <em>Cluster Transport &amp; Services</em>.</li>
+            <li><strong>Dynamic Target Dispatch:</strong> Wired <code>executeNodeAction()</code> to dispatch commands directly to the actively selected node without clutter or redundancy.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.4.8 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.4.8</span>
+            <span class="ver-date">October 26, 2026</span>
+          </div>
+          <h4 class="ver-title">Symmetrical Dual-Node Matrix &amp; SSO Auth Resilience</h4>
+          <ul class="ver-list">
+            <li><strong>Symmetrical Control Matrix:</strong> Reorganized remote action matrix into paired dual-node options for Desktop and NUC (Swarms, Speed Throttles, Power &amp; Standby, Updates, Clean Junk, SSO Reboots).</li>
+            <li><strong>Desktop Action Execution:</strong> Connected Desktop queue dispatcher via <code>Sync-AgyTranscript</code> daemon to execute remote disk cleanup, system update, and reboot commands locally.</li>
+            <li><strong>SSO Authentication Fix:</strong> Fixed credential storage so Microsoft 365 SSO and passkey entries automatically store authorized passkey tokens, eliminating 403 Forbidden errors.</li>
+            <li><strong>UI Cleanliness:</strong> Purged legacy placeholders and mojibake characters across all system control cards.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.4.7 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.4.7</span>
+            <span class="ver-date">October 26, 2026</span>
+          </div>
+          <h4 class="ver-title">Remote AGY Session Launcher &amp; Uncapped Terminal Streaming</h4>
+          <ul class="ver-list">
+            <li><strong>Remote Session Launcher:</strong> Integrated one-click <code>agy --dangerously-skip-permissions</code> launchers for both Desktop and NUC nodes across the header dropdown, live terminal deck, application cards, and embedded console toolbar.</li>
+            <li><strong>Desktop &amp; NUC Execution Pipeline:</strong> Created automatic background launch triggers via <code>Sync-AgyTranscript</code> on Desktop (Windows Terminal) and direct process dispatch on NUC.</li>
+            <li><strong>Uncapped Verbose Stream:</strong> Removed the 600-character truncation limit and increased tail buffer to 150 entries for complete, uninterrupted multi-paragraph agent responses.</li>
+            <li><strong>Desktop 1-Click Batch Shortcut:</strong> Created <code>Launch-AGY-Skip-Permissions.bat</code> on the shared OneDrive Desktop for instant local startup.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.4.6 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.4.6</span>
+            <span class="ver-date">October 26, 2026</span>
+          </div>
+          <h4 class="ver-title">Bidirectional Agent Prompt Pipeline &amp; One-Click Diagnostics</h4>
+          <ul class="ver-list">
+            <li><strong>Bidirectional Agent Dispatch:</strong> Connected web dispatchers directly to active AGY session 572d607f via dual-path queue ingestion (Desktop background daemon + NUC SMB relay).</li>
+            <li><strong>One-Click Quick Action Chips:</strong> Interactive tactile blue buttons for Cluster Health, Code Audit, ISP Diagnostics, and Git Status with active spinning dispatch states.</li>
+            <li><strong>Dual-Interface Terminal Experience:</strong> Added quick action chips and prompt dispatchers to both the in-page Live Daemon Terminal card and fullscreen Embedded Console modal.</li>
+            <li><strong>Encoding &amp; Auth Resilience:</strong> Hardened HTTP listener against null ContentEncoding traps, with Microsoft 365 Entra ID SSO token enforcement.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.4.5 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.4.5</span>
+            <span class="ver-date">October 26, 2026</span>
+          </div>
+          <h4 class="ver-title">Live Terminal SSO Security Gate, Probe Now Visuals &amp; CatCam UTF-8 Fix</h4>
+          <ul class="ver-list">
+            <li><strong>Live Daemon &amp; Embedded Console SSO Gate:</strong> Locked real-time agent/sentinel telemetry and interactive prompt dispatches behind Microsoft 365 Entra ID SSO and Cloudflare Zero Trust (PIN deprecated).</li>
+            <li><strong>Probe Now Telemetry Trigger:</strong> Unified blue button affordance with active probing feedback state, disabled state prevention, and synchronized ISP health polling.</li>
+            <li><strong>CatCam Optical Suite Mojibake Fix:</strong> Replaced all corrupted UTF-8 and multi-byte bullet characters with clean ASCII and standards-compliant HTML entities.</li>
+            <li><strong>Copy Streamlining:</strong> Rephrased technical media copy to clear, consumer-friendly high-speed 4K and instant high-definition streaming descriptions.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.4.4 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.4.4</span>
+            <span class="ver-date">October 26, 2026</span>
+          </div>
+          <h4 class="ver-title">Unified Button Affordances, Instant Dropdowns &amp; StreamHub Previews</h4>
+          <ul class="ver-list">
+            <li><strong>Unified Button Affordances:</strong> Harmonized all interactive buttons, homelab deck controls, and dropdown action items with consistent tactile blue styling.</li>
+            <li><strong>Probe Bell Speed:</strong> Integrated direct probe action with active button state and synchronized polling to Bell Canada diagnostic metrics.</li>
+            <li><strong>Instant Dropdown Dismissal:</strong> Dropdown menus dismiss immediately when clicking embedded console, stream viewer, or node status actions.</li>
+            <li><strong>StreamHub Previews:</strong> Generated fast cached JPEG video snapshots on NUC so 100% of media cards display video previews.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.4.3 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.4.3</span>
+            <span class="ver-date">October 26, 2026</span>
+          </div>
+          <h4 class="ver-title">Real-Time In-Page Terminal Stream &amp; Header Fluid Scaling</h4>
+          <ul class="ver-list">
+            <li><strong>Inline Live Stream Poller Fix:</strong> Repaired template string interpolation in DOMContentLoaded poller; terminal entries now stream immediately on page load without getting stuck.</li>
+            <li><strong>Header &amp; Deck Scaling:</strong> Fluid <code>.logo-deck-badge</code> and multi-tier responsive media queries prevent wrapping or clipping on mobile and narrow tablet views.</li>
+            <li><strong>StreamHub Recovery &amp; Remux:</strong> Revived port 8088 service behind M365 SSO, remuxed complete 3 Body Problem Season 1 to faststart MP4, and added VLC/download player controls.</li>
+            <li><strong>In-Memory Cache Layer:</strong> Added 2.5s caching in <code>wol-listener.ps1</code> for instantaneous sub-millisecond API responses under concurrent polling.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.4.2 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.4.2</span>
+            <span class="ver-date">October 26, 2026</span>
+          </div>
+          <h4 class="ver-title">Live Embedded AGY Terminal Console &amp; Apex Redirection</h4>
+          <ul class="ver-list">
+            <li><strong>Interactive Embedded Console:</strong> Full-screen in-browser terminal connected to active session (<code>572d607f-e5b8</code>) with verbose turn streaming, command chip shortcuts, and 2.5s auto-polling.</li>
+            <li><strong>Bi-Directional NUC &harr; Desktop Proxy:</strong> Zero-latency background sync daemon and Entra ID SSO authorization for prompt injection.</li>
+            <li><strong>Apex Domain Enforcement:</strong> Seamless canonical routing ensuring <code>www.digitalresolve.ca</code> immediately redirects to <code>https://digitalresolve.ca</code>.</li>
+            <li><strong>Clickable Footer Versioning:</strong> Integrated system release changelog accessible directly from the operations deck.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.4.0 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.4.0</span>
+            <span class="ver-date">October 26, 2026</span>
+          </div>
+          <h4 class="ver-title">Multi-Modal AGY Sessions &amp; Geeni WebRTC Gateway</h4>
+          <ul class="ver-list">
+            <li><strong>Antigravity Multi-Modal Launcher:</strong> Support for Google Web Console (Cloud), native app protocol (<code>conversation://</code>), and live transcript viewing.</li>
+            <li><strong>Geeni Camera Gateway Fix:</strong> Replaced retired <code>my.geenismart.com</code> with verified live <code>camview.mygeeni.com</code> and local SSO stream <code>cam.digitalresolve.ca</code>.</li>
+            <li><strong>ISP Telemetry Fixes:</strong> Resolved undefined jitter and latency metrics in Bell Canada fiber optic diagnostic card.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.3.0 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.3.0</span>
+            <span class="ver-date">October 25, 2026</span>
+          </div>
+          <h4 class="ver-title">M365 Entra ID Reboot Shield &amp; SLA Status Legend</h4>
+          <ul class="ver-list">
+            <li><strong>Remote Reboot Protection:</strong> Shielded NUC power actions exclusively behind Microsoft 365 Entra ID SSO token verification.</li>
+            <li><strong>SLA Uptime Matrix Legend:</strong> Added operational status guide for 100% Operational, Smart Eco Sleep, Maintenance, Outages, and Day Inspection.</li>
+            <li><strong>Watch Library Rebranding:</strong> Re-branded media streaming node to <em>Review &amp; Watch Library</em> for <code>D:\Torrents</code>.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.2.0 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.2.0</span>
+            <span class="ver-date">October 25, 2026</span>
+          </div>
+          <h4 class="ver-title">Autonomous ISP Diagnostics &amp; Self-Healing Sentinel</h4>
+          <ul class="ver-list">
+            <li><strong>ISP Health Engine:</strong> ICMP jitter analysis, Cloudflare edge latency variance, and automated speed telemetry.</li>
+            <li><strong>Self-Healing Sentinel Watchdog:</strong> Proactive HTTP probing across all edge endpoints with autonomous service restart.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.0.0 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.0.0</span>
+            <span class="ver-date">October 23, 2026</span>
+          </div>
+          <h4 class="ver-title">Dual-Node Hybrid Homelab Foundation</h4>
+          <ul class="ver-list">
+            <li><strong>Core Infrastructure:</strong> Unified 24/7 Intel NUC Server (<code>192.168.2.35</code>) and High-Power Desktop Workstation (<code>192.168.2.62</code>).</li>
+            <li><strong>Zero Trust Edge Tunnels:</strong> Cloudflare edge routing, WireGuard VPN ingestion, and Wake-on-LAN power state switching.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- NUC Server Scheduled Maintenance & SLA Protection Modal -->
+  <div id="maintenance-modal-overlay" class="health-modal-overlay" style="display: none;" onclick="if(event.target===this)closeMaintenanceModal()">
+    <div class="health-modal-window" role="dialog" aria-modal="true" aria-label="NUC Server Scheduled Maintenance Mode" style="max-width: 680px; max-height: 90vh; display: flex; flex-direction: column;">
+      <div class="health-modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 14px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.4rem;">&#128736;&#65039;</span>
+          <div>
+            <h3 style="font-size: 1.05rem; font-weight: 800; color: #f8fafc; margin: 0;">NUC Server Scheduled Maintenance Window</h3>
+            <div style="font-size: 0.76rem; color: #94a3b8; margin-top: 2px;">Protect 90-Day SLA &amp; Cluster Heartbeat (0 Outage Impact) during Windows Updates &amp; Reboots</div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-secondary" onclick="closeMaintenanceModal()" style="font-size: 0.85rem; padding: 4px 10px; cursor: pointer;">&times;</button>
+      </div>
+
+      <div class="health-modal-body" style="padding: 18px 0; display: flex; flex-direction: column; gap: 16px; overflow-y: auto;">
+        <!-- Status Banner -->
+        <div id="maint-modal-banner" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span class="pulse-dot" id="maint-banner-dot" style="background: #10b981; box-shadow: 0 0 8px #10b981; width: 10px; height: 10px;"></span>
+            <div>
+              <div style="font-weight: 700; color: #f0fdf4; font-size: 0.88rem;" id="maint-banner-title">Normal 24/7 Operations &mdash; 90-Day SLA: 99.985%</div>
+              <div style="font-size: 0.76rem; color: #94a3b8;" id="maint-banner-sub">Planned maintenance windows are excluded from outage penalties.</div>
+            </div>
+          </div>
+          <span class="item-tag online" id="maint-banner-tag">SLA Protected</span>
+        </div>
+
+        <!-- Window Duration Selector -->
+        <div>
+          <label style="font-size: 0.8rem; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 8px;">Select Maintenance Window Duration:</label>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px;">
+            <button type="button" class="btn btn-secondary maint-dur-btn" data-dur="15" onclick="selectMaintDuration(15)" style="font-size: 0.78rem; padding: 8px; text-align: center; border-color: rgba(255,255,255,0.15);">15 Minutes<br><span style="font-size: 0.68rem; color: #94a3b8;">Quick Patch</span></button>
+            <button type="button" class="btn btn-secondary maint-dur-btn active" data-dur="30" onclick="selectMaintDuration(30)" style="font-size: 0.78rem; padding: 8px; text-align: center; border-color: #f59e0b; color: #fef08a !important; background: rgba(245, 158, 11, 0.15);">30 Minutes<br><span style="font-size: 0.68rem; color: #cbd5e1;">Windows Update</span></button>
+            <button type="button" class="btn btn-secondary maint-dur-btn" data-dur="60" onclick="selectMaintDuration(60)" style="font-size: 0.78rem; padding: 8px; text-align: center; border-color: rgba(255,255,255,0.15);">1 Hour<br><span style="font-size: 0.68rem; color: #94a3b8;">Deep Updates</span></button>
+            <button type="button" class="btn btn-secondary maint-dur-btn" data-dur="120" onclick="selectMaintDuration(120)" style="font-size: 0.78rem; padding: 8px; text-align: center; border-color: rgba(255,255,255,0.15);">2 Hours<br><span style="font-size: 0.68rem; color: #94a3b8;">Hardware/Driver</span></button>
+            <button type="button" class="btn btn-secondary maint-dur-btn" data-dur="0" onclick="selectMaintDuration(0)" style="font-size: 0.78rem; padding: 8px; text-align: center; border-color: rgba(255,255,255,0.15);">Manual Toggle<br><span style="font-size: 0.68rem; color: #94a3b8;">Until Closed</span></button>
+          </div>
+        </div>
+
+        <!-- Reason Input -->
+        <div>
+          <label for="maint-reason-input" style="font-size: 0.8rem; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 6px;">Maintenance Reason / Work Description:</label>
+          <input type="text" id="maint-reason-input" class="quick-drop-input" value="Windows Updates &amp; Optimization" placeholder="e.g. Windows Cumulative Update &amp; Reboot" style="width: 100%; box-sizing: border-box;">
+        </div>
+
+        <!-- DevOps SLA Protection Features -->
+        <div style="background: rgba(2, 6, 23, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 12px 14px; font-size: 0.78rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 8px;">
+          <div style="font-weight: 700; color: #60a5fa; display: flex; align-items: center; gap: 6px;">
+            <span>&#128737;&#65039;</span> Zero-Penalty SLA Shield Protections:
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="maint-chk-pause" checked style="accent-color: #3b82f6;">
+            <label for="maint-chk-pause">Gracefully pause torrent swarms during maintenance</label>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="maint-chk-resume" checked style="accent-color: #3b82f6;">
+            <label for="maint-chk-resume">Auto-resume all torrents &amp; background daemons when maintenance ends</label>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="maint-chk-sla" checked disabled style="accent-color: #10b981;">
+            <label for="maint-chk-sla" style="color: #6ee7b7;">Exempt reboots from 90-Day SLA downtime &amp; suppress watchdog failure alerts</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Buttons -->
+      <div style="border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <button type="button" class="btn btn-secondary" onclick="closeMaintenanceModal()" style="font-size: 0.8rem; padding: 6px 14px;">Close</button>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button type="button" id="btn-maint-trigger-update" class="btn btn-secondary" onclick="activateMaintenanceWithUpdate()" style="font-size: 0.8rem; padding: 6px 14px; color: #38bdf8 !important; border-color: rgba(56, 189, 248, 0.4);" title="Activate maintenance window and immediately execute Update-Computer on NUC">
+            &#128640; Maintenance &amp; Run Update-Computer
+          </button>
+          <button type="button" id="btn-maint-toggle-action" class="btn btn-primary" onclick="confirmToggleMaintenance()" style="font-size: 0.8rem; padding: 6px 16px; background: linear-gradient(135deg, #f59e0b, #d97706); border-color: #f59e0b;">
+            &#128736;&#65039; Activate Maintenance Window
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="app.js?v=2.8.8"></script>
+</body>
+</html>
