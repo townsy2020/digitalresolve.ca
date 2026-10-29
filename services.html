@@ -6,9 +6,9 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>Services &bull; Digital Resolve Homelab</title>
-  <meta name="description" content="24/7 self-hosted homelab operations, Cloudflare Zero Trust tunnels, private 4K media streaming, and automated WireGuard VPN ingestion.">
-  <link rel="stylesheet" href="styles.css?v=2.8.14">
+  <title>Services - Self-Hosted Homelab Portfolio</title>
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.15 - Services - Self-Hosted Homelab Portfolio">
+  <link rel="stylesheet" href="styles.css?v=2.8.7">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -45,26 +45,12 @@
   
   <header class="header" id="site-header">
     <div class="container nav-container">
-      <a href="index.html#deck" class="logo" title="DigitalResolve Homelab Deck">
+      <a href="#deck" class="logo" title="DigitalResolve Homelab Deck">
         <span class="logo-text-group"><span class="logo-accent">Digital</span>Resolve</span>
         <span class="logo-deck-badge">HOMELAB DECK</span>
       </a>
       <nav class="nav-links">
-        <!-- Primary Category Pages Navigation -->
-        <div class="nav-pages-group">
-          <a href="index.html" class="btn-nav">DECK</a>
-          <a href="services.html" class="btn-nav active">SERVICES</a>
-          <a href="fleet.html" class="btn-nav">FLEET NODES</a>
-          <a href="uptime.html" class="btn-nav">UPTIME</a>
-          <a href="media.html" class="btn-nav">MEDIA</a>
-          <a href="penny.html" class="btn-nav">PENNY</a>
-          <a href="ops.html" class="btn-nav">OPS &amp; AI</a>
-        </div>
-
-        <div class="nav-divider" aria-hidden="true"></div>
-
-        <!-- Contextual Quick-Action Tool Menus -->
-        <div class="nav-tools-group">
+        <a href="#deck" class="btn-nav">DECK</a>
 
         <!-- Consolidated Menu 1: Cluster & Media -->
         <div class="dropdown">
@@ -72,12 +58,12 @@
             <span>Cluster &amp; Media</span> <span class="dropdown-arrow">&#9662;</span>
           </button>
           <div class="dropdown-menu">
-            <a href="services.html#service-status" class="btn-action-item" title="Open Live Homelab Service Status Dashboard">
+            <a href="#service-status" class="btn-action-item" title="Open Live Homelab Service Status Dashboard">
               <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
               <span>Live Service Status Dashboard</span>
               <span class="item-tag online">8 Online</span>
             </a>
-            <a href="services.html#nuc-services" class="btn-action-item" title="Open NUC 24/7 Telemetry &amp; Microservices Suite">
+            <a href="#nuc-services" class="btn-action-item" title="Open NUC 24/7 Telemetry &amp; Microservices Suite">
               <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
               <span>NUC 24/7 Services Suite</span>
               <span class="item-tag online">Active</span>
@@ -92,7 +78,7 @@
               <span>Browse Media &amp; Files (NUC)</span>
               <span class="item-tag">Vault</span>
             </a>
-            <a href="penny.html#camera-feed-card" class="btn-action-item" title="Penny's Cat Hub - Live Optical Stream &amp; Smart Feeder IoT">
+            <a href="#camera-feed-card" class="btn-action-item" title="Penny's Cat Hub - Live Optical Stream &amp; Smart Feeder IoT">
               <span class="dropdown-dot" style="background-color: #f472b6; box-shadow: 0 0 8px #f472b6;"></span>
               <span>Penny's Cat Hub (Stream &amp; Feeder)</span>
               <span class="item-tag online">Live &bull; 192.168.2.22</span>
@@ -153,12 +139,12 @@
               <span>Wake Both</span>
             </button>
             <div class="dropdown-divider"></div>
-            <a href="fleet.html#fleet" class="btn-action-item" title="Jump to Cluster Hardware Topology &amp; Circuit Schematic">
+            <a href="#fleet" class="btn-action-item" title="Jump to Cluster Hardware Topology &amp; Circuit Schematic">
               <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
               <span>Hardware Topology &amp; Schematic</span>
               <span class="item-tag">Schematic</span>
             </a>
-            <a href="uptime.html#uptime" class="btn-action-item" title="Jump to Cluster Availability &amp; 90-Day SLA History">
+            <a href="#uptime" class="btn-action-item" title="Jump to Cluster Availability &amp; 90-Day SLA History">
               <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
               <span>90-Day SLA &amp; Uptime History</span>
               <span class="item-tag online">99.98%</span>
@@ -185,7 +171,7 @@
         <!-- Consolidated Menu 3: Ops, AI & Resilience -->
         <div class="dropdown">
           <button type="button" class="btn-nav" id="ops-menu-btn" aria-haspopup="true" title="Antigravity Autonomous Agent, Disaster Resilience Test, and AI Telemetry">
-            <span>Ops &amp; Tools</span> <span class="dropdown-arrow">&#9662;</span>
+            <span>Ops &amp; AI</span> <span class="dropdown-arrow">&#9662;</span>
           </button>
           <div class="dropdown-menu">
             <button type="button" class="btn-action-item" onclick="openEmbeddedConsole()" title="Open Live Interactive Terminal for Active Session 572d607f">
@@ -193,7 +179,7 @@
               <span>Open AGY Terminal (webdev1.0)</span>
               <span class="item-tag online">Live</span>
             </button>
-            <a href="ops.html#ops-ai" class="btn-action-item" title="Jump to In-Page Compute, AI &amp; Terminal Operations Console">
+            <a href="#ops-ai" class="btn-action-item" title="Jump to In-Page Compute, AI &amp; Terminal Operations Console">
               <span class="dropdown-dot dot-1"></span>
               <span>In-Page Terminal &amp; Ollama</span>
               <span class="item-tag">Ops Hub</span>
@@ -249,7 +235,6 @@
             </div>
           </div>
         </div>
-        </div>
       </nav>
 
       <!-- Top Right Actions: Dedicated SSO Login / Logout Controls & Layout Toggle -->
@@ -284,720 +269,7 @@
       </div>
     </div>
   </header>
-  <main>
-    <section class="subpage-hero">
-      <div class="container">
-        <div class="subpage-badge">
-          <span class="pulse-dot"></span>
-          <span>24/7 Cluster Microservices &amp; Apps</span>
-        </div>
-        <h1 class="subpage-title">Homelab Services &amp; Infrastructure Suite</h1>
-        <p class="subpage-subtitle">Real-time health observability, high-performance local network endpoints, and zero-trust secured application containers.</p>
-      </div>
-    </section>
-    <div class="container">
-          <!-- Live Homelab Service Status Dashboard -->
-          <div class="service-status-dashboard" id="service-status" style="margin-top: 24px;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px; margin-bottom: 16px;">
-              <div>
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap;">
-                  <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 10px #10b981; width: 10px; height: 10px;"></span>
-                  <h3 style="font-size: 1.25rem; font-weight: 800; color: #f0f6fc; margin: 0;">Homelab Service Status Dashboard</h3>
-                  <span class="item-tag online" id="dash-global-status" style="font-size: 0.72rem; padding: 2px 8px;">8/8 Services Online</span>
-                </div>
-                <div style="font-size: 0.8rem; color: #94a3b8; max-width: 650px;">
-                  Real-time health, active listener ports, zero-trust edge routing, and autonomous Sentinel watchdog status across all fleet microservices.
-                </div>
-              </div>
-              <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                <span class="sentinel-badge" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 6px; font-size: 0.74rem; color: #6ee7b7; font-weight: 600;">
-                  <span class="pulse-dot" style="background-color: #10b981; width: 6px; height: 6px;"></span> Sentinel Daemon: Armed (3m Loop)
-                </span>
-                <button type="button" class="btn-schematic-chip" onclick="refreshServiceDashboard(this)" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; font-size: 0.76rem; border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;" title="Query all microservice ports and refresh status">
-                  <svg id="dash-refresh-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle; margin-right:4px;"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>Ping Services Now
-                </button>
-              </div>
-            </div>
-
-            <!-- Service Filter Tabs -->
-            <div class="dash-filter-bar" style="margin-bottom: 16px;">
-              <button type="button" class="btn-schematic-chip dash-filter-btn active" onclick="filterServiceDashboard('all', this)">All Services (8)</button>
-              <button type="button" class="btn-schematic-chip dash-filter-btn" onclick="filterServiceDashboard('media', this)">Media &amp; Video (2)</button>
-              <button type="button" class="btn-schematic-chip dash-filter-btn" onclick="filterServiceDashboard('security', this)">Perimeter &amp; Edge (2)</button>
-              <button type="button" class="btn-schematic-chip dash-filter-btn" onclick="filterServiceDashboard('compute', this)">Compute &amp; BitTorrent (2)</button>
-              <button type="button" class="btn-schematic-chip dash-filter-btn" onclick="filterServiceDashboard('iot', this)">Pet IoT &amp; Vitals (2)</button>
-            </div>
-
-            <!-- Service Cards Grid -->
-            <div class="dash-service-grid" id="dashServiceGrid">
-              <!-- Service 1: StreamHub -->
-              <div class="dash-card" data-category="media" id="scard-streamhub">
-                <div class="dash-card-header">
-                  <div class="dash-card-title-group">
-                    <div class="dash-card-icon" style="background: rgba(168, 85, 247, 0.18); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.35);">4K</div>
-                    <div>
-                      <div class="dash-card-name">StreamHub Video Library</div>
-                      <div class="dash-card-port">Port 8088 &bull; HTTP 206 Partial Content</div>
-                    </div>
-                  </div>
-                  <span class="item-tag online" id="stag-streamhub">Operational</span>
-                </div>
-                <div class="dash-card-meta">
-                  <div class="dash-card-meta-row">
-                    <span>Host Node:</span>
-                    <strong style="color: #cbd5e1;">Intel NUC (192.168.2.35)</strong>
-                  </div>
-                  <div class="dash-card-meta-row">
-                    <span>Public URL:</span>
-                    <span class="mono" style="color: #c4b5fd;">stream.digitalresolve.ca</span>
-                  </div>
-                  <div class="dash-card-meta-row">
-                    <span>Latency &bull; Watchdog:</span>
-                    <span style="color: #34d399;">1.1 ms &bull; Sentinel Armed (3m)</span>
-                  </div>
-                </div>
-                <div class="dash-card-footer">
-                  <span style="font-size: 0.72rem; color: #64748b;">M365 Entra ID SSO</span>
-                  <a href="javascript:void(0)" onclick="launchProtectedService('https://stream.digitalresolve.ca', 'Watch Library &amp; StreamHub (Port 8088)')" class="btn-schematic-chip dash-btn-action">Launch Stream &rarr;</a>
-                </div>
-              </div>
-
-              <!-- Service 2: FileBrowser -->
-              <div class="dash-card" data-category="media" id="scard-filebrowser">
-                <div class="dash-card-header">
-                  <div class="dash-card-title-group">
-                    <div class="dash-card-icon" style="background: rgba(14, 165, 233, 0.18); color: #38bdf8; border: 1px solid rgba(14, 165, 233, 0.35);">DIR</div>
-                    <div>
-                      <div class="dash-card-name">FileBrowser Cloud Vault</div>
-                      <div class="dash-card-port">Port 8085 &bull; WebDAV &amp; File Engine</div>
-                    </div>
-                  </div>
-                  <span class="item-tag online" id="stag-files">Operational</span>
-                </div>
-                <div class="dash-card-meta">
-                  <div class="dash-card-meta-row">
-                    <span>Host Node:</span>
-                    <strong style="color: #cbd5e1;">Intel NUC (192.168.2.35)</strong>
-                  </div>
-                  <div class="dash-card-meta-row">
-                    <span>Public URL:</span>
-                    <span class="mono" style="color: #38bdf8;">files.digitalresolve.ca</span>
-                  </div>
-                  <div class="dash-card-meta-row">
-                    <span>Latency &bull; Watchdog:</span>
-                    <span style="color: #34d399;">0.9 ms &bull; Sentinel Armed (3m)</span>
-                  </div>
-                </div>
-                <div class="dash-card-footer">
-                  <span style="font-size: 0.72rem; color: #64748b;">Media &amp; Document Vault</span>
-                  <a href="javascript:void(0)" onclick="launchProtectedService('https://files.digitalresolve.ca/files/', 'FileBrowser Media Cloud (Port 8085)')" class="btn-schematic-chip dash-btn-action">Open Vault &rarr;</a>
-                </div>
-              </div>
-
-              <!-- Service 3: Cat Cam Suite -->
-              <div class="dash-card" data-category="iot" id="scard-cam">
-                <div class="dash-card-header">
-                  <div class="dash-card-title-group">
-                    <div class="dash-card-icon" style="background: rgba(244, 63, 94, 0.18); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.35);">CAM</div>
-                    <div>
-                      <div class="dash-card-name">Penny's Cat Cam (go2rtc)</div>
-                      <div class="dash-card-port">Port 8089 &bull; WebRTC &amp; H.264 Gateway</div>
-                    </div>
-                  </div>
-                  <span class="item-tag online" id="stag-cam">Operational</span>
-                </div>
-                <div class="dash-card-meta">
-                  <div class="dash-card-meta-row">
-                    <span>Host Node:</span>
-                    <strong style="color: #cbd5e1;">Intel NUC (192.168.2.35)</strong>
-                  </div>
-                  <div class="dash-card-meta-row">
-                    <span>Public URL:</span>
-                    <span class="mono" style="color: #fb7185;">cam.digitalresolve.ca</span>
-                  </div>
-                  <div class="dash-card-meta-row">
-                    <span>Latency &bull; Watchdog:</span>
-                    <span style="color: #34d399;">2.1 ms &bull; go2rtc Daemon Active</span>
-                  </div>
-                </div>
-                <div class="dash-card-footer">
-                  <span style="font-size: 0.72rem; color: #64748b;">Zero Latency WebRTC</span>
-                  <a href="penny.html#camera-feed-card" class="btn-schematic-chip dash-btn-action">Watch Cam &rarr;</a>
-                </div>
-              </div>
-
-              <!-- Service 4: Smart Feeder IoT -->
-              <div class="dash-card" data-category="iot" id="scard-feeder">
-                <div class="dash-card-header">
-                  <div class="dash-card-title-group">
-                    <div class="dash-card-icon" style="background: rgba(236, 72, 153, 0.18); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.35);">IOT</div>
-                    <div>
-                      <div class="dash-card-name">Penny's Smart Feeder IoT</div>
-                      <div class="dash-card-port">192.168.2.22 &bull; LiieyPet Tuya v3.3</div>
-                    </div>
-                  </div>
-                  <span class="item-tag" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5;" id="stag-feeder">Hopper Empty</span>
-                </div>
-                <div class="dash-card-meta">
-                  <div class="dash-card-meta-row">
-                    <span>Kibble Level:</span>
-                    <strong style="color: #f87171;">0% (0g Dry Kibble) - Refill Needed</strong>
-                  </div>
-                  <div class="dash-card-meta-row">
-                    <span>Optical Cam:</span>
-                    <span style="color: #cbd5e1;">Cam 1 Pointing at Feeder</span>
-                  </div>
-                  <div class="dash-card-meta-row">
-                    <span>Watchdog:</span>
-                    <span style="color: #f87171;">Optical Watchdog Alert Active</span>
-                  </div>
-                </div>
-                <div class="dash-card-footer">
-                  <span style="font-size: 0.72rem; color: #64748b;">Hardware Bridge Active</span>
-                  <a href="penny.html#camera-feed-card" class="btn-schematic-chip dash-btn-action">Control Feeder &rarr;</a>
-                </div>
-              </div>
-
-              <!-- Service 5: WoL & Power Gateway -->
-              <div class="dash-card" data-category="security" id="scard-wol">
-                <div class="dash-card-header">
-                  <div class="dash-card-title-group">
-                    <div class="dash-card-icon" style="background: rgba(16, 185, 129, 0.18); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.35);">WOL</div>
-                    <div>
-                      <div class="dash-card-name">WoL &amp; Power Orchestration</div>
-                      <div class="dash-card-port">Port 8082 &bull; Magic Packet Dispatcher</div>
-                    </div>
-                  </div>
-                  <span class="item-tag online" id="stag-wol">Operational</span>
-                </div>
-                <div class="dash-card-meta">
-                  <div class="dash-card-meta-row">
-                    <span>Host Node:</span>
-                    <strong style="color: #cbd5e1;">Intel NUC (192.168.2.35)</strong>
-                  </div>
-                  <div class="dash-card-meta-row">
-                    <span>Public URL:</span>
-                    <span class="mono" style="color: #34d399;">wake.digitalresolve.ca</span>
-                  </div>
-                  <div class="dash-card-meta-row">
-                    <span>Latency &bull; Watchdog:</span>
-                    <span style="color: #34d399;">0.8 ms &bull; Windows Task Supervised</span>
-                  </div>
-                </div>
-                <div class="dash-card-footer">
-                  <span style="font-size: 0.72rem; color: #64748b;">REST API Power Gateway</span>
-                  <a href="#fleet-quick-controls" class="btn-schematic-chip dash-btn-action">Control Power &rarr;</a>
-                </div>
-              </div>
-
-              <!-- Service 6: NUC qBittorrent (VPN) -->
-              <div class="dash-card" data-category="compute" id="scard-qbit-nuc">
-                <div class="dash-card-header">
-                  <div class="dash-card-title-group">
-                    <div class="dash-card-icon" style="background: rgba(59, 130, 246, 0.18); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.35);">VPN</div>
-                    <div>
-                      <div class="dash-card-name">NUC qBittorrent (Mullvad)</div>
-                      <div class="dash-card-port">Port 8081 &bull; WireGuard Isolated</div>
-                    </div>
-                  </div>
-                  <span class="item-tag online" id="stag-torrents2">Operational</span>
-                </div>
-                <div class="dash-card-meta">
-                  <div class="dash-card-meta-row">
-                    <span>Host Node:</span>
-                    <strong style="color: #cbd5e1;">Intel NUC (192.168.2.35)</strong>
-                  </div>
-                  <div class="dash-card-meta-row">
-                    <span>Public URL:</span>
-                    <span class="mono" style="color: #60a5fa;">torrents2.digitalresolve.ca</span>
-                  </div>
-                  <div class="dash-card-meta-row">
-                    <span>Latency &bull; Watchdog:</span>
-                    <span style="color: #34d399;">1.4 ms &bull; Sentinel Armed (3m)</span>
-                  </div>
-                </div>
-                <div class="dash-card-footer">
-                  <span style="font-size: 0.72rem; color: #64748b;">Kill-Switch Protected</span>
-                  <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents2.digitalresolve.ca', 'qBittorrent NUC (Port 8081)')" class="btn-schematic-chip dash-btn-action">Open qBit NUC &rarr;</a>
-                </div>
-              </div>
-
-              <!-- Service 7: Desktop qBittorrent -->
-              <div class="dash-card" data-category="compute" id="scard-qbit-desktop">
-                <div class="dash-card-header">
-                  <div class="dash-card-title-group">
-                    <div class="dash-card-icon" style="background: rgba(99, 102, 241, 0.18); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.35);">PC</div>
-                    <div>
-                      <div class="dash-card-name">Desktop qBittorrent Node</div>
-                      <div class="dash-card-port">Port 8080 &bull; High-Throughput NVMe</div>
-                    </div>
-                  </div>
-                  <span class="item-tag online" id="stag-torrents">Operational</span>
-                </div>
-                <div class="dash-card-meta">
-                  <div class="dash-card-meta-row">
-                    <span>Host Node:</span>
-                    <strong style="color: #cbd5e1;">Desktop PC (192.168.2.62)</strong>
-                  </div>
-                  <div class="dash-card-meta-row">
-                    <span>Public URL:</span>
-                    <span class="mono" style="color: #818cf8;">torrents.digitalresolve.ca</span>
-                  </div>
-                  <div class="dash-card-meta-row">
-                    <span>Latency &bull; Watchdog:</span>
-                    <span style="color: #34d399;">0.2 ms &bull; Interactive Node Active</span>
-                  </div>
-                </div>
-                <div class="dash-card-footer">
-                  <span style="font-size: 0.72rem; color: #64748b;">High Performance Ingestion</span>
-                  <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents.digitalresolve.ca', 'qBittorrent Desktop (Port 8080)')" class="btn-schematic-chip dash-btn-action">Open qBit Desktop &rarr;</a>
-                </div>
-              </div>
-
-              <!-- Service 8: Cloudflare Zero Trust Mesh -->
-              <div class="dash-card" data-category="security" id="scard-cf">
-                <div class="dash-card-header">
-                  <div class="dash-card-title-group">
-                    <div class="dash-card-icon" style="background: rgba(249, 115, 22, 0.18); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.35);">CF</div>
-                    <div>
-                      <div class="dash-card-name">Cloudflare Zero Trust Edge</div>
-                      <div class="dash-card-port">Global Anycast &bull; Dual Tunnel Mesh</div>
-                    </div>
-                  </div>
-                  <span class="item-tag online" style="background: rgba(249, 115, 22, 0.2); color: #fb923c;" id="stag-cf">Shield Active</span>
-                </div>
-                <div class="dash-card-meta">
-                  <div class="dash-card-meta-row">
-                    <span>Edge Nodes:</span>
-                    <strong style="color: #cbd5e1;">YUL (Montreal) &bull; YYZ (Toronto)</strong>
-                  </div>
-                  <div class="dash-card-meta-row">
-                    <span>Perimeter:</span>
-                    <span style="color: #34d399;">0 Port Forwards &bull; TLS 1.3 / HTTP3</span>
-                  </div>
-                  <div class="dash-card-meta-row">
-                    <span>Latency &bull; Watchdog:</span>
-                    <span style="color: #fb923c;">1.1 ms &bull; Global Anycast Resilient</span>
-                  </div>
-                </div>
-                <div class="dash-card-footer">
-                  <span style="font-size: 0.72rem; color: #64748b;">M365 Entra ID SSO Policy</span>
-                  <a href="javascript:void(0)" onclick="openCloudflareStatsModal()" class="btn-schematic-chip dash-btn-action">View Edge Stats &rarr;</a>
-                </div>
-              </div>
-            </div>
-
-            <!-- Bottom Watchdog Sentinel Audit Bar -->
-            <div style="background: rgba(2, 6, 23, 0.75); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 12px 16px; margin-top: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-size: 0.76rem; color: #94a3b8;">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 6px #10b981;"></span>
-                <span><strong>Sentinel Auto-Healing Watchdog:</strong> Active every 3 minutes on NUC (<code>192.168.2.35</code>). Auto-restarts failed tasks autonomously.</span>
-              </div>
-              <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #64748b;">
-                Audit Log: <span style="color: #38bdf8;">Sentinel-Audit.log</span> &bull; MTTR: &lt; 180s
-              </div>
-            </div>
-          </div>
-    </div>
-    <section id="nuc-services" class="fleet-section" style="border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 60px;">
-      <div class="container">
-        <div class="section-header">
-          <span class="section-tag" style="background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3);">NUC 24/7 Telemetry &amp; Microservices</span>
-          <h2>Homelab Edge Intelligence &amp; Services Suite</h2>
-          <p>High-density 24/7 services hosted on the Intel NUC core server (32 GB RAM) with hardware isolation, zero-trust security, and real-time observability.</p>
-        </div>
-
-        <div class="nuc-services-container">
-          <!-- Segmented Tab Navigation Bar -->
-          <div class="nuc-tabs-bar" role="tablist">
-            <button type="button" class="nuc-tab-btn active" id="tab-btn-speedtest" onclick="switchNucTab('speedtest')">
-              Bell Speedtest
-            </button>
-            <button type="button" class="nuc-tab-btn" id="tab-btn-dns" onclick="switchNucTab('dns')">
-              <span></span> DNS Threat Shield
-            </button>
-            <button type="button" class="nuc-tab-btn" id="tab-btn-books" onclick="switchNucTab('books')">
-              Knowledge Vault
-            </button>
-            <button type="button" class="nuc-tab-btn" id="tab-btn-iot" onclick="switchNucTab('iot')">
-              <span></span> IoT &amp; Power Vitals
-            </button>
-            <button type="button" class="nuc-tab-btn" id="tab-btn-kuma" onclick="switchNucTab('kuma')">
-              Uptime Heartbeats
-            </button>
-          </div>
-
-          <!-- PANE 1: Bell Gigabit Fiber Speedtest -->
-          <div class="nuc-pane active" id="pane-speedtest">
-            <div class="kpi-row-4">
-              <div class="kpi-mini-card success">
-                <div class="kpi-label">Download Speed <span>&#9660;</span></div>
-                <div class="kpi-val" id="st-val-down" style="color: #34d399;">942.4 <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span></div>
-                <div class="kpi-sub"><span class="dropdown-dot dot-1" style="background:#10b981;"></span> Direct Bell WAN Interface</div>
-              </div>
-              <div class="kpi-mini-card">
-                <div class="kpi-label">Upload Speed <span>&#9650;</span></div>
-                <div class="kpi-val" id="st-val-up" style="color: #38bdf8;">884.1 <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span></div>
-                <div class="kpi-sub"><span class="dropdown-dot dot-1" style="background:#38bdf8;"></span> Symmetric Symmetrical Fiber</div>
-              </div>
-              <div class="kpi-mini-card purple">
-                <div class="kpi-label">Latency &amp; Jitter <span>&#8644;</span></div>
-                <div class="kpi-val" id="st-val-ping" style="color: #c084fc;">3.1 <span style="font-size: 0.85rem; color: #94a3b8;">ms</span></div>
-                <div class="kpi-sub">&plusmn; 0.3 ms Jitter &bull; Cloudflare YYZ</div>
-              </div>
-              <div class="kpi-mini-card amber">
-                <div class="kpi-label">Bufferbloat Rating</div>
-                <div class="kpi-val" id="st-val-grade" style="color: #fbbf24;">Grade A+</div>
-                <div class="kpi-sub">+0 ms latency under full saturation</div>
-              </div>
-            </div>
-
-            <!-- Speedtest Execution Hero Card -->
-            <div class="speedtest-hero-card">
-              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-                <div>
-                  <h3 style="font-size: 1.15rem; font-weight: 800; color: #f8fafc; margin-bottom: 4px;">Automated Gigabit Benchmark Daemon</h3>
-                  <div style="font-size: 0.8rem; color: #94a3b8;">Hourly scheduled testing daemon running on NUC via Ookla/Cloudflare Speedtest CLI.</div>
-                </div>
-                <span class="item-tag online" style="font-size: 0.76rem; padding: 4px 10px;">Automated: Next in 24m</span>
-              </div>
-
-              <!-- Animated Speedometer Dial Display -->
-              <div class="speedtest-gauge-wrap">
-                <div class="speed-dial-meter">
-                  <div class="speed-dial-bg" id="speed-dial-needle" style="transform: rotate(105deg);"></div>
-                  <div class="speed-dial-center">
-                    <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Current Test</div>
-                    <div id="gauge-live-num" style="font-size: 1.6rem; font-weight: 900; color: #38bdf8; font-family: 'JetBrains Mono', monospace;">942.4</div>
-                    <div style="font-size: 0.7rem; color: #94a3b8;">Mbps Throughput</div>
-                  </div>
-                </div>
-                <div id="st-stage-indicator" style="font-size: 0.8rem; color: #94a3b8; margin-top: 10px; font-family: monospace;">
-                  Last Tested: 14 mins ago &bull; Target: Cloudflare Edge (Toronto, ON) &bull; Zero Packet Loss
-                </div>
-              </div>
-
-              <!-- Speedtest Action Trigger -->
-              <div class="speedtest-sso-banner">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <span style="font-size: 1.4rem;"></span>
-                  <div>
-                    <div style="font-weight: 700; color: #fde68a; font-size: 0.85rem;">Interactive Gigabit WAN Benchmark</div>
-                    <div style="font-size: 0.76rem; color: #94a3b8; max-width: 600px;">
-                      Live bidirectional tests transmit full bandwidth across WAN. Automated tests run hourly via NUC daemon.
-                    </div>
-                  </div>
-                </div>
-                <button type="button" class="btn btn-primary" onclick="triggerSpeedtest()" id="btn-run-speedtest" style="background: linear-gradient(135deg, #f59e0b, #d97706); border-color: #f59e0b; color: #000; font-weight: 800; padding: 8px 18px; font-size: 0.84rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
-                  Run Gigabit Speedtest
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- PANE 2: Network DNS Threat Shield (AdGuard / Pi-hole) -->
-          <div class="nuc-pane" id="pane-dns">
-            <div class="kpi-row-4">
-              <div class="kpi-mini-card">
-                <div class="kpi-label">Upstream Protocol</div>
-                <div class="kpi-val" style="color: #60a5fa;">DNS-over-TLS</div>
-                <div class="kpi-sub"><span class="dropdown-dot dot-1" style="background:#38bdf8;"></span> Cloudflare (1.1.1.1) + Quad9 (9.9.9.9)</div>
-              </div>
-              <div class="kpi-mini-card success">
-                <div class="kpi-label">Split-Horizon Rewrites</div>
-                <div class="kpi-val" style="color: #34d399;">6 LAN Routes</div>
-                <div class="kpi-sub"><span class="dropdown-dot dot-1" style="background:#10b981;"></span> Zero NAT Loopback</div>
-              </div>
-              <div class="kpi-mini-card purple">
-                <div class="kpi-label">Curated Blocklists</div>
-                <div class="kpi-val" style="color: #c084fc;">412,850</div>
-                <div class="kpi-sub">OISD Full + HaGeZi Multi PRO</div>
-              </div>
-              <div class="kpi-mini-card amber">
-                <div class="kpi-label">Service Daemon</div>
-                <div class="kpi-val" style="color: #fbbf24;">Awaiting Install</div>
-                <div class="kpi-sub">Intel NUC (192.168.2.35:3000)</div>
-              </div>
-            </div>
-
-            <div class="dns-threat-box">
-              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
-                <div style="font-weight: 700; color: #f8fafc; font-size: 0.95rem;">
-                  Pre-Configured Split-Horizon DNS Rewrites
-                </div>
-                <span style="font-size: 0.74rem; color: #94a3b8; font-family: monospace;">Local Cluster Resolution (Zero Internet Egress)</span>
-              </div>
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px;">
-                <div style="background: rgba(0, 0, 0, 0.4); padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem;">
-                  <div style="color: #cbd5e1; font-weight: 600; margin-bottom: 2px;">torrents.digitalresolve.ca</div>
-                  <div style="color: #38bdf8; font-family: monospace;">&rarr; 192.168.2.62 (Desktop Workstation)</div>
-                </div>
-                <div style="background: rgba(0, 0, 0, 0.4); padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem;">
-                  <div style="color: #cbd5e1; font-weight: 600; margin-bottom: 2px;">torrents2.digitalresolve.ca</div>
-                  <div style="color: #38bdf8; font-family: monospace;">&rarr; 192.168.2.35 (NUC Server)</div>
-                </div>
-                <div style="background: rgba(0, 0, 0, 0.4); padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem;">
-                  <div style="color: #cbd5e1; font-weight: 600; margin-bottom: 2px;">cam.digitalresolve.ca</div>
-                  <div style="color: #38bdf8; font-family: monospace;">&rarr; 192.168.2.35 (Penny Feeder WebRTC)</div>
-                </div>
-                <div style="background: rgba(0, 0, 0, 0.4); padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem;">
-                  <div style="color: #cbd5e1; font-weight: 600; margin-bottom: 2px;">files.digitalresolve.ca</div>
-                  <div style="color: #38bdf8; font-family: monospace;">&rarr; 192.168.2.35 (Kavita &amp; File Storage)</div>
-                </div>
-                <div style="background: rgba(0, 0, 0, 0.4); padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem;">
-                  <div style="color: #cbd5e1; font-weight: 600; margin-bottom: 2px;">stream.digitalresolve.ca</div>
-                  <div style="color: #38bdf8; font-family: monospace;">&rarr; 192.168.2.35 (Audiobookshelf)</div>
-                </div>
-                <div style="background: rgba(0, 0, 0, 0.4); padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem;">
-                  <div style="color: #cbd5e1; font-weight: 600; margin-bottom: 2px;">feeder.local</div>
-                  <div style="color: #f472b6; font-family: monospace;">&rarr; 192.168.2.22 (Smart Feeder Hardware)</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- AdGuard Configuration & Status Controls -->
-            <div style="margin-top: 16px; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 16px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-                <div>
-                  <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                    <span style="font-weight: 800; color: #f8fafc; font-size: 0.95rem;">AdGuard Home DNS Configuration Suite</span>
-                    <span class="item-tag warning" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); font-size: 0.7rem;">Service Setup Required &bull; Port 3000 Inactive</span>
-                  </div>
-                  <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 3px;">
-                    Homelab DNS filtering and local rewrites ready. Configured for DoT upstreams (1.1.1.1 &bull; 9.9.9.9), HaGeZi + OISD blocklists, and LAN split-horizon.
-                  </div>
-                </div>
-                <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-                  <button type="button" class="btn btn-primary" onclick="openAdGuardConfigModal()" style="font-size: 0.78rem; padding: 7px 14px; background: linear-gradient(135deg, #10b981, #059669); border-color: #10b981; color: white !important; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-weight: 600;">
-                    AdGuard Configuration &amp; Rewrites
-                  </button>
-                  <button type="button" class="btn btn-secondary" onclick="copyAdguardDeployCommand()" id="btn-copy-adguard" style="font-size: 0.78rem; padding: 7px 14px; color: #38bdf8 !important; border-color: rgba(56, 189, 248, 0.4); display: inline-flex; align-items: center; gap: 6px; cursor: pointer;" title="Copy PowerShell 1-liner to deploy natively on Windows NUC">
-                    Copy Windows Deploy Command
-                  </button>
-                  <a href="http://192.168.2.35:3000" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.78rem; padding: 7px 14px; color: #64748b !important; border-color: rgba(255, 255, 255, 0.1); display: inline-flex; align-items: center; gap: 6px; opacity: 0.75;" title="Port 3000 web console is available after running the installer on NUC">
-                    Web Console (Port 3000) &nearr;
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-
-
-          <!-- PANE 4: Curated Knowledge Vault & Audiobookshelf -->
-          <div class="nuc-pane" id="pane-books">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
-              <div>
-                <h3 style="font-size: 1.05rem; font-weight: 800; color: #f8fafc; margin-bottom: 2px;">Curated Media Vault &amp; Audiobookshelf</h3>
-                <div style="font-size: 0.8rem; color: #94a3b8;">High-fidelity audiobooks and technical literature hosted on NUC storage with progress sync.</div>
-              </div>
-              <div style="display: flex; gap: 8px;">
-                <button type="button" onclick="launchProtectedService('https://stream.digitalresolve.ca', 'Audiobookshelf (stream.digitalresolve.ca)')" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; color: #c4b5fd !important; cursor: pointer;">Launch Audiobookshelf &nearr;</button>
-                <button type="button" onclick="launchProtectedService('https://files.digitalresolve.ca/files/', 'Kavita Reader (files.digitalresolve.ca)')" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; cursor: pointer;">Kavita Reader &nearr;</button>
-              </div>
-            </div>
-
-            <div class="bookshelf-grid">
-              <div class="book-card">
-                <div class="book-cover" style="background: linear-gradient(135deg, #1e3a8a, #0f172a);"></div>
-                <div class="book-body">
-                  <div style="font-size: 0.72rem; color: #60a5fa; font-weight: 700; text-transform: uppercase;">Audiobook &bull; Gene Kim</div>
-                  <div style="font-weight: 800; color: #f8fafc; font-size: 0.92rem;">The Phoenix Project</div>
-                  <div style="font-size: 0.76rem; color: #94a3b8;">A Novel About IT, DevOps, and Helping Your Business Win</div>
-                  <div style="margin-top: auto; padding-top: 10px;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #64748b; margin-bottom: 4px;">
-                      <span>Progress: 72%</span>
-                      <span>4h 12m left</span>
-                    </div>
-                    <div style="height: 4px; background: rgba(255,255,255,0.1); border-radius: 9999px; overflow: hidden;">
-                      <div style="width: 72%; height: 100%; background: #38bdf8;"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="book-card">
-                <div class="book-cover" style="background: linear-gradient(135deg, #065f46, #022c22);"></div>
-                <div class="book-body">
-                  <div style="font-size: 0.72rem; color: #34d399; font-weight: 700; text-transform: uppercase;">eBook / Kavita &bull; Martin Kleppmann</div>
-                  <div style="font-weight: 800; color: #f8fafc; font-size: 0.92rem;">Designing Data-Intensive Apps</div>
-                  <div style="font-size: 0.76rem; color: #94a3b8;">The Big Ideas Behind Reliable, Scalable, and Maintainable Systems</div>
-                  <div style="margin-top: auto; padding-top: 10px;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #64748b; margin-bottom: 4px;">
-                      <span>Chapter 7</span>
-                      <span>Transactions</span>
-                    </div>
-                    <div style="height: 4px; background: rgba(255,255,255,0.1); border-radius: 9999px; overflow: hidden;">
-                      <div style="width: 58%; height: 100%; background: #10b981;"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="book-card">
-                <div class="book-cover" style="background: linear-gradient(135deg, #581c87, #2e1065);"></div>
-                <div class="book-body">
-                  <div style="font-size: 0.72rem; color: #c084fc; font-weight: 700; text-transform: uppercase;">Audiobook &bull; William Gibson</div>
-                  <div style="font-weight: 800; color: #f8fafc; font-size: 0.92rem;">Neuromancer</div>
-                  <div style="font-size: 0.76rem; color: #94a3b8;">The Sprawl Trilogy &bull; Cyberpunk Classic</div>
-                  <div style="margin-top: auto; padding-top: 10px;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #64748b; margin-bottom: 4px;">
-                      <span>Progress: 34%</span>
-                      <span>6h 40m left</span>
-                    </div>
-                    <div style="height: 4px; background: rgba(255,255,255,0.1); border-radius: 9999px; overflow: hidden;">
-                      <div style="width: 34%; height: 100%; background: #a855f7;"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="book-card">
-                <div class="book-cover" style="background: linear-gradient(135deg, #78350f, #451a03);"></div>
-                <div class="book-body">
-                  <div style="font-size: 0.72rem; color: #fbbf24; font-weight: 700; text-transform: uppercase;">Reference &bull; Kelsey Hightower</div>
-                  <div style="font-weight: 800; color: #f8fafc; font-size: 0.92rem;">Kubernetes: Up and Running</div>
-                  <div style="font-size: 0.76rem; color: #94a3b8;">Dive into the Future of Infrastructure</div>
-                  <div style="margin-top: auto; padding-top: 10px;">
-                    <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #64748b; margin-bottom: 4px;">
-                      <span>Reference</span>
-                      <span>Handbook</span>
-                    </div>
-                    <div style="height: 4px; background: rgba(255,255,255,0.1); border-radius: 9999px; overflow: hidden;">
-                      <div style="width: 100%; height: 100%; background: #f59e0b;"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- PANE 5: IoT & Environmental Power Vitals -->
-          <div class="nuc-pane" id="pane-iot">
-            <div class="iot-metrics-grid">
-              <div class="iot-card">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <span style="font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: 700;">Cluster Power Draw</span>
-                  <span class="item-tag online" style="background: rgba(34, 197, 94, 0.2); color: #4ade80;">Energy Star</span>
-                </div>
-                <div style="font-size: 1.8rem; font-weight: 800; color: #34d399; font-family: 'JetBrains Mono', monospace;">
-                  68 <span style="font-size: 0.9rem; color: #94a3b8;">Watts</span>
-                </div>
-                <div style="font-size: 0.78rem; color: #94a3b8; line-height: 1.5;">
-                  &bull; NUC 24/7 Server: <strong>18 Watts</strong><br>
-                  &bull; Desktop Active Workstation: <strong>50 Watts</strong><br>
-                  &bull; Estimated Monthly Grid Cost: <strong>~$5.88 CAD</strong>
-                </div>
-              </div>
-
-              <div class="iot-card">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <span style="font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: 700;">Home Lab Thermals</span>
-                  <span class="item-tag online" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8;">Nominal</span>
-                </div>
-                <div style="font-size: 1.8rem; font-weight: 800; color: #38bdf8; font-family: 'JetBrains Mono', monospace;">
-                  21.4&deg;C <span style="font-size: 0.9rem; color: #94a3b8;">/ 42% RH</span>
-                </div>
-                <div style="font-size: 0.78rem; color: #94a3b8; line-height: 1.5;">
-                  &bull; NUC CPU Die Package: <strong>42&deg;C</strong><br>
-                  &bull; Ambient Room Thermostat: <strong>21.2&deg;C</strong><br>
-                  &bull; Air Circulation: Active &bull; Zero Thermal Throttling
-                </div>
-              </div>
-
-              <div class="iot-card" style="border-color: rgba(244, 114, 182, 0.35);">
-                <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;">
-                  <span style="font-size: 0.75rem; text-transform: uppercase; color: #f472b6; font-weight: 700;">Penny's Smart Feeder IoT</span>
-                  <span class="item-tag online" style="background: rgba(16, 185, 129, 0.2); color: #34d399;"><span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10b981; margin-right: 4px; box-shadow: 0 0 6px #10b981;"></span>192.168.2.22 &bull; Connected &amp; Armed</span>
-                </div>
-                <div style="font-size: 1.8rem; font-weight: 800; color: #f472b6; font-family: 'JetBrains Mono', monospace; margin: 4px 0;">
-                  <span id="feeder-nuc-hopper-pct">0%</span> <span id="feeder-nuc-hopper-sub" style="font-size: 0.85rem; color: #f87171; font-weight: 600;">(0g - EMPTY - Refill Needed)</span>
-                </div>
-                <div class="disk-bar-bg" style="margin-bottom: 8px;">
-                  <div class="disk-bar-fill" id="feeder-nuc-hopper-bar" style="width: 0%; background: linear-gradient(90deg, #ef4444, #f87171); transition: width 0.4s ease;"></div>
-                </div>
-                <div style="font-size: 0.78rem; color: #94a3b8; line-height: 1.5;">
-                  - Consolidated into <strong>Penny's Cat Hub</strong> alongside optical cam stream.<br>
-                  - Hardware: <strong>LiieyPet WIFI - 192.168.2.22</strong><br>
-                  - Optical Watchdog: <span id="feeder-nuc-watchdog" style="color: #f87171; font-weight: 600;">Alert - Empty Hopper Detected</span><br>
-                  - Last Dispense: <span id="feeder-iot-last-time" style="color: #cbd5e1;">Empty Hopper Detected</span>
-                </div>
-                <div style="margin-top: 10px;">
-                  <a href="#camera-feed-card" class="btn btn-secondary" style="font-size: 0.76rem; padding: 5px 12px; color: #f472b6 !important; border-color: rgba(244, 114, 182, 0.4); display: inline-flex; align-items: center; gap: 6px;" title="Open Penny's Cat Hub (Stream &amp; Feeder)">
-                    <span>Open Penny's Cat Hub (Stream &amp; Controls) &rarr;</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- PANE 6: Uptime Kuma Multi-Service Heartbeat Matrix -->
-          <div class="nuc-pane" id="pane-kuma">
-            <div class="kuma-matrix-box">
-              <table class="kuma-table">
-                <thead>
-                  <tr>
-                    <th>Service &amp; Port</th>
-                    <th>Node Host</th>
-                    <th>Latency</th>
-                    <th>24h Uptime</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><strong>Review &amp; Watch Library</strong> (StreamHub :8088)</td>
-                    <td>NUC (192.168.2.35)</td>
-                    <td><span class="mono" style="color: #34d399;">1.1 ms</span></td>
-                    <td>100.0%</td>
-                    <td><span class="item-tag online">Healthy</span></td>
-                  </tr>
-                  <tr>
-                    <td><strong>FileBrowser Media Cloud</strong> (:8085)</td>
-                    <td>NUC (192.168.2.35)</td>
-                    <td><span class="mono" style="color: #34d399;">0.9 ms</span></td>
-                    <td>100.0%</td>
-                    <td><span class="item-tag online">Healthy</span></td>
-                  </tr>
-                  <tr>
-                    <td><strong>qBittorrent VPN Daemon</strong> (:8081)</td>
-                    <td>NUC (WireGuard Mullvad)</td>
-                    <td><span class="mono" style="color: #34d399;">1.4 ms</span></td>
-                    <td>100.0%</td>
-                    <td><span class="item-tag online">Healthy</span></td>
-                  </tr>
-                  <tr>
-                    <td><strong>WoL &amp; Power Orchestration Gateway</strong> (:8082)</td>
-                    <td>NUC / Desktop Cluster</td>
-                    <td><span class="mono" style="color: #34d399;">0.8 ms</span></td>
-                    <td>100.0%</td>
-                    <td><span class="item-tag online">Healthy</span></td>
-                  </tr>
-                  <tr>
-                    <td><strong>Optical Cat Cam WebRTC Engine</strong> (:8089)</td>
-                    <td>NUC (Hardware go2rtc)</td>
-                    <td><span class="mono" style="color: #34d399;">2.1 ms</span></td>
-                    <td>100.0%</td>
-                    <td><span class="item-tag online">Healthy</span></td>
-                  </tr>
-                  <tr>
-                    <td><strong>Cloudflare Zero Trust Edge Mesh</strong> (Tunnel)</td>
-                    <td>Global Edge Anycast</td>
-                    <td><span class="mono" style="color: #38bdf8;">14.2 ms</span></td>
-                    <td>100.0%</td>
-                    <td><span class="item-tag online">Shield Active</span></td>
-                  </tr>
-                </tbody>
-              </table>
-              <div style="background: rgba(2, 6, 23, 0.9); padding: 12px 18px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 0.78rem; color: #94a3b8;">
-                <span>SSL Certificate: <strong>digitalresolve.ca</strong> (Cloudflare ECC CA-3) &bull; <strong style="color: #34d399;">82 Days Remaining</strong> (Auto-Renews)</span>
-                <span class="mono">TLS 1.3 &bull; 0-RTT &bull; HTTP/3 Ready</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+  <main id="main-content" style="padding-top: 30px;">
     <section id="services" class="homelab-apps-section">
       <div class="container">
         <div class="section-header">
@@ -1236,12 +508,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.14</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.15</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 22,837 Lines of Code (HTML: 13,203 lines across 7 sub-pages | JS: 3,880 lines | CSS: 5,753 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 12,336 Lines of Code (HTML: 7,012 lines | CSS: 5,323 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">22,837</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">23,634</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1943,67 +1215,7 @@
         <!-- Version 2.8.7 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.14 | Current</span>
-            <span class="ver-date">October 28, 2026</span>
-          </div>
-          <h4 class="ver-title">Calibrated Latency Sparkline Y-Axis &amp; Live Telemetry Pre-Rendering</h4>
-          <ul class="ver-list">
-            <li><strong>Calibrated Sparkline Y-Axis:</strong> Integrated an authentic vertical Y-axis on the 24-hour response heartbeat canvas with tick markers (<code>10 ms</code>, <code>5 ms</code>, <code>0 ms</code>), scale labels, and dashed horizontal reference guidelines.</li>
-            <li><strong>Live Telemetry Pre-Rendering:</strong> Pre-rendered authentic live status across navigation menus for NUC storage (<code>D: 489 GB free</code>), NUC response (<code>0.2 ms | D: 489 GB</code>), and Desktop workstation (<code>0.4 ms</code>), eliminating empty placeholder states.</li>
-            <li><strong>Unblocked Read-Only Diagnostics:</strong> Removed preemptive authentication gates from node ping diagnostics, allowing immediate real-time latency verification on demand.</li>
-          </ul>
-        </div>
-
-        <!-- Version 2.8.13 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.8.13</span>
-            <span class="ver-date">October 28, 2026</span>
-          </div>
-          <h4 class="ver-title">Streamlined Power Controls &amp; Unified NUC High Performance Status</h4>
-        </div>
-
-        <!-- Version 2.8.12 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.8.12</span>
-            <span class="ver-date">October 28, 2026</span>
-          </div>
-          <h4 class="ver-title">Pre-Rendered 90-Day SLA Bars, SLA Shield Indicator &amp; Fleet Nodes Architecture</h4>
-        </div>
-
-        <!-- Version 2.8.11 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.8.11</span>
-            <span class="ver-date">October 28, 2026</span>
-          </div>
-          <h4 class="ver-title">Maintenance Window Relocation to Uptime &amp; Complete Emoji Purge</h4>
-        </div>
-
-        <!-- Version 2.8.10 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.8.10</span>
-            <span class="ver-date">October 28, 2026</span>
-          </div>
-          <h4 class="ver-title">Top Navigation Grouping &amp; Contextual Tools Separation</h4>
-        </div>
-
-        <!-- Version 2.8.9 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.8.9</span>
-            <span class="ver-date">October 28, 2026</span>
-          </div>
-          <h4 class="ver-title">Dedicated Media Hub &amp; Penny's Cat Hub Separation</h4>
-        </div>
-
-        <!-- Version 2.8.7 -->
-        <div class="changelog-entry">
-            <span class="ver-tag">v2.8.7</span>
+            <span class="ver-tag current">v2.8.7 | Current</span>
             <span class="ver-date">October 28, 2026</span>
           </div>
           <h4 class="ver-title">Unified Homelab Service Dashboard Button Styles &amp; Cache-Busted Pipeline</h4>
@@ -2402,6 +1614,6 @@
         </div>
       </div>
     </div>
-  <script src="app.js?v=2.8.14"></script>
+  </div>
 </body>
 </html>

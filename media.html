@@ -6,9 +6,9 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>Media &amp; Audiobooks &bull; Digital Resolve Homelab</title>
-  <meta name="description" content="24/7 self-hosted homelab operations, Cloudflare Zero Trust tunnels, private 4K media streaming, and automated WireGuard VPN ingestion.">
-  <link rel="stylesheet" href="styles.css?v=2.8.14">
+  <title>Media Suite & Torrent Swarm - Homelab</title>
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.15 - Media Suite & Torrent Swarm - Homelab">
+  <link rel="stylesheet" href="styles.css?v=2.8.7">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -45,26 +45,12 @@
   
   <header class="header" id="site-header">
     <div class="container nav-container">
-      <a href="index.html#deck" class="logo" title="DigitalResolve Homelab Deck">
+      <a href="#deck" class="logo" title="DigitalResolve Homelab Deck">
         <span class="logo-text-group"><span class="logo-accent">Digital</span>Resolve</span>
         <span class="logo-deck-badge">HOMELAB DECK</span>
       </a>
       <nav class="nav-links">
-        <!-- Primary Category Pages Navigation -->
-        <div class="nav-pages-group">
-          <a href="index.html" class="btn-nav">DECK</a>
-          <a href="services.html" class="btn-nav">SERVICES</a>
-          <a href="fleet.html" class="btn-nav">FLEET NODES</a>
-          <a href="uptime.html" class="btn-nav">UPTIME</a>
-          <a href="media.html" class="btn-nav active">MEDIA</a>
-          <a href="penny.html" class="btn-nav">PENNY</a>
-          <a href="ops.html" class="btn-nav">OPS &amp; AI</a>
-        </div>
-
-        <div class="nav-divider" aria-hidden="true"></div>
-
-        <!-- Contextual Quick-Action Tool Menus -->
-        <div class="nav-tools-group">
+        <a href="#deck" class="btn-nav">DECK</a>
 
         <!-- Consolidated Menu 1: Cluster & Media -->
         <div class="dropdown">
@@ -72,12 +58,12 @@
             <span>Cluster &amp; Media</span> <span class="dropdown-arrow">&#9662;</span>
           </button>
           <div class="dropdown-menu">
-            <a href="services.html#service-status" class="btn-action-item" title="Open Live Homelab Service Status Dashboard">
+            <a href="#service-status" class="btn-action-item" title="Open Live Homelab Service Status Dashboard">
               <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
               <span>Live Service Status Dashboard</span>
               <span class="item-tag online">8 Online</span>
             </a>
-            <a href="services.html#nuc-services" class="btn-action-item" title="Open NUC 24/7 Telemetry &amp; Microservices Suite">
+            <a href="#nuc-services" class="btn-action-item" title="Open NUC 24/7 Telemetry &amp; Microservices Suite">
               <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
               <span>NUC 24/7 Services Suite</span>
               <span class="item-tag online">Active</span>
@@ -92,7 +78,7 @@
               <span>Browse Media &amp; Files (NUC)</span>
               <span class="item-tag">Vault</span>
             </a>
-            <a href="penny.html#camera-feed-card" class="btn-action-item" title="Penny's Cat Hub - Live Optical Stream &amp; Smart Feeder IoT">
+            <a href="#camera-feed-card" class="btn-action-item" title="Penny's Cat Hub - Live Optical Stream &amp; Smart Feeder IoT">
               <span class="dropdown-dot" style="background-color: #f472b6; box-shadow: 0 0 8px #f472b6;"></span>
               <span>Penny's Cat Hub (Stream &amp; Feeder)</span>
               <span class="item-tag online">Live &bull; 192.168.2.22</span>
@@ -153,12 +139,12 @@
               <span>Wake Both</span>
             </button>
             <div class="dropdown-divider"></div>
-            <a href="fleet.html#fleet" class="btn-action-item" title="Jump to Cluster Hardware Topology &amp; Circuit Schematic">
+            <a href="#fleet" class="btn-action-item" title="Jump to Cluster Hardware Topology &amp; Circuit Schematic">
               <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
               <span>Hardware Topology &amp; Schematic</span>
               <span class="item-tag">Schematic</span>
             </a>
-            <a href="uptime.html#uptime" class="btn-action-item" title="Jump to Cluster Availability &amp; 90-Day SLA History">
+            <a href="#uptime" class="btn-action-item" title="Jump to Cluster Availability &amp; 90-Day SLA History">
               <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
               <span>90-Day SLA &amp; Uptime History</span>
               <span class="item-tag online">99.98%</span>
@@ -185,7 +171,7 @@
         <!-- Consolidated Menu 3: Ops, AI & Resilience -->
         <div class="dropdown">
           <button type="button" class="btn-nav" id="ops-menu-btn" aria-haspopup="true" title="Antigravity Autonomous Agent, Disaster Resilience Test, and AI Telemetry">
-            <span>Ops &amp; Tools</span> <span class="dropdown-arrow">&#9662;</span>
+            <span>Ops &amp; AI</span> <span class="dropdown-arrow">&#9662;</span>
           </button>
           <div class="dropdown-menu">
             <button type="button" class="btn-action-item" onclick="openEmbeddedConsole()" title="Open Live Interactive Terminal for Active Session 572d607f">
@@ -193,7 +179,7 @@
               <span>Open AGY Terminal (webdev1.0)</span>
               <span class="item-tag online">Live</span>
             </button>
-            <a href="ops.html#ops-ai" class="btn-action-item" title="Jump to In-Page Compute, AI &amp; Terminal Operations Console">
+            <a href="#ops-ai" class="btn-action-item" title="Jump to In-Page Compute, AI &amp; Terminal Operations Console">
               <span class="dropdown-dot dot-1"></span>
               <span>In-Page Terminal &amp; Ollama</span>
               <span class="item-tag">Ops Hub</span>
@@ -249,7 +235,6 @@
             </div>
           </div>
         </div>
-        </div>
       </nav>
 
       <!-- Top Right Actions: Dedicated SSO Login / Logout Controls & Layout Toggle -->
@@ -284,68 +269,144 @@
       </div>
     </div>
   </header>
-  <main>
-    <section class="subpage-hero">
+  <main id="main-content" style="padding-top: 30px;">
+    <section class="fleet-section">
       <div class="container">
-        <div class="subpage-badge">
-          <span class="pulse-dot"></span>
-          <span>Media Streaming &bull; Audiobookshelf &bull; File Vault</span>
-        </div>
-        <h1 class="subpage-title">Media, Audiobooks &amp; File Vault</h1>
-        <p class="subpage-subtitle">Private high-definition 4K streaming via StreamHub, curated Audiobookshelf and digital reading library, and zero-trust secured file vault on NUC storage.</p>
-      </div>
-    </section>
-    <div class="container">
-      <!-- Primary Media Engines Grid -->
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px; margin-bottom: 24px;">
-        <!-- Card 1: StreamHub 4K Video Player -->
-        <div class="app-card" id="streamhub" style="border-color: rgba(168, 85, 247, 0.4); background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(88, 28, 135, 0.2));">
-          <div class="app-card-header">
-            <div class="app-icon" style="color: #c084fc; border-color: rgba(168, 85, 247, 0.4); background: rgba(168, 85, 247, 0.15); font-weight: 700; font-size: 0.85rem;">4K</div>
-            <div style="display: flex; gap: 6px; align-items: center;">
-              <span class="item-tag online" id="dash-tag-streamhub"><span class="pulse-dot" style="background-color: #10b981; width: 6px; height: 6px;"></span> 8088 Active</span>
-              <span class="item-tag" style="background: rgba(168, 85, 247, 0.2); color: #d8b4fe;">Web Player</span>
-            </div>
-          </div>
-          <div class="app-card-title">StreamHub &bull; Private Watch Library</div>
-          <div class="app-card-desc">
-            Ultra-fast video player and streaming engine directly mounted to <code style="color: #d8b4fe;">D:\Torrents</code> and <code style="color: #d8b4fe;">D:\Media</code>. Direct playback for 4K UHD and 1080p content across all devices.
-          </div>
-          <div class="app-card-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
-            <div style="display: flex; gap: 8px; align-items: center;">
-              <button type="button" class="btn-schematic-chip dash-btn-action" onclick="launchProtectedService('https://stream.digitalresolve.ca', 'Watch Library &amp; StreamHub (stream.digitalresolve.ca)')" style="background: rgba(168, 85, 247, 0.25); border-color: #a855f7; color: #e9d5ff;">
-                Launch Stream &rarr;
-              </button>
-              <button type="button" class="btn-schematic-chip" onclick="sendControl('restart-streamhub', 'nuc')" style="font-size: 0.76rem; padding: 4px 10px; color: #94a3b8;" title="Restart StreamHub Windows Service on NUC">
-                Restart
-              </button>
-            </div>
-            <span style="font-size: 0.74rem; color: #64748b; font-family: monospace;">stream.digitalresolve.ca</span>
-          </div>
+        <div class="section-header">
+          <span class="section-tag" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3);">Media Hub</span>
+          <h2>Media Suite &amp; Torrent Swarm</h2>
+          <p>qBittorrent automated torrent ingestion, Jellyfin media streaming, and Audiobookshelf digital library.</p>
         </div>
 
-        <!-- Card 2: FileBrowser Vault -->
-        <div class="app-card" id="filebrowser" style="border-color: rgba(56, 189, 248, 0.4); background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(3, 105, 161, 0.2));">
-          <div class="app-card-header">
-            <div class="app-icon" style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.4); background: rgba(56, 189, 248, 0.15); font-weight: 700; font-size: 0.85rem;">DIR</div>
-            <div style="display: flex; gap: 6px; align-items: center;">
-              <span class="item-tag online" id="dash-tag-files"><span class="pulse-dot" style="background-color: #10b981; width: 6px; height: 6px;"></span> 8085 Active</span>
-              <span class="item-tag" style="background: rgba(56, 189, 248, 0.2); color: #7dd3fc;">File Vault</span>
+        <!-- Torrent Control Matrix -->
+        <div class="control-matrix-card" style="margin-bottom: 24px;">
+          <div class="control-matrix-header">
+            <div class="control-matrix-title">
+              <span>[TOR]</span> qBittorrent Swarm Control Matrix
+            </div>
+            <div style="font-size: 0.8rem; color: #8b949e;">
+              Managed Seeding &bull; Speed Limits &bull; Autonomous Ingestion
             </div>
           </div>
-          <div class="app-card-title">FileBrowser &bull; Media &amp; Cloud Vault</div>
-          <div class="app-card-desc">
-            Full-featured web filesystem explorer to upload, download, preview, and organize files, literature, audio tracks, and archives across the 24/7 NUC server storage array.
+            <!-- Group 1: Torrent Swarms & Bandwidth Throttling -->
+            <div class="control-group">
+              <div class="control-group-header">
+                
+                <span class="control-group-title">Torrent Swarms &amp; Bandwidth Throttling</span>
+              </div>
+              <div class="control-group-grid">
+                <button type="button" class="btn-control active-pause" onclick="executeNodeAction('pause-all')" title="Pause All Active Torrent Swarms on Selected Target">
+                  <span>||</span> Pause All Swarms
+                </button>
+                <button type="button" class="btn-control active-resume" onclick="executeNodeAction('resume-all')" title="Resume All Torrent Swarms on Selected Target">
+                  <span>&gt;</span> Resume All Swarms
+                </button>
+                <button type="button" class="btn-control active-eco" onclick="executeNodeAction('eco-throttle')" title="Apply 500 KB/s Eco Bandwidth Limit on Selected Target">
+                  <span>ECO</span> Eco Throttle (500K)
+                </button>
+                <button type="button" class="btn-control" onclick="executeNodeAction('unlimit')" title="Restore Full Unconstrained Bandwidth on Selected Target">
+                  <span>MAX</span> Full Speed (Uncapped)
+                </button>
+              </div>
+            </div>
+        </div>
+        <div class="control-matrix-card" style="margin-bottom: 24px;">
+          <div class="control-matrix-header">
+            <div class="control-matrix-title">
+              <span>[STAT]</span> Live Swarm Telemetry &amp; Storage Footprint
+            </div>
+            <div style="font-size: 0.8rem; color: #8b949e;">
+              High-Speed Bell Fiber &bull; D: Drive Allocation
+            </div>
           </div>
-          <div class="app-card-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
-            <button type="button" class="btn-schematic-chip dash-btn-action" onclick="launchProtectedService('https://files.digitalresolve.ca/files/', 'Media &amp; File Vault (files.digitalresolve.ca)')" style="background: rgba(56, 189, 248, 0.25); border-color: #38bdf8; color: #e0f2fe;">
-              Browse Files &rarr;
-            </button>
-            <span style="font-size: 0.74rem; color: #64748b; font-family: monospace;">files.digitalresolve.ca</span>
+        <!-- Live Cluster Telemetry & Swarm Dials -->
+        <div class="homelab-stats-section">
+          <div class="stats-grid-row">
+            <!-- Swarm Activity Tile -->
+            <div class="stat-metric-card">
+              <div>
+                <div class="stat-card-header">
+                  <span class="stat-card-title">Torrent Swarm (NUC)</span>
+                  <span class="item-tag online" id="swarm-tag">216 Managed</span>
+                </div>
+                <div class="stat-big-val" id="stat-swarm-active">4 Active &bull; 212 Seed</div>
+              </div>
+              <div class="stat-subtext">
+                <span style="color: #38bdf8;" id="stat-dht">DHT: 333 Nodes</span>
+                <span style="color: #475569; padding: 0 2px;">&bull;</span> 
+                <span style="color: #34d399;" id="stat-vpn-ip">VPN: 23.234.103.246</span>
+              </div>
+            </div>
+
+            <!-- Bandwidth Meter Tile -->
+            <div class="stat-metric-card stat-bandwidth-card">
+              <div>
+                <div class="stat-card-header">
+                  <span class="stat-card-title">Live Bandwidth</span>
+                  <span class="item-tag" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; padding: 4px 10px; border-radius: 6px;" id="stat-throttle-tag">Unconstrained</span>
+                </div>
+                <div class="stat-big-val" id="stat-dl-speed" style="color: #60a5fa;">0 KB/s <span style="font-size: 0.95rem; color: #8b949e; margin-left: 6px;">&darr;</span></div>
+              </div>
+              <div class="stat-subtext">
+                <span>Upload: <strong id="stat-up-speed" style="color: #c4b5fd;">0 KB/s</strong> <span style="color: #c4b5fd; margin-left: 2px;">&uarr;</span></span>
+                <span style="color: #475569; padding: 0 2px;">&bull;</span> 
+                <span style="color: #a5b4fc;">Dual Gigabit Routing</span>
+              </div>
+            </div>
+
+            <!-- NUC CPU & RAM Tile -->
+            <div class="stat-metric-card">
+              <div>
+                <div class="stat-card-header">
+                  <span class="stat-card-title">Hardware Utilization</span>
+                  <span class="item-tag online" id="stat-hw-tag">Nominal</span>
+                </div>
+                <div class="stat-big-val" id="stat-cpu-val" style="color: #4ade80;">4% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span></div>
+              </div>
+              <div class="stat-subtext" id="stat-ram-sub">
+                Memory: 5.8 GB / 31.8 GB (18%) &bull; 0d 2h up
+              </div>
+            </div>
+
+            <!-- Storage Safeguard Tile -->
+            <div class="stat-metric-card">
+              <div class="stat-card-header">
+                <span class="stat-card-title">D: Drive Safeguard</span>
+                <span class="item-tag online">Safe (+476 GB)</span>
+              </div>
+              <div class="stat-big-val" id="stat-disk-free" style="color: #38bdf8;">496.1 GB <span style="font-size: 0.9rem; color: #8b949e;">Free</span></div>
+              <div class="stat-subtext">
+                <span>Total 1863 GB (73.4% Used)</span>
+              </div>
+              <!-- Multi-Segment Storage Bar -->
+              <div class="storage-segments-wrap">
+                <div class="storage-segments-bar">
+                  <div class="seg-movies" style="width: 28%;" title="Movies: 520 GB"></div>
+                  <div class="seg-tv" style="width: 22%;" title="TV Series: 410 GB"></div>
+                  <div class="seg-mixes" style="width: 23.4%;" title="Media Mixes: 437 GB"></div>
+                  <div class="seg-free" style="width: 26.6%;" title="Free Space: 496 GB"></div>
+                </div>
+                <div class="storage-legend">
+                  <span><span class="legend-dot seg-movies"></span> Movies (520 GB)</span>
+                  <span><span class="legend-dot seg-tv"></span> Series (410 GB)</span>
+                  <span><span class="legend-dot seg-mixes"></span> Mixes (437 GB)</span>
+                  <span><span class="legend-dot seg-free"></span> Free (496 GB)</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-      <!-- Audiobookshelf Section -->
+        </div>
+        <div class="control-matrix-card" style="margin-bottom: 24px;">
+          <div class="control-matrix-header">
+            <div class="control-matrix-title">
+              <span>[LIB]</span> Audiobookshelf Digital Media Vault
+            </div>
+            <div style="font-size: 0.8rem; color: #8b949e;">
+              Port 13378 &bull; Intel NUC Storage Backend
+            </div>
+          </div>
+          <div style="padding: 16px 20px;">
           <div class="nuc-pane" id="pane-books">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
               <div>
@@ -432,116 +493,10 @@
               </div>
             </div>
           </div>
-      <!-- BitTorrent Ingestion & Swarm Pipeline -->
-      <div class="control-matrix-card" style="margin-top: 24px; margin-bottom: 24px;">
-        <div class="control-matrix-header">
-          <div class="control-matrix-title">
-            <span>[INGEST]</span> BitTorrent Swarms &amp; Bandwidth Pipeline
-          </div>
-          <div style="font-size: 0.8rem; color: #8b949e;">
-            WireGuard Encrypted Swarms &bull; D:\Torrents Ingestion &bull; Bandwidth Throttling
           </div>
         </div>
-            <!-- Group 1: Torrent Swarms & Bandwidth Throttling -->
-            <div class="control-group">
-              <div class="control-group-header">
-                
-                <span class="control-group-title">Torrent Swarms &amp; Bandwidth Throttling</span>
-              </div>
-              <div class="control-group-grid">
-                <button type="button" class="btn-control active-pause" onclick="executeNodeAction('pause-all')" title="Pause All Active Torrent Swarms on Selected Target">
-                  <span>||</span> Pause All Swarms
-                </button>
-                <button type="button" class="btn-control active-resume" onclick="executeNodeAction('resume-all')" title="Resume All Torrent Swarms on Selected Target">
-                  <span>&gt;</span> Resume All Swarms
-                </button>
-                <button type="button" class="btn-control active-eco" onclick="executeNodeAction('eco-throttle')" title="Apply 500 KB/s Eco Bandwidth Limit on Selected Target">
-                  <span>ECO</span> Eco Throttle (500K)
-                </button>
-                <button type="button" class="btn-control" onclick="executeNodeAction('unlimit')" title="Restore Full Unconstrained Bandwidth on Selected Target">
-                  <span>MAX</span> Full Speed (Uncapped)
-                </button>
-              </div>
-            </div>
       </div>
-        <!-- Live Cluster Telemetry & Swarm Dials -->
-        <div class="homelab-stats-section">
-          <div class="stats-grid-row">
-            <!-- Swarm Activity Tile -->
-            <div class="stat-metric-card">
-              <div>
-                <div class="stat-card-header">
-                  <span class="stat-card-title">Torrent Swarm (NUC)</span>
-                  <span class="item-tag online" id="swarm-tag">216 Managed</span>
-                </div>
-                <div class="stat-big-val" id="stat-swarm-active">4 Active &bull; 212 Seed</div>
-              </div>
-              <div class="stat-subtext">
-                <span style="color: #38bdf8;" id="stat-dht">DHT: 333 Nodes</span>
-                <span style="color: #475569; padding: 0 2px;">&bull;</span> 
-                <span style="color: #34d399;" id="stat-vpn-ip">VPN: 23.234.103.246</span>
-              </div>
-            </div>
-
-            <!-- Bandwidth Meter Tile -->
-            <div class="stat-metric-card stat-bandwidth-card">
-              <div>
-                <div class="stat-card-header">
-                  <span class="stat-card-title">Live Bandwidth</span>
-                  <span class="item-tag" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; padding: 4px 10px; border-radius: 6px;" id="stat-throttle-tag">Unconstrained</span>
-                </div>
-                <div class="stat-big-val" id="stat-dl-speed" style="color: #60a5fa;">0 KB/s <span style="font-size: 0.95rem; color: #8b949e; margin-left: 6px;">&darr;</span></div>
-              </div>
-              <div class="stat-subtext">
-                <span>Upload: <strong id="stat-up-speed" style="color: #c4b5fd;">0 KB/s</strong> <span style="color: #c4b5fd; margin-left: 2px;">&uarr;</span></span>
-                <span style="color: #475569; padding: 0 2px;">&bull;</span> 
-                <span style="color: #a5b4fc;">Dual Gigabit Routing</span>
-              </div>
-            </div>
-
-            <!-- NUC CPU & RAM Tile -->
-            <div class="stat-metric-card">
-              <div>
-                <div class="stat-card-header">
-                  <span class="stat-card-title">Hardware Utilization</span>
-                  <span class="item-tag online" id="stat-hw-tag">Nominal</span>
-                </div>
-                <div class="stat-big-val" id="stat-cpu-val" style="color: #4ade80;">4% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span></div>
-              </div>
-              <div class="stat-subtext" id="stat-ram-sub">
-                Memory: 5.8 GB / 31.8 GB (18%) &bull; 0d 2h up
-              </div>
-            </div>
-
-            <!-- Storage Safeguard Tile -->
-            <div class="stat-metric-card">
-              <div class="stat-card-header">
-                <span class="stat-card-title">D: Drive Safeguard</span>
-                <span class="item-tag online">Safe (+476 GB)</span>
-              </div>
-              <div class="stat-big-val" id="stat-disk-free" style="color: #38bdf8;">496.1 GB <span style="font-size: 0.9rem; color: #8b949e;">Free</span></div>
-              <div class="stat-subtext">
-                <span>Total 1863 GB (73.4% Used)</span>
-              </div>
-              <!-- Multi-Segment Storage Bar -->
-              <div class="storage-segments-wrap">
-                <div class="storage-segments-bar">
-                  <div class="seg-movies" style="width: 28%;" title="Movies: 520 GB"></div>
-                  <div class="seg-tv" style="width: 22%;" title="TV Series: 410 GB"></div>
-                  <div class="seg-mixes" style="width: 23.4%;" title="Media Mixes: 437 GB"></div>
-                  <div class="seg-free" style="width: 26.6%;" title="Free Space: 496 GB"></div>
-                </div>
-                <div class="storage-legend">
-                  <span><span class="legend-dot seg-movies"></span> Movies (520 GB)</span>
-                  <span><span class="legend-dot seg-tv"></span> Series (410 GB)</span>
-                  <span><span class="legend-dot seg-mixes"></span> Mixes (437 GB)</span>
-                  <span><span class="legend-dot seg-free"></span> Free (496 GB)</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-    </div>
+    </section>
   </main>
   <footer class="footer">
     <div class="container footer-container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
@@ -553,12 +508,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.14</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.15</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 22,837 Lines of Code (HTML: 13,203 lines across 7 sub-pages | JS: 3,880 lines | CSS: 5,753 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 12,336 Lines of Code (HTML: 7,012 lines | CSS: 5,323 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">22,837</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">23,634</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1260,67 +1215,7 @@
         <!-- Version 2.8.7 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.14 | Current</span>
-            <span class="ver-date">October 28, 2026</span>
-          </div>
-          <h4 class="ver-title">Calibrated Latency Sparkline Y-Axis &amp; Live Telemetry Pre-Rendering</h4>
-          <ul class="ver-list">
-            <li><strong>Calibrated Sparkline Y-Axis:</strong> Integrated an authentic vertical Y-axis on the 24-hour response heartbeat canvas with tick markers (<code>10 ms</code>, <code>5 ms</code>, <code>0 ms</code>), scale labels, and dashed horizontal reference guidelines.</li>
-            <li><strong>Live Telemetry Pre-Rendering:</strong> Pre-rendered authentic live status across navigation menus for NUC storage (<code>D: 489 GB free</code>), NUC response (<code>0.2 ms | D: 489 GB</code>), and Desktop workstation (<code>0.4 ms</code>), eliminating empty placeholder states.</li>
-            <li><strong>Unblocked Read-Only Diagnostics:</strong> Removed preemptive authentication gates from node ping diagnostics, allowing immediate real-time latency verification on demand.</li>
-          </ul>
-        </div>
-
-        <!-- Version 2.8.13 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.8.13</span>
-            <span class="ver-date">October 28, 2026</span>
-          </div>
-          <h4 class="ver-title">Streamlined Power Controls &amp; Unified NUC High Performance Status</h4>
-        </div>
-
-        <!-- Version 2.8.12 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.8.12</span>
-            <span class="ver-date">October 28, 2026</span>
-          </div>
-          <h4 class="ver-title">Pre-Rendered 90-Day SLA Bars, SLA Shield Indicator &amp; Fleet Nodes Architecture</h4>
-        </div>
-
-        <!-- Version 2.8.11 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.8.11</span>
-            <span class="ver-date">October 28, 2026</span>
-          </div>
-          <h4 class="ver-title">Maintenance Window Relocation to Uptime &amp; Complete Emoji Purge</h4>
-        </div>
-
-        <!-- Version 2.8.10 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.8.10</span>
-            <span class="ver-date">October 28, 2026</span>
-          </div>
-          <h4 class="ver-title">Top Navigation Grouping &amp; Contextual Tools Separation</h4>
-        </div>
-
-        <!-- Version 2.8.9 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.8.9</span>
-            <span class="ver-date">October 28, 2026</span>
-          </div>
-          <h4 class="ver-title">Dedicated Media Hub &amp; Penny's Cat Hub Separation</h4>
-        </div>
-
-        <!-- Version 2.8.7 -->
-        <div class="changelog-entry">
-            <span class="ver-tag">v2.8.7</span>
+            <span class="ver-tag current">v2.8.7 | Current</span>
             <span class="ver-date">October 28, 2026</span>
           </div>
           <h4 class="ver-title">Unified Homelab Service Dashboard Button Styles &amp; Cache-Busted Pipeline</h4>
@@ -1719,6 +1614,6 @@
         </div>
       </div>
     </div>
-  <script src="app.js?v=2.8.14"></script>
+  </div>
 </body>
 </html>

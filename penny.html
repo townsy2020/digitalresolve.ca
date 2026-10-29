@@ -6,9 +6,9 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>Penny's Cat Hub &bull; Digital Resolve Homelab</title>
-  <meta name="description" content="24/7 self-hosted homelab operations, Cloudflare Zero Trust tunnels, private 4K media streaming, and automated WireGuard VPN ingestion.">
-  <link rel="stylesheet" href="styles.css?v=2.8.14">
+  <title>Penny's Cat Cam & Feeder IoT - Homelab</title>
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.15 - Penny's Cat Cam & Feeder IoT - Homelab">
+  <link rel="stylesheet" href="styles.css?v=2.8.7">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -45,26 +45,12 @@
   
   <header class="header" id="site-header">
     <div class="container nav-container">
-      <a href="index.html#deck" class="logo" title="DigitalResolve Homelab Deck">
+      <a href="#deck" class="logo" title="DigitalResolve Homelab Deck">
         <span class="logo-text-group"><span class="logo-accent">Digital</span>Resolve</span>
         <span class="logo-deck-badge">HOMELAB DECK</span>
       </a>
       <nav class="nav-links">
-        <!-- Primary Category Pages Navigation -->
-        <div class="nav-pages-group">
-          <a href="index.html" class="btn-nav">DECK</a>
-          <a href="services.html" class="btn-nav">SERVICES</a>
-          <a href="fleet.html" class="btn-nav">FLEET NODES</a>
-          <a href="uptime.html" class="btn-nav">UPTIME</a>
-          <a href="media.html" class="btn-nav">MEDIA</a>
-          <a href="penny.html" class="btn-nav active">PENNY</a>
-          <a href="ops.html" class="btn-nav">OPS &amp; AI</a>
-        </div>
-
-        <div class="nav-divider" aria-hidden="true"></div>
-
-        <!-- Contextual Quick-Action Tool Menus -->
-        <div class="nav-tools-group">
+        <a href="#deck" class="btn-nav">DECK</a>
 
         <!-- Consolidated Menu 1: Cluster & Media -->
         <div class="dropdown">
@@ -72,12 +58,12 @@
             <span>Cluster &amp; Media</span> <span class="dropdown-arrow">&#9662;</span>
           </button>
           <div class="dropdown-menu">
-            <a href="services.html#service-status" class="btn-action-item" title="Open Live Homelab Service Status Dashboard">
+            <a href="#service-status" class="btn-action-item" title="Open Live Homelab Service Status Dashboard">
               <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
               <span>Live Service Status Dashboard</span>
               <span class="item-tag online">8 Online</span>
             </a>
-            <a href="services.html#nuc-services" class="btn-action-item" title="Open NUC 24/7 Telemetry &amp; Microservices Suite">
+            <a href="#nuc-services" class="btn-action-item" title="Open NUC 24/7 Telemetry &amp; Microservices Suite">
               <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
               <span>NUC 24/7 Services Suite</span>
               <span class="item-tag online">Active</span>
@@ -92,7 +78,7 @@
               <span>Browse Media &amp; Files (NUC)</span>
               <span class="item-tag">Vault</span>
             </a>
-            <a href="penny.html#camera-feed-card" class="btn-action-item" title="Penny's Cat Hub - Live Optical Stream &amp; Smart Feeder IoT">
+            <a href="#camera-feed-card" class="btn-action-item" title="Penny's Cat Hub - Live Optical Stream &amp; Smart Feeder IoT">
               <span class="dropdown-dot" style="background-color: #f472b6; box-shadow: 0 0 8px #f472b6;"></span>
               <span>Penny's Cat Hub (Stream &amp; Feeder)</span>
               <span class="item-tag online">Live &bull; 192.168.2.22</span>
@@ -153,12 +139,12 @@
               <span>Wake Both</span>
             </button>
             <div class="dropdown-divider"></div>
-            <a href="fleet.html#fleet" class="btn-action-item" title="Jump to Cluster Hardware Topology &amp; Circuit Schematic">
+            <a href="#fleet" class="btn-action-item" title="Jump to Cluster Hardware Topology &amp; Circuit Schematic">
               <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
               <span>Hardware Topology &amp; Schematic</span>
               <span class="item-tag">Schematic</span>
             </a>
-            <a href="uptime.html#uptime" class="btn-action-item" title="Jump to Cluster Availability &amp; 90-Day SLA History">
+            <a href="#uptime" class="btn-action-item" title="Jump to Cluster Availability &amp; 90-Day SLA History">
               <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
               <span>90-Day SLA &amp; Uptime History</span>
               <span class="item-tag online">99.98%</span>
@@ -185,7 +171,7 @@
         <!-- Consolidated Menu 3: Ops, AI & Resilience -->
         <div class="dropdown">
           <button type="button" class="btn-nav" id="ops-menu-btn" aria-haspopup="true" title="Antigravity Autonomous Agent, Disaster Resilience Test, and AI Telemetry">
-            <span>Ops &amp; Tools</span> <span class="dropdown-arrow">&#9662;</span>
+            <span>Ops &amp; AI</span> <span class="dropdown-arrow">&#9662;</span>
           </button>
           <div class="dropdown-menu">
             <button type="button" class="btn-action-item" onclick="openEmbeddedConsole()" title="Open Live Interactive Terminal for Active Session 572d607f">
@@ -193,7 +179,7 @@
               <span>Open AGY Terminal (webdev1.0)</span>
               <span class="item-tag online">Live</span>
             </button>
-            <a href="ops.html#ops-ai" class="btn-action-item" title="Jump to In-Page Compute, AI &amp; Terminal Operations Console">
+            <a href="#ops-ai" class="btn-action-item" title="Jump to In-Page Compute, AI &amp; Terminal Operations Console">
               <span class="dropdown-dot dot-1"></span>
               <span>In-Page Terminal &amp; Ollama</span>
               <span class="item-tag">Ops Hub</span>
@@ -249,7 +235,6 @@
             </div>
           </div>
         </div>
-        </div>
       </nav>
 
       <!-- Top Right Actions: Dedicated SSO Login / Logout Controls & Layout Toggle -->
@@ -284,18 +269,11 @@
       </div>
     </div>
   </header>
-  <main>
-    <section class="subpage-hero">
-      <div class="container">
-        <div class="subpage-badge">
-          <span class="pulse-dot"></span>
-          <span>Penny's Hub &bull; Optical Stream &bull; Smart Feeder IoT</span>
+  <main id="main-content" style="padding-top: 30px;">
+    <div class="container" style="max-width: 1400px; margin: 0 auto; padding: 0 20px;">
         </div>
-        <h1 class="subpage-title">Penny's Cat Hub &amp; Smart Feeder</h1>
-        <p class="subpage-subtitle">Dual low-latency WebRTC optical camera feeds, Tuya IoT automated smart feeder at 192.168.2.22, and live portion dispensing bridge.</p>
-      </div>
-    </section>
-    <div class="container">
+
+        <!-- Unified Penny's Cat Hub (Stream & Smart Feeder IoT) -->
         <div class="control-matrix-card" id="camera-feed-card" style="margin-top: 24px; margin-bottom: 40px; border-color: rgba(244, 114, 182, 0.35);">
             <div class="control-matrix-header">
               <div class="control-matrix-title" style="color: #f472b6;">
@@ -307,9 +285,6 @@
                 </span>
                 <span class="item-tag" style="background: rgba(244, 114, 182, 0.15); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.3);">
                   Tuya IoT &bull; 192.168.2.22
-                </span>
-                <span class="item-tag" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">
-                  SSO Protected
                 </span>
                 <a href="https://cam.digitalresolve.ca/webrtc.html?src=pennys_feeder" id="cam-direct-link" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.78rem; padding: 4px 12px; background: rgba(59, 130, 246, 0.2); color: #93c5fd !important; border-color: rgba(59, 130, 246, 0.5);" title="Open live camera feed in a new window to authenticate Cloudflare Access SSO">
                   &#x2197; Direct WebRTC
@@ -397,7 +372,7 @@
                   </div>
 
                   <div>
-                    <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700; margin-bottom: 6px;">Instant Dispense (SSO Authenticated &bull; Connected IoT Bridge):</div>
+                    
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px;">
                       <button type="button" class="btn btn-secondary" onclick="triggerCatTreat('10g Snack')" style="font-size: 0.74rem; padding: 6px 4px; color: #f472b6 !important; border-color: rgba(244, 114, 182, 0.4); text-align: center; justify-content: center; width: 100%;" title="Dispense 10g small snack">
                         10g Snack
@@ -428,12 +403,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.14</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.15</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 22,837 Lines of Code (HTML: 13,203 lines across 7 sub-pages | JS: 3,880 lines | CSS: 5,753 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 12,336 Lines of Code (HTML: 7,012 lines | CSS: 5,323 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">22,837</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">23,634</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1135,67 +1110,7 @@
         <!-- Version 2.8.7 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.14 | Current</span>
-            <span class="ver-date">October 28, 2026</span>
-          </div>
-          <h4 class="ver-title">Calibrated Latency Sparkline Y-Axis &amp; Live Telemetry Pre-Rendering</h4>
-          <ul class="ver-list">
-            <li><strong>Calibrated Sparkline Y-Axis:</strong> Integrated an authentic vertical Y-axis on the 24-hour response heartbeat canvas with tick markers (<code>10 ms</code>, <code>5 ms</code>, <code>0 ms</code>), scale labels, and dashed horizontal reference guidelines.</li>
-            <li><strong>Live Telemetry Pre-Rendering:</strong> Pre-rendered authentic live status across navigation menus for NUC storage (<code>D: 489 GB free</code>), NUC response (<code>0.2 ms | D: 489 GB</code>), and Desktop workstation (<code>0.4 ms</code>), eliminating empty placeholder states.</li>
-            <li><strong>Unblocked Read-Only Diagnostics:</strong> Removed preemptive authentication gates from node ping diagnostics, allowing immediate real-time latency verification on demand.</li>
-          </ul>
-        </div>
-
-        <!-- Version 2.8.13 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.8.13</span>
-            <span class="ver-date">October 28, 2026</span>
-          </div>
-          <h4 class="ver-title">Streamlined Power Controls &amp; Unified NUC High Performance Status</h4>
-        </div>
-
-        <!-- Version 2.8.12 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.8.12</span>
-            <span class="ver-date">October 28, 2026</span>
-          </div>
-          <h4 class="ver-title">Pre-Rendered 90-Day SLA Bars, SLA Shield Indicator &amp; Fleet Nodes Architecture</h4>
-        </div>
-
-        <!-- Version 2.8.11 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.8.11</span>
-            <span class="ver-date">October 28, 2026</span>
-          </div>
-          <h4 class="ver-title">Maintenance Window Relocation to Uptime &amp; Complete Emoji Purge</h4>
-        </div>
-
-        <!-- Version 2.8.10 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.8.10</span>
-            <span class="ver-date">October 28, 2026</span>
-          </div>
-          <h4 class="ver-title">Top Navigation Grouping &amp; Contextual Tools Separation</h4>
-        </div>
-
-        <!-- Version 2.8.9 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.8.9</span>
-            <span class="ver-date">October 28, 2026</span>
-          </div>
-          <h4 class="ver-title">Dedicated Media Hub &amp; Penny's Cat Hub Separation</h4>
-        </div>
-
-        <!-- Version 2.8.7 -->
-        <div class="changelog-entry">
-            <span class="ver-tag">v2.8.7</span>
+            <span class="ver-tag current">v2.8.7 | Current</span>
             <span class="ver-date">October 28, 2026</span>
           </div>
           <h4 class="ver-title">Unified Homelab Service Dashboard Button Styles &amp; Cache-Busted Pipeline</h4>
@@ -1594,6 +1509,6 @@
         </div>
       </div>
     </div>
-  <script src="app.js?v=2.8.14"></script>
+  </div>
 </body>
 </html>

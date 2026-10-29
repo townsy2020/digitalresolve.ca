@@ -6,9 +6,9 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>Fleet Nodes &bull; Digital Resolve Homelab</title>
-  <meta name="description" content="24/7 self-hosted homelab operations, Cloudflare Zero Trust tunnels, private 4K media streaming, and automated WireGuard VPN ingestion.">
-  <link rel="stylesheet" href="styles.css?v=2.8.14">
+  <title>Fleet Nodes - Hardware & Cluster Infrastructure</title>
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.15 - Fleet Nodes - Hardware & Cluster Infrastructure">
+  <link rel="stylesheet" href="styles.css?v=2.8.7">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -45,26 +45,12 @@
   
   <header class="header" id="site-header">
     <div class="container nav-container">
-      <a href="index.html#deck" class="logo" title="DigitalResolve Homelab Deck">
+      <a href="#deck" class="logo" title="DigitalResolve Homelab Deck">
         <span class="logo-text-group"><span class="logo-accent">Digital</span>Resolve</span>
         <span class="logo-deck-badge">HOMELAB DECK</span>
       </a>
       <nav class="nav-links">
-        <!-- Primary Category Pages Navigation -->
-        <div class="nav-pages-group">
-          <a href="index.html" class="btn-nav">DECK</a>
-          <a href="services.html" class="btn-nav">SERVICES</a>
-          <a href="fleet.html" class="btn-nav active">FLEET NODES</a>
-          <a href="uptime.html" class="btn-nav">UPTIME</a>
-          <a href="media.html" class="btn-nav">MEDIA</a>
-          <a href="penny.html" class="btn-nav">PENNY</a>
-          <a href="ops.html" class="btn-nav">OPS &amp; AI</a>
-        </div>
-
-        <div class="nav-divider" aria-hidden="true"></div>
-
-        <!-- Contextual Quick-Action Tool Menus -->
-        <div class="nav-tools-group">
+        <a href="#deck" class="btn-nav">DECK</a>
 
         <!-- Consolidated Menu 1: Cluster & Media -->
         <div class="dropdown">
@@ -72,12 +58,12 @@
             <span>Cluster &amp; Media</span> <span class="dropdown-arrow">&#9662;</span>
           </button>
           <div class="dropdown-menu">
-            <a href="services.html#service-status" class="btn-action-item" title="Open Live Homelab Service Status Dashboard">
+            <a href="#service-status" class="btn-action-item" title="Open Live Homelab Service Status Dashboard">
               <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
               <span>Live Service Status Dashboard</span>
               <span class="item-tag online">8 Online</span>
             </a>
-            <a href="services.html#nuc-services" class="btn-action-item" title="Open NUC 24/7 Telemetry &amp; Microservices Suite">
+            <a href="#nuc-services" class="btn-action-item" title="Open NUC 24/7 Telemetry &amp; Microservices Suite">
               <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
               <span>NUC 24/7 Services Suite</span>
               <span class="item-tag online">Active</span>
@@ -92,7 +78,7 @@
               <span>Browse Media &amp; Files (NUC)</span>
               <span class="item-tag">Vault</span>
             </a>
-            <a href="penny.html#camera-feed-card" class="btn-action-item" title="Penny's Cat Hub - Live Optical Stream &amp; Smart Feeder IoT">
+            <a href="#camera-feed-card" class="btn-action-item" title="Penny's Cat Hub - Live Optical Stream &amp; Smart Feeder IoT">
               <span class="dropdown-dot" style="background-color: #f472b6; box-shadow: 0 0 8px #f472b6;"></span>
               <span>Penny's Cat Hub (Stream &amp; Feeder)</span>
               <span class="item-tag online">Live &bull; 192.168.2.22</span>
@@ -153,12 +139,12 @@
               <span>Wake Both</span>
             </button>
             <div class="dropdown-divider"></div>
-            <a href="fleet.html#fleet" class="btn-action-item" title="Jump to Cluster Hardware Topology &amp; Circuit Schematic">
+            <a href="#fleet" class="btn-action-item" title="Jump to Cluster Hardware Topology &amp; Circuit Schematic">
               <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
               <span>Hardware Topology &amp; Schematic</span>
               <span class="item-tag">Schematic</span>
             </a>
-            <a href="uptime.html#uptime" class="btn-action-item" title="Jump to Cluster Availability &amp; 90-Day SLA History">
+            <a href="#uptime" class="btn-action-item" title="Jump to Cluster Availability &amp; 90-Day SLA History">
               <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
               <span>90-Day SLA &amp; Uptime History</span>
               <span class="item-tag online">99.98%</span>
@@ -185,7 +171,7 @@
         <!-- Consolidated Menu 3: Ops, AI & Resilience -->
         <div class="dropdown">
           <button type="button" class="btn-nav" id="ops-menu-btn" aria-haspopup="true" title="Antigravity Autonomous Agent, Disaster Resilience Test, and AI Telemetry">
-            <span>Ops &amp; Tools</span> <span class="dropdown-arrow">&#9662;</span>
+            <span>Ops &amp; AI</span> <span class="dropdown-arrow">&#9662;</span>
           </button>
           <div class="dropdown-menu">
             <button type="button" class="btn-action-item" onclick="openEmbeddedConsole()" title="Open Live Interactive Terminal for Active Session 572d607f">
@@ -193,7 +179,7 @@
               <span>Open AGY Terminal (webdev1.0)</span>
               <span class="item-tag online">Live</span>
             </button>
-            <a href="ops.html#ops-ai" class="btn-action-item" title="Jump to In-Page Compute, AI &amp; Terminal Operations Console">
+            <a href="#ops-ai" class="btn-action-item" title="Jump to In-Page Compute, AI &amp; Terminal Operations Console">
               <span class="dropdown-dot dot-1"></span>
               <span>In-Page Terminal &amp; Ollama</span>
               <span class="item-tag">Ops Hub</span>
@@ -249,7 +235,6 @@
             </div>
           </div>
         </div>
-        </div>
       </nav>
 
       <!-- Top Right Actions: Dedicated SSO Login / Logout Controls & Layout Toggle -->
@@ -284,18 +269,8 @@
       </div>
     </div>
   </header>
-  <main>
-    <section class="subpage-hero">
-      <div class="container">
-        <div class="subpage-badge">
-          <span class="pulse-dot"></span>
-          <span>Hardware Topology &amp; Remote Power</span>
-        </div>
-        <h1 class="subpage-title">Cluster Fleet Nodes</h1>
-        <p class="subpage-subtitle">Interactive circuit schematic board, remote Wake-on-LAN power triggers, hardware resource monitors, and edge routing tunnels.</p>
-      </div>
-    </section>
-    <div class="container">
+  <main id="main-content" style="padding-top: 30px;">
+    <div class="container" style="max-width: 1400px; margin: 0 auto; padding: 0 20px;">
       <!-- Hardware Fleet Lifecycle & Remote Power Operations -->
       <div class="control-matrix-card" style="margin-bottom: 28px;">
         <div class="control-matrix-header">
@@ -310,75 +285,80 @@
         <!-- Top Target Node Selector Bar -->
         <div class="control-node-bar">
           <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-            <span style="font-size: 0.82rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Target Node:</span>
-            <div class="dropdown">
-              <button type="button" class="btn-nav" id="target-node-btn" aria-haspopup="true" title="Switch Target Node between NUC Core Server and Desktop PC">
-                <span class="dropdown-dot" id="target-node-btn-dot" style="background-color: #c084fc; box-shadow: 0 0 8px #c084fc;"></span>
-                <span id="target-node-btn-label">NUC Core Server (24/7 Always-On)</span>
-                <span class="dropdown-arrow">&#9662;</span>
-              </button>
-              <div class="dropdown-menu">
-                <button type="button" class="btn-action-item" onclick="selectControlNode('nuc')" title="Select NUC Core Server as Execution Target">
-                  <span class="dropdown-dot" style="background-color: #c084fc; box-shadow: 0 0 8px #c084fc;"></span>
-                  <span>NUC Core Server (24/7 Always-On &bull; 192.168.2.35)</span>
-                  <span class="item-tag" style="background: rgba(192, 132, 252, 0.2); color: #c084fc;">Port 8081</span>
-                </button>
-                <button type="button" class="btn-action-item" onclick="selectControlNode('desktop')" title="Select Desktop PC as Execution Target">
-                  <span class="dropdown-dot dot-1"></span>
-                  <span>Desktop PC (Core Workstation &bull; 192.168.2.62)</span>
-                  <span class="item-tag online">Port 8080</span>
-                </button>
-              </div>
+            <span style="font-size: 0.78rem; text-transform: uppercase; font-weight: 700; color: #94a3b8; letter-spacing: 0.5px;">Target Node:</span>
+            <div class="radio-pill-group" id="power-target-group">
+              <label class="radio-pill-label active" id="label-target-desktop">
+                <input type="radio" name="power_target" value="desktop" checked onchange="onPowerTargetChange('desktop')">
+                <span class="radio-indicator"></span>
+                <span class="radio-text">Desktop Node (192.168.2.62)</span>
+              </label>
+              <label class="radio-pill-label" id="label-target-nuc">
+                <input type="radio" name="power_target" value="nuc" onchange="onPowerTargetChange('nuc')">
+                <span class="radio-indicator"></span>
+                <span class="radio-text">NUC Server (192.168.2.35)</span>
+              </label>
             </div>
           </div>
-          <div id="ctrl-node-status-badge" class="ctrl-node-status-badge">
-            <span class="dropdown-dot" id="ctrl-node-status-dot" style="background-color: #c084fc; box-shadow: 0 0 8px #c084fc;"></span>
-            <span id="ctrl-node-status-text" style="color: #e9d5ff; font-weight: 700; font-size: 0.8rem;">Target: NUC Server (Port 8081)</span>
+          <div style="font-size: 0.78rem; color: #64748b; font-family: 'JetBrains Mono', monospace;" id="power-target-hint">
+            Active: Desktop Workstation &bull; Target MAC: D8:BB:C1:4D:4E:91
           </div>
         </div>
 
-        <!-- Power & Lifecycle Operations -->
-        <div class="control-groups-container">
-          <!-- Group 1: Remote Power Lifecycle -->
-          <div class="control-group">
-            <div class="control-group-header">
-              <span class="control-group-title">Power &amp; Standby Operations</span>
+        <!-- Primary Action Grid (WoL, Sleep, Reboot, Broadcast WoL) -->
+        <div class="control-matrix-grid">
+          <!-- 1. WoL (Wake-on-LAN) -->
+          <div class="control-action-cell">
+            <div class="control-action-meta">
+              <span class="control-action-name">WoL</span>
+              <span class="control-action-desc">Transmit Magic Packet to Target Node</span>
             </div>
-            <div class="control-group-grid">
-              <button type="button" class="btn-control active-wake" onclick="executeNodeAction('wake')" title="Send Wake-on-LAN Magic Packet to Selected Target">
-                WoL
-              </button>
-              <button type="button" class="btn-control active-sleep" onclick="executeNodeAction('sleep')" title="Put Selected Target into Low-Power Sleep Standby">
-                Sleep
-              </button>
-              <button type="button" class="btn-control btn-reboot" onclick="executeNodeAction('reboot')" title="Requires Admin Authorization">
-                Reboot
-              </button>
-              <button type="button" class="btn-control" onclick="sendWol('both')" title="Broadcast Wake-on-LAN Magic Packets to Both Machines">
-                Broadcast WoL
-              </button>
-            </div>
+            <button type="button" class="btn btn-secondary" id="btn-power-wake" onclick="triggerNodeAction('wake')" style="font-size: 0.78rem; padding: 6px 14px; color: #6ee7b7 !important; border-color: rgba(16, 185, 129, 0.4);" title="Send WoL magic packet to wake node">
+              Wake
+            </button>
           </div>
 
-          <!-- Group 2: System Lifecycle & Disk Hygiene -->
-          <div class="control-group">
-            <div class="control-group-header">
-              <span class="control-group-title">System Maintenance &amp; Health Lifecycle</span>
+          <!-- 2. Sleep -->
+          <div class="control-action-cell">
+            <div class="control-action-meta">
+              <span class="control-action-name">Sleep</span>
+              <span class="control-action-desc">Low-power S3 standby state</span>
             </div>
-            <div class="control-group-grid">
-              <button type="button" class="btn-control" onclick="executeNodeAction('run-update-computer')" title="Execute Update-Computer.exe Optimization on Selected Target">
-                Run Update-Computer
-              </button>
-              <button type="button" class="btn-control" onclick="executeNodeAction('clean-junk')" title="Clean Temp Files &amp; Storage Cache on Selected Target">
-                Clean Temp &amp; Junk
-              </button>
-              <button type="button" class="btn-control" onclick="executeNodeAction('run-audit')" title="Run Sentinel Watchdog System Health Audit on Selected Target">
-                Sentinel Health Audit
-              </button>
-              <button type="button" class="btn-control" onclick="executeNodeAction('run-backup')" title="Trigger Cloud Disaster Recovery Backup to OneDrive">
-                Cloud Backup (OneDrive)
-              </button>
+            <button type="button" class="btn btn-secondary" id="btn-power-sleep" onclick="triggerNodeAction('sleep')" style="font-size: 0.78rem; padding: 6px 14px; color: #cbd5e1 !important; border-color: rgba(255, 255, 255, 0.2);" title="Transition target node to standby">
+              Sleep
+            </button>
+          </div>
+
+          <!-- 3. Reboot -->
+          <div class="control-action-cell">
+            <div class="control-action-meta">
+              <span class="control-action-name">Reboot</span>
+              <span class="control-action-desc">Graceful operating system reboot</span>
             </div>
+            <button type="button" class="btn btn-secondary" id="btn-power-reboot" onclick="triggerNodeAction('reboot')" style="font-size: 0.78rem; padding: 6px 14px; color: #f59e0b !important; border-color: rgba(245, 158, 11, 0.4);" title="Perform clean OS restart on node">
+              Reboot
+            </button>
+          </div>
+
+          <!-- 4. Broadcast WoL -->
+          <div class="control-action-cell">
+            <div class="control-action-meta">
+              <span class="control-action-name">Broadcast WoL</span>
+              <span class="control-action-desc">Dual subnet packet to all cluster nodes</span>
+            </div>
+            <button type="button" class="btn btn-secondary" id="btn-power-broadcast" onclick="triggerNodeAction('wake-all')" style="font-size: 0.78rem; padding: 6px 14px; color: #38bdf8 !important; border-color: rgba(56, 189, 248, 0.4);" title="Broadcast WoL magic packet to Desktop and NUC">
+              Broadcast WoL
+            </button>
+          </div>
+        </div>
+
+        <!-- Node Status & Telemetry Strip -->
+        <div class="control-matrix-footer">
+          <div class="footer-status-pill">
+            <span class="status-indicator-dot online" id="power-footer-dot"></span>
+            <span id="power-footer-status">Desktop Node: Online &bull; Active Interactive Session</span>
+          </div>
+          <div class="footer-telemetry-text" id="power-footer-telemetry">
+            Latency: 0.4 ms &bull; Subnet: 192.168.2.0/24 &bull; Gateway: Online
           </div>
         </div>
       </div>
@@ -753,12 +733,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.14</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.15</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 22,837 Lines of Code (HTML: 13,203 lines across 7 sub-pages | JS: 3,880 lines | CSS: 5,753 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 12,336 Lines of Code (HTML: 7,012 lines | CSS: 5,323 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">22,837</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">23,634</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1460,67 +1440,7 @@
         <!-- Version 2.8.7 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.14 | Current</span>
-            <span class="ver-date">October 28, 2026</span>
-          </div>
-          <h4 class="ver-title">Calibrated Latency Sparkline Y-Axis &amp; Live Telemetry Pre-Rendering</h4>
-          <ul class="ver-list">
-            <li><strong>Calibrated Sparkline Y-Axis:</strong> Integrated an authentic vertical Y-axis on the 24-hour response heartbeat canvas with tick markers (<code>10 ms</code>, <code>5 ms</code>, <code>0 ms</code>), scale labels, and dashed horizontal reference guidelines.</li>
-            <li><strong>Live Telemetry Pre-Rendering:</strong> Pre-rendered authentic live status across navigation menus for NUC storage (<code>D: 489 GB free</code>), NUC response (<code>0.2 ms | D: 489 GB</code>), and Desktop workstation (<code>0.4 ms</code>), eliminating empty placeholder states.</li>
-            <li><strong>Unblocked Read-Only Diagnostics:</strong> Removed preemptive authentication gates from node ping diagnostics, allowing immediate real-time latency verification on demand.</li>
-          </ul>
-        </div>
-
-        <!-- Version 2.8.13 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.8.13</span>
-            <span class="ver-date">October 28, 2026</span>
-          </div>
-          <h4 class="ver-title">Streamlined Power Controls &amp; Unified NUC High Performance Status</h4>
-        </div>
-
-        <!-- Version 2.8.12 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.8.12</span>
-            <span class="ver-date">October 28, 2026</span>
-          </div>
-          <h4 class="ver-title">Pre-Rendered 90-Day SLA Bars, SLA Shield Indicator &amp; Fleet Nodes Architecture</h4>
-        </div>
-
-        <!-- Version 2.8.11 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.8.11</span>
-            <span class="ver-date">October 28, 2026</span>
-          </div>
-          <h4 class="ver-title">Maintenance Window Relocation to Uptime &amp; Complete Emoji Purge</h4>
-        </div>
-
-        <!-- Version 2.8.10 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.8.10</span>
-            <span class="ver-date">October 28, 2026</span>
-          </div>
-          <h4 class="ver-title">Top Navigation Grouping &amp; Contextual Tools Separation</h4>
-        </div>
-
-        <!-- Version 2.8.9 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.8.9</span>
-            <span class="ver-date">October 28, 2026</span>
-          </div>
-          <h4 class="ver-title">Dedicated Media Hub &amp; Penny's Cat Hub Separation</h4>
-        </div>
-
-        <!-- Version 2.8.7 -->
-        <div class="changelog-entry">
-            <span class="ver-tag">v2.8.7</span>
+            <span class="ver-tag current">v2.8.7 | Current</span>
             <span class="ver-date">October 28, 2026</span>
           </div>
           <h4 class="ver-title">Unified Homelab Service Dashboard Button Styles &amp; Cache-Busted Pipeline</h4>
@@ -1919,6 +1839,6 @@
         </div>
       </div>
     </div>
-  <script src="app.js?v=2.8.14"></script>
+  </div>
 </body>
 </html>
