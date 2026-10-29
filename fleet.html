@@ -308,17 +308,17 @@
           <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
             <span style="font-size: 0.78rem; text-transform: uppercase; font-weight: 700; color: #94a3b8; letter-spacing: 0.5px;">Target Node:</span>
             <div class="target-node-pill-group" id="power-target-group">
-              <button type="button" class="btn-node-pill active" id="btn-target-desktop" onclick="onPowerTargetChange('desktop')">
+              <button type="button" class="btn btn-secondary btn-node-pill active" id="btn-target-desktop" onclick="onPowerTargetChange('desktop')">
                 <span class="dropdown-dot dot-1"></span>
                 <span>Desktop Node (192.168.2.62)</span>
               </button>
-              <button type="button" class="btn-node-pill" id="btn-target-nuc" onclick="onPowerTargetChange('nuc')">
+              <button type="button" class="btn btn-secondary btn-node-pill" id="btn-target-nuc" onclick="onPowerTargetChange('nuc')">
                 <span class="dropdown-dot dot-2"></span>
                 <span>NUC Server (192.168.2.35)</span>
               </button>
             </div>
           </div>
-          <button type="button" class="node-state-pill target-desktop" id="power-target-status-pill" onclick="togglePowerTarget()" title="Click to toggle target between Desktop Node and NUC Server">
+          <button type="button" class="btn btn-secondary node-state-pill target-desktop" id="power-target-status-pill" onclick="togglePowerTarget()" title="Click to toggle target between Desktop Node and NUC Server">
             <span class="status-indicator online" id="power-target-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
             <span id="power-target-desc">AMD Ryzen 7 &bull; RTX Workstation &bull; Online</span>
           </button>
