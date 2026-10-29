@@ -47,18 +47,18 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.10';
+          const activeVer = match ? match[0] : 'v2.8.11';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 12987;
-        const baseCssLines = 5681;
-        const baseJsLines = 3796;
+      const baseHtmlLines = 12997;
+        const baseCssLines = 5713;
+        const baseJsLines = 3769;
         const baseCnameLines = 1;
-        const defaultTotal = baseHtmlLines + baseCssLines + baseCnameLines;
+        const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
         // Asynchronously count exact live lines via parallel cache-busted fetch
         Promise.all([
@@ -67,7 +67,7 @@
         ]).then(([htmlSrc, cssSrc]) => {
           const hLines = htmlSrc ? htmlSrc.split(/\r?\n/).length : baseHtmlLines;
           const cLines = cssSrc ? cssSrc.split(/\r?\n/).length : baseCssLines;
-          const total = hLines + cLines + baseCnameLines;
+          const total = 12997 + 3769 + cLines + baseCnameLines;
           const totalFormatted = total.toLocaleString();
 
           const locEl = document.getElementById('project-loc-count');
@@ -125,33 +125,6 @@
       }
     }
 
-    function updateLayoutToggleButtons(mode) {
-      const isMobile = mode === 'mobile';
-      const actionText = isMobile ? 'Desktop View' : 'Mobile View';
-      const icon = isMobile ? "\uD83D\uDDA5" : "\uD83D\uDCF1";
-      const currentModeText = isMobile ? 'Mobile' : 'Desktop';
-      const title = `Currently in ${currentModeText} View. Click to switch to ${actionText}.`;
-
-      const navBtn = document.getElementById('layout-toggle-nav');
-      const navText = document.getElementById('layout-toggle-nav-text');
-      const navIcon = document.getElementById('layout-toggle-nav-icon');
-      if (navBtn) {
-        navBtn.setAttribute('title', title);
-        navBtn.setAttribute('aria-label', title);
-      }
-      if (navText) navText.textContent = actionText;
-      if (navIcon) navIcon.textContent = icon;
-
-      const footerBtn = document.getElementById('layout-toggle-footer');
-      const footerText = document.getElementById('layout-toggle-footer-text');
-      const footerIcon = document.getElementById('layout-toggle-footer-icon');
-      if (footerBtn) {
-        footerBtn.setAttribute('title', title);
-        footerBtn.setAttribute('aria-label', title);
-      }
-      if (footerText) footerText.textContent = actionText;
-      if (footerIcon) footerIcon.textContent = icon;
-    }
 
     function setLayoutMode(mode, savePreference = true) {
       const html = document.documentElement;
@@ -410,13 +383,13 @@
         if (target === 'desktop') {
           const dTag = document.getElementById('desktop-speed-tag');
           if (dTag) {
-            dTag.textContent = torrent.dlSpeed > 0 ? `\u2B07 ${torrent.dlSpeedText}` : 'Idle';
+            dTag.textContent = torrent.dlSpeed > 0 ? `DL: ${torrent.dlSpeedText}` : 'Idle';
             dTag.className = torrent.dlSpeed > 0 ? 'item-tag online' : 'item-tag';
           }
         } else if (target === 'nuc') {
           const nTag = document.getElementById('nuc-disk-tag');
           if (nTag && torrent.dlSpeed > 1024) {
-            nTag.textContent = `\u2B07 ${torrent.dlSpeedText}`;
+            nTag.textContent = `DL: ${torrent.dlSpeedText}`;
             nTag.className = 'item-tag online';
           }
         }
@@ -444,7 +417,7 @@
             diskBar.classList.remove('warning');
           }
         }
-        const speedNote = (torrent && torrent.dlSpeed > 0) ? ` | \u2B07 ${torrent.dlSpeedText}` : '';
+        const speedNote = (torrent && torrent.dlSpeed > 0) ? ` | DL: ${torrent.dlSpeedText}` : '';
         if (diskSub) {
           diskSub.innerHTML = `${disk.usedGB} GB used of ${disk.totalGB} GB (${disk.usedPercent}%)${speedNote}`;
         }
@@ -1240,18 +1213,18 @@
       if (isSpeed) {
         if (speedBtn) {
           speedBtn.disabled = true;
-          speedBtn.innerHTML = '<span>&#8987;</span> Probing Bell Fiber...';
+          speedBtn.innerHTML = 'Probing Bell Fiber...';
         }
         if (probeNowBtn) {
           probeNowBtn.disabled = true;
-          probeNowBtn.innerHTML = '<span>&#8987;</span> Probing...';
+          probeNowBtn.innerHTML = 'Probing...';
         }
       }
 
       const resetSpeedBtns = () => {
         if (speedBtn) {
           speedBtn.disabled = false;
-          speedBtn.innerHTML = '<span>&#127760;</span> Probe Bell Speed';
+          speedBtn.innerHTML = 'Probe Bell Speed';
         }
         if (probeNowBtn) {
           probeNowBtn.disabled = false;
@@ -1301,7 +1274,7 @@
       const text = document.getElementById('ctrl-node-status-text');
 
       if (currentControlTarget === 'nuc') {
-        if (label) label.innerHTML = '&#9889; NUC Core Server (24/7 Always-On)';
+        if (label) label.innerHTML = 'NUC Core Server (24/7 Always-On)';
         if (btnDot) {
           btnDot.style.backgroundColor = '#c084fc';
           btnDot.style.boxShadow = '0 0 8px #c084fc';
@@ -1320,7 +1293,7 @@
         }
         showToast('info', 'Target Switched: NUC', 'Actions will target NUC Server (24/7 Always-On).');
       } else {
-        if (label) label.innerHTML = '&#128421;&#65039; Desktop PC (Core Workstation)';
+        if (label) label.innerHTML = 'Desktop PC (Core Workstation)';
         if (btnDot) {
           btnDot.style.backgroundColor = '#60a5fa';
           btnDot.style.boxShadow = '0 0 8px #60a5fa';
@@ -1733,7 +1706,7 @@
                 tierBellIp.style.fontFamily = 'inherit';
               }
             }
-            if (pingTag) pingTag.textContent = `\u2713 ${pingAvg} ms`;
+            if (pingTag) pingTag.textContent = `${pingAvg} ms`;
 
             const tbody = document.getElementById('isp-history-tbody');
             if (tbody && rawList.length > 0) {
@@ -1763,7 +1736,7 @@
       const probeBtn = document.getElementById('btn-probe-now');
       if (probeBtn) {
         probeBtn.disabled = true;
-        probeBtn.innerHTML = '<span>&#8987;</span> Probing...';
+        probeBtn.innerHTML = 'Probing...';
       }
       sendControl('run-speedtest');
       setTimeout(fetchISPHistory, 2000);
@@ -2003,12 +1976,12 @@
           bAi.style.background = 'rgba(168, 85, 247, 0.25)';
           bAi.style.borderColor = '#a855f7';
           bAi.style.color = '#d8b4fe';
-          bAi.innerHTML = '&#129302; AI Cat Vision: ON (TF)';
+          bAi.innerHTML = 'AI Cat Vision: ON (TF)';
         } else {
           bAi.style.background = 'rgba(16, 185, 129, 0.15)';
           bAi.style.borderColor = 'rgba(16, 185, 129, 0.35)';
           bAi.style.color = '#6ee7b7';
-          bAi.innerHTML = '&#9889; Fast WebRTC (0% CPU)';
+          bAi.innerHTML = 'Fast WebRTC (0% CPU)';
         }
       }
     }
@@ -2105,7 +2078,7 @@
         if (dot) { dot.style.background = '#f59e0b'; dot.style.boxShadow = '0 0 10px #f59e0b'; }
         if (tag) { tag.textContent = 'Active (SLA Shield)'; tag.className = 'item-tag'; tag.style.background = 'rgba(245, 158, 11, 0.25)'; tag.style.color = '#fde047'; }
         if (actionBtn) {
-          actionBtn.innerHTML = '&#9989; Exit Maintenance Mode';
+          actionBtn.innerHTML = 'Exit Maintenance Mode';
           actionBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
           actionBtn.style.borderColor = '#10b981';
         }
@@ -2138,7 +2111,7 @@
         if (sub) sub.textContent = 'Planned maintenance windows are excluded from outage penalties.';
         if (tag) { tag.textContent = 'SLA Protected'; tag.className = 'item-tag online'; tag.style.background = ''; tag.style.color = ''; }
         if (actionBtn) {
-          actionBtn.innerHTML = '&#128736;&#65039; Activate Maintenance Window';
+          actionBtn.innerHTML = 'Activate Maintenance Window';
           actionBtn.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
           actionBtn.style.borderColor = '#f59e0b';
         }
@@ -2760,7 +2733,7 @@
     // ==========================================
     const schematicNodesData = {
       cf: {
-        icon: '\uD83D\uDEE1\uFE0F',
+        icon: '[EDGE]',
         title: 'Cloudflare Zero Trust Edge Network',
         subtitle: 'Global Ingress & Anycast Edge Tunnels',
         status: '100% SLA Green',
@@ -2774,7 +2747,7 @@
         action: () => { checkStatus('both'); showToast('info', 'Edge Trace Dispatched', 'Pinging Cloudflare PoP Montreal (YUL)...'); }
       },
       bell: {
-        icon: '\uD83D\uDCE1',
+        icon: '[FIBER]',
         title: 'Bell Gigabit Fiber (GigaHub 4000)',
         subtitle: 'FTTH Uplink  -  1.5 Gbps Optical Carrier',
         status: '1.5 Gbps Optimal',
@@ -2788,7 +2761,7 @@
         action: () => { triggerSpeedtest(); }
       },
       vpn: {
-        icon: '\u26A1',
+        icon: '[VPN]',
         title: 'Mullvad WireGuard Privacy Tunnel',
         subtitle: 'Zero-Logging Cryptographic Outbound Proxy',
         status: 'Encrypted & Active',
@@ -2802,7 +2775,7 @@
         action: () => { openHealthModal(); }
       },
       tunnel: {
-        icon: '\uD83D\uDE87',
+        icon: '[TUNNEL]',
         title: 'Cloudflare Tunnel Daemon (cloudflared)',
         subtitle: 'Zero Trust Outbound Ingress Connector',
         status: 'Connected (Dual-Path)',
@@ -2816,7 +2789,7 @@
         action: () => { showToast('info', 'Zero Trust Tunnel', 'Argo tunnel active across 24/7 NUC node.'); }
       },
       nuc: {
-        icon: '\uD83D\uDC27',
+        icon: '[SERVER]',
         title: 'Intel NUC Core Server (Always-On 24/7)',
         subtitle: 'Central Edge Gateway & Service Host',
         status: 'Online (0.4 ms LAN)',
@@ -2830,7 +2803,7 @@
         action: () => { checkStatus('nuc'); }
       },
       desktop: {
-        icon: '\uD83D\uDDA5\uFE0F',
+        icon: '[COMPUTE]',
         title: 'Desktop Workstation (Cory-Desktop)',
         subtitle: 'High-Power Compute, GPU & Autonomous CLI Node',
         status: 'Online (Active Workstation)',
@@ -2844,7 +2817,7 @@
         action: () => { checkStatus('desktop'); }
       },
       storage: {
-        icon: '\uD83D\uDCBE',
+        icon: '[STORAGE]',
         title: 'Media Storage & NVMe Pools',
         subtitle: 'High-Speed Local Storage & Network Shares',
         status: 'Healthy (496 GB Free)',
@@ -2929,7 +2902,7 @@
       const btn = document.getElementById('btn-toggle-flow');
       const streams = document.querySelectorAll('.circuit-stream');
       if (btn) {
-        btn.innerHTML = circuitFlowActive ? 'Flow: ON' : '<span>&#9889;</span> Flow: OFF';
+        btn.innerHTML = circuitFlowActive ? 'Flow: ON' : 'Flow: OFF';
         btn.classList.toggle('pulse-active', circuitFlowActive);
       }
       streams.forEach(s => {
