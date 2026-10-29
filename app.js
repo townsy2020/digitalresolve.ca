@@ -352,11 +352,12 @@
           pillEl.classList.remove('target-nuc');
           pillEl.setAttribute('aria-label', 'Active Target: Desktop Workstation. Click to switch to NUC Server.');
         }
-        if (descEl) descEl.innerHTML = 'AMD Ryzen 7 &bull; RTX Workstation &bull; Online';
+        const deskOnline = window.DESKTOP_IS_ONLINE !== undefined ? window.DESKTOP_IS_ONLINE : true;
+        if (descEl) descEl.innerHTML = `AMD Ryzen 7 &bull; RTX Workstation &bull; ${deskOnline ? 'Online' : 'Standby'}`;
         if (dotEl) {
-          dotEl.className = 'status-indicator online';
-          dotEl.style.backgroundColor = '#38bdf8';
-          dotEl.style.boxShadow = '0 0 8px #38bdf8';
+          dotEl.className = `status-indicator ${deskOnline ? 'online' : 'offline'}`;
+          dotEl.style.backgroundColor = deskOnline ? '#38bdf8' : '#ef4444';
+          dotEl.style.boxShadow = deskOnline ? '0 0 8px #38bdf8' : '0 0 8px #ef4444';
         }
         if (feedbackEl) feedbackEl.textContent = 'Ready | Target: Desktop Workstation (192.168.2.62)';
       } else {
@@ -861,6 +862,18 @@
             fVpn.textContent = vitals.vpn;
           }
         }
+        if (!isOnline) {
+          const sHw = document.getElementById('stat-hw-tag');
+          if (sHw) { sHw.textContent = 'Offline'; sHw.className = 'item-tag offline'; }
+          const sCpu = document.getElementById('stat-cpu-val');
+          if (sCpu) sCpu.innerHTML = `-- <span style="font-size: 0.85rem; color: #8b949e; margin-left: 4px;">CPU</span>`;
+          const sRam = document.getElementById('stat-ram-sub');
+          if (sRam) sRam.textContent = 'Hardware Node Unreachable';
+          const fVitals = document.getElementById('fleet-vitals-nuc');
+          if (fVitals) fVitals.textContent = 'Node Unreachable';
+          const fCpu = document.getElementById('fleet-cpu-nuc');
+          if (fCpu) fCpu.textContent = 'Intel Core i5 | Offline';
+        }
 
         const rNuc = document.getElementById('ribbon-nuc');
         if (rNuc) {
@@ -889,6 +902,29 @@
         if (uptimeDeskStatus) {
           uptimeDeskStatus.textContent = isOnline ? 'Online • Active Session' : 'Eco Standby • Sleeping';
           uptimeDeskStatus.className = `tier-status ${isOnline ? 'online' : 'offline'}`;
+        }
+        const uptimeScaleToday = document.getElementById('uptime-desktop-scale-today');
+        if (uptimeScaleToday) {
+          uptimeScaleToday.innerHTML = isOnline
+            ? 'Today (Active Session &bull; 100% Operational)'
+            : 'Today (Eco Standby Mode &bull; Sleep)';
+        }
+
+        const cfTorrentsBadges = document.querySelectorAll('.cf-sub-torrents-badge, #cf-sub-torrents-badge');
+        cfTorrentsBadges.forEach(badge => {
+          badge.className = `item-tag ${isOnline ? 'online' : 'offline'} cf-sub-torrents-badge`;
+          badge.textContent = isOnline ? 'Active' : 'Standby';
+        });
+
+        if (typeof currentPowerTarget !== 'undefined' && currentPowerTarget === 'desktop') {
+          const descEl = document.getElementById('power-target-desc');
+          const dotEl = document.getElementById('power-target-dot');
+          if (descEl) descEl.innerHTML = `AMD Ryzen 7 &bull; RTX Workstation &bull; ${isOnline ? 'Online' : 'Standby'}`;
+          if (dotEl) {
+            dotEl.className = `status-indicator ${isOnline ? 'online' : 'offline'}`;
+            dotEl.style.backgroundColor = isOnline ? '#38bdf8' : '#ef4444';
+            dotEl.style.boxShadow = isOnline ? '0 0 8px #38bdf8' : '0 0 8px #ef4444';
+          }
         }
 
         // Update Desktop Storage Segments Bar (media.html & index.html)
@@ -997,9 +1033,6 @@
       updateClusterPowerAndThermalsUI(false);
       fetchAgySessionInfo();
 
-      // Immediate live telemetry baseline before background polling
-      updateStatusUI('nuc', true, 0.2, { freeGB: 489.2, totalGB: 1863, usedGB: 1373.8, usedPercent: 73.7 });
-
       // Ensure all modal overlays are strictly hidden on load
       ['magnet-modal-overlay', 'agy-console-modal-overlay', 'changelog-modal-overlay', 'health-modal-overlay', 'chaos-modal-overlay', 'disaster-modal-overlay', 'speedtest-sso-modal-overlay', 'cloudflare-stats-modal-overlay', 'adguard-modal-overlay'].forEach(id => {
         const el = document.getElementById(id);
@@ -1013,8 +1046,7 @@
         .then(r => r.json())
         .then(d => { if (t1) clearTimeout(t1); updateStatusUI('nuc', d.online, d.latencyMs, d.disk, d.torrent, d.vitals); })
         .catch(() => {
-          // 24/7 Core Server resilient default
-          updateStatusUI('nuc', true, 0.8, { freeGB: 489.2, totalGB: 1863, usedGB: 1373.8, usedPercent: 73.4 }, null, { ramUsedGB: 9.4, ramTotalGB: 31.8, ramPercent: 30, uptime: '3d 3h 32m', cpuLoad: 15, vpn: 'Mullvad WireGuard (NYC)' });
+          updateStatusUI('nuc', false);
         });
 
       const ctrl2 = typeof AbortController !== 'undefined' ? new AbortController() : null;
@@ -1911,14 +1943,15 @@
       if (!metrics) {
         metrics = getLiveTokenMetrics();
       } else {
+        const defMetrics = getLiveTokenMetrics();
         const parsed = {
-          inputTokens: metrics.input !== undefined ? metrics.input : (metrics.inputTokens || 14305241),
-          outputTokens: metrics.output !== undefined ? metrics.output : (metrics.outputTokens || 1219543),
-          cacheTokens: metrics.cache !== undefined ? metrics.cache : (metrics.cacheTokens || 318233040),
-          totalTokens: metrics.total !== undefined ? metrics.total : (metrics.totalTokens || ((metrics.input || 14305241) + (metrics.output || 1219543))),
-          model: metrics.model || 'Gemini 3.8 Flash (Token-Efficiency Protocol)',
-          efficiency: metrics.efficiency || 'Optimal (90% Token Efficiency)',
-          breakdown: metrics.breakdown || null
+          inputTokens: metrics.input !== undefined ? metrics.input : (metrics.inputTokens || defMetrics.inputTokens),
+          outputTokens: metrics.output !== undefined ? metrics.output : (metrics.outputTokens || defMetrics.outputTokens),
+          cacheTokens: metrics.cache !== undefined ? metrics.cache : (metrics.cacheTokens || defMetrics.cacheTokens),
+          totalTokens: metrics.total !== undefined ? metrics.total : (metrics.totalTokens || ((metrics.input || defMetrics.inputTokens) + (metrics.output || defMetrics.outputTokens))),
+          model: metrics.model || defMetrics.model,
+          efficiency: metrics.efficiency || defMetrics.efficiency,
+          breakdown: metrics.breakdown || defMetrics.breakdown
         };
         metrics = parsed;
         try { localStorage.setItem(TOKEN_METRICS_KEY, JSON.stringify(metrics)); } catch (e) {}
