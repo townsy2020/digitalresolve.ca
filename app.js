@@ -690,6 +690,11 @@
         setTimeout(() => {
           if (typeof scrollToPowerControls === 'function') scrollToPowerControls();
         }, 350);
+      } else if (window.location.hash && window.location.hash.startsWith('#pane-')) {
+        const tabKey = window.location.hash.replace('#pane-', '');
+        setTimeout(() => {
+          if (typeof switchNucTab === 'function') switchNucTab(tabKey);
+        }, 350);
       }
       updateTokenCounterUI();
 
@@ -3606,16 +3611,36 @@
     function switchNucTab(tabKey) {
       if (tabKey === 'ai') {
         const ops = document.getElementById('ops-ai');
-        if (ops) ops.scrollIntoView({ behavior: 'smooth' });
+        if (ops) {
+          ops.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          window.location.href = 'ai.html#ops-ai';
+        }
         return;
       }
-      document.querySelectorAll('.nuc-tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.nuc-pane').forEach(pane => pane.classList.remove('active'));
 
       const btn = document.getElementById(`tab-btn-${tabKey}`);
       const pane = document.getElementById(`pane-${tabKey}`);
+      const container = document.getElementById('nuc-services');
+
+      if (!btn && !pane && !container) {
+        window.location.href = `index.html#pane-${tabKey}`;
+        return;
+      }
+
+      document.querySelectorAll('.nuc-tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.nuc-pane').forEach(p => p.classList.remove('active'));
+
       if (btn) btn.classList.add('active');
-      if (pane) pane.classList.add('active');
+      if (pane) {
+        pane.classList.add('active');
+        pane.style.transition = 'box-shadow 0.4s ease, border-color 0.4s ease';
+        pane.style.boxShadow = '0 0 24px rgba(56, 189, 248, 0.45)';
+        setTimeout(() => { pane.style.boxShadow = ''; }, 2200);
+        pane.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if (container) {
+        container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
     window.switchNucTab = switchNucTab;
 
