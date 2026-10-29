@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0">
   <title>Digital Resolve &bull; Homelab Cloud &amp; Command Deck</title>
   <meta name="description" content="24/7 self-hosted homelab operations, Cloudflare Zero Trust tunnels, private 4K media streaming, and automated WireGuard VPN ingestion.">
-  <link rel="stylesheet" href="styles.css?v=2.8.6">
+  <link rel="stylesheet" href="styles.css?v=2.8.7">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -197,7 +197,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.6</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.7</span>)</span>
             </button>
             <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO()" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -1023,11 +1023,11 @@
 
             <!-- Service Filter Tabs -->
             <div class="dash-filter-bar" style="margin-bottom: 16px;">
-              <button type="button" class="dash-filter-btn active" onclick="filterServiceDashboard('all', this)">All Services (8)</button>
-              <button type="button" class="dash-filter-btn" onclick="filterServiceDashboard('media', this)">Media &amp; Video (3)</button>
-              <button type="button" class="dash-filter-btn" onclick="filterServiceDashboard('security', this)">Perimeter &amp; Edge (2)</button>
-              <button type="button" class="dash-filter-btn" onclick="filterServiceDashboard('compute', this)">Compute &amp; BitTorrent (2)</button>
-              <button type="button" class="dash-filter-btn" onclick="filterServiceDashboard('iot', this)">Pet IoT &amp; Vitals (1)</button>
+              <button type="button" class="btn-schematic-chip dash-filter-btn active" onclick="filterServiceDashboard('all', this)">All Services (8)</button>
+              <button type="button" class="btn-schematic-chip dash-filter-btn" onclick="filterServiceDashboard('media', this)">Media &amp; Video (3)</button>
+              <button type="button" class="btn-schematic-chip dash-filter-btn" onclick="filterServiceDashboard('security', this)">Perimeter &amp; Edge (2)</button>
+              <button type="button" class="btn-schematic-chip dash-filter-btn" onclick="filterServiceDashboard('compute', this)">Compute &amp; BitTorrent (2)</button>
+              <button type="button" class="btn-schematic-chip dash-filter-btn" onclick="filterServiceDashboard('iot', this)">Pet IoT &amp; Vitals (1)</button>
             </div>
 
             <!-- Service Cards Grid -->
@@ -1060,7 +1060,7 @@
                 </div>
                 <div class="dash-card-footer">
                   <span style="font-size: 0.72rem; color: #64748b;">M365 Entra ID SSO</span>
-                  <a href="javascript:void(0)" onclick="launchProtectedService('https://stream.digitalresolve.ca', 'Watch Library &amp; StreamHub (Port 8088)')" class="dash-btn-action">Launch Stream &rarr;</a>
+                  <a href="javascript:void(0)" onclick="launchProtectedService('https://stream.digitalresolve.ca', 'Watch Library &amp; StreamHub (Port 8088)')" class="btn-schematic-chip dash-btn-action">Launch Stream &rarr;</a>
                 </div>
               </div>
 
@@ -1092,7 +1092,7 @@
                 </div>
                 <div class="dash-card-footer">
                   <span style="font-size: 0.72rem; color: #64748b;">Media &amp; Document Vault</span>
-                  <a href="javascript:void(0)" onclick="launchProtectedService('https://files.digitalresolve.ca/files/', 'FileBrowser Media Cloud (Port 8085)')" class="dash-btn-action">Open Vault &rarr;</a>
+                  <a href="javascript:void(0)" onclick="launchProtectedService('https://files.digitalresolve.ca/files/', 'FileBrowser Media Cloud (Port 8085)')" class="btn-schematic-chip dash-btn-action">Open Vault &rarr;</a>
                 </div>
               </div>
 
@@ -1124,7 +1124,7 @@
                 </div>
                 <div class="dash-card-footer">
                   <span style="font-size: 0.72rem; color: #64748b;">Zero Latency WebRTC</span>
-                  <a href="#camera-feed-card" class="dash-btn-action">Watch Cam &rarr;</a>
+                  <a href="#camera-feed-card" class="btn-schematic-chip dash-btn-action">Watch Cam &rarr;</a>
                 </div>
               </div>
 
@@ -1156,7 +1156,7 @@
                 </div>
                 <div class="dash-card-footer">
                   <span style="font-size: 0.72rem; color: #64748b;">Hardware Bridge Active</span>
-                  <a href="#camera-feed-card" class="dash-btn-action">Feeder Controls &rarr;</a>
+                  <a href="#camera-feed-card" class="btn-schematic-chip dash-btn-action">Control Feeder &rarr;</a>
                 </div>
               </div>
 
@@ -1188,7 +1188,7 @@
                 </div>
                 <div class="dash-card-footer">
                   <span style="font-size: 0.72rem; color: #64748b;">REST API Power Gateway</span>
-                  <a href="#fleet-quick-controls" class="dash-btn-action">Power Controls &rarr;</a>
+                  <a href="#fleet-quick-controls" class="btn-schematic-chip dash-btn-action">Control Power &rarr;</a>
                 </div>
               </div>
 
@@ -1220,7 +1220,7 @@
                 </div>
                 <div class="dash-card-footer">
                   <span style="font-size: 0.72rem; color: #64748b;">Kill-Switch Protected</span>
-                  <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents2.digitalresolve.ca', 'qBittorrent NUC (Port 8081)')" class="dash-btn-action">Open qBit NUC &rarr;</a>
+                  <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents2.digitalresolve.ca', 'qBittorrent NUC (Port 8081)')" class="btn-schematic-chip dash-btn-action">Open qBit NUC &rarr;</a>
                 </div>
               </div>
 
@@ -1252,7 +1252,7 @@
                 </div>
                 <div class="dash-card-footer">
                   <span style="font-size: 0.72rem; color: #64748b;">High Performance Ingestion</span>
-                  <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents.digitalresolve.ca', 'qBittorrent Desktop (Port 8080)')" class="dash-btn-action">Open qBit Desktop &rarr;</a>
+                  <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents.digitalresolve.ca', 'qBittorrent Desktop (Port 8080)')" class="btn-schematic-chip dash-btn-action">Open qBit Desktop &rarr;</a>
                 </div>
               </div>
 
@@ -1284,7 +1284,7 @@
                 </div>
                 <div class="dash-card-footer">
                   <span style="font-size: 0.72rem; color: #64748b;">M365 Entra ID SSO Policy</span>
-                  <a href="javascript:void(0)" onclick="openCloudflareStatsModal()" class="dash-btn-action">Edge Stats &rarr;</a>
+                  <a href="javascript:void(0)" onclick="openCloudflareStatsModal()" class="btn-schematic-chip dash-btn-action">View Edge Stats &rarr;</a>
                 </div>
               </div>
             </div>
@@ -6975,10 +6975,24 @@
       </div>
 
       <div class="changelog-body">
-        <!-- Version 2.8.6 (Current) -->
+        <!-- Version 2.8.7 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.6 | Current</span>
+            <span class="ver-tag current">v2.8.7 | Current</span>
+            <span class="ver-date">October 28, 2026</span>
+          </div>
+          <h4 class="ver-title">Unified Homelab Service Dashboard Button Styles &amp; Cache-Busted Pipeline</h4>
+          <ul class="ver-list">
+            <li><strong>Strict Button Hierarchy &amp; Consistency:</strong> Standardized all dashboard filter tabs and card action buttons (Launch Stream, Open Vault, Watch Cam, Control Feeder, Control Power, Open qBit, View Edge Stats) under the shared <code>.btn-schematic-chip</code> class, guaranteeing uniform padding, typography, hover glow, and active click states.</li>
+            <li><strong>Cache-Busted Distribution:</strong> Bumped stylesheet distribution to <code>styles.css?v=2.8.7</code> ensuring instant viewport synchronization across Cloudflare Edge and client browsers.</li>
+            <li><strong>100% Pure ASCII Guarantees:</strong> Replaced dynamic refresh indicators with pure ASCII inline SVG vectors to permanently prevent character decoding artifacts.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.8.6 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.6</span>
             <span class="ver-date">October 28, 2026</span>
           </div>
           <h4 class="ver-title">M365 Dedicated SSO Authentication Symmetrical Refresh &amp; Connected Pet Feeder IoT Bridge</h4>
