@@ -598,16 +598,44 @@
       const fBadge = document.getElementById(`fleet-badge-${target}`);
       const fLat = document.getElementById(`fleet-latency-${target}`);
       if (fDot) {
-        fDot.style.backgroundColor = isOnline ? '#22c55e' : '#22c55e';
-        fDot.style.boxShadow = isOnline ? '0 0 8px #22c55e' : '0 0 8px #22c55e';
+        fDot.style.backgroundColor = isOnline ? '#22c55e' : '#ef4444';
+        fDot.style.boxShadow = isOnline ? '0 0 8px #22c55e' : '0 0 8px #ef4444';
       }
       if (fBadge) {
-        fBadge.textContent = target === 'nuc' ? 'Online  -  24/7 Core' : 'Online  -  Active';
-        fBadge.className = 'item-tag online';
+        if (target === 'nuc') {
+          fBadge.textContent = isOnline ? 'Online  -  24/7 Core' : 'Offline  -  Unreachable';
+        } else {
+          fBadge.textContent = isOnline ? 'Online  -  Active' : 'Offline  -  Standby';
+        }
+        fBadge.className = `item-tag ${isOnline ? 'online' : 'offline'}`;
       }
-      if (fLat && latencyMs !== null) {
-        fLat.textContent = `${latencyMs} ms (LAN)`;
+      if (fLat) {
+        if (isOnline && latencyMs !== null) {
+          fLat.textContent = `${latencyMs} ms (LAN)`;
+          fLat.className = 'item-tag online';
+        } else if (!isOnline) {
+          fLat.textContent = 'Unreachable';
+          fLat.className = 'item-tag offline';
+        }
       }
+
+      // Dynamic Health Radar row update
+      document.querySelectorAll('.health-radar-row').forEach(row => {
+        if (target === 'desktop' && row.textContent.includes('Desktop Workstation')) {
+          const statusSpan = row.querySelector('.health-radar-header span:last-child');
+          const fillBar = row.querySelector('.health-meter-fill');
+          const subText = row.querySelector('div[style*="font-size: 0.72rem"]');
+          if (isOnline) {
+            if (statusSpan) { statusSpan.style.color = '#34d399'; statusSpan.textContent = '100% (Bell Fiber)'; }
+            if (fillBar) fillBar.style.width = '100%';
+            if (subText) subText.textContent = 'Services: Antigravity CLI Daemon, High-Speed Torrenting, Git Sync';
+          } else {
+            if (statusSpan) { statusSpan.style.color = '#ef4444'; statusSpan.textContent = '0% (Offline / Standby)'; }
+            if (fillBar) fillBar.style.width = '0%';
+            if (subText) subText.textContent = 'System Offline • Sleep/Standby Mode • Wake-on-LAN Ready';
+          }
+        }
+      });
       if (target === 'nuc') {
         if (disk) {
           const fStorage = document.getElementById('fleet-storage-nuc');
@@ -678,6 +706,18 @@
           if (sDeskCpu && vitals.cpuLoad !== undefined) sDeskCpu.innerHTML = `${vitals.cpuLoad}% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>`;
           if (sDeskRam) sDeskRam.textContent = `Memory: ${vitals.ramUsedGB} GB / ${vitals.ramTotalGB} GB (${vitals.ramPercent}%) | Active Session`;
         }
+        if (!isOnline) {
+          const fVitals = document.getElementById('fleet-vitals-desktop');
+          const fCpu = document.getElementById('fleet-cpu-desktop');
+          if (fVitals) fVitals.textContent = 'Node in Sleep / Standby Mode';
+          if (fCpu) fCpu.textContent = 'AMD Ryzen 7 | Offline';
+          const sDeskCpu = document.getElementById('stat-desktop-cpu-val');
+          const sDeskRam = document.getElementById('stat-desktop-ram-sub');
+          if (sDeskCpu) sDeskCpu.innerHTML = `0% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>`;
+          if (sDeskRam) sDeskRam.textContent = 'Memory: Standby / Sleep';
+          const dTag = document.getElementById('desktop-speed-tag');
+          if (dTag) { dTag.textContent = 'Offline'; dTag.className = 'item-tag offline'; }
+        }
     }
     }
 
@@ -700,7 +740,6 @@
 
       // Immediate live telemetry baseline before background polling
       updateStatusUI('nuc', true, 0.2, { freeGB: 489.2, totalGB: 1863, usedGB: 1373.8, usedPercent: 73.7 });
-      updateStatusUI('desktop', true, 0.4, { freeGB: 5751, totalGB: 6054, usedGB: 303, usedPercent: 5.0, cFreeGB: 374.8, cTotalGB: 464.8, dFreeGB: 5375.7, dTotalGB: 5588.9 }, null, { ramUsedGB: 15.6, ramTotalGB: 31.9, ramPercent: 48.9, cpuLoad: 12 });
 
       // Ensure all modal overlays are strictly hidden on load
       ['magnet-modal-overlay', 'agy-console-modal-overlay', 'changelog-modal-overlay', 'health-modal-overlay', 'chaos-modal-overlay', 'disaster-modal-overlay', 'speedtest-sso-modal-overlay', 'cloudflare-stats-modal-overlay', 'adguard-modal-overlay'].forEach(id => {
@@ -726,7 +765,7 @@
         .then(d => { if (t2) clearTimeout(t2); updateStatusUI('desktop', d.online, d.latencyMs, d.disk, d.torrent, d.vitals); })
         .catch(() => {
           // Active Workstation resilient default
-          updateStatusUI('desktop', true, 1.4, { freeGB: 5751, totalGB: 6054, usedGB: 303, usedPercent: 5.0, cFreeGB: 374.8, cTotalGB: 464.8, dFreeGB: 5375.7, dTotalGB: 5588.9 }, null, { ramUsedGB: 15.6, ramTotalGB: 31.9, ramPercent: 48.9, cpuLoad: 12 });
+            updateStatusUI('desktop', false);
         });
 
       // Smooth dropdown hover & focus management with zero flicker
@@ -1817,6 +1856,9 @@
               const dFree = document.getElementById('stat-disk-free');
               if (dFree) dFree.innerHTML = `${nuc.disk.freeGB} GB <span style="font-size: 0.9rem; color: #8b949e;">Free</span>`;
             }
+          }
+          if (data && data.desktop) {
+            updateStatusUI('desktop', data.desktop.online, data.desktop.latencyMs, data.desktop.disk, data.desktop.torrent, data.desktop.vitals);
           }
           if (data && data.tokens) {
             updateTokenCounterUI(data.tokens);
