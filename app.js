@@ -534,7 +534,7 @@
         dot.style.boxShadow = isOnline ? '0 0 8px #22c55e' : '0 0 8px #ef4444';
       }
       if (tag) {
-        tag.textContent = isOnline ? 'Online' : 'Offline';
+        tag.textContent = isOnline ? 'Online' : (target === 'desktop' ? 'Standby' : 'Offline');
         tag.className = `item-tag ${isOnline ? 'online' : 'offline'}`;
       }
       if (lat) {
@@ -545,7 +545,22 @@
         } else {
           lat.textContent = `${valLat} ms`;
         }
-        lat.className = 'item-tag online';
+        lat.className = `item-tag ${isOnline ? 'online' : 'offline'}`;
+      }
+      // Update Node Deck Hardware Tags (index.html, media.html)
+      const hwTag = document.getElementById(target === 'desktop' ? 'stat-desktop-hw-tag' : 'stat-hw-tag');
+      if (hwTag) {
+        hwTag.textContent = isOnline ? 'Online' : (target === 'desktop' ? 'Standby' : 'Offline');
+        hwTag.className = `item-tag ${isOnline ? 'online' : 'offline'}`;
+        if (target === 'desktop') {
+          hwTag.style.background = isOnline ? 'rgba(56, 189, 248, 0.15)' : 'rgba(239, 68, 68, 0.15)';
+          hwTag.style.color = isOnline ? '#38bdf8' : '#f87171';
+          hwTag.style.borderColor = isOnline ? 'rgba(56, 189, 248, 0.3)' : 'rgba(239, 68, 68, 0.3)';
+        } else {
+          hwTag.style.background = isOnline ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)';
+          hwTag.style.color = isOnline ? '#34d399' : '#f87171';
+          hwTag.style.borderColor = isOnline ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)';
+        }
       }
 
       // Update Torrent Speeds
@@ -605,7 +620,7 @@
         if (target === 'nuc') {
           fBadge.textContent = isOnline ? 'Online  -  24/7 Core' : 'Offline  -  Unreachable';
         } else {
-          fBadge.textContent = isOnline ? 'Online  -  Active' : 'Offline  -  Standby';
+          fBadge.textContent = isOnline ? 'Online  -  Active' : 'Standby  -  Sleeping';
         }
         fBadge.className = `item-tag ${isOnline ? 'online' : 'offline'}`;
       }
@@ -715,6 +730,8 @@
           const sDeskRam = document.getElementById('stat-desktop-ram-sub');
           if (sDeskCpu) sDeskCpu.innerHTML = `0% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>`;
           if (sDeskRam) sDeskRam.textContent = 'Memory: Standby / Sleep';
+          const sDeskSub = document.getElementById('stat-desktop-disk-sub');
+          if (sDeskSub) sDeskSub.innerHTML = '<span>Total 6,054 GB (5.0% Used &bull; Standby)</span>';
           const dTag = document.getElementById('desktop-speed-tag');
           if (dTag) { dTag.textContent = 'Offline'; dTag.className = 'item-tag offline'; }
         }
