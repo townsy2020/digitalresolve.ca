@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0">
   <title>Penny's Cat Hub &bull; Digital Resolve Homelab</title>
   <meta name="description" content="24/7 self-hosted homelab operations, Cloudflare Zero Trust tunnels, private 4K media streaming, and automated WireGuard VPN ingestion.">
-  <link rel="stylesheet" href="styles.css?v=2.8.9">
+  <link rel="stylesheet" href="styles.css?v=2.8.10">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -50,13 +50,21 @@
         <span class="logo-deck-badge">HOMELAB DECK</span>
       </a>
       <nav class="nav-links">
-        <a href="index.html" class="btn-nav">DECK</a>
-        <a href="services.html" class="btn-nav">SERVICES</a>
-        <a href="fleet.html" class="btn-nav">FLEET</a>
-        <a href="uptime.html" class="btn-nav">UPTIME</a>
-        <a href="media.html" class="btn-nav">MEDIA</a>
-        <a href="penny.html" class="btn-nav active">PENNY</a>
-        <a href="ops.html" class="btn-nav">OPS &amp; AI</a>
+        <!-- Primary Category Pages Navigation -->
+        <div class="nav-pages-group">
+          <a href="index.html" class="btn-nav">DECK</a>
+          <a href="services.html" class="btn-nav">SERVICES</a>
+          <a href="fleet.html" class="btn-nav">FLEET</a>
+          <a href="uptime.html" class="btn-nav">UPTIME</a>
+          <a href="media.html" class="btn-nav">MEDIA</a>
+          <a href="penny.html" class="btn-nav active">PENNY</a>
+          <a href="ops.html" class="btn-nav">OPS &amp; AI</a>
+        </div>
+
+        <div class="nav-divider" aria-hidden="true"></div>
+
+        <!-- Contextual Quick-Action Tool Menus -->
+        <div class="nav-tools-group">
 
         <!-- Consolidated Menu 1: Cluster & Media -->
         <div class="dropdown">
@@ -177,7 +185,7 @@
         <!-- Consolidated Menu 3: Ops, AI & Resilience -->
         <div class="dropdown">
           <button type="button" class="btn-nav" id="ops-menu-btn" aria-haspopup="true" title="Antigravity Autonomous Agent, Disaster Resilience Test, and AI Telemetry">
-            <span>Ops &amp; AI</span> <span class="dropdown-arrow">&#9662;</span>
+            <span>Ops &amp; Tools</span> <span class="dropdown-arrow">&#9662;</span>
           </button>
           <div class="dropdown-menu">
             <button type="button" class="btn-action-item" onclick="openEmbeddedConsole()" title="Open Live Interactive Terminal for Active Session 572d607f">
@@ -240,6 +248,7 @@
               </div>
             </div>
           </div>
+        </div>
         </div>
       </nav>
 
@@ -419,12 +428,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.9</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.10</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 22,337 Lines of Code (HTML: 13,081 lines across 7 sub-pages | JS: 3,796 lines | CSS: 5,630 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 22,448 Lines of Code (HTML: 12,938 lines across 7 sub-pages | JS: 3,796 lines | CSS: 5,713 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">22,337</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">22,448</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1127,29 +1136,24 @@
           <div class="changelog-ver-header">
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.9 | Current</span>
+            <span class="ver-tag current">v2.8.10 | Current</span>
             <span class="ver-date">October 28, 2026</span>
           </div>
-          <h4 class="ver-title">Streamlined Fleet Topology (Removed Torrent Controls) &amp; Dedicated Media / Penny Portals</h4>
+          <h4 class="ver-title">Top Navigation Grouping &amp; Contextual Tools Separation</h4>
           <ul class="ver-list">
-            <li><strong>Focused Fleet Page (<code>fleet.html</code>):</strong> Purged torrent controls and swarms from the Fleet topology page. Replaced with dedicated remote power management (Wake-on-LAN, sleep standby, maintenance window) leading immediately into the circuit schematic board.</li>
-            <li><strong>Dedicated Media Hub (<code>media.html</code>):</strong> Consolidated all media ingestion, torrent swarms, Audiobookshelf, StreamHub 4K video player, and FileBrowser media vault.</li>
-            <li><strong>Dedicated Pet Hub (<code>penny.html</code>):</strong> Dedicated portal for Penny's Cat Hub featuring low-latency dual WebRTC optical camera feeds and Tuya Smart Feeder IoT (192.168.2.22).</li>
-            <li><strong>100% Pure ASCII Guarantees:</strong> Verified zero non-ASCII characters or Mojibake encoding artifacts across all assets.</li>
+            <li><strong>Visual Grouping &amp; Breathing Room:</strong> Separated primary page navigation buttons (<code>DECK</code>, <code>SERVICES</code>, <code>FLEET</code>, <code>UPTIME</code>, <code>MEDIA</code>, <code>PENNY</code>, <code>OPS &amp; AI</code>) from contextual tool dropdowns with a vertical divider and distinct utility capsule styling.</li>
+            <li><strong>Dropdown Clarification:</strong> Grouped dropdown menus (<em>Cluster &amp; Media</em>, <em>Power &amp; Fleet</em>, <em>Ops &amp; Tools</em>) inside a dedicated <code>.nav-tools-group</code> container, eliminating button crowding and disambiguating tools from pages.</li>
+            <li><strong>100% Pure ASCII Guarantees:</strong> Verified zero non-ASCII characters across all HTML, CSS, and JS assets.</li>
           </ul>
         </div>
 
-        <!-- Version 2.8.8 -->
+        <!-- Version 2.8.9 -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag">v2.8.8</span>
+            <span class="ver-tag">v2.8.9</span>
             <span class="ver-date">October 28, 2026</span>
           </div>
-          <h4 class="ver-title">Sub-Page Modular Architecture &amp; Dedicated Category Systems</h4>
-          <ul class="ver-list">
-            <li><strong>Monolith Decomposition:</strong> Modularized monolithic single page into specialized category portals.</li>
-            <li><strong>Shared Client Engine (<code>app.js</code>):</strong> Extracted 3,796 lines of core client logic into external cached script.</li>
-          </ul>
+          <h4 class="ver-title">Dedicated Media Hub &amp; Penny's Cat Hub Separation</h4>
         </div>
 
         <!-- Version 2.8.7 -->
@@ -1555,6 +1559,6 @@
       </div>
     </div>
   </div>
-  <script src="app.js?v=2.8.9"></script>
+  <script src="app.js?v=2.8.10"></script>
 </body>
 </html>

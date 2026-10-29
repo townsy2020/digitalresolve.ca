@@ -47,18 +47,18 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.9';
+          const activeVer = match ? match[0] : 'v2.8.10';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 12910;
-        const baseCssLines = 5630;
+      const baseHtmlLines = 12987;
+        const baseCssLines = 5681;
         const baseJsLines = 3796;
         const baseCnameLines = 1;
-        const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
+        const defaultTotal = baseHtmlLines + baseCssLines + baseCnameLines;
 
         // Asynchronously count exact live lines via parallel cache-busted fetch
         Promise.all([
@@ -67,7 +67,7 @@
         ]).then(([htmlSrc, cssSrc]) => {
           const hLines = htmlSrc ? htmlSrc.split(/\r?\n/).length : baseHtmlLines;
           const cLines = cssSrc ? cssSrc.split(/\r?\n/).length : baseCssLines;
-          const total = 12910 + 3796 + cLines + baseCnameLines;
+          const total = hLines + cLines + baseCnameLines;
           const totalFormatted = total.toLocaleString();
 
           const locEl = document.getElementById('project-loc-count');
