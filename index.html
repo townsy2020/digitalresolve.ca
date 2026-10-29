@@ -247,11 +247,11 @@
         </div>
 
         <button type="button" class="btn-nav layout-toggle-btn" id="layout-toggle-nav" onclick="toggleLayoutMode()" title="Switch layout mode (Mobile / Desktop)" aria-label="Toggle Layout Mode">
-          <span class="layout-toggle-icon" id="layout-toggle-nav-icon"></span>
+          <span class="layout-toggle-icon" id="layout-toggle-nav-icon">&#128241;</span>
           <span class="layout-toggle-text" id="layout-toggle-nav-text">Mobile View</span>
         </button>
         <button type="button" class="btn-nav nav-menu-toggle" id="nav-menu-toggle" onclick="toggleMobileNav()" aria-label="Toggle navigation menu" aria-expanded="false">
-          <span id="nav-toggle-icon"></span>
+          <span id="nav-toggle-icon">&#9776;</span>
         </button>
       </div>
     </div>
@@ -984,7 +984,7 @@
           <p>Real-time hardware vitals, memory allocation, storage arrays, and network telemetry.</p>
         </div>
 
-        <!-- 🎛 Interactive Topology & Circuit Schematic Map -->
+        <!-- Interactive Topology & Circuit Schematic Map -->
         <div class="schematic-section-container" id="topology-schematic">
           <div class="schematic-top-bar">
             <div class="schematic-title-group">
@@ -2041,7 +2041,7 @@
             </div>
           </div>
 
-          <!-- Disaster Recovery Card -->
+  <!-- Disaster Recovery & Resilience Test Modal -->
           <div class="app-card" style="cursor: default;">
             <div>
               <div class="app-card-header">
@@ -2140,7 +2140,7 @@
       <p>&copy; 2026 Digital Resolve &bull; Homelab Operations Deck &bull; Cory Townsend</p>
       <div class="footer-meta" style="display: flex; align-items: center; flex-wrap: wrap; gap: 14px;">
         <button type="button" class="version-badge-btn layout-toggle-btn" id="layout-toggle-footer" onclick="toggleLayoutMode()" title="Switch layout mode (Mobile / Desktop)" aria-label="Toggle Layout Mode">
-          <span class="layout-toggle-icon" id="layout-toggle-footer-icon"></span>
+          <span class="layout-toggle-icon" id="layout-toggle-footer-icon">&#128241;</span>
           <span class="layout-toggle-text" id="layout-toggle-footer-text">Mobile View</span>
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
@@ -4192,7 +4192,7 @@
     }
 
     // ==========================================================
-    // ðŸ› ï¸ NUC Server Scheduled Maintenance & SLA Shield Controller
+    // NUC Server Scheduled Maintenance & SLA Shield Controller
     // ==========================================================
     let selectedMaintDuration = 30;
     let maintCountdownInterval = null;
@@ -4312,7 +4312,7 @@
       } else {
         if (banner) { banner.style.background = 'rgba(16, 185, 129, 0.1)'; banner.style.borderColor = 'rgba(16, 185, 129, 0.3)'; }
         if (dot) { dot.style.background = '#10b981'; dot.style.boxShadow = '0 0 8px #10b981'; }
-        if (title) title.textContent = 'Normal 24/7 Operations â€” 90-Day SLA: 99.985%';
+        if (title) title.textContent = 'Normal 24/7 Operations &mdash; 90-Day SLA: 99.985%';
         if (sub) sub.textContent = 'Planned maintenance windows are excluded from outage penalties.';
         if (tag) { tag.textContent = 'SLA Protected'; tag.className = 'item-tag online'; tag.style.background = ''; tag.style.color = ''; }
         if (actionBtn) {
@@ -4436,7 +4436,7 @@
         slaChip.classList.toggle('in-maintenance', active);
         if (active) {
           if (chipDot) { chipDot.style.backgroundColor = '#f59e0b'; chipDot.style.boxShadow = '0 0 8px #f59e0b'; }
-          if (chipText) chipText.textContent = 'ðŸ› ï¸ NUC Maintenance Active (SLA Shield)';
+          if (chipText) chipText.textContent = 'NUC Maintenance Active (SLA Shield)';
         } else {
           if (chipDot) { chipDot.style.backgroundColor = '#10b981'; chipDot.style.boxShadow = '0 0 6px #10b981'; }
           if (chipText) chipText.textContent = 'SLA Shield: 100% Protected';
@@ -4890,11 +4890,11 @@
     }
 
     // ==========================================
-    // 🎛 Interactive Topology Schematic Map Engine
+    // ==========================================
     // ==========================================
     const schematicNodesData = {
       cf: {
-        icon: '🛡',
+        icon: '\uD83D\uDEE1\uFE0F',
         title: 'Cloudflare Zero Trust Edge Network',
         subtitle: 'Global Ingress & Anycast Edge Tunnels',
         status: '100% SLA Green',
@@ -4908,7 +4908,7 @@
         action: () => { checkStatus('both'); showToast('info', 'Edge Trace Dispatched', 'Pinging Cloudflare PoP Montreal (YUL)...'); }
       },
       bell: {
-        icon: '📡',
+        icon: '\uD83D\uDCE1',
         title: 'Bell Gigabit Fiber (GigaHub 4000)',
         subtitle: 'FTTH Uplink • 1.5 Gbps Optical Carrier',
         status: '1.5 Gbps Optimal',
@@ -4922,7 +4922,7 @@
         action: () => { triggerSpeedtest(); }
       },
       vpn: {
-        icon: '⚡',
+        icon: '\u26A1',
         title: 'Mullvad WireGuard Privacy Tunnel',
         subtitle: 'Zero-Logging Cryptographic Outbound Proxy',
         status: 'Encrypted & Active',
@@ -4936,7 +4936,7 @@
         action: () => { openHealthModal(); }
       },
       tunnel: {
-        icon: '🚇',
+        icon: '\uD83D\uDE87',
         title: 'Cloudflare Tunnel Daemon (cloudflared)',
         subtitle: 'Zero Trust Outbound Ingress Connector',
         status: 'Connected (Dual-Path)',
@@ -4950,7 +4950,7 @@
         action: () => { showToast('info', 'Zero Trust Tunnel', 'Argo tunnel active across 24/7 NUC node.'); }
       },
       nuc: {
-        icon: '🐧',
+        icon: '\uD83D\uDC27',
         title: 'Intel NUC Core Server (Always-On 24/7)',
         subtitle: 'Central Edge Gateway & Service Host',
         status: 'Online (0.4 ms LAN)',
@@ -4964,7 +4964,7 @@
         action: () => { checkStatus('nuc'); }
       },
       desktop: {
-        icon: '🖥',
+        icon: '\uD83D\uDDA5\uFE0F',
         title: 'Desktop Workstation (Cory-Desktop)',
         subtitle: 'High-Power Compute, GPU & Autonomous CLI Node',
         status: 'Online (Active Workstation)',
@@ -4978,7 +4978,7 @@
         action: () => { checkStatus('desktop'); }
       },
       storage: {
-        icon: '💾',
+        icon: '\uD83D\uDCBE',
         title: 'Media Storage & NVMe Pools',
         subtitle: 'High-Speed Local Storage & Network Shares',
         status: 'Healthy (496 GB Free)',
@@ -5074,7 +5074,7 @@
     }
 
     // ==========================================
-    // 🕹 Chaos Monkey Resilience Simulator Engine
+    // Chaos Monkey Resilience Simulator Engine
     // ==========================================
     const chaosState = {
       soundEnabled: false,
@@ -6273,7 +6273,7 @@
     </div>
   </div>
 
-  <!-- 🚨 Disaster Recovery & Resilience Test Modal -->
+  <!-- Disaster Recovery & Resilience Test Modal -->
   <div id="disaster-modal-overlay" class="disaster-modal-overlay chaos-modal-overlay" style="position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 10005; background: rgba(2, 6, 23, 0.94); display: none; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box;" onclick="closeDisasterModalOnBackdrop(event)">
     <div class="disaster-modal-window chaos-modal-window" role="dialog" aria-modal="true" aria-label="Homelab Disaster Recovery Test" style="background: #090d16; border: 1px solid rgba(245, 158, 11, 0.45); border-radius: 16px; width: 95%; max-width: 860px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 35px rgba(245, 158, 11, 0.22); overflow: hidden;">
       <div class="disaster-modal-header chaos-modal-header">
@@ -6307,7 +6307,7 @@
           </div>
         </div>
 
-        <!-- Interactive Topology Sandbox Grid -->
+        <!-- Interactive Topology & Circuit Schematic Map -->
         <div class="chaos-topology-box">
           <div class="chaos-topology-header">
             <span style="font-size: 0.78rem; font-weight: 700; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px;">Live Topology Schematic</span>
@@ -6448,7 +6448,7 @@
     </div>
   </div>
 
-  <!-- 🛡 Universal Admin SSO Verification Gate Modal -->
+  <!-- Universal Admin SSO Verification Gate Modal -->
   <div id="speedtest-sso-modal-overlay" class="speedtest-sso-modal-overlay" style="display: none;" onclick="if(event.target===this)closeSpeedtestSSOModal()">
     <div class="speedtest-sso-modal" role="dialog" aria-modal="true" aria-label="Admin SSO Authorization for Homelab Operations">
       <div style="background: rgba(15, 23, 42, 0.95); padding: 18px 22px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center;">
@@ -6497,7 +6497,7 @@
           </div>
           <h4 class="ver-title">M365 Dedicated SSO Authentication Symmetrical Refresh &amp; Connected Pet Feeder IoT Bridge</h4>
           <ul class="ver-list">
-            <li><strong>M365 Sign In Multi-Layer Synchronization:</strong> Restored top navigation <code>[ ðŸ”’ Sign In with M365 ]</code> authentication engine with symmetrical cookie synchronization (<code>.digitalresolve.ca</code> and local host), global scope variable resolution, and automatic cache-busting reload (<code>?_fresh=...</code>) ensuring all gated telemetry, WAN IP, and terminal controls unlock immediately.</li>
+            <li><strong>M365 Sign In Multi-Layer Synchronization:</strong> Restored top navigation <code>[ &#128274; Sign In with M365 ]</code> authentication engine with symmetrical cookie synchronization (<code>.digitalresolve.ca</code> and local host), global scope variable resolution, and automatic cache-busting reload (<code>?_fresh=...</code>) ensuring all gated telemetry, WAN IP, and terminal controls unlock immediately.</li>
             <li><strong>Penny''s Smart Feeder IoT Bridge:</strong> Fully connected and armed Penny''s Smart Feeder IoT (<code>192.168.2.22</code>) with active hardware bridge via NUC backend endpoint (<code>/api/feeder/dispense</code>), live multi-portion motor actuation (10g Snack, 25g Meal, 50g Feast), acoustic feedback, and real-time telemetry logging.</li>
           </ul>
         </div>
@@ -6584,7 +6584,7 @@
           <ul class="ver-list">
             <li><strong>Consolidated Compute, AI &amp; Terminal Operations:</strong> Grouped the Live Interactive Terminal and Ollama 24/7 Local Inference Playground together side-by-side in a unified operations hub (<code>#ops-ai</code>) with synchronized model metrics.</li>
             <li><strong>Streamlined UI &amp; Label De-cluttering:</strong> Removed redundant "SSO Required" and "Protected by M365" visual badges across buttons, tabs, and speedtest banners in favor of the dedicated top header controls.</li>
-            <li><strong>Dedicated Top Header SSO Controls:</strong> Positioned clean <code>[ 🔒 SSO Login ]</code> and <code>[ 🟢 Cory Townsend ] [ Sign Out ]</code> action buttons directly in the top right navigation bar.</li>
+            <li><strong>Dedicated Top Header SSO Controls:</strong> Positioned clean <code>[ &#128274; SSO Login ]</code> and <code>[ &#128994; Cory Townsend ] [ Sign Out ]</code> action buttons directly in the top right navigation bar.</li>
             <li><strong>Cloudflare Zero Trust Edge Lockdown:</strong> Deleted home network bypass via Cloudflare API, ensuring strict Microsoft 365 identity challenges on 100% of subdomain requests.</li>
             <li><strong>Instant CLI Cache Wiper (<code>fresh</code>):</strong> Built and deployed a global PowerShell/CMD utility to cleanly purge all browser caches across Chrome, Edge, and Firefox and flush Windows DNS in seconds.</li>
           </ul>
@@ -6799,12 +6799,12 @@
       </div>
     </div>
   </div>
-  <!-- ðŸ› ï¸ NUC Server Scheduled Maintenance & SLA Protection Modal -->
+  <!-- NUC Server Scheduled Maintenance & SLA Protection Modal -->
   <div id="maintenance-modal-overlay" class="health-modal-overlay" style="display: none;" onclick="if(event.target===this)closeMaintenanceModal()">
     <div class="health-modal-window" role="dialog" aria-modal="true" aria-label="NUC Server Scheduled Maintenance Mode" style="max-width: 680px; max-height: 90vh; display: flex; flex-direction: column;">
       <div class="health-modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 14px;">
         <div style="display: flex; align-items: center; gap: 10px;">
-          <span style="font-size: 1.4rem;">ðŸ› ï¸</span>
+          <span style="font-size: 1.4rem;">&#128736;&#65039;</span>
           <div>
             <h3 style="font-size: 1.05rem; font-weight: 800; color: #f8fafc; margin: 0;">NUC Server Scheduled Maintenance Window</h3>
             <div style="font-size: 0.76rem; color: #94a3b8; margin-top: 2px;">Protect 90-Day SLA &amp; Cluster Heartbeat (0 Outage Impact) during Windows Updates &amp; Reboots</div>
@@ -6819,7 +6819,7 @@
           <div style="display: flex; align-items: center; gap: 10px;">
             <span class="pulse-dot" id="maint-banner-dot" style="background: #10b981; box-shadow: 0 0 8px #10b981; width: 10px; height: 10px;"></span>
             <div>
-              <div style="font-weight: 700; color: #f0fdf4; font-size: 0.88rem;" id="maint-banner-title">Normal 24/7 Operations â€” 90-Day SLA: 99.985%</div>
+              <div style="font-weight: 700; color: #f0fdf4; font-size: 0.88rem;" id="maint-banner-title">Normal 24/7 Operations &mdash; 90-Day SLA: 99.985%</div>
               <div style="font-size: 0.76rem; color: #94a3b8;" id="maint-banner-sub">Planned maintenance windows are excluded from outage penalties.</div>
             </div>
           </div>
@@ -6847,7 +6847,7 @@
         <!-- DevOps SLA Protection Features -->
         <div style="background: rgba(2, 6, 23, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 12px 14px; font-size: 0.78rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 8px;">
           <div style="font-weight: 700; color: #60a5fa; display: flex; align-items: center; gap: 6px;">
-            <span>ðŸ›¡ï¸</span> Zero-Penalty SLA Shield Protections:
+            <span>&#128737;&#65039;</span> Zero-Penalty SLA Shield Protections:
           </div>
           <div style="display: flex; align-items: center; gap: 8px;">
             <input type="checkbox" id="maint-chk-pause" checked style="accent-color: #3b82f6;">
@@ -6869,10 +6869,10 @@
         <button type="button" class="btn btn-secondary" onclick="closeMaintenanceModal()" style="font-size: 0.8rem; padding: 6px 14px;">Close</button>
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
           <button type="button" id="btn-maint-trigger-update" class="btn btn-secondary" onclick="activateMaintenanceWithUpdate()" style="font-size: 0.8rem; padding: 6px 14px; color: #38bdf8 !important; border-color: rgba(56, 189, 248, 0.4);" title="Activate maintenance window and immediately execute Update-Computer on NUC">
-            ðŸš€ Maintenance &amp; Run Update-Computer
+            &#128640; Maintenance &amp; Run Update-Computer
           </button>
           <button type="button" id="btn-maint-toggle-action" class="btn btn-primary" onclick="confirmToggleMaintenance()" style="font-size: 0.8rem; padding: 6px 16px; background: linear-gradient(135deg, #f59e0b, #d97706); border-color: #f59e0b;">
-            ðŸ› ï¸ Activate Maintenance Window
+            &#128736;&#65039; Activate Maintenance Window
           </button>
         </div>
       </div>
