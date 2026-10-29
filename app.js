@@ -54,7 +54,7 @@
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 13081;
+      const baseHtmlLines = 12910;
         const baseCssLines = 5630;
         const baseJsLines = 3796;
         const baseCnameLines = 1;
@@ -67,7 +67,7 @@
         ]).then(([htmlSrc, cssSrc]) => {
           const hLines = htmlSrc ? htmlSrc.split(/\r?\n/).length : baseHtmlLines;
           const cLines = cssSrc ? cssSrc.split(/\r?\n/).length : baseCssLines;
-          const total = 13081 + 3796 + cLines + baseCnameLines;
+          const total = 12910 + 3796 + cLines + baseCnameLines;
           const totalFormatted = total.toLocaleString();
 
           const locEl = document.getElementById('project-loc-count');
