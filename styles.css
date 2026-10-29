@@ -5341,26 +5341,31 @@ html.mobile-layout .penny-hub-grid {
 .dash-filter-btn {
   background: rgba(15, 23, 42, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #94a3b8;
+  color: #cbd5e1;
+  font-family: inherit;
   font-size: 0.78rem;
-  font-weight: 600;
+  font-weight: 700;
   padding: 6px 14px;
-  border-radius: 9999px;
+  border-radius: 8px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   transition: all 0.2s ease;
 }
 
 .dash-filter-btn:hover {
-  border-color: rgba(56, 189, 248, 0.4);
-  color: #f0f6fc;
-  background: rgba(56, 189, 248, 0.1);
+  border-color: #38bdf8;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.15);
+  transform: translateY(-1px);
 }
 
 .dash-filter-btn.active {
-  background: rgba(56, 189, 248, 0.2);
+  background: rgba(56, 189, 248, 0.22);
   border-color: #38bdf8;
   color: #38bdf8;
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
 }
 
 .dash-service-grid {
@@ -5460,23 +5465,30 @@ html.mobile-layout .penny-hub-grid {
 }
 
 .dash-btn-action {
+  font-family: inherit;
   font-size: 0.76rem;
-  font-weight: 600;
+  font-weight: 700;
   color: #38bdf8;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  transition: color 0.15s ease;
-  background: none;
-  border: none;
+  gap: 5px;
+  transition: all 0.2s ease;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 6px;
+  padding: 5px 12px;
   cursor: pointer;
-  padding: 0;
+  line-height: 1.2;
 }
 
 .dash-btn-action:hover {
-  color: #93c5fd;
-  text-decoration: underline;
+  background: rgba(56, 189, 248, 0.22);
+  border-color: #38bdf8;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.35);
+  text-decoration: none;
+  transform: translateY(-1px);
 }
 
 @media (max-width: 768px) {

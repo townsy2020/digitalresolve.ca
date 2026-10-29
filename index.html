@@ -61,7 +61,7 @@
             <a href="#service-status" class="btn-action-item" title="Open Live Homelab Service Status Dashboard">
               <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
               <span>Live Service Status Dashboard</span>
-              <span class="item-tag online">All Online</span>
+              <span class="item-tag online">8 Online</span>
             </a>
             <a href="#nuc-services" class="btn-action-item" title="Open NUC 24/7 Telemetry &amp; Microservices Suite">
               <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
@@ -289,7 +289,7 @@
         <div class="command-pills">
           <a href="#service-status" class="pill-btn pill-status" style="border-color: rgba(16, 185, 129, 0.45); color: #6ee7b7; background: rgba(16, 185, 129, 0.12); cursor: pointer;" title="Jump to Live Homelab Service Status Dashboard">
             <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
-            <span>Service Status (7/7 Online)</span>
+            <span>Service Status (8/8 Online)</span>
           </a>
           <button type="button" onclick="launchProtectedService('https://stream.digitalresolve.ca', 'Watch Library (HD / 4K)')" class="pill-btn pill-stream" style="cursor: pointer;">
             <span>[PLAY]</span> Open Watch Library (HD / 4K)
@@ -1005,7 +1005,7 @@
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap;">
                   <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 10px #10b981; width: 10px; height: 10px;"></span>
                   <h3 style="font-size: 1.25rem; font-weight: 800; color: #f0f6fc; margin: 0;">Homelab Service Status Dashboard</h3>
-                  <span class="item-tag online" id="dash-global-status" style="font-size: 0.72rem; padding: 2px 8px;">7/7 Services Online</span>
+                  <span class="item-tag online" id="dash-global-status" style="font-size: 0.72rem; padding: 2px 8px;">8/8 Services Online</span>
                 </div>
                 <div style="font-size: 0.8rem; color: #94a3b8; max-width: 650px;">
                   Real-time health, active listener ports, zero-trust edge routing, and autonomous Sentinel watchdog status across all fleet microservices.
@@ -1023,8 +1023,8 @@
 
             <!-- Service Filter Tabs -->
             <div class="dash-filter-bar" style="margin-bottom: 16px;">
-              <button type="button" class="dash-filter-btn active" onclick="filterServiceDashboard('all', this)">All Services (7)</button>
-              <button type="button" class="dash-filter-btn" onclick="filterServiceDashboard('media', this)">Media &amp; Video (2)</button>
+              <button type="button" class="dash-filter-btn active" onclick="filterServiceDashboard('all', this)">All Services (8)</button>
+              <button type="button" class="dash-filter-btn" onclick="filterServiceDashboard('media', this)">Media &amp; Video (3)</button>
               <button type="button" class="dash-filter-btn" onclick="filterServiceDashboard('security', this)">Perimeter &amp; Edge (2)</button>
               <button type="button" class="dash-filter-btn" onclick="filterServiceDashboard('compute', this)">Compute &amp; BitTorrent (2)</button>
               <button type="button" class="dash-filter-btn" onclick="filterServiceDashboard('iot', this)">Pet IoT &amp; Vitals (1)</button>
@@ -1284,7 +1284,7 @@
                 </div>
                 <div class="dash-card-footer">
                   <span style="font-size: 0.72rem; color: #64748b;">M365 Entra ID SSO Policy</span>
-                  <button type="button" onclick="openCloudflareStatsModal()" class="dash-btn-action">Edge Stats &rarr;</button>
+                  <a href="javascript:void(0)" onclick="openCloudflareStatsModal()" class="dash-btn-action">Edge Stats &rarr;</a>
                 </div>
               </div>
             </div>
@@ -4944,15 +4944,15 @@
         if (icon) icon.style.transform = 'none';
         const globalStatus = document.getElementById('dash-global-status');
         if (globalStatus) {
-          globalStatus.textContent = '7/7 Services Online - Verified';
+          globalStatus.textContent = '8/8 Services Online - Verified';
           globalStatus.style.background = 'rgba(16, 185, 129, 0.35)';
           setTimeout(() => {
-            globalStatus.textContent = '7/7 Services Online';
+            globalStatus.textContent = '8/8 Services Online';
             globalStatus.style.background = '';
           }, 3500);
         }
         if (typeof showToast === 'function') {
-          showToast('success', 'Service Status Refreshed', 'All 7 edge services verified operational.', 3500);
+          showToast('success', 'Service Status Refreshed', 'All 8 edge services verified operational.', 3500);
         }
       }, 1000);
     }
