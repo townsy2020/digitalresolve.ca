@@ -225,6 +225,10 @@
 
       pc.addEventListener('connectionstatechange', () => {
         if (pc.connectionState === 'connected') {
+          hideSpinner();
+          video.play().catch(e => console.warn('Auto-play suppressed:', e));
+        }
+        if (pc.connectionState === 'connected') {
           statusBadge.classList.add('online');
           statusText.textContent = 'LIVE WEBRTC';
           hideSpinner();
@@ -238,7 +242,11 @@
       const params = new URLSearchParams(window.location.search);
       const src = params.get('src') || 'pennys_feeder';
       const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${proto}//${window.location.host}/api/ws?src=${encodeURIComponent(src)}`;
+      let wsHost = window.location.host;
+      if (window.location.hostname === 'digitalresolve.ca' || window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:' || window.location.hostname === 'localhost') {
+        wsHost = 'cam.digitalresolve.ca';
+      }
+      const wsUrl = `${proto}//${wsHost}/api/ws?src=${encodeURIComponent(src)}`;
 
       ws = new WebSocket(wsUrl);
 

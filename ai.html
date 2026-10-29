@@ -424,6 +424,10 @@
       video.srcObject = new MediaStream(tracks);
 
       pc.addEventListener('connectionstatechange', () => {
+        if (pc.connectionState === 'connected') {
+          hideSpinner();
+          video.play().catch(e => console.warn('Auto-play suppressed:', e));
+        }
         if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
           scheduleReconnect();
         }
@@ -432,7 +436,11 @@
       const params = new URLSearchParams(window.location.search);
       const src = params.get('src') || 'pennys_feeder';
       const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${proto}//${window.location.host}/api/ws?src=${encodeURIComponent(src)}`;
+      let wsHost = window.location.host;
+      if (window.location.hostname === 'digitalresolve.ca' || window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:' || window.location.hostname === 'localhost') {
+        wsHost = 'cam.digitalresolve.ca';
+      }
+      const wsUrl = `${proto}//${wsHost}/api/ws?src=${encodeURIComponent(src)}`;
       
       ws = new WebSocket(wsUrl);
 
@@ -689,7 +697,7 @@
         if (transitions >= 2 || (hasRedPulse && redBlinkSamples.filter(s => s.on).length >= 8)) {
           isFeederFoodLow = true;
           if (hopperBeaconBadge) hopperBeaconBadge.style.display = 'inline-flex';
-          if (hopperBeaconText) hopperBeaconText.innerHTML = <strong>Kibble Low</strong> [Red Blink Detected];
+          if (hopperBeaconText) hopperBeaconText.innerHTML = '<strong>Kibble Low</strong> [Red Blink Detected]';
           
           // Notify gateway if confirmed
           if (now - lastHopperWebhookNotify > 60000) {
@@ -732,7 +740,7 @@
 
           const [x, y, w, h] = trackedPenny.displayBbox;
           const strokeColor = '#10b981';
-          const labelText = `${trackedPenny.label} ? ${Math.round(trackedPenny.score * 100)}%`;
+          const labelText = `${trackedPenny.label} - ${Math.round(trackedPenny.score * 100)}%`;
 
           ctx.save();
           ctx.lineWidth = 3;
@@ -807,7 +815,7 @@
           const h = rawH * layout.scale;
 
           const strokeColor = isPerson ? '#a855f7' : '#38bdf8';
-          const labelText = `${p.class} ? ${Math.round(p.score * 100)}%`;
+          const labelText = `${p.class} - ${Math.round(p.score * 100)}%`;
 
           ctx.save();
           ctx.lineWidth = 2;
