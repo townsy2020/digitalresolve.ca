@@ -375,13 +375,63 @@
             </div>
           </div>
 
-          <!-- Consolidated Node Hardware Decks (NUC & Desktop) -->
+          <!-- Consolidated Node Hardware Decks (Desktop & NUC) -->
           <div class="node-decks-grid">
+            <!-- Desktop Workstation Node Deck -->
+            <div class="node-deck-card desktop-deck">
+              <div class="stat-card-header" style="padding-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 4px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+                  <span style="font-weight: 700; font-size: 0.95rem; color: #f8fafc; letter-spacing: 0.3px;">Desktop Node (192.168.2.62)</span>
+                </div>
+                <span class="item-tag online" id="stat-desktop-hw-tag" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3);">Active Node</span>
+              </div>
+              <div class="node-deck-metrics">
+                <!-- Desktop Compute Subcard -->
+                <div class="node-metric-subcard">
+                  <div>
+                    <div class="stat-card-header" style="margin-bottom: 8px;">
+                      <span class="stat-card-title" style="font-size: 0.8rem; color: #94a3b8;">Desktop Compute (Ryzen 7)</span>
+                      <span style="font-size: 0.72rem; color: #38bdf8; font-weight: 600; font-family: 'JetBrains Mono', monospace;">RTX Workstation</span>
+                    </div>
+                    <div class="stat-big-val" id="stat-desktop-cpu-val" style="color: #34d399;">12% <span style="font-size: 0.85rem; color: #8b949e; margin-left: 4px;">CPU</span></div>
+                  </div>
+                  <div class="stat-subtext" id="stat-desktop-ram-sub" style="margin-top: 10px;">
+                    Memory: 15.6 GB / 31.9 GB (48.9%) &bull; Active Session
+                  </div>
+                </div>
+
+                <!-- Desktop Storage Safeguard Subcard -->
+                <div class="node-metric-subcard">
+                  <div>
+                    <div class="stat-card-header" style="margin-bottom: 8px;">
+                      <span class="stat-card-title" style="font-size: 0.8rem; color: #94a3b8;">C: Drive Storage (Desktop)</span>
+                      <span class="item-tag online" style="font-size: 0.68rem; padding: 2px 7px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3);">NVMe Primary</span>
+                    </div>
+                    <div class="stat-big-val" id="stat-desktop-disk-free" style="color: #34d399;">375.4 GB <span style="font-size: 0.85rem; color: #8b949e;">Free</span></div>
+                    <div class="stat-subtext" id="stat-desktop-disk-sub" style="margin-top: 4px;">
+                      <span>Total 1950 GB (19.2% Used)</span>
+                    </div>
+                  </div>
+                  <div class="storage-segments-wrap" style="margin-top: 12px;">
+                    <div class="storage-segments-bar">
+                      <div style="width: 19.2%; background: #10b981;" title="Used Space: 374 GB"></div>
+                      <div style="width: 80.8%; background: rgba(16, 185, 129, 0.25);" title="Free Space: 1576 GB"></div>
+                    </div>
+                    <div class="storage-legend">
+                      <span><span class="legend-dot" style="background: #10b981;"></span> Used (374 GB &bull; 19.2%)</span>
+                      <span><span class="legend-dot" style="background: rgba(16, 185, 129, 0.35);"></span> Free (1576 GB &bull; 80.8%)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- NUC Server Node Deck -->
             <div class="node-deck-card nuc-deck">
-              <div class="stat-card-header" style="padding-bottom: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); margin-bottom: 4px;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 6px #10b981;"></span>
+              <div class="stat-card-header" style="padding-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 4px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
                   <span style="font-weight: 700; font-size: 0.95rem; color: #f8fafc; letter-spacing: 0.3px;">NUC Server Node (192.168.2.35)</span>
                 </div>
                 <span class="item-tag online" id="stat-hw-tag">Nominal</span>
@@ -390,7 +440,7 @@
                 <!-- NUC Compute Subcard -->
                 <div class="node-metric-subcard">
                   <div>
-                    <div class="stat-card-header" style="margin-bottom: 6px;">
+                    <div class="stat-card-header" style="margin-bottom: 8px;">
                       <span class="stat-card-title" style="font-size: 0.8rem; color: #94a3b8;">Hardware Utilization</span>
                       <span style="font-size: 0.72rem; color: #10b981; font-weight: 600; font-family: 'JetBrains Mono', monospace;">Intel Core i5</span>
                     </div>
@@ -404,16 +454,16 @@
                 <!-- NUC Storage Safeguard Subcard -->
                 <div class="node-metric-subcard">
                   <div>
-                    <div class="stat-card-header" style="margin-bottom: 6px;">
+                    <div class="stat-card-header" style="margin-bottom: 8px;">
                       <span class="stat-card-title" style="font-size: 0.8rem; color: #94a3b8;">D: Drive Safeguard</span>
                       <span class="item-tag online" style="font-size: 0.68rem; padding: 2px 7px;">Safe (+476 GB)</span>
                     </div>
                     <div class="stat-big-val" id="stat-disk-free" style="color: #38bdf8;">489.2 GB <span style="font-size: 0.85rem; color: #8b949e;">Free</span></div>
-                    <div class="stat-subtext" style="margin-top: 2px;">
+                    <div class="stat-subtext" style="margin-top: 4px;">
                       <span>Total 1863 GB (73.4% Used)</span>
                     </div>
                   </div>
-                  <div class="storage-segments-wrap" style="margin-top: 10px;">
+                  <div class="storage-segments-wrap" style="margin-top: 12px;">
                     <div class="storage-segments-bar">
                       <div class="seg-movies" style="width: 28%;" title="Movies: 520 GB"></div>
                       <div class="seg-tv" style="width: 22%;" title="TV Series: 410 GB"></div>
@@ -430,58 +480,7 @@
                 </div>
               </div>
             </div>
-
-            <!-- Desktop Workstation Node Deck -->
-            <div class="node-deck-card desktop-deck">
-              <div class="stat-card-header" style="padding-bottom: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); margin-bottom: 4px;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-                  <span style="font-weight: 700; font-size: 0.95rem; color: #f8fafc; letter-spacing: 0.3px;">Desktop Node (192.168.2.62)</span>
-                </div>
-                <span class="item-tag online" id="stat-desktop-hw-tag" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3);">Active Node</span>
-              </div>
-              <div class="node-deck-metrics">
-                <!-- Desktop Compute Subcard -->
-                <div class="node-metric-subcard">
-                  <div>
-                    <div class="stat-card-header" style="margin-bottom: 6px;">
-                      <span class="stat-card-title" style="font-size: 0.8rem; color: #94a3b8;">Desktop Compute (Ryzen 7)</span>
-                      <span style="font-size: 0.72rem; color: #38bdf8; font-weight: 600; font-family: 'JetBrains Mono', monospace;">RTX Workstation</span>
-                    </div>
-                    <div class="stat-big-val" id="stat-desktop-cpu-val" style="color: #34d399;">12% <span style="font-size: 0.85rem; color: #8b949e; margin-left: 4px;">CPU</span></div>
-                  </div>
-                  <div class="stat-subtext" id="stat-desktop-ram-sub" style="margin-top: 10px;">
-                    Memory: 15.6 GB / 31.9 GB (48.9%) &bull; Active Session
-                  </div>
-                </div>
-
-                <!-- Desktop Storage Safeguard Subcard -->
-                <div class="node-metric-subcard">
-                  <div>
-                    <div class="stat-card-header" style="margin-bottom: 6px;">
-                      <span class="stat-card-title" style="font-size: 0.8rem; color: #94a3b8;">C: Drive Storage (Desktop)</span>
-                      <span class="item-tag online" style="font-size: 0.68rem; padding: 2px 7px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3);">NVMe Primary</span>
-                    </div>
-                    <div class="stat-big-val" id="stat-desktop-disk-free" style="color: #34d399;">375.4 GB <span style="font-size: 0.85rem; color: #8b949e;">Free</span></div>
-                    <div class="stat-subtext" id="stat-desktop-disk-sub" style="margin-top: 2px;">
-                      <span>Total 1950 GB (19.2% Used)</span>
-                    </div>
-                  </div>
-                  <div class="storage-segments-wrap" style="margin-top: 10px;">
-                    <div class="storage-segments-bar">
-                      <div style="width: 19.2%; background: #10b981;" title="Used Space: 374 GB"></div>
-                      <div style="width: 80.8%; background: rgba(16, 185, 129, 0.25);" title="Free Space: 1576 GB"></div>
-                    </div>
-                    <div class="storage-legend">
-                      <span><span class="legend-dot" style="background: #10b981;"></span> Used (374 GB &bull; 19.2%)</span>
-                      <span><span class="legend-dot" style="background: rgba(16, 185, 129, 0.35);"></span> Free (1576 GB &bull; 80.8%)</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+          </div></div>
 
 
 
