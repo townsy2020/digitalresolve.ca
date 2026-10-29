@@ -47,14 +47,14 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.8';
+          const activeVer = match ? match[0] : 'v2.8.9';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 11428;
+      const baseHtmlLines = 13081;
         const baseCssLines = 5630;
         const baseJsLines = 3796;
         const baseCnameLines = 1;
@@ -67,7 +67,7 @@
         ]).then(([htmlSrc, cssSrc]) => {
           const hLines = htmlSrc ? htmlSrc.split(/\r?\n/).length : baseHtmlLines;
           const cLines = cssSrc ? cssSrc.split(/\r?\n/).length : baseCssLines;
-          const total = 11428 + 3796 + cLines + baseCnameLines;
+          const total = 13081 + 3796 + cLines + baseCnameLines;
           const totalFormatted = total.toLocaleString();
 
           const locEl = document.getElementById('project-loc-count');
