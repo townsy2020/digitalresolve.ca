@@ -5830,7 +5830,7 @@
       }
         const d = new Date(state.lastDispenseTime);
         const tStr = isNaN(d) ? state.lastDispenseTime : d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-        timeEl.textContent = `${tStr} (${state.lastDispenseLabel || 'Snack'}) â€¢ ${state.lastDispenseStatus || 'Verified'}`;
+        timeEl.textContent = `${tStr} (${state.lastDispenseLabel || "Snack"}) - ${state.lastDispenseStatus || "Verified"}`;
       }
     }
     window.updateFeederUI = updateFeederUI;
