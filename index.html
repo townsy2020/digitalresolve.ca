@@ -229,7 +229,7 @@
         <!-- Top Dedicated SSO Controls -->
         <div id="top-sso-container" class="top-sso-container">
           <!-- Logged Out: SSO Login Button -->
-          <button type="button" class="btn-sso-login" id="top-sso-login-btn" onclick="unlockSSO('m365', true)" title="Sign in with Microsoft 365 Entra ID SSO">
+          <button type="button" class="btn-sso-login" id="top-sso-login-btn" onclick="unlockSSO('m365')" title="Sign in with Microsoft 365 Entra ID SSO">
             <span class="dropdown-dot" style="background-color: #f59e0b; box-shadow: 0 0 8px #f59e0b;"></span>
             <span>Sign In with M365</span>
           </button>
@@ -371,7 +371,7 @@
               <span style="font-size: 1.2rem;"></span>
               <span style="font-size: 0.88rem; color: #cbd5e1;">Remote Torrent Magnet Ingestion is protected by Microsoft 365 Entra ID SSO.</span>
             </div>
-            <button type="button" class="btn btn-primary" onclick="unlockSSO('m365', true)" style="font-size: 0.84rem; padding: 6px 14px;">Sign In with M365</button>
+            <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" style="font-size: 0.84rem; padding: 6px 14px;">Sign In with M365</button>
           </div>
         </div>
 
@@ -1422,7 +1422,7 @@
                 
                 <!-- One-Click Microsoft 365 Entra ID SSO Unlock Button -->
                 <div style="display: flex; gap: 10px; width: 100%; max-width: 440px; margin-top: 6px;">
-                  <button type="button" class="btn btn-primary" onclick="unlockSSO('m365', true)" title="Authenticate with Microsoft 365" style="flex: 1; padding: 12px 18px; font-size: 0.92rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 0 18px rgba(59, 130, 246, 0.4); cursor: pointer;">
+                  <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" title="Authenticate with Microsoft 365" style="flex: 1; padding: 12px 18px; font-size: 0.92rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 0 18px rgba(59, 130, 246, 0.4); cursor: pointer;">
                     <svg width="18" height="18" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;" aria-hidden="true" focusable="false"><path d="M0 0h9.9v9.9H0z" fill="#f25022"/><path d="M11.1 0H21v9.9h-9.9z" fill="#7fba00"/><path d="M0 11.1h9.9V21H0z" fill="#00a4ef"/><path d="M11.1 11.1H21V21h-9.9z" fill="#ffb900"/></svg>
                     <span>Sign In with M365</span>
                   </button>
@@ -1493,7 +1493,7 @@
                 </div>
               </div>
               <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 4px;">
-                <button type="button" class="btn btn-primary" onclick="unlockSSO('m365', true)" style="font-size: 0.88rem; padding: 10px 22px; font-weight: 700; background: linear-gradient(135deg, #a855f7, #7c3aed); border-color: #a855f7; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 0 16px rgba(168, 85, 247, 0.35);">
+                <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" style="font-size: 0.88rem; padding: 10px 22px; font-weight: 700; background: linear-gradient(135deg, #a855f7, #7c3aed); border-color: #a855f7; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 0 16px rgba(168, 85, 247, 0.35);">
                   <svg width="16" height="16" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;"><path d="M0 0h9.9v9.9H0z" fill="#f25022"/><path d="M11.1 0H21v9.9h-9.9z" fill="#7fba00"/><path d="M0 11.1h9.9V21H0z" fill="#00a4ef"/><path d="M11.1 11.1H21V21h-9.9z" fill="#ffb900"/></svg>
                   <span>Sign In with M365</span>
                 </button>
@@ -2148,9 +2148,9 @@
           <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.6</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 12,212 Lines of Code (HTML: 6,888 lines | CSS: 5,323 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 12,206 Lines of Code (HTML: 6,882 lines | CSS: 5,323 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">12,212</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">12,206</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -2233,7 +2233,7 @@
           if (mVer) mVer.textContent = activeVer;
         }
 
-        const baseHtmlLines = 6888;
+        const baseHtmlLines = 6882;
         const baseCssLines = 5323;
         const baseCnameLines = 1;
         const defaultTotal = baseHtmlLines + baseCssLines + baseCnameLines;
@@ -2846,7 +2846,7 @@
           menuSsoBtn.title = 'Sign out and refresh deck behind Microsoft 365 SSO';
           menuSsoBtn.innerHTML = '<span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span><span>Sign Out (M365)</span><span class="item-tag">Sign Out</span>';
         } else {
-          menuSsoBtn.onclick = () => unlockSSO('m365', true);
+          menuSsoBtn.onclick = () => unlockSSO('m365');
           menuSsoBtn.title = 'Sign in with Microsoft 365 Entra ID SSO';
           menuSsoBtn.innerHTML = '<span class="dropdown-dot" style="background-color: #f59e0b; box-shadow: 0 0 6px #f59e0b;"></span><span>Sign In with M365</span><span class="item-tag">Sign In</span>';
         }
@@ -3034,7 +3034,7 @@
     }
     window.toggleGlobalSSO = toggleGlobalSSO;
 
-    function unlockSSO(method = 'm365', reload = true) {
+    function unlockSSO(method = 'm365') {
       try {
         localStorage.setItem('dr_sso_authenticated', 'true');
         localStorage.setItem('dr_sso_user', 'Cory Townsend');
@@ -3078,12 +3078,6 @@
 
       if (cb && typeof cb === 'function') {
         try { cb(); } catch(e) { console.error('SSO callback execution error:', e); }
-      } else if (reload) {
-        // Symmetrical automatic cache-busting page reload (just like lockSSO)
-        setTimeout(() => {
-          const cleanUrl = window.location.origin + window.location.pathname + '?_fresh=' + Date.now();
-          window.location.replace(cleanUrl);
-        }, 300);
       }
     }
     window.unlockSSO = unlockSSO;
@@ -4313,11 +4307,11 @@
             const diff = Math.max(0, d.expiresAt - Date.now());
             const mins = Math.floor(diff / 60000);
             const secs = Math.floor((diff % 60000) / 1000);
-            if (title) title.textContent = MAINTENANCE ACTIVE: m s Remaining;
-            if (sub) sub.textContent = Reason:  | SLA Status: 100% Compliant (Zero Penalty);
+            if (title) title.textContent = `MAINTENANCE ACTIVE: ${mins}m ${secs}s Remaining`;
+            if (sub) sub.textContent = `Reason: ${d && d.reason ? d.reason : 'Scheduled Maintenance'} | SLA Status: 100% Compliant (Zero Penalty)`;
           } else {
             if (title) title.textContent = 'MAINTENANCE ACTIVE (Manual Mode)';
-            if (sub) sub.textContent = Reason:  | Running until manually exited;
+            if (sub) sub.textContent = `Reason: ${d && d.reason ? d.reason : 'Scheduled Maintenance'} | Running until manually exited`;
           }
         }, 1000);
       } else {
@@ -4373,7 +4367,7 @@
       } catch(e) {}
 
       // Inform NUC listener backend
-      fetch(${GATEWAY}/api/control?action=maintenance&target=nuc&enable=true&duration=, {
+      fetch(`${GATEWAY}/api/control?action=maintenance&target=nuc&enable=true&duration=${durationMinutes}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-SSO-Email': 'contact@digitalresolve.ca' },
         body: JSON.stringify({ enable: true, duration: durationMinutes, reason: reason })
@@ -4397,7 +4391,7 @@
       closeMaintenanceModal();
 
       playChaosTone(523, 1046, 'triangle', 0.25);
-      showToast('success', 'NUC Maintenance Window Engaged', SLA Shield Active for . Updates & reboots are 100% exempt from outage metrics.);
+      showToast('success', 'NUC Maintenance Window Engaged', `SLA Shield Active for ${durationMinutes}m. Updates & reboots are 100% exempt from outage metrics.`);
     }
     window.activateMaintenanceMode = activateMaintenanceMode;
 
@@ -4406,7 +4400,7 @@
         localStorage.removeItem('dr_nuc_maintenance');
       } catch(e) {}
 
-      fetch(${GATEWAY}/api/control?action=maintenance&target=nuc&enable=false, {
+      fetch(`${GATEWAY}/api/control?action=maintenance&target=nuc&enable=false`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-SSO-Email': 'contact@digitalresolve.ca' },
         body: JSON.stringify({ enable: false })
@@ -5504,7 +5498,7 @@
     window.launchProtectedService = launchProtectedService;
 
     function verifySpeedtestSSO() {
-      unlockSSO('m365', true);
+      unlockSSO('m365');
       closeSpeedtestSSOModal();
     }
     window.verifySpeedtestSSO = verifySpeedtestSSO;
@@ -6099,7 +6093,7 @@
         <p style="font-size: 0.85rem; color: #94a3b8; max-width: 380px; margin: 0 auto; line-height: 1.4;">
           Direct torrent and magnet ingestion to local storage drives requires authenticated administrator access.
         </p>
-        <button type="button" class="btn btn-primary" onclick="unlockSSO('m365', true)" style="padding: 10px 22px; font-size: 0.92rem;">
+        <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" style="padding: 10px 22px; font-size: 0.92rem;">
           Sign In with M365
         </button>
       </div>
@@ -6163,7 +6157,7 @@
           
           <!-- One-Click Microsoft 365 Entra ID SSO Unlock Button -->
           <div style="display: flex; gap: 10px; width: 100%; max-width: 440px; margin-top: 6px;">
-            <button type="button" class="btn btn-primary" onclick="unlockSSO('m365', true)" title="Authenticate with Microsoft 365 Entra ID SSO" style="flex: 1; padding: 12px 18px; font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 0 18px rgba(59, 130, 246, 0.4); cursor: pointer;">
+            <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" title="Authenticate with Microsoft 365 Entra ID SSO" style="flex: 1; padding: 12px 18px; font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 0 18px rgba(59, 130, 246, 0.4); cursor: pointer;">
               <svg width="18" height="18" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;" aria-hidden="true" focusable="false"><path d="M0 0h9.9v9.9H0z" fill="#f25022"/><path d="M11.1 0H21v9.9h-9.9z" fill="#7fba00"/><path d="M0 11.1h9.9V21H0z" fill="#00a4ef"/><path d="M11.1 11.1H21V21h-9.9z" fill="#ffb900"/></svg>
               <span>Sign In with M365</span>
             </button>
@@ -6473,7 +6467,7 @@
           This is a public, front-facing website. Any operation that interacts with on-premise hardware (Ollama LLM inference, Gigabit WAN tests, Wake-on-LAN, sleep standby, remote reboots, torrent injection, or IoT treat dispensers) is strictly restricted to authenticated <strong>Microsoft 365 Administrators</strong> (<code>cory.townsend@digitalresolve.ca</code>).
         </div>
         <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 4px;">
-          <button type="button" class="btn btn-primary" onclick="unlockSSO('m365', true); closeSpeedtestSSOModal();" style="width: 100%; padding: 13px 20px; font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); cursor: pointer;">
+          <button type="button" class="btn btn-primary" onclick="unlockSSO('m365'); closeSpeedtestSSOModal();" style="width: 100%; padding: 13px 20px; font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); cursor: pointer;">
             <svg width="18" height="18" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;"><path d="M0 0h9.9v9.9H0z" fill="#f25022"/><path d="M11.1 0H21v9.9h-9.9z" fill="#7fba00"/><path d="M0 11.1h9.9V21H0z" fill="#00a4ef"/><path d="M11.1 11.1H21V21h-9.9z" fill="#ffb900"/></svg>
             <span>Sign In with M365</span>
           </button>
