@@ -665,6 +665,10 @@
       if (thTag) {
         thTag.textContent = isDeskOnline ? 'Nominal' : 'Eco Cool';
       }
+      const ambTemp = document.getElementById('iot-ambient-temp');
+      if (ambTemp) {
+        ambTemp.innerHTML = `21.4&deg;C <span style="font-size: 0.9rem; color: #94a3b8;">/ 42% RH</span>`;
+      }
 
       // 3. Uptime Kuma Heartbeat Table Latencies
       const nucLat = (window.LAST_NUC_LATENCY !== undefined && window.LAST_NUC_LATENCY !== null) ? window.LAST_NUC_LATENCY : 0.2;
@@ -846,6 +850,7 @@
         }
       });
       if (target === 'nuc') {
+        window.NUC_IS_ONLINE = isOnline;
         if (disk) {
           const fStorage = document.getElementById('fleet-storage-nuc');
           const fBar = document.getElementById('fleet-bar-nuc');
@@ -862,6 +867,28 @@
         });
         const stagCf = document.getElementById('stag-cf');
         if (stagCf) { stagCf.className = `item-tag ${isOnline ? 'online' : 'offline'}`; stagCf.textContent = isOnline ? 'Shield Active' : 'Origin Standby'; }
+
+        const stNuc = document.getElementById('status-tag-nuc');
+        if (stNuc) { stNuc.textContent = isOnline ? '24/7 Core' : 'Offline'; stNuc.className = 'item-tag ' + (isOnline ? 'online' : 'offline'); }
+        const latNuc = document.getElementById('latency-nuc');
+        if (latNuc) { latNuc.textContent = isOnline ? (latencyMs !== null ? latencyMs + ' ms' : '0 ms') : 'Offline'; latNuc.className = 'item-tag ' + (isOnline ? 'online' : 'offline'); }
+        const fBadgeNuc = document.getElementById('fleet-badge-nuc');
+        if (fBadgeNuc) { fBadgeNuc.className = `item-tag ${isOnline ? 'online' : 'offline'}`; fBadgeNuc.textContent = isOnline ? 'Online • 24/7 Core' : 'Offline • Unreachable'; }
+        const fLatNuc = document.getElementById('fleet-latency-nuc');
+        if (fLatNuc) { fLatNuc.textContent = `192.168.2.35 • ${latencyMs !== null ? latencyMs : 0} ms`; }
+
+        const mStream = document.getElementById('meta-watch-streamhub');
+        if (mStream) mStream.innerHTML = isOnline ? `${latencyMs !== null ? latencyMs : 0.8} ms &bull; Sentinel Armed (3m)` : 'Unreachable &bull; Offline';
+        const mFiles = document.getElementById('meta-watch-files');
+        if (mFiles) mFiles.innerHTML = isOnline ? `${latencyMs !== null ? latencyMs : 0.9} ms &bull; Auto-Mount Active` : 'Unreachable &bull; Offline';
+        const mCam = document.getElementById('meta-watch-cam');
+        if (mCam) mCam.innerHTML = isOnline ? '&lt;50ms Low-Latency WebRTC' : 'Unreachable &bull; Offline';
+        const mWol = document.getElementById('meta-watch-wol');
+        if (mWol) mWol.innerHTML = isOnline ? '0.2 ms LAN &bull; Fast-Path' : 'Unreachable &bull; Offline';
+        const mTorrents2 = document.getElementById('meta-watch-torrents2');
+        if (mTorrents2) mTorrents2.innerHTML = isOnline ? `${latencyMs !== null ? latencyMs : 0.8} ms &bull; Swarm Active` : 'Unreachable &bull; Offline';
+        const mCf = document.getElementById('meta-watch-cf');
+        if (mCf) mCf.innerHTML = isOnline ? '1.1 ms &bull; Global Anycast Resilient' : 'Standby &bull; Ingress Suspended';
         if (vitals) {
           const fVitals = document.getElementById('fleet-vitals-nuc');
           const fVpn = document.getElementById('fleet-vpn-nuc');
@@ -982,6 +1009,18 @@
           metaTorrents.style.color = isOnline ? '#34d399' : '#94a3b8';
           metaTorrents.innerHTML = isOnline ? '0.2 ms &bull; Interactive Node Active' : 'Standby &bull; Sleeping (WoL Ready)';
         }
+        const stDesk = document.getElementById('status-tag-desktop');
+        if (stDesk) { stDesk.textContent = isOnline ? 'Active' : 'Standby'; stDesk.className = 'item-tag ' + (isOnline ? 'online' : 'offline'); }
+        const latDesk = document.getElementById('latency-desktop');
+        if (latDesk) { latDesk.textContent = isOnline ? (latencyMs !== null ? latencyMs + ' ms' : '0 ms') : 'Standby'; latDesk.className = 'item-tag ' + (isOnline ? 'online' : 'offline'); }
+        const fBadgeDesk = document.getElementById('fleet-badge-desktop');
+        if (fBadgeDesk) { fBadgeDesk.className = `item-tag ${isOnline ? 'online' : 'offline'}`; fBadgeDesk.textContent = isOnline ? 'Online • Active' : 'Standby • Sleeping'; }
+        const fLatDesk = document.getElementById('fleet-latency-desktop');
+        if (fLatDesk) {
+          fLatDesk.textContent = isOnline
+            ? `192.168.2.62 • ${latencyMs !== null ? latencyMs : 0} ms (Bell Gigabit)`
+            : '192.168.2.62 • Standby (WoL Ready)';
+        }
         const rDesk = document.getElementById('ribbon-desktop');
         if (rDesk) {
           rDesk.innerHTML = `<span class="dropdown-dot dot-1"></span> Bell Fiber | ${isOnline ? 'Online' : 'Standby'}`;
@@ -991,28 +1030,30 @@
           const usedPercent = (disk.usedPercent !== undefined && disk.usedPercent !== null) ? disk.usedPercent : 5.0;
           const usedGB = (disk.usedGB !== undefined && disk.usedGB !== null) ? disk.usedGB : 303;
           const freeGB = (disk.freeGB !== undefined && disk.freeGB !== null) ? disk.freeGB : 5751;
+          const cFree = disk.cFreeGB ? Math.round(disk.cFreeGB) : 375;
+          const dFree = disk.dFreeGB ? (disk.dFreeGB / 1000).toFixed(1) : '5.4';
 
           const fStorage = document.getElementById('fleet-storage-desktop');
           const fBar = document.getElementById('fleet-bar-desktop');
-          if (fStorage) fStorage.innerHTML = `5,751 GB Free (5.0% used) &bull; C: 375G | D: 5.4T`;
+          if (fStorage) fStorage.innerHTML = `${freeGB.toLocaleString()} GB Free (${usedPercent}% used) &bull; C: ${cFree}G | D: ${dFree}T`;
           if (fBar) fBar.style.width = `${usedPercent}%`;
           
           const dTag = document.getElementById('desktop-disk-tag');
           const dVal = document.getElementById('desktop-disk-val');
           const dBar = document.getElementById('desktop-disk-bar');
           const dSub = document.getElementById('desktop-disk-sub');
-          if (dTag) dTag.innerHTML = `C: 375G &bull; D: 5.4T`;
-          if (dVal) dVal.textContent = `5,751 GB Free`;
+          if (dTag) dTag.innerHTML = `C: ${cFree}G &bull; D: ${dFree}T`;
+          if (dVal) dVal.textContent = `${freeGB.toLocaleString()} GB Free`;
           if (dBar) dBar.style.width = `${usedPercent}%`;
-          if (dSub) dSub.innerHTML = `303 GB used of 6,054 GB (5.0%) &bull; C: 465G | D: 5.6T`;
+          if (dSub) dSub.innerHTML = `${usedGB} GB used of ${totalGB.toLocaleString()} GB (${usedPercent}%) &bull; C: ${cFree}G | D: ${dFree}T`;
           
           const sDeskFree = document.getElementById('stat-desktop-disk-free');
           const sDeskSub = document.getElementById('stat-desktop-disk-sub');
-          if (sDeskFree) sDeskFree.innerHTML = `5,751 GB <span style="font-size: 0.9rem; color: #8b949e;">Free</span>`;
-          if (sDeskSub) sDeskSub.innerHTML = `<span>Total 6,054 GB (5.0% Used &bull; 303 GB)</span>`;
+          if (sDeskFree) sDeskFree.innerHTML = `${freeGB.toLocaleString()} GB <span style="font-size: 0.9rem; color: #8b949e;">Free</span>`;
+          if (sDeskSub) sDeskSub.innerHTML = `<span>Total ${totalGB.toLocaleString()} GB (${usedPercent}% Used &bull; ${usedGB} GB)</span>`;
 
           const rDeskStorage = document.getElementById('ribbon-desktop-storage');
-          if (rDeskStorage) rDeskStorage.textContent = `5.75 TB Free (${usedPercent}%)`;
+          if (rDeskStorage) rDeskStorage.textContent = `${(freeGB / 1000).toFixed(2)} TB Free (${usedPercent}%)`;
         }
         if (vitals) {
           const fVitals = document.getElementById('fleet-vitals-desktop');
@@ -1039,7 +1080,41 @@
           const dTag = document.getElementById('desktop-speed-tag');
           if (dTag) { dTag.textContent = 'Offline'; dTag.className = 'item-tag offline'; }
         }
+      }
+      updateHealthIndexScore();
     }
+
+    function updateHealthIndexScore() {
+      const hPct = document.getElementById('health-index-pct');
+      const hStatus = document.getElementById('health-index-status');
+      if (!hPct && !hStatus) return;
+      const nucOn = window.NUC_IS_ONLINE !== undefined ? window.NUC_IS_ONLINE : true;
+      const deskOn = window.DESKTOP_IS_ONLINE !== undefined ? window.DESKTOP_IS_ONLINE : false;
+      let score = 100;
+      let statusText = 'Optimal';
+      let statusClass = 'item-tag online';
+      if (!nucOn && !deskOn) {
+        score = 0;
+        statusText = 'Critical';
+        statusClass = 'item-tag offline';
+      } else if (!nucOn) {
+        score = 45;
+        statusText = 'Degraded';
+        statusClass = 'item-tag offline';
+      } else if (!deskOn) {
+        score = 98;
+        statusText = 'Optimal (Eco)';
+        statusClass = 'item-tag online';
+      } else {
+        score = 100;
+        statusText = 'Optimal';
+        statusClass = 'item-tag online';
+      }
+      if (hPct) hPct.textContent = `${score}%`;
+      if (hStatus) {
+        hStatus.textContent = statusText;
+        hStatus.className = statusClass;
+      }
     }
 
     // Check status on load
@@ -2110,6 +2185,12 @@
       if (appModels) {
         appModels.innerHTML = `<span style="color: #38bdf8; font-weight: 600;">${flashPct}% Gemini Flash</span> &bull; <span style="color: #c084fc; font-weight: 600;">${proPct}% Pro</span> &bull; <span style="color: #34d399; font-weight: 600;">${cacheFmt} Cache Read</span>`;
       }
+      document.querySelectorAll('#app-card-tokens-port').forEach(el => {
+        el.textContent = totalFmt;
+      });
+      document.querySelectorAll('#modal-model-val').forEach(el => {
+        if (metrics.model) el.textContent = metrics.model;
+      });
 
       // Update Header Dropdown Progress Bar
       const menuVal = document.getElementById('menu-token-val');
@@ -2973,6 +3054,11 @@
               if (hrsEl && data.monitoredHours) hrsEl.innerHTML = `${Number(data.monitoredHours).toLocaleString()} <span style="font-size: 0.9rem; color: #8b949e;">Hours</span>`;
               const outEl = document.getElementById('uptime-outages-val');
               if (outEl && data.outages !== undefined) outEl.innerHTML = `${data.outages} <span style="font-size: 0.9rem; color: #8b949e;">Incidents</span>`;
+              document.querySelectorAll('.nav-sla-tag').forEach(tag => {
+                if (data.overallSla) tag.textContent = data.overallSla;
+              });
+              const ispOverall = document.getElementById('isp-uptime-val');
+              if (ispOverall && data.overallSla) ispOverall.textContent = data.overallSla;
 
               if (Array.isArray(data.nodes)) {
                 data.nodes.forEach(n => {
@@ -2985,6 +3071,8 @@
                   } else if (n.id === 'isp') {
                     const el = document.getElementById('uptime-isp-sla-val');
                     if (el && n.uptime) el.textContent = `${n.uptime} Uptime`;
+                    const ispValNode = document.getElementById('isp-uptime-val');
+                    if (ispValNode && n.uptime) ispValNode.textContent = n.uptime;
                   } else if (n.id === 'edge') {
                     const el = document.getElementById('uptime-edge-sla-val');
                     if (el && n.uptime) el.textContent = `${n.uptime} Uptime`;
