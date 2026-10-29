@@ -5868,6 +5868,77 @@ html.mobile-layout .nav-tools-group .dropdown > .btn-nav {
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 0 16px rgba(16, 185, 129, 0.35) !important;
 }
 
+/* ==========================================================================
+   CONSOLIDATED NODE HARDWARE DECKS (NUC & DESKTOP)
+   ========================================================================== */
+.node-decks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.node-deck-card {
+  background: rgba(15, 23, 42, 0.75);
+  border-radius: 12px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s;
+}
+
+.node-deck-card:hover {
+  transform: translateY(-2px);
+}
+
+.node-deck-card.nuc-deck {
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.node-deck-card.nuc-deck:hover {
+  border-color: rgba(16, 185, 129, 0.55);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4), 0 0 16px rgba(16, 185, 129, 0.15);
+}
+
+.node-deck-card.desktop-deck {
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.node-deck-card.desktop-deck:hover {
+  border-color: rgba(56, 189, 248, 0.55);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4), 0 0 16px rgba(56, 189, 248, 0.15);
+}
+
+.node-deck-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.node-metric-subcard {
+  background: rgba(17, 24, 39, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 140px;
+  box-sizing: border-box;
+}
+
+html:not(.desktop-layout) .node-deck-metrics,
+html.mobile-layout .node-deck-metrics {
+  grid-template-columns: 1fr !important;
+}
+
+html:not(.desktop-layout) .node-decks-grid,
+html.mobile-layout .node-decks-grid {
+  grid-template-columns: 1fr !important;
+}
+
 .btn-control-icon {
   font-family: 'JetBrains Mono', monospace;
   font-weight: 800;
