@@ -390,6 +390,23 @@
     }
     window.togglePowerTarget = togglePowerTarget;
 
+    function scrollToPowerControls() {
+      const el = document.getElementById('fleet-quick-controls');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.style.transition = 'box-shadow 0.4s ease, border-color 0.4s ease';
+        el.style.borderColor = 'rgba(56, 189, 248, 0.85)';
+        el.style.boxShadow = '0 0 28px rgba(56, 189, 248, 0.45)';
+        setTimeout(() => {
+          el.style.borderColor = '';
+          el.style.boxShadow = '';
+        }, 2200);
+      } else {
+        window.location.href = 'index.html#fleet-quick-controls';
+      }
+    }
+    window.scrollToPowerControls = scrollToPowerControls;
+
     function triggerNodePower(action) {
       const target = currentPowerTarget || 'desktop';
       const targetName = target === 'desktop' ? 'Desktop Workstation' : 'NUC Core Server';
@@ -669,6 +686,11 @@
       document.body.style.overflow = '';
       document.documentElement.style.overflow = '';
       initLayoutMode();
+      if (window.location.hash === '#fleet-quick-controls') {
+        setTimeout(() => {
+          if (typeof scrollToPowerControls === 'function') scrollToPowerControls();
+        }, 350);
+      }
       updateTokenCounterUI();
 
       // Immediate live telemetry baseline before background polling

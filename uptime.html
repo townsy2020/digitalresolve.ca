@@ -652,7 +652,7 @@
                   </div>
                   <div class="dash-card-meta-row">
                     <span>Public URL:</span>
-                    <span class="mono" style="color: #34d399;">wake.digitalresolve.ca</span>
+                    <a href="javascript:void(0)" onclick="launchProtectedService('https://wake.digitalresolve.ca', 'Wake-on-LAN Power Gateway (Port 8082)')" class="mono" style="color: #34d399; text-decoration: none;" title="Open Wake-on-LAN REST API Gateway">wake.digitalresolve.ca &rarr;</a>
                   </div>
                   <div class="dash-card-meta-row">
                     <span>Latency &bull; Watchdog:</span>
@@ -661,7 +661,7 @@
                 </div>
                 <div class="dash-card-footer">
                   <span style="font-size: 0.72rem; color: #64748b;">REST API Power Gateway</span>
-                  <a href="#fleet-quick-controls" class="btn-schematic-chip dash-btn-action">Control Power &rarr;</a>
+                  <a href="index.html#fleet-quick-controls" onclick="if(typeof scrollToPowerControls==='function'){scrollToPowerControls();return false;}" class="btn-schematic-chip dash-btn-action" title="Jump to Cluster Fleet &amp; Hardware Power Management Controls">Control Power &rarr;</a>
                 </div>
               </div>
 
