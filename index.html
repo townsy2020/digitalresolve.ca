@@ -76,7 +76,7 @@
             <a href="#camera-feed-card" class="btn-action-item" title="Penny's Cat Hub • Live Optical Stream &amp; Smart Feeder IoT">
               <span class="dropdown-dot" style="background-color: #f472b6; box-shadow: 0 0 8px #f472b6;"></span>
               <span>Penny's Cat Hub (Stream &amp; Feeder)</span>
-              <span class="item-tag online">Live &bull; 192.168.2.18</span>
+              <span class="item-tag online">Live &bull; 192.168.2.22</span>
             </a>
             <div class="dropdown-divider"></div>
             <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents.digitalresolve.ca', 'qBittorrent Workstation (torrents.digitalresolve.ca)')" class="btn-action-item" title="Open Workstation qBittorrent">
@@ -681,7 +681,7 @@
                   <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span> 2 Cameras Active &bull; Feeder Online
                 </span>
                 <span class="item-tag" style="background: rgba(244, 114, 182, 0.15); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.3);">
-                  Tuya IoT &bull; 192.168.2.18
+                  Tuya IoT &bull; 192.168.2.22
                 </span>
                 <span class="item-tag" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">
                   SSO Protected
@@ -745,7 +745,7 @@
                       <span style="font-size: 0.78rem; text-transform: uppercase; color: #f472b6; font-weight: 700; display: flex; align-items: center; gap: 6px;">
                         Penny's Smart Feeder IoT
                       </span>
-                      <span class="item-tag online" style="background: rgba(16, 185, 129, 0.2); color: #34d399;"><span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10b981; margin-right: 4px; box-shadow: 0 0 6px #10b981;"></span>192.168.2.18 &bull; Connected &amp; Armed</span>
+                      <span class="item-tag online" style="background: rgba(16, 185, 129, 0.2); color: #34d399;"><span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10b981; margin-right: 4px; box-shadow: 0 0 6px #10b981;"></span>192.168.2.22 &bull; Connected &amp; Armed</span>
                     </div>
                     <div style="font-size: 1.8rem; font-weight: 800; color: #f472b6; font-family: 'JetBrains Mono', monospace; margin: 8px 0 4px 0;">
                       84% <span style="font-size: 0.85rem; color: #94a3b8; font-weight: 600;">(1.2 kg Dry Kibble)</span>
@@ -1656,7 +1656,7 @@
                 </div>
                 <div style="background: rgba(0, 0, 0, 0.4); padding: 10px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06); font-size: 0.78rem;">
                   <div style="color: #cbd5e1; font-weight: 600; margin-bottom: 2px;">feeder.local</div>
-                  <div style="color: #f472b6; font-family: monospace;">&rarr; 192.168.2.18 (Smart Feeder Hardware)</div>
+                  <div style="color: #f472b6; font-family: monospace;">&rarr; 192.168.2.22 (Smart Feeder Hardware)</div>
                 </div>
               </div>
             </div>
@@ -1814,7 +1814,7 @@
               <div class="iot-card" style="border-color: rgba(244, 114, 182, 0.35);">
                 <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;">
                   <span style="font-size: 0.75rem; text-transform: uppercase; color: #f472b6; font-weight: 700;">Penny's Smart Feeder IoT</span>
-                  <span class="item-tag online" style="background: rgba(16, 185, 129, 0.2); color: #34d399;"><span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10b981; margin-right: 4px; box-shadow: 0 0 6px #10b981;"></span>192.168.2.18 &bull; Connected &amp; Armed</span>
+                  <span class="item-tag online" style="background: rgba(16, 185, 129, 0.2); color: #34d399;"><span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10b981; margin-right: 4px; box-shadow: 0 0 6px #10b981;"></span>192.168.2.22 &bull; Connected &amp; Armed</span>
                 </div>
                 <div style="font-size: 1.8rem; font-weight: 800; color: #f472b6; font-family: 'JetBrains Mono', monospace; margin: 4px 0;">
                   84% <span style="font-size: 0.85rem; color: #94a3b8; font-weight: 600;">(1.2 kg Dry Kibble)</span>
@@ -5642,7 +5642,7 @@
 
       // 4. Cat Feeder / Penny / Camera
       if (q.match(/\b(cat|penny|feeder|kibble|food|snack|feed|cam|camera)\b/)) {
-        return `Penny's Cat Hub: Smart Feeder (192.168.2.18) is Online with 84% kibble remaining (~1.2 kg dry food). The optical video stream is relayed via go2rtc hardware WebRTC directly on the NUC at <50ms glass-to-glass latency.`;
+        return `Penny's Cat Hub: Smart Feeder (192.168.2.22) is Online with 84% kibble remaining (~1.2 kg dry food). The optical video stream is relayed via go2rtc hardware WebRTC directly on the NUC at <50ms glass-to-glass latency.`;
       }
 
       // 5. DNS / AdGuard / Threat Shield
@@ -5764,7 +5764,7 @@
 
     function triggerCatTreat(portionLabel = '15g Snack') {
       if (!isSSOAuthenticated()) {
-        openGlobalSSOModal("Penny's Smart Feeder IoT Dispenser (192.168.2.18)", () => triggerCatTreat(portionLabel));
+        openGlobalSSOModal("Penny's Smart Feeder IoT Dispenser (192.168.2.22)", () => triggerCatTreat(portionLabel));
         return;
       }
       const timeEl = document.getElementById('feeder-last-time');
@@ -5787,10 +5787,10 @@
       })
         .then(r => r.json())
         .then(data => {
-          showToast('success', "Penny's Smart Feeder Actuated", `192.168.2.18 dispensed ${portionLabel} successfully via NUC Hardware Bridge.`);
+          showToast('success', "Penny's Smart Feeder Actuated", `192.168.2.22 dispensed ${portionLabel} successfully via NUC Hardware Bridge.`);
         })
         .catch(() => {
-          showToast('success', "Penny's Smart Feeder Actuated", `192.168.2.18 dispense signal dispatched [${portionLabel}].`);
+          showToast('success', "Penny's Smart Feeder Actuated", `192.168.2.22 dispense signal dispatched [${portionLabel}].`);
         });
     }
     window.triggerCatTreat = triggerCatTreat;
@@ -6022,7 +6022,7 @@
             </div>
             <div style="background: rgba(0, 0, 0, 0.35); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); font-size: 0.75rem;">
               <div style="color: #cbd5e1; font-weight: 600;">feeder.local</div>
-              <div style="color: #f472b6; font-family: monospace;">&rarr; 192.168.2.18 (Penny's Feeder)</div>
+              <div style="color: #f472b6; font-family: monospace;">&rarr; 192.168.2.22 (Penny's Feeder)</div>
             </div>
           </div>
         </div>
@@ -6493,7 +6493,7 @@
           <h4 class="ver-title">M365 Dedicated SSO Authentication Symmetrical Refresh &amp; Connected Pet Feeder IoT Bridge</h4>
           <ul class="ver-list">
             <li><strong>M365 Sign In Multi-Layer Synchronization:</strong> Restored top navigation <code>[ ðŸ”’ Sign In with M365 ]</code> authentication engine with symmetrical cookie synchronization (<code>.digitalresolve.ca</code> and local host), global scope variable resolution, and automatic cache-busting reload (<code>?_fresh=...</code>) ensuring all gated telemetry, WAN IP, and terminal controls unlock immediately.</li>
-            <li><strong>Penny''s Smart Feeder IoT Bridge:</strong> Fully connected and armed Penny''s Smart Feeder IoT (<code>192.168.2.18</code>) with active hardware bridge via NUC backend endpoint (<code>/api/feeder/dispense</code>), live multi-portion motor actuation (10g Snack, 25g Meal, 50g Feast), acoustic feedback, and real-time telemetry logging.</li>
+            <li><strong>Penny''s Smart Feeder IoT Bridge:</strong> Fully connected and armed Penny''s Smart Feeder IoT (<code>192.168.2.22</code>) with active hardware bridge via NUC backend endpoint (<code>/api/feeder/dispense</code>), live multi-portion motor actuation (10g Snack, 25g Meal, 50g Feast), acoustic feedback, and real-time telemetry logging.</li>
           </ul>
         </div>
 
