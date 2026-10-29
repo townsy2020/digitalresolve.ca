@@ -2477,20 +2477,20 @@ button.dropdown-item:active,
 }
 
 .uptime-bar.edge {
-  background-color: #f97316 !important;
+  background-color: #10b981 !important;
 }
 
 .uptime-bar.edge:hover {
-  background-color: #fb923c !important;
+  background-color: #38bdf8 !important;
   transform: scaleY(1.35);
 }
 
 .uptime-bar.isp {
-  background-color: #3b82f6 !important;
+  background-color: #10b981 !important;
 }
 
 .uptime-bar.isp:hover {
-  background-color: #60a5fa !important;
+  background-color: #38bdf8 !important;
   transform: scaleY(1.35);
 }
 

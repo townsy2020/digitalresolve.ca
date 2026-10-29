@@ -2359,11 +2359,8 @@
             d.setDate(d.getDate() - i);
             const dateStr = d.toISOString().split('T')[0];
 
-            if (node.type === 'edge') {
-              bar.classList.add('edge');
-            } else if (node.type === 'isp') {
-              bar.classList.add('isp');
-            }
+            bar.classList.remove('edge');
+            bar.classList.remove('isp');
 
             if (node.id === 'bars-nuc' && isNucMaintenanceActive() && i === 0) {
               bar.classList.add('maintenance');
@@ -2384,8 +2381,6 @@
 
             const bar = document.createElement('div');
             bar.className = 'uptime-bar';
-            if (node.type === 'edge') bar.classList.add('edge');
-            if (node.type === 'isp') bar.classList.add('isp');
 
             if (node.id === 'bars-nuc' && isNucMaintenanceActive() && i === 0) {
               bar.classList.add('maintenance');
@@ -2409,32 +2404,49 @@
     let sparklinePhase = 0;
 
     function renderSparklineFrame() {
+      sparklineAnimId = null;
       const canvas = document.getElementById('uptimeSparkline');
       if (!canvas) return;
-      const ctx = canvas.getContext('2d');
+
+      const rect = canvas.getBoundingClientRect();
+      const displayW = Math.round(rect.width || (canvas.parentElement ? canvas.parentElement.clientWidth : 960));
+      const displayH = 80;
+      if (displayW > 0 && (canvas.width !== displayW || canvas.height !== displayH)) {
+        canvas.width = displayW;
+        canvas.height = displayH;
+      }
+
       const w = canvas.width;
       const h = canvas.height;
+      if (w <= 60 || h <= 20) return;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
 
       ctx.clearRect(0, 0, w, h);
 
-      const axisX = 52;
+      const axisX = 48;
 
       // Draw Y-Axis Vertical Line
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(axisX, 6);
-      ctx.lineTo(axisX, h - 8);
+      ctx.lineTo(axisX, h - 10);
       ctx.stroke();
 
       // Tick markers and Y-axis scale labels (10 ms, 5 ms, 0 ms)
+      const yZero = h - 14;  // 0 ms baseline (66px)
+      const yTen  = 14;      // 10 ms top (14px)
+      const yFive = (yZero + yTen) / 2; // 5 ms middle (40px)
+
       const yTicks = [
-        { label: '10 ms', y: 14 },
-        { label: '5 ms',  y: 42 },
-        { label: '0 ms',  y: h - 10 }
+        { label: '10 ms', y: yTen },
+        { label: '5 ms',  y: yFive },
+        { label: '0 ms',  y: yZero }
       ];
 
-      ctx.font = '10px "JetBrains Mono", Consolas, "Courier New", monospace';
+      ctx.font = '10px "JetBrains Mono", Consolas, monospace';
       ctx.fillStyle = '#94a3b8';
       ctx.textAlign = 'right';
       ctx.textBaseline = 'middle';
@@ -2452,10 +2464,10 @@
 
         // Horizontal dashed guideline across graph
         ctx.beginPath();
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
         ctx.setLineDash([4, 4]);
         ctx.moveTo(axisX + 4, tick.y);
-        ctx.lineTo(w, tick.y);
+        ctx.lineTo(w - 6, tick.y);
         ctx.stroke();
         ctx.setLineDash([]);
       });
@@ -2463,33 +2475,37 @@
       sparklinePhase += 0.032;
 
       // Draw Bell Fiber Line (Royal Blue ~4.5ms)
+      const bellBaseY = yZero - (4.5 / 10) * (yZero - yTen);
       ctx.beginPath();
       ctx.strokeStyle = '#3b82f6';
       ctx.lineWidth = 2.2;
       for (let x = axisX; x <= w; x += 10) {
-        const jitter = Math.sin(((x - axisX) * 0.05) + sparklinePhase) * 4 + Math.cos(((x - axisX) * 0.1) + sparklinePhase * 0.7) * 2;
-        const y = h - 35 + jitter;
+        const jitter = Math.sin(((x - axisX) * 0.05) + sparklinePhase) * 3.5 + Math.cos(((x - axisX) * 0.1) + sparklinePhase * 0.7) * 1.5;
+        const y = bellBaseY + jitter;
         if (x === axisX) ctx.moveTo(x, y); else ctx.lineTo(x, y);
       }
       ctx.stroke();
 
-      // Draw Cloudflare Edge Line (Vivid Cloudflare Orange ~1.1ms)
+      // Draw Cloudflare Edge Line (Cloudflare Orange ~1.1ms)
+      const edgeBaseY = yZero - (1.1 / 10) * (yZero - yTen);
       ctx.beginPath();
       ctx.strokeStyle = '#f97316';
       ctx.lineWidth = 2.2;
       for (let x = axisX; x <= w; x += 10) {
-        const jitter = Math.sin(((x - axisX) * 0.08) + sparklinePhase * 1.2) * 2;
-        const y = h - 18 + jitter;
+        const jitter = Math.sin(((x - axisX) * 0.08) + sparklinePhase * 1.2) * 1.8;
+        const y = edgeBaseY + jitter;
         if (x === axisX) ctx.moveTo(x, y); else ctx.lineTo(x, y);
       }
       ctx.stroke();
 
       // Draw NUC Server Line (Emerald Green ~0.2ms)
+      const nucBaseY = yZero - (0.2 / 10) * (yZero - yTen);
       ctx.beginPath();
       ctx.strokeStyle = '#10b981';
       ctx.lineWidth = 2.2;
       for (let x = axisX; x <= w; x += 10) {
-        const y = h - 8 + Math.sin(((x - axisX) * 0.04) + sparklinePhase * 0.5) * 1.2;
+        const jitter = Math.sin(((x - axisX) * 0.04) + sparklinePhase * 0.5) * 1.0;
+        const y = nucBaseY + jitter;
         if (x === axisX) ctx.moveTo(x, y); else ctx.lineTo(x, y);
       }
       ctx.stroke();
@@ -2500,7 +2516,12 @@
     }
 
     function initSparklineHeartbeat() {
-      if (!sparklineAnimId && !document.hidden) {
+      if (sparklineAnimId) {
+        cancelAnimationFrame(sparklineAnimId);
+        sparklineAnimId = null;
+      }
+      const canvas = document.getElementById('uptimeSparkline');
+      if (canvas && !document.hidden) {
         sparklineAnimId = requestAnimationFrame(renderSparklineFrame);
       }
     }
@@ -2516,7 +2537,9 @@
       }
     });
 
-    // --- Service Status Dashboard Filter & Telemetry Refresh ---
+    window.addEventListener('resize', () => {
+      initSparklineHeartbeat();
+    });
     function filterServiceDashboard(category, btn) {
       document.querySelectorAll('.dash-filter-btn').forEach(b => b.classList.remove('active'));
       if (btn) btn.classList.add('active');
