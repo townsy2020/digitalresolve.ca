@@ -851,7 +851,17 @@
           const fBar = document.getElementById('fleet-bar-nuc');
           if (fStorage) fStorage.textContent = `${disk.freeGB} GB Free (${disk.usedPercent}%)`;
           if (fBar) fBar.style.width = `${disk.usedPercent}%`;
+          const nFreeEl = document.getElementById('stat-nuc-free-legend');
+          if (nFreeEl && disk.freeGB) {
+            nFreeEl.innerHTML = `<span class="legend-dot seg-free"></span> Free (${Math.round(disk.freeGB)} GB)`;
+          }
         }
+        ['stag-streamhub', 'stag-files', 'stag-cam', 'stag-wol', 'stag-torrents2'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) { el.className = `item-tag ${isOnline ? 'online' : 'offline'}`; el.textContent = isOnline ? 'Operational' : 'Unreachable'; }
+        });
+        const stagCf = document.getElementById('stag-cf');
+        if (stagCf) { stagCf.className = `item-tag ${isOnline ? 'online' : 'offline'}`; stagCf.textContent = isOnline ? 'Shield Active' : 'Origin Standby'; }
         if (vitals) {
           const fVitals = document.getElementById('fleet-vitals-nuc');
           const fVpn = document.getElementById('fleet-vpn-nuc');
@@ -951,7 +961,26 @@
             segs[2].title = `D: Apps Used: ${dUsed} GB`;
             segs[3].style.width = `${dFreePct}%`;
             segs[3].title = `D: Apps Free: ${dFree} GB`;
+
+            const cUsedEl = document.getElementById('stat-desktop-c-used');
+            const cFreeEl = document.getElementById('stat-desktop-c-free');
+            const dUsedEl = document.getElementById('stat-desktop-d-used');
+            const dFreeEl = document.getElementById('stat-desktop-d-free');
+            if (cUsedEl) cUsedEl.innerHTML = `<span class="legend-dot" style="background: #38bdf8;"></span> C: ${cUsed}G Used`;
+            if (cFreeEl) cFreeEl.innerHTML = `<span class="legend-dot" style="background: rgba(56, 189, 248, 0.45);"></span> C: ${cFree}G Free`;
+            if (dUsedEl) dUsedEl.innerHTML = `<span class="legend-dot" style="background: #10b981;"></span> D: ${dUsed}G Used`;
+            if (dFreeEl) dFreeEl.innerHTML = `<span class="legend-dot" style="background: rgba(16, 185, 129, 0.35);"></span> D: ${(dFree / 1000).toFixed(2)}T Free`;
           }
+        }
+        const stagTorrents = document.getElementById('stag-torrents');
+        if (stagTorrents) {
+          stagTorrents.className = `item-tag ${isOnline ? 'online' : 'offline'}`;
+          stagTorrents.textContent = isOnline ? 'Operational' : 'Standby';
+        }
+        const metaTorrents = document.getElementById('meta-watch-torrents');
+        if (metaTorrents) {
+          metaTorrents.style.color = isOnline ? '#34d399' : '#94a3b8';
+          metaTorrents.innerHTML = isOnline ? '0.2 ms &bull; Interactive Node Active' : 'Standby &bull; Sleeping (WoL Ready)';
         }
         const rDesk = document.getElementById('ribbon-desktop');
         if (rDesk) {
@@ -1032,6 +1061,7 @@
       updateSslCertExpiryUI();
       updateClusterPowerAndThermalsUI(false);
       fetchAgySessionInfo();
+      if (typeof fetchFeederStatus === 'function') fetchFeederStatus();
 
       // Ensure all modal overlays are strictly hidden on load
       ['magnet-modal-overlay', 'agy-console-modal-overlay', 'changelog-modal-overlay', 'health-modal-overlay', 'chaos-modal-overlay', 'disaster-modal-overlay', 'speedtest-sso-modal-overlay', 'cloudflare-stats-modal-overlay', 'adguard-modal-overlay'].forEach(id => {
@@ -4426,12 +4456,15 @@
         warnEl.style.display = pct <= 20 ? 'flex' : 'none';
       }
       if (watchEl) {
-        watchEl.textContent = pct === 0 ? "Alert - Empty Hopper Detected" : (state.opticalWatchdog || "Active - Camera Line-of-Sight");
+        watchEl.textContent = pct === 0 ? "Alert - Empty Hopper Detected" : (state.opticalWatchdog || "Armed & Active");
+        watchEl.style.color = pct <= 20 ? '#f87171' : '#34d399';
       }
       if (dishEl) {
-        dishEl.textContent = pct === 0 ? "Empty - Refill Required" : (state.bowlStatus || "Ready - Verified");
+        dishEl.textContent = pct === 0 ? "Empty - Refill Required" : (state.bowlStatus || "Kibble Present (Verified)");
+        dishEl.style.color = pct <= 20 ? '#f87171' : '#34d399';
       }
-      if (timeEl && state.lastDispenseTime) {
+
+      // Pane-IoT elements (index.html & ops.html)
       const nucPctEl = document.getElementById('feeder-nuc-hopper-pct');
       const nucSubEl = document.getElementById('feeder-nuc-hopper-sub');
       const nucBarEl = document.getElementById('feeder-nuc-hopper-bar');
@@ -4443,15 +4476,46 @@
         nucBarEl.style.width = `${pct}%`;
         nucBarEl.style.background = pct <= 15 ? 'linear-gradient(90deg, #ef4444, #f87171)' : (pct <= 30 ? 'linear-gradient(90deg, #f59e0b, #fbbf24)' : 'linear-gradient(90deg, #ec4899, #f472b6)');
       }
-      if (nucWatchEl) nucWatchEl.textContent = pct === 0 ? "Alert - Empty Hopper Detected" : (state.opticalWatchdog || "Active - Camera Line-of-Sight");
-      if (iotTimeEl && state.lastDispenseTime) {
-        const d2 = new Date(state.lastDispenseTime);
-        const tStr2 = isNaN(d2) ? state.lastDispenseTime : d2.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-        iotTimeEl.textContent = `${tStr2} (${state.lastDispenseLabel || 'Snack'})`;
+      if (nucWatchEl) {
+        nucWatchEl.textContent = pct === 0 ? "Alert - Empty Hopper Detected" : (state.opticalWatchdog || "Armed & Active");
+        nucWatchEl.style.color = pct <= 20 ? '#f87171' : '#34d399';
       }
+
+      // Live Homelab Service Dashboard Card (index.html & uptime.html)
+      const stagFeeder = document.getElementById('stag-feeder');
+      if (stagFeeder) {
+        if (pct > 20) {
+          stagFeeder.className = 'item-tag online';
+          stagFeeder.textContent = 'Armed & Active';
+          stagFeeder.style.background = 'rgba(16, 185, 129, 0.2)';
+          stagFeeder.style.color = '#34d399';
+        } else {
+          stagFeeder.className = 'item-tag offline';
+          stagFeeder.textContent = pct === 0 ? 'Hopper Empty' : 'Low Kibble';
+          stagFeeder.style.background = 'rgba(239, 68, 68, 0.2)';
+          stagFeeder.style.color = '#fca5a5';
+        }
+      }
+      const feederKibble = document.getElementById('feeder-card-kibble');
+      if (feederKibble) {
+        feederKibble.textContent = `${pct}% (${rem}g Kibble)`;
+        feederKibble.style.color = pct <= 20 ? '#f87171' : '#34d399';
+      }
+      const feederWatchdog = document.getElementById('feeder-card-watchdog');
+      if (feederWatchdog) {
+        feederWatchdog.textContent = state.opticalWatchdog || 'Armed & Active';
+        feederWatchdog.style.color = pct <= 20 ? '#f87171' : '#34d399';
+      }
+
+      if (state.lastDispenseTime) {
         const d = new Date(state.lastDispenseTime);
         const tStr = isNaN(d) ? state.lastDispenseTime : d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-        timeEl.textContent = `${tStr} (${state.lastDispenseLabel || "Snack"}) - ${state.lastDispenseStatus || "Verified"}`;
+        if (timeEl) {
+          timeEl.textContent = `${tStr} (${state.lastDispenseLabel || "Snack"}) - ${state.lastDispenseStatus || "Verified"}`;
+        }
+        if (iotTimeEl) {
+          iotTimeEl.textContent = `${tStr} (${state.lastDispenseLabel || 'Snack'})`;
+        }
       }
     }
     window.updateFeederUI = updateFeederUI;

@@ -580,10 +580,10 @@
                       <div style="width: 56%; background: rgba(16, 185, 129, 0.25);" title="D: Apps Free: 5,376 GB (96.2%)"></div>
                     </div>
                     <div class="storage-legend">
-                      <span><span class="legend-dot" style="background: #38bdf8;"></span> C: 90G Used</span>
-                      <span><span class="legend-dot" style="background: rgba(56, 189, 248, 0.45);"></span> C: 375G Free</span>
-                      <span><span class="legend-dot" style="background: #10b981;"></span> D: 213G Used</span>
-                      <span><span class="legend-dot" style="background: rgba(16, 185, 129, 0.35);"></span> D: 5.38T Free</span>
+                      <span id="stat-desktop-c-used"><span class="legend-dot" style="background: #38bdf8;"></span> C: 90G Used</span>
+                      <span id="stat-desktop-c-free"><span class="legend-dot" style="background: rgba(56, 189, 248, 0.45);"></span> C: 375G Free</span>
+                      <span id="stat-desktop-d-used"><span class="legend-dot" style="background: #10b981;"></span> D: 213G Used</span>
+                      <span id="stat-desktop-d-free"><span class="legend-dot" style="background: rgba(16, 185, 129, 0.35);"></span> D: 5.38T Free</span>
                     </div>
                   </div>
                 </div>
@@ -637,7 +637,7 @@
                       <span><span class="legend-dot seg-movies"></span> Movies (520 GB)</span>
                       <span><span class="legend-dot seg-tv"></span> Series (410 GB)</span>
                       <span><span class="legend-dot seg-mixes"></span> Mixes (437 GB)</span>
-                      <span><span class="legend-dot seg-free"></span> Free (496 GB)</span>
+                      <span id="stat-nuc-free-legend"><span class="legend-dot seg-free"></span> Free (489.2 GB)</span>
                     </div>
                   </div>
                 </div>
@@ -1177,12 +1177,12 @@
                       <div class="dash-card-port">192.168.2.22 &bull; LiieyPet Tuya v3.3</div>
                     </div>
                   </div>
-                  <span class="item-tag" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5;" id="stag-feeder">Hopper Empty</span>
+                  <span class="item-tag online" id="stag-feeder">Checking...</span>
                 </div>
                 <div class="dash-card-meta">
                   <div class="dash-card-meta-row">
                     <span>Kibble Level:</span>
-                    <strong style="color: #f87171;">0% (0g Dry Kibble) - Refill Needed</strong>
+                    <strong id="feeder-card-kibble" style="color: #cbd5e1;">Checking...</strong>
                   </div>
                   <div class="dash-card-meta-row">
                     <span>Optical Cam:</span>
@@ -1190,7 +1190,7 @@
                   </div>
                   <div class="dash-card-meta-row">
                     <span>Watchdog:</span>
-                    <span style="color: #f87171;">Optical Watchdog Alert Active</span>
+                    <span id="feeder-card-watchdog" style="color: #cbd5e1;">Connecting...</span>
                   </div>
                 </div>
                 <div class="dash-card-footer">
@@ -1286,7 +1286,7 @@
                   </div>
                   <div class="dash-card-meta-row">
                     <span>Latency &bull; Watchdog:</span>
-                    <span style="color: #34d399;">0.2 ms &bull; Interactive Node Active</span>
+                    <span id="meta-watch-torrents" style="color: #34d399;">Checking...</span>
                   </div>
                 </div>
                 <div class="dash-card-footer">
@@ -2210,7 +2210,7 @@
                   <span class="item-tag online" style="background: rgba(16, 185, 129, 0.2); color: #34d399;"><span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10b981; margin-right: 4px; box-shadow: 0 0 6px #10b981;"></span>192.168.2.22 &bull; Connected &amp; Armed</span>
                 </div>
                 <div style="font-size: 1.8rem; font-weight: 800; color: #f472b6; font-family: 'JetBrains Mono', monospace; margin: 4px 0;">
-                  <span id="feeder-nuc-hopper-pct">0%</span> <span id="feeder-nuc-hopper-sub" style="font-size: 0.85rem; color: #f87171; font-weight: 600;">(0g - EMPTY - Refill Needed)</span>
+                  <span id="feeder-nuc-hopper-pct">--%</span> <span id="feeder-nuc-hopper-sub" style="font-size: 0.85rem; color: #94a3b8; font-weight: 600;">(Checking status...)</span>
                 </div>
                 <div class="disk-bar-bg" style="margin-bottom: 8px;">
                   <div class="disk-bar-fill" id="feeder-nuc-hopper-bar" style="width: 0%; background: linear-gradient(90deg, #ef4444, #f87171); transition: width 0.4s ease;"></div>
@@ -2218,8 +2218,8 @@
                 <div style="font-size: 0.78rem; color: #94a3b8; line-height: 1.5;">
                   - Consolidated into <strong>Penny's Cat Hub</strong> alongside optical cam stream.<br>
                   - Hardware: <strong>LiieyPet WIFI - 192.168.2.22</strong><br>
-                  - Optical Watchdog: <span id="feeder-nuc-watchdog" style="color: #f87171; font-weight: 600;">Alert - Empty Hopper Detected</span><br>
-                  - Last Dispense: <span id="feeder-iot-last-time" style="color: #cbd5e1;">Empty Hopper Detected</span>
+                  - Optical Watchdog: <span id="feeder-nuc-watchdog" style="color: #cbd5e1; font-weight: 600;">Connecting...</span><br>
+                  - Last Dispense: <span id="feeder-iot-last-time" style="color: #cbd5e1;">Querying...</span>
                 </div>
                 <div style="margin-top: 10px;">
                   <a href="#camera-feed-card" class="btn btn-secondary" style="font-size: 0.76rem; padding: 5px 12px; color: #f472b6 !important; border-color: rgba(244, 114, 182, 0.4); display: inline-flex; align-items: center; gap: 6px;" title="Open Penny's Cat Hub (Stream &amp; Feeder)">
