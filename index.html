@@ -2148,9 +2148,9 @@
           <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.6</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 12,206 Lines of Code (HTML: 6,882 lines | CSS: 5,323 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 12,201 Lines of Code (HTML: 6,877 lines | CSS: 5,323 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">12,206</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">12,201</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -2233,7 +2233,7 @@
           if (mVer) mVer.textContent = activeVer;
         }
 
-        const baseHtmlLines = 6882;
+        const baseHtmlLines = 6877;
         const baseCssLines = 5323;
         const baseCnameLines = 1;
         const defaultTotal = baseHtmlLines + baseCssLines + baseCnameLines;
@@ -3119,10 +3119,10 @@
         }
       } catch(e) {}
 
-      // 6. Clear relevant domain auth cookies
+      // 6. Clear local deck auth cookies (preserve Cloudflare Access session so cameras stay online)
       try {
         const host = window.location.hostname;
-        const cookieList = ['dr_sso_authenticated', 'dr_sso_user', 'dr_sso', 'CF_Authorization', 'CF_AppSession'];
+        const cookieList = ['dr_sso_authenticated', 'dr_sso_user', 'dr_sso'];
         cookieList.forEach(name => {
           document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
           document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${host};`;
@@ -3139,11 +3139,6 @@
       updateSSOGateUI(); try { updateMaintenanceVisualStates(); } catch(e) {}
       try { updateCodebaseMetrics(); } catch(e) {}
       try { fetchISPHistory(); } catch(e) {}
-
-      // 9. Ping Cloudflare Zero Trust Access logout endpoint in background
-      try {
-        fetch('/cdn-cgi/access/logout', { method: 'GET', credentials: 'include', mode: 'no-cors' }).catch(() => {});
-      } catch(e) {}
 
       // 10. If explicit full Microsoft IdP logout was requested with Shift key
       if (fullIdpLogout && (window.event && window.event.shiftKey)) {
