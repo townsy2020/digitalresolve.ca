@@ -38,6 +38,33 @@
       return false;
     }
     window.scrollToTop = scrollToTop;
+    // Unified Smooth Section Navigation Controller
+    function scrollToSection(id, e) {
+      if (e) {
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        if (typeof e.stopPropagation === 'function') e.stopPropagation();
+      }
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        try {
+          history.pushState(null, document.title, '#' + id);
+        } catch(err) {}
+        return false;
+      }
+      // If element is not present on this page, navigate to dedicated page
+      if (id === 'ops-ai' || id === 'nuc-services') {
+        window.location.href = 'ops.html#' + id;
+      } else if (id === 'fleet') {
+        window.location.href = 'fleet.html#' + id;
+      } else if (id === 'deck') {
+        window.location.href = 'index.html#deck';
+      } else {
+        window.location.href = 'index.html#' + id;
+      }
+      return false;
+    }
+    window.scrollToSection = scrollToSection;
 
     // Dynamic Codebase Scale & Version Synchronizer
     function updateCodebaseMetrics() {

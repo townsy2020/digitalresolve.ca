@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Penny's Cat Cam & Feeder IoT - Homelab</title>
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.15 - Penny's Cat Cam & Feeder IoT - Homelab">
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.16 - Penny's Cat Cam & Feeder IoT - Homelab">
   <link rel="stylesheet" href="styles.css?v=2.8.7">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,9 +45,8 @@
   
   <header class="header" id="site-header">
     <div class="container nav-container">
-      <a href="#deck" class="logo" title="DigitalResolve Homelab Deck">
+      <a href="#deck" class="logo" title="DigitalResolve Operations Deck" onclick="return scrollToTop(event);">
         <span class="logo-text-group"><span class="logo-accent">Digital</span>Resolve</span>
-        <span class="logo-deck-badge">HOMELAB DECK</span>
       </a>
       <nav class="nav-links">
         <a href="#deck" class="btn-nav">DECK</a>
@@ -393,6 +392,8 @@
           </div>
     </div>
   </main>
+  </main>
+
   <footer class="footer">
     <div class="container footer-container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
       <p>&copy; 2026 Digital Resolve &bull; Homelab Operations Deck &bull; Cory Townsend</p>
@@ -403,12 +404,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.15</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.16</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
         <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 12,336 Lines of Code (HTML: 7,012 lines | CSS: 5,323 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">23,634</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">23,687</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -432,8 +433,7 @@
       <span id="toast-message" class="toast-title">Notification</span>
       <span id="toast-subtext" class="toast-subtext"></span>
     </div>
-  </div>
-
+    });
   </script>
 
   <!-- Cloudflare Site Statistics & Traffic Analytics Modal -->
