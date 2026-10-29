@@ -203,21 +203,29 @@
             <!-- Embedded AI Token Widget -->
             <div style="padding: 8px 14px 6px; font-size: 0.78rem;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                <span style="color: #94a3b8; font-weight: 600;">AI Token Efficiency:</span>
-                <span id="menu-token-val" class="mono" style="font-weight: 700; color: #38bdf8;">1.30M</span>
+                <span style="color: #94a3b8; font-weight: 600;">Antigravity Quota:</span>
+                <span id="menu-token-val" class="mono" style="font-weight: 700; color: #38bdf8;">88.16% Weekly</span>
               </div>
-              <div class="model-progress-bar" id="menu-progress-bar" title="Gemini Flash: 92.32% (Dynamic Telemetry) &bull; 7.68% Pro &bull; 412M Cache Reused">
-                <div class="model-segment flash" id="menu-bar-flash" style="width: 92.32%;"></div>
-                <div class="model-segment pro" id="menu-bar-pro" style="width: 7.68%; display: block; background: #a855f7;"></div>
+              <!-- Weekly Limit Progress Bar -->
+              <div style="font-size: 0.7rem; color: #cbd5e1; margin-bottom: 2px; display: flex; justify-content: space-between;">
+                <span>Gemini Weekly Limit</span>
+                <span style="color: #34d399; font-weight: 700;" id="menu-pct-flash">88.16% Remaining</span>
               </div>
-              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.7rem; color: #cbd5e1; gap: 4px; margin-top: 4px;">
-                <span style="color: #38bdf8;" id="menu-pct-flash"><strong style="font-weight:700;">92.32%</strong> Flash</span>
-                <span style="color: #34d399;" id="menu-pct-cache"><strong style="font-weight:700;">412M</strong> Cache</span>
-                <span style="color: #c084fc;" id="menu-pct-pro"><strong style="font-weight:700;">7.68%</strong> Pro</span>
+              <div class="model-progress-bar" id="menu-progress-bar" title="Gemini Weekly: 88.16% Remaining - Refreshes in 129h 38m">
+                <div class="model-segment flash" id="menu-bar-flash" style="width: 88.16%; background: #38bdf8;"></div>
+                <div class="model-segment pro" id="menu-bar-pro" style="width: 11.84%; display: block; background: rgba(255,255,255,0.15);"></div>
+              </div>
+              <!-- 5-Hour Limit Progress Bar -->
+              <div style="font-size: 0.7rem; color: #cbd5e1; margin-top: 6px; margin-bottom: 2px; display: flex; justify-content: space-between;">
+                <span>5-Hour Rolling Limit</span>
+                <span style="color: #f59e0b; font-weight: 700;" id="menu-pct-5h">83.84% (1h 16m)</span>
+              </div>
+              <div class="model-progress-bar" title="5-Hour Limit: 83.84% Remaining - Refreshes in 1h 16m">
+                <div class="model-segment" id="menu-bar-5h" style="width: 83.84%; background: #f59e0b;"></div>
               </div>
               <div style="margin-top: 6px; font-size: 0.68rem; color: #64748b; display: flex; justify-content: space-between;">
-                <span>Protocol: <span style="color: #34d399; font-weight:600;">92.32% Flash / 7.68% Pro</span></span>
-                <span>Saved: <span style="color: #34d399; font-weight: 700;">~$35.20 (97%)</span></span>
+                <span>Account: <span style="color: #cbd5e1;">coryrobertleetownsend</span></span>
+                <span>Claude/GPT: <span style="color: #34d399; font-weight: 700;">100%</span></span>
               </div>
             </div>
           </div>
@@ -2158,9 +2166,9 @@
           <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.6</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 12,328 Lines of Code (HTML: 7,004 lines | CSS: 5,323 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 12,336 Lines of Code (HTML: 7,012 lines | CSS: 5,323 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">12,328</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">12,336</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -2243,7 +2251,7 @@
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 7004;
+      const baseHtmlLines = 7012;
         const baseCssLines = 5323;
         const baseCnameLines = 1;
         const defaultTotal = baseHtmlLines + baseCssLines + baseCnameLines;
@@ -3731,21 +3739,21 @@
 
       // Update Header Dropdown Progress Bar
       const menuVal = document.getElementById('menu-token-val');
-      if (menuVal) menuVal.textContent = totalFmt;
-
+      const weeklyLimit = (metrics.weeklyLimitRemaining !== undefined) ? metrics.weeklyLimitRemaining : 88.16;
+      const fiveHourLimit = (metrics.fiveHourLimitRemaining !== undefined) ? metrics.fiveHourLimitRemaining : 83.84;
+      const weeklyRef = metrics.weeklyRefresh || "129h 38m";
+      const fiveHourRef = metrics.fiveHourRefresh || "1h 16m";
+      if (menuVal) menuVal.textContent = `${weeklyLimit}% Weekly`;
       const barFlash = document.getElementById('menu-bar-flash');
-      if (barFlash) barFlash.style.width = `${flashPct}%`;
-      const barArgon = document.getElementById('menu-bar-argon');
-      if (barArgon) barArgon.style.display = 'none';
+      if (barFlash) barFlash.style.width = `${weeklyLimit}%`;
       const barPro = document.getElementById('menu-bar-pro');
-      if (barPro) {
-        barPro.style.display = 'block';
-        barPro.style.width = `${proPct}%`;
-        barPro.style.background = '#a855f7';
-      }
-
+      if (barPro) barPro.style.width = `${(100 - weeklyLimit).toFixed(2)}%`;
       const mFlash = document.getElementById('menu-pct-flash');
-      if (mFlash) mFlash.innerHTML = `<strong style="font-weight:700;">${flashPct}%</strong> Flash`;
+      if (mFlash) mFlash.textContent = `${weeklyLimit}% Remaining`;
+      const m5h = document.getElementById('menu-pct-5h');
+      if (m5h) m5h.textContent = `${fiveHourLimit}% (${fiveHourRef})`;
+      const bar5h = document.getElementById('menu-bar-5h');
+      if (bar5h) bar5h.style.width = `${fiveHourLimit}%`;
       const mPro = document.getElementById('menu-pct-pro');
       if (mPro) mPro.innerHTML = `<strong style="font-weight:700; color: #c084fc;">${proPct}%</strong> Pro`;
       const mCache = document.getElementById('menu-pct-cache');
