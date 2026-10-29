@@ -1827,16 +1827,16 @@
                   <span class="item-tag online" style="background: rgba(16, 185, 129, 0.2); color: #34d399;"><span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10b981; margin-right: 4px; box-shadow: 0 0 6px #10b981;"></span>192.168.2.22 &bull; Connected &amp; Armed</span>
                 </div>
                 <div style="font-size: 1.8rem; font-weight: 800; color: #f472b6; font-family: 'JetBrains Mono', monospace; margin: 4px 0;">
-                  84% <span style="font-size: 0.85rem; color: #94a3b8; font-weight: 600;">(1.2 kg Dry Kibble)</span>
+                  <span id="feeder-nuc-hopper-pct">0%</span> <span id="feeder-nuc-hopper-sub" style="font-size: 0.85rem; color: #f87171; font-weight: 600;">(0g - EMPTY - Refill Needed)</span>
                 </div>
                 <div class="disk-bar-bg" style="margin-bottom: 8px;">
-                  <div class="disk-bar-fill" style="width: 84%; background: linear-gradient(90deg, #ec4899, #f472b6);"></div>
+                  <div class="disk-bar-fill" id="feeder-nuc-hopper-bar" style="width: 0%; background: linear-gradient(90deg, #ef4444, #f87171); transition: width 0.4s ease;"></div>
                 </div>
                 <div style="font-size: 0.78rem; color: #94a3b8; line-height: 1.5;">
-                  &bull; Consolidated into <strong>Penny's Cat Hub</strong> alongside optical cam stream.<br>
-                  &bull; Protocol: <strong>Tuya IoT v3.3 &bull; 04:f4:d8:ba:e3:c7</strong><br>
-                  &bull; Status: <strong style="color: #34d399;">Connected &amp; Operational (Hardware Bridge Active)</strong><br>
-                  &bull; Last Dispense: <span id="feeder-iot-last-time" style="color: #cbd5e1;">2 hours ago (Penny Feast 25g)</span>
+                  - Consolidated into <strong>Penny's Cat Hub</strong> alongside optical cam stream.<br>
+                  - Hardware: <strong>LiieyPet WIFI - 192.168.2.22</strong><br>
+                  - Optical Watchdog: <span id="feeder-nuc-watchdog" style="color: #f87171; font-weight: 600;">Alert - Empty Hopper Detected</span><br>
+                  - Last Dispense: <span id="feeder-iot-last-time" style="color: #cbd5e1;">Empty Hopper Detected</span>
                 </div>
                 <div style="margin-top: 10px;">
                   <a href="#camera-feed-card" class="btn btn-secondary" style="font-size: 0.76rem; padding: 5px 12px; color: #f472b6 !important; border-color: rgba(244, 114, 182, 0.4); display: inline-flex; align-items: center; gap: 6px;" title="Open Penny's Cat Hub (Stream &amp; Feeder)">
@@ -2158,9 +2158,9 @@
           <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.6</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 12,311 Lines of Code (HTML: 6,987 lines | CSS: 5,323 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 12,328 Lines of Code (HTML: 7,004 lines | CSS: 5,323 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">12,311</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">12,328</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -2243,7 +2243,7 @@
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 6987;
+      const baseHtmlLines = 7004;
         const baseCssLines = 5323;
         const baseCnameLines = 1;
         const defaultTotal = baseHtmlLines + baseCssLines + baseCnameLines;
@@ -5652,7 +5652,7 @@
 
       // 4. Cat Feeder / Penny / Camera
       if (q.match(/\b(cat|penny|feeder|kibble|food|snack|feed|cam|camera)\b/)) {
-        return `Penny's Cat Hub: Smart Feeder (192.168.2.22) is Online with 84% kibble remaining (~1.2 kg dry food). The optical video stream is relayed via go2rtc hardware WebRTC directly on the NUC at <50ms glass-to-glass latency.`;
+        return `Penny's Cat Hub: Smart Feeder (192.168.2.22) is Online. Live state: Hopper is currently EMPTY (0g remaining - refill required). Optical camera watchdog is active on the NUC at <50ms latency.`;
       }
 
       // 5. DNS / AdGuard / Threat Shield
@@ -5811,6 +5811,23 @@
         dishEl.textContent = pct === 0 ? "Empty - Refill Required" : (state.bowlStatus || "Ready - Verified");
       }
       if (timeEl && state.lastDispenseTime) {
+      const nucPctEl = document.getElementById('feeder-nuc-hopper-pct');
+      const nucSubEl = document.getElementById('feeder-nuc-hopper-sub');
+      const nucBarEl = document.getElementById('feeder-nuc-hopper-bar');
+      const nucWatchEl = document.getElementById('feeder-nuc-watchdog');
+      const iotTimeEl = document.getElementById('feeder-iot-last-time');
+      if (nucPctEl) nucPctEl.textContent = `${pct}%`;
+      if (nucSubEl) nucSubEl.textContent = pct === 0 ? "(0g - EMPTY - Refill Needed)" : `(${rem}g - ~${days} Days)`;
+      if (nucBarEl) {
+        nucBarEl.style.width = `${pct}%`;
+        nucBarEl.style.background = pct <= 15 ? 'linear-gradient(90deg, #ef4444, #f87171)' : (pct <= 30 ? 'linear-gradient(90deg, #f59e0b, #fbbf24)' : 'linear-gradient(90deg, #ec4899, #f472b6)');
+      }
+      if (nucWatchEl) nucWatchEl.textContent = pct === 0 ? "Alert - Empty Hopper Detected" : (state.opticalWatchdog || "Active - Camera Line-of-Sight");
+      if (iotTimeEl && state.lastDispenseTime) {
+        const d2 = new Date(state.lastDispenseTime);
+        const tStr2 = isNaN(d2) ? state.lastDispenseTime : d2.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        iotTimeEl.textContent = `${tStr2} (${state.lastDispenseLabel || 'Snack'})`;
+      }
         const d = new Date(state.lastDispenseTime);
         const tStr = isNaN(d) ? state.lastDispenseTime : d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
         timeEl.textContent = `${tStr} (${state.lastDispenseLabel || 'Snack'}) â€¢ ${state.lastDispenseStatus || 'Verified'}`;
