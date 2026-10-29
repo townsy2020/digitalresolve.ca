@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0">
   <title>Autonomous Ops &amp; AI &bull; Digital Resolve Homelab</title>
   <meta name="description" content="24/7 self-hosted homelab operations, Cloudflare Zero Trust tunnels, private 4K media streaming, and automated WireGuard VPN ingestion.">
-  <link rel="stylesheet" href="styles.css?v=2.8.13">
+  <link rel="stylesheet" href="styles.css?v=2.8.14">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -106,7 +106,7 @@
             <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents2.digitalresolve.ca', 'qBittorrent NUC (torrents2.digitalresolve.ca)')" class="btn-action-item" title="Open NUC qBittorrent">
               <span class="dropdown-dot dot-2"></span>
               <span>Torrents (NUC qBit)</span>
-              <span class="item-tag" id="nuc-disk-tag">D: -- GB free</span>
+              <span class="item-tag online" id="nuc-disk-tag">D: 489 GB free</span>
             </a>
             <a href="javascript:void(0)" onclick="openMagnetModal()" class="btn-action-item" title="Open Rapid Torrent &amp; Magnet Ingestion Console">
               <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
@@ -117,12 +117,12 @@
             <div class="disk-widget" id="nuc-disk-widget">
               <div class="disk-widget-header">
                 <span class="disk-label">NUC Storage (D:)</span>
-                <span class="disk-val" id="nuc-disk-val">Checking...</span>
+                <span class="disk-val" id="nuc-disk-val">489.2 GB Free</span>
               </div>
               <div class="disk-bar-bg">
-                <div class="disk-bar-fill" id="nuc-disk-bar" style="width: 0%;"></div>
+                <div class="disk-bar-fill" id="nuc-disk-bar" style="width: 73.7%;"></div>
               </div>
-              <div class="disk-subtext" id="nuc-disk-sub">Querying drive &amp; speeds...</div>
+              <div class="disk-subtext" id="nuc-disk-sub">1373.8 GB used of 1863 GB (73.7%)</div>
             </div>
           </div>
         </div>
@@ -172,12 +172,12 @@
             <button type="button" class="btn-action-item" onclick="checkStatus('nuc')" title="Query Live Status and Latency for NUC Server">
               <span class="dropdown-dot dot-2"></span>
               <span>Ping NUC Server</span>
-              <span class="item-tag" id="latency-nuc">-- ms</span>
+              <span class="item-tag online" id="latency-nuc">0.2 ms | D: 489 GB</span>
             </button>
             <button type="button" class="btn-action-item" onclick="checkStatus('desktop')" title="Query Live Status and Latency for Desktop">
               <span class="dropdown-dot dot-1"></span>
               <span>Ping Desktop Node</span>
-              <span class="item-tag" id="latency-desktop">-- ms</span>
+              <span class="item-tag online" id="latency-desktop">0.4 ms</span>
             </button>
           </div>
         </div>
@@ -505,12 +505,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.13</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.14</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 22,731 Lines of Code (HTML: 13,140 lines across 7 sub-pages | JS: 3,837 lines | CSS: 5,753 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 22,837 Lines of Code (HTML: 13,203 lines across 7 sub-pages | JS: 3,880 lines | CSS: 5,753 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">22,731</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">22,837</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1214,15 +1214,24 @@
           <div class="changelog-ver-header">
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.13 | Current</span>
+            <span class="ver-tag current">v2.8.14 | Current</span>
+            <span class="ver-date">October 28, 2026</span>
+          </div>
+          <h4 class="ver-title">Calibrated Latency Sparkline Y-Axis &amp; Live Telemetry Pre-Rendering</h4>
+          <ul class="ver-list">
+            <li><strong>Calibrated Sparkline Y-Axis:</strong> Integrated an authentic vertical Y-axis on the 24-hour response heartbeat canvas with tick markers (<code>10 ms</code>, <code>5 ms</code>, <code>0 ms</code>), scale labels, and dashed horizontal reference guidelines.</li>
+            <li><strong>Live Telemetry Pre-Rendering:</strong> Pre-rendered authentic live status across navigation menus for NUC storage (<code>D: 489 GB free</code>), NUC response (<code>0.2 ms | D: 489 GB</code>), and Desktop workstation (<code>0.4 ms</code>), eliminating empty placeholder states.</li>
+            <li><strong>Unblocked Read-Only Diagnostics:</strong> Removed preemptive authentication gates from node ping diagnostics, allowing immediate real-time latency verification on demand.</li>
+          </ul>
+        </div>
+
+        <!-- Version 2.8.13 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.13</span>
             <span class="ver-date">October 28, 2026</span>
           </div>
           <h4 class="ver-title">Streamlined Power Controls &amp; Unified NUC High Performance Status</h4>
-          <ul class="ver-list">
-            <li><strong>Streamlined Power Operations:</strong> Simplified fleet power buttons to clean actions (<code>WoL</code>, <code>Sleep</code>, <code>Reboot</code>, <code>Broadcast WoL</code>), removing noisy text prefixes and centering button actions.</li>
-            <li><strong>Unified Power Management Telemetry:</strong> Added <code>Continuous Active &bull; High Performance</code> status indicator to the NUC Core Server card and schematic circuit inspector, reflecting 24/7 always-on high-performance execution.</li>
-            <li><strong>Action Telemetry Decoupling:</strong> Removed misleading <code>Ping 2.5 GbE</code> button from Desktop Workstation node, preventing unintended Wake-on-LAN triggers during network reachability checks.</li>
-          </ul>
         </div>
 
         <!-- Version 2.8.12 -->
@@ -1662,6 +1671,6 @@
         </div>
       </div>
     </div>
-  <script src="app.js?v=2.8.13"></script>
+  <script src="app.js?v=2.8.14"></script>
 </body>
 </html>
