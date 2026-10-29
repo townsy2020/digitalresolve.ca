@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>DigitalResolve &bull; Real-Time AI Vision</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body, html {
+      width: 100%;
+      height: 100%;
+      background: #020617;
+      color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    #viewport-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #000;
+      overflow: hidden;
+    }
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      background: #000;
+    }
+    canvas#overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    /* Modern HUD Overlays */
+    .hud-layer {
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .hud-layer.hidden {
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
+    .hud-top-bar {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .hud-badges-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .hud-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 12px;
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(15, 23, 42, 0.85);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+      transition: all 0.25s ease;
+    }
+    .hud-badge.cat-detected {
+      border-color: rgba(16, 185, 129, 0.6);
+      background: rgba(6, 78, 59, 0.85);
+      color: #a7f3d0;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.45);
+    }
+    .hud-badge.cat-scanning {
+      border-color: rgba(56, 189, 248, 0.4);
+      background: rgba(12, 74, 110, 0.75);
+      color: #bae6fd;
+    }
+        .hud-badge.hopper-low {
+      border-color: rgba(239, 68, 68, 0.7);
+      background: rgba(127, 29, 29, 0.85);
+      color: #fca5a5;
+      animation: pulse-red 1.2s infinite ease-in-out;
+    }
+    @keyframes pulse-red {
+      0%, 100% { box-shadow: 0 0 4px rgba(239, 68, 68, 0.3); }
+      50% { box-shadow: 0 0 14px rgba(239, 68, 68, 0.8); }
+    }
+    .hud-badge.person-detected {
+      border-color: rgba(168, 85, 247, 0.5);
+      background: rgba(88, 28, 135, 0.8);
+      color: #e9d5ff;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.3); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+
+    .hud-stats-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: monospace;
+      font-size: 0.73rem;
+      color: #94a3b8;
+      background: rgba(15, 23, 42, 0.85);
+      padding: 5px 12px;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(12px);
+      white-space: nowrap;
+    }
+    .detected-feed-text {
+      color: #cbd5e1;
+      max-width: 140px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    @media (max-width: 680px) {
+      .detected-feed-text {
+        display: none !important;
+      }
+      .hud-stats-separator {
+        display: none !important;
+      }
+    }
+
+    .hud-bottom-bar {
+      position: absolute;
+      bottom: 12px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+    .hud-controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .hud-btn {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #cbd5e1;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(10px);
+      transition: all 0.2s ease;
+    }
+    .hud-btn:hover {
+      background: rgba(30, 41, 59, 0.95);
+      border-color: rgba(255, 255, 255, 0.35);
+      color: #fff;
+    }
+    .hud-btn.active {
+      background: rgba(16, 185, 129, 0.25);
+      border-color: #10b981;
+      color: #6ee7b7;
+    }
+
+    /* Ultra-Fast Non-Blocking Loading overlay */
+    #loading-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      z-index: 20;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(56, 189, 248, 0.2);
+      border-top-color: #38bdf8;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="viewport-container">
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="overlay"></canvas>
+
+    <!-- Unified Top HUD Bar (Zero Overlap Across All Viewports) -->
+    <div class="hud-top-bar hud-layer" id="hud-top-bar">
+      <div class="hud-badges-group">
+        <div id="cat-badge" class="hud-badge cat-scanning">
+          <span class="pulse-dot" id="cat-pulse" style="background:#38bdf8; box-shadow:0 0 8px #38bdf8;"></span>
+          <span id="cat-status-text">Cat: 0% (Scanning)</span>
+        </div>
+        <div id="hopper-beacon-badge" class="hud-badge hopper-low" style="display: none;">
+          <span class="pulse-dot" style="background:#ef4444; box-shadow:0 0 10px #ef4444;"></span>
+          <span id="hopper-beacon-text">Feeder Food Low [BEACON BLINK]</span>
+        </div>
+        <div id="person-badge" class="hud-badge person-detected" style="display: none;">
+          <span>Person: <strong id="person-pct">0%</strong></span>
+        </div>
+      </div>
+
+      <div class="hud-stats-group" id="hud-stats-group">
+        <span id="inference-time">-- ms</span>
+        <span class="hud-stats-separator" style="color: rgba(255,255,255,0.2);">|</span>
+        <span id="detected-feed" class="detected-feed-text">Scanning</span>
+        <span style="color: rgba(255,255,255,0.2);">|</span>
+        <span id="stream-res">1080p</span>
+      </div>
+    </div>
+
+    <!-- Bottom Controls -->
+    <div class="hud-bottom-bar hud-layer" id="hud-bottom-bar">
+      <div class="hud-controls">
+        <button type="button" class="hud-btn active" id="btn-toggle-boxes" onclick="toggleBoundingBoxes()">
+          &#9638; Boxes
+        </button>
+        <button type="button" class="hud-btn active" id="btn-toggle-tracking" onclick="toggleTracking()">
+          &#128373;&#65039; Pet Lock: ON
+        </button>
+        <button type="button" class="hud-btn" id="btn-sensitivity" onclick="cycleSensitivity()" title="Adjust minimum confidence threshold">
+          &#127899; Sensitivity: Ultra (15%)
+        </button>
+        <button type="button" class="hud-btn" id="btn-toggle-audio" onclick="toggleAudio()">
+          &#128263; Audio
+        </button>
+      </div>
+      <div class="hud-controls">
+        <button type="button" class="hud-btn" onclick="toggleFullscreen()">
+          &#9974; Fullscreen
+        </button>
+      </div>
+    </div>
+
+    <!-- Initializer Spinner -->
+    <div id="loading-overlay">
+      <div class="spinner"></div>
+      <div style="font-size: 0.9rem; font-weight: 600; color: #f1f5f9;">Connecting Live Feed...</div>
+      <div style="font-size: 0.75rem; color: #64748b; font-family: monospace;">Zero-Latency WebRTC Stream</div>
+    </div>
+  </div>
+
+  <script>
+    const container = document.getElementById('viewport-container');
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('overlay');
+    const ctx = canvas.getContext('2d');
+
+    const catBadge = document.getElementById('cat-badge');
+    const catPulse = document.getElementById('cat-pulse');
+    const catStatusText = document.getElementById('cat-status-text');
+    const personBadge = document.getElementById('person-badge');
+    const personPct = document.getElementById('person-pct');
+    const inferenceTimeEl = document.getElementById('inference-time');
+    const detectedFeedEl = document.getElementById('detected-feed');
+    const streamResEl = document.getElementById('stream-res');
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const btnToggleBoxes = document.getElementById('btn-toggle-boxes');
+    const btnToggleTracking = document.getElementById('btn-toggle-tracking');
+    const btnToggleAudio = document.getElementById('btn-toggle-audio');
+    const btnSensitivity = document.getElementById('btn-sensitivity');
+
+    let aiModel = null;
+    let showBoundingBoxes = true;
+    let temporalTrackingEnabled = true;
+    let isDetecting = false;
+    let lastInferenceTimestamp = 0;
+    let reconnectTimeout = null;
+    let reconnectAttempts = 0;
+    let pc = null;
+    let ws = null;
+
+    // Temporal Hysteresis Tracker for Penny (solves plaid/checkered bed flicker completely)
+    const PENNY_HOLD_DURATION_MS = 5000;
+    let trackedPenny = {
+      active: false,
+      rawBbox: null,
+      displayBbox: null,
+      score: 0,
+      lastSeen: 0,
+      label: 'Penny (Cat)'
+    };
+
+    // Ultra Sensitivity (15% catches pets even when camouflaged on patterned bedding)
+    let detectionThreshold = 0.15;
+    const sensitivityLevels = [
+      { label: 'Ultra (15%)', val: 0.15 },
+      { label: 'High (22%)', val: 0.22 },
+      { label: 'Medium (35%)', val: 0.35 }
+    ];
+    let sensIdx = 0;
+
+    function cycleSensitivity() {
+      sensIdx = (sensIdx + 1) % sensitivityLevels.length;
+      detectionThreshold = sensitivityLevels[sensIdx].val;
+      btnSensitivity.innerHTML = `&#127899; Sensitivity: ${sensitivityLevels[sensIdx].label}`;
+    }
+
+    function toggleTracking() {
+      temporalTrackingEnabled = !temporalTrackingEnabled;
+      btnToggleTracking.classList.toggle('active', temporalTrackingEnabled);
+      btnToggleTracking.innerHTML = temporalTrackingEnabled ? '&#128373;&#65039; Pet Lock: ON' : '&#9889; Pet Lock: OFF';
+      if (!temporalTrackingEnabled) {
+        trackedPenny.active = false;
+        trackedPenny.rawBbox = null;
+        trackedPenny.displayBbox = null;
+      }
+    }
+
+    function hideSpinner() {
+      if (loadingOverlay && loadingOverlay.style.display !== 'none') {
+        loadingOverlay.style.opacity = '0';
+        setTimeout(() => { loadingOverlay.style.display = 'none'; }, 300);
+      }
+    }
+
+    // 1. Precise Pillarbox / Letterbox Video Layout Calculation
+    function getVideoLayout() {
+      const vWidth = video.videoWidth;
+      const vHeight = video.videoHeight;
+      const cWidth = container.clientWidth;
+      const cHeight = container.clientHeight;
+      if (!vWidth || !vHeight || !cWidth || !cHeight) return null;
+
+      const videoRatio = vWidth / vHeight;
+      const containerRatio = cWidth / cHeight;
+      let renderW, renderH, offsetX, offsetY;
+
+      if (containerRatio > videoRatio) {
+        // Pillarboxed (bars on left/right)
+        renderH = cHeight;
+        renderW = cHeight * videoRatio;
+        offsetX = (cWidth - renderW) / 2;
+        offsetY = 0;
+      } else {
+        // Letterboxed (bars on top/bottom)
+        renderW = cWidth;
+        renderH = cWidth / videoRatio;
+        offsetX = 0;
+        offsetY = (cHeight - renderH) / 2;
+      }
+
+      const scale = renderW / vWidth;
+      return { renderW, renderH, offsetX, offsetY, scale };
+    }
+
+    function syncCanvasDimensions() {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = container.clientWidth * dpr;
+      canvas.height = container.clientHeight * dpr;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+    }
+    window.addEventListener('resize', syncCanvasDimensions);
+
+    // 2. High-Speed WebRTC Connection
+    function initWebRTC() {
+      if (reconnectTimeout) clearTimeout(reconnectTimeout);
+      if (pc) { try { pc.close(); } catch(e){} }
+      if (ws) { try { ws.close(); } catch(e){} }
+
+      pc = new RTCPeerConnection({
+        iceServers: [{ urls: ['stun:stun.cloudflare.com:3478', 'stun:stun.l.google.com:19302'] }]
+      });
+
+      const tracks = ['video', 'audio'].map(kind => pc.addTransceiver(kind, { direction: 'recvonly' }).receiver.track);
+      video.srcObject = new MediaStream(tracks);
+
+      pc.addEventListener('connectionstatechange', () => {
+        if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
+          scheduleReconnect();
+        }
+      });
+
+      const params = new URLSearchParams(window.location.search);
+      const src = params.get('src') || 'pennys_feeder';
+      const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${proto}//${window.location.host}/api/ws?src=${encodeURIComponent(src)}`;
+      
+      ws = new WebSocket(wsUrl);
+
+      ws.addEventListener('open', () => {
+        reconnectAttempts = 0;
+        pc.addEventListener('icecandidate', ev => {
+          if (!ev.candidate || ws.readyState !== WebSocket.OPEN) return;
+          ws.send(JSON.stringify({ type: 'webrtc/candidate', value: ev.candidate.candidate }));
+        });
+
+        pc.createOffer().then(offer => pc.setLocalDescription(offer)).then(() => {
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: 'webrtc/offer', value: pc.localDescription.sdp }));
+          }
+        });
+      });
+
+      ws.addEventListener('message', ev => {
+        try {
+          const msg = JSON.parse(ev.data);
+          if (msg.type === 'webrtc/candidate') {
+            pc.addIceCandidate({ candidate: msg.value, sdpMid: '0' });
+          } else if (msg.type === 'webrtc/answer') {
+            pc.setRemoteDescription({ type: 'answer', sdp: msg.value });
+          }
+        } catch (e) {
+          console.warn('WS parse error:', e);
+        }
+      });
+
+      ws.addEventListener('close', scheduleReconnect);
+      ws.addEventListener('error', scheduleReconnect);
+
+      video.addEventListener('loadeddata', () => {
+        hideSpinner();
+        streamResEl.textContent = `${video.videoWidth}x${video.videoHeight}`;
+        syncCanvasDimensions();
+        if (aiModel) startDetectionLoop();
+      });
+
+      video.addEventListener('playing', () => {
+        hideSpinner();
+        if (aiModel) startDetectionLoop();
+      });
+
+      // Failsafe: hide spinner after 3 seconds max so user is never locked out
+      setTimeout(hideSpinner, 3000);
+    }
+
+    function scheduleReconnect() {
+      if (reconnectTimeout) return;
+      const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 12000);
+      reconnectAttempts++;
+      reconnectTimeout = setTimeout(() => {
+        reconnectTimeout = null;
+        initWebRTC();
+      }, delay);
+    }
+
+    // 3. Fast Asynchronous Model Loading (Non-Blocking, Zero UI Freeze)
+    async function loadModel() {
+      try {
+        catStatusText.textContent = "AI Initializing...";
+        // Standard mobilenet_v2 provides vastly superior accuracy for domestic cat features
+        aiModel = await cocoSsd.load({ base: 'mobilenet_v2' });
+        catStatusText.textContent = "Cat: 0% (Scanning)";
+        if (video.readyState >= 2) {
+          startDetectionLoop();
+        }
+      } catch (err) {
+        console.warn("Retrying with lite model:", err);
+        try {
+          aiModel = await cocoSsd.load({ base: 'lite_mobilenet_v2' });
+          catStatusText.textContent = "Cat: 0% (Scanning)";
+          if (video.readyState >= 2) startDetectionLoop();
+        } catch (e2) {
+          catStatusText.textContent = "AI Standby";
+        }
+      }
+    }
+
+    // 4. Memory-Safe Real-Time Detection Inference Loop
+    function startDetectionLoop() {
+      if (!aiModel || isDetecting) return;
+      isDetecting = true;
+
+      async function detectFrame() {
+        if (!aiModel || video.readyState < 2 || video.paused || video.ended || video.videoWidth === 0) {
+          requestAnimationFrame(detectFrame);
+          return;
+        }
+
+        const now = performance.now();
+        // ~10 FPS loop maintains instantaneous responsiveness with 0% CPU strain
+        if (now - lastInferenceTimestamp < 95) {
+          requestAnimationFrame(detectFrame);
+          return;
+        }
+        lastInferenceTimestamp = now;
+
+        const startTime = performance.now();
+        try {
+          const predictions = await aiModel.detect(video, 12, detectionThreshold);
+          const duration = Math.round(performance.now() - startTime);
+          inferenceTimeEl.textContent = `${duration} ms`;
+
+          processDetections(predictions);
+        } catch (e) {
+          console.warn("Inference error:", e);
+        }
+
+        requestAnimationFrame(detectFrame);
+      }
+
+      requestAnimationFrame(detectFrame);
+    }
+
+    // 5. Process Detections with Temporal Persistence Tracker
+    function processDetections(predictions) {
+      ctx.clearRect(0, 0, container.clientWidth, container.clientHeight);
+      const now = performance.now();
+
+      let bestPetScore = 0;
+      let immediatePet = null;
+      let immediatePerson = null;
+      const detectedClasses = [];
+
+      for (const p of predictions) {
+        const pctVal = Math.round(p.score * 100);
+        detectedClasses.push(`${p.class} (${pctVal}%)`);
+
+        // Comprehensive pet candidates: cat, dog, teddy bear, bird, sheep
+        const isPet = (p.class === 'cat' || p.class === 'dog' || p.class === 'teddy bear' || p.class === 'bird' || p.class === 'sheep');
+        if (isPet) {
+          if (p.score > bestPetScore) {
+            bestPetScore = p.score;
+          }
+          if (!immediatePet || p.score > immediatePet.score) {
+            immediatePet = p;
+          }
+        } else if (p.class === 'person' && (!immediatePerson || p.score > immediatePerson.score)) {
+          immediatePerson = p;
+        }
+      }
+
+      // Update Detected Classes Debug Telemetry
+      if (detectedClasses.length > 0) {
+        detectedFeedEl.textContent = detectedClasses.slice(0, 2).join(', ');
+        detectedFeedEl.title = detectedClasses.join('\n');
+      } else {
+        detectedFeedEl.textContent = 'Scanning';
+      }
+
+      // Live continuous pet confidence percentage
+      const livePetPct = Math.round(bestPetScore * 100);
+
+      // Update Temporal Hysteresis Tracker for Penny
+      if (immediatePet && immediatePet.score >= detectionThreshold) {
+        trackedPenny.active = true;
+        trackedPenny.lastSeen = now;
+        trackedPenny.score = immediatePet.score;
+        trackedPenny.rawBbox = immediatePet.bbox;
+        trackedPenny.label = immediatePet.class === 'cat' ? 'Penny (Cat)' : 'Penny (Pet)';
+      } else if (temporalTrackingEnabled && trackedPenny.active) {
+        const elapsed = now - trackedPenny.lastSeen;
+        if (elapsed < PENNY_HOLD_DURATION_MS) {
+          // Maintain active lock during stationary rest on bed
+          const decay = 1 - (elapsed / PENNY_HOLD_DURATION_MS) * 0.20;
+          trackedPenny.score = Math.max(0.15, trackedPenny.score * decay);
+        } else {
+          // Release lock after 5 seconds of total absence
+          trackedPenny.active = false;
+          trackedPenny.rawBbox = null;
+          trackedPenny.displayBbox = null;
+        }
+      } else if (!temporalTrackingEnabled) {
+        trackedPenny.active = false;
+        trackedPenny.rawBbox = null;
+        trackedPenny.displayBbox = null;
+      }
+
+      // Update Cat Telemetry HUD with LIVE CONTINUOUS PERCENTAGE
+      if (trackedPenny.active) {
+        const pct = Math.round(trackedPenny.score * 100);
+        const isHolding = (now - trackedPenny.lastSeen > 200);
+        catBadge.className = 'hud-badge cat-detected';
+        catPulse.style.background = '#10b981';
+        catPulse.style.boxShadow = '0 0 10px #10b981';
+        catStatusText.innerHTML = `<strong>Penny: ${pct}%</strong> ${isHolding ? '<span style="font-size:0.68rem; opacity:0.85; margin-left:4px;">[LOCKED]</span>' : ''}`;
+      } else {
+        catBadge.className = 'hud-badge cat-scanning';
+        catPulse.style.background = '#38bdf8';
+        catPulse.style.boxShadow = '0 0 8px #38bdf8';
+        catStatusText.innerHTML = `Cat: <strong>${livePetPct}%</strong> (Scanning)`;
+      }
+
+      // Update Person Telemetry HUD
+      if (immediatePerson) {
+        const pPct = Math.round(immediatePerson.score * 100);
+        personBadge.style.display = 'inline-flex';
+        personPct.textContent = `${pPct}%`;
+      } else {
+        personBadge.style.display = 'none';
+      }
+
+          // Optical Feeder Food Level Red Beacon Detector
+    // Detects periodic red LED pulse / blink frequency on feeder chassis
+    const hopperBeaconBadge = document.getElementById('hopper-beacon-badge');
+    const hopperBeaconText = document.getElementById('hopper-beacon-text');
+    let redBlinkSamples = [];
+    let isFeederFoodLow = false;
+    let lastHopperWebhookNotify = 0;
+
+    function detectFeederRedBlink(videoEl) {
+      if (!videoEl || videoEl.videoWidth === 0) return;
+      try {
+        if (!window.beaconCanvas) {
+          window.beaconCanvas = document.createElement('canvas');
+          window.beaconCanvas.width = 160;
+          window.beaconCanvas.height = 90;
+          window.beaconCtx = window.beaconCanvas.getContext('2d', { willReadFrequently: true });
+        }
+        const bCtx = window.beaconCtx;
+        bCtx.drawImage(videoEl, 0, 0, 160, 90);
+        const imgData = bCtx.getImageData(0, 0, 160, 90).data;
+        
+        let redPixels = 0;
+        // Count saturated bright red pixels (R > 175, G < 85, B < 85)
+        for (let i = 0; i < imgData.length; i += 4) {
+          const r = imgData[i];
+          const g = imgData[i + 1];
+          const b = imgData[i + 2];
+          if (r > 175 && g < 85 && b < 85 && (r - g) > 90) {
+            redPixels++;
+          }
+        }
+        
+        const now = Date.now();
+        const hasRedPulse = redPixels >= 3;
+        redBlinkSamples.push({ t: now, on: hasRedPulse });
+        
+        // Keep a 4-second rolling window
+        redBlinkSamples = redBlinkSamples.filter(s => now - s.t < 4000);
+        
+        // Count state transitions (OFF -> ON) to detect blinking
+        let transitions = 0;
+        for (let j = 1; j < redBlinkSamples.length; j++) {
+          if (!redBlinkSamples[j - 1].on && redBlinkSamples[j].on) {
+            transitions++;
+          }
+        }
+        
+        // Blinking red beacon verified: periodic transitions or sustained pulse
+        if (transitions >= 2 || (hasRedPulse && redBlinkSamples.filter(s => s.on).length >= 8)) {
+          isFeederFoodLow = true;
+          if (hopperBeaconBadge) hopperBeaconBadge.style.display = 'inline-flex';
+          if (hopperBeaconText) hopperBeaconText.innerHTML = <strong>Kibble Low</strong> [Red Blink Detected];
+          
+          // Notify gateway if confirmed
+          if (now - lastHopperWebhookNotify > 60000) {
+            lastHopperWebhookNotify = now;
+            fetch('https://wake.digitalresolve.ca/api/feeder/beacon-alert?state=low&optical=true', { method: 'POST', mode: 'no-cors' }).catch(() => {});
+          }
+        } else {
+          if (redBlinkSamples.length > 10 && transitions === 0 && !hasRedPulse) {
+            isFeederFoodLow = false;
+            if (hopperBeaconBadge) hopperBeaconBadge.style.display = 'none';
+          }
+        }
+      } catch (err) {}
+    }
+
+      // Optical Feeder Blink Check
+      detectFeederRedBlink(video);
+
+      // Render Bounding Boxes on Canvas with Smooth Interpolation
+      if (showBoundingBoxes) {
+        const layout = getVideoLayout();
+        if (!layout) return;
+
+        // 1. Draw Tracked Penny (Smooth Moving Average Bounding Box)
+        if (trackedPenny.active && trackedPenny.rawBbox) {
+          const targetX = layout.offsetX + (trackedPenny.rawBbox[0] * layout.scale);
+          const targetY = layout.offsetY + (trackedPenny.rawBbox[1] * layout.scale);
+          const targetW = trackedPenny.rawBbox[2] * layout.scale;
+          const targetH = trackedPenny.rawBbox[3] * layout.scale;
+
+          if (!trackedPenny.displayBbox) {
+            trackedPenny.displayBbox = [targetX, targetY, targetW, targetH];
+          } else {
+            // Glide smoothly towards new coordinates (35% lerp per tick)
+            trackedPenny.displayBbox[0] += (targetX - trackedPenny.displayBbox[0]) * 0.35;
+            trackedPenny.displayBbox[1] += (targetY - trackedPenny.displayBbox[1]) * 0.35;
+            trackedPenny.displayBbox[2] += (targetW - trackedPenny.displayBbox[2]) * 0.35;
+            trackedPenny.displayBbox[3] += (targetH - trackedPenny.displayBbox[3]) * 0.35;
+          }
+
+          const [x, y, w, h] = trackedPenny.displayBbox;
+          const strokeColor = '#10b981';
+          const labelText = `${trackedPenny.label} ? ${Math.round(trackedPenny.score * 100)}%`;
+
+          ctx.save();
+          ctx.lineWidth = 3;
+          ctx.strokeStyle = strokeColor;
+          ctx.fillStyle = strokeColor;
+          ctx.shadowColor = strokeColor;
+          ctx.shadowBlur = 14;
+
+          // Corner bracket styling
+          const cornerLen = Math.min(26, w / 4, h / 4);
+
+          // Top-Left
+          ctx.beginPath();
+          ctx.moveTo(x, y + cornerLen);
+          ctx.lineTo(x, y);
+          ctx.lineTo(x + cornerLen, y);
+          ctx.stroke();
+
+          // Top-Right
+          ctx.beginPath();
+          ctx.moveTo(x + w - cornerLen, y);
+          ctx.lineTo(x + w);
+          ctx.lineTo(x + w, y + cornerLen);
+          ctx.stroke();
+
+          // Bottom-Right
+          ctx.beginPath();
+          ctx.moveTo(x + w, y + h - cornerLen);
+          ctx.lineTo(x + w, y + h);
+          ctx.lineTo(x + w - cornerLen, y + h);
+          ctx.stroke();
+
+          // Bottom-Left
+          ctx.beginPath();
+          ctx.moveTo(x + cornerLen, y + h);
+          ctx.lineTo(x, y + h);
+          ctx.lineTo(x, y + h - cornerLen);
+          ctx.stroke();
+
+          // Soft green body fill
+          ctx.fillStyle = 'rgba(16, 185, 129, 0.12)';
+          ctx.fillRect(x, y, w, h);
+
+          // Tag Label pill
+          ctx.shadowBlur = 0;
+          ctx.font = 'bold 12px -apple-system, BlinkMacSystemFont, sans-serif';
+          const textWidth = ctx.measureText(labelText).width;
+          const tagH = 22;
+          const tagY = Math.max(layout.offsetY, y - tagH - 4);
+
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+          ctx.strokeStyle = strokeColor;
+          ctx.lineWidth = 1;
+          ctx.fillRect(x, tagY, textWidth + 14, tagH);
+          ctx.strokeRect(x, tagY, textWidth + 14, tagH);
+
+          ctx.fillStyle = '#ffffff';
+          ctx.fillText(labelText, x + 7, tagY + 15);
+          ctx.restore();
+        }
+
+        // 2. Draw Other Detections (e.g. Person)
+        for (const p of predictions) {
+          if (p.class === 'cat' || p.class === 'dog' || p.class === 'teddy bear') continue;
+
+          const [rawX, rawY, rawW, rawH] = p.bbox;
+          const isPerson = (p.class === 'person');
+
+          const x = layout.offsetX + (rawX * layout.scale);
+          const y = layout.offsetY + (rawY * layout.scale);
+          const w = rawW * layout.scale;
+          const h = rawH * layout.scale;
+
+          const strokeColor = isPerson ? '#a855f7' : '#38bdf8';
+          const labelText = `${p.class} ? ${Math.round(p.score * 100)}%`;
+
+          ctx.save();
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = strokeColor;
+          ctx.fillStyle = strokeColor;
+
+          const cornerLen = Math.min(20, w / 4, h / 4);
+          ctx.beginPath();
+          ctx.moveTo(x, y + cornerLen); ctx.lineTo(x, y); ctx.lineTo(x + cornerLen, y); ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(x + w - cornerLen, y); ctx.lineTo(x + w); ctx.lineTo(x + w, y + cornerLen); ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(x + w, y + h - cornerLen); ctx.lineTo(x + w, y + h); ctx.lineTo(x + w - cornerLen, y + h); ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(x + cornerLen, y + h); ctx.lineTo(x, y + h); ctx.lineTo(x, y + h - cornerLen); ctx.stroke();
+
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.08)';
+          ctx.fillRect(x, y, w, h);
+
+          ctx.font = 'bold 12px -apple-system, BlinkMacSystemFont, sans-serif';
+          const textWidth = ctx.measureText(labelText).width;
+          const tagH = 22;
+          const tagY = Math.max(layout.offsetY, y - tagH - 4);
+
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+          ctx.strokeStyle = strokeColor;
+          ctx.lineWidth = 1;
+          ctx.fillRect(x, tagY, textWidth + 14, tagH);
+          ctx.strokeRect(x, tagY, textWidth + 14, tagH);
+
+          ctx.fillStyle = '#ffffff';
+          ctx.fillText(labelText, x + 7, tagY + 15);
+          ctx.restore();
+        }
+      }
+    }
+
+    // 6. Interactive Controls & Touch Gestures
+    function toggleBoundingBoxes() {
+      showBoundingBoxes = !showBoundingBoxes;
+      btnToggleBoxes.classList.toggle('active', showBoundingBoxes);
+      if (!showBoundingBoxes) {
+        ctx.clearRect(0, 0, container.clientWidth, container.clientHeight);
+      }
+    }
+
+    function toggleAudio() {
+      video.muted = !video.muted;
+      btnToggleAudio.innerHTML = video.muted ? '&#128263; Audio' : '&#128266; Audio ON';
+      btnToggleAudio.classList.toggle('active', !video.muted);
+    }
+
+    function toggleFullscreen() {
+      const elem = document.getElementById('viewport-container');
+      if (!document.fullscreenElement) {
+        elem.requestFullscreen().catch(err => console.warn(err));
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    // Double-tap or double-click to toggle fullscreen
+    let lastTap = 0;
+    container.addEventListener('touchend', (e) => {
+      const now = new Date().getTime();
+      const delta = now - lastTap;
+      if (delta < 300 && delta > 0) {
+        toggleFullscreen();
+        e.preventDefault();
+      }
+      lastTap = now;
+    });
+
+    // Startup: Connect video IMMEDIATELY with zero blocking
+    window.addEventListener('DOMContentLoaded', () => {
+      syncCanvasDimensions();
+      initWebRTC(); // Starts streaming video instantly!
+      // Warm up lightweight model asynchronously in the background
+      setTimeout(loadModel, 200);
+    });
+  </script>
+</body>
+</html>
