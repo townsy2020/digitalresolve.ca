@@ -315,7 +315,7 @@
                 <span class="stat-card-title">90-Day SLA Availability</span>
                 <span class="item-tag online">Grade A+</span>
               </div>
-              <div class="stat-big-val" style="color: #6ee7b7;">99.985%</div>
+              <div class="stat-big-val" id="uptime-sla-val" style="color: #6ee7b7;">99.985%</div>
               <div class="stat-subtext">Across 4 monitored cluster tiers</div>
             </div>
 
@@ -324,7 +324,7 @@
                 <span class="stat-card-title">Continuous Monitored Time</span>
                 <span class="item-tag" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8;">24/7 Heartbeat</span>
               </div>
-              <div class="stat-big-val" style="color: #38bdf8;">2,160 <span style="font-size: 0.9rem; color: #8b949e;">Hours</span></div>
+              <div class="stat-big-val" id="uptime-hours-val" style="color: #38bdf8;">2,160 <span style="font-size: 0.9rem; color: #8b949e;">Hours</span></div>
               <div class="stat-subtext">Zero lost heartbeat cycles</div>
             </div>
 
@@ -333,7 +333,7 @@
                 <span class="stat-card-title">Unplanned Outages</span>
                 <span class="item-tag online">Zero Loss</span>
               </div>
-              <div class="stat-big-val" style="color: #4ade80;">0 <span style="font-size: 0.9rem; color: #8b949e;">Incidents</span></div>
+              <div class="stat-big-val" id="uptime-outages-val" style="color: #4ade80;">0 <span style="font-size: 0.9rem; color: #8b949e;">Incidents</span></div>
               <div class="stat-subtext">Autonomous self-healing active</div>
             </div>
 
@@ -381,6 +381,10 @@
                 <span style="color: #cbd5e1;"><strong>Amber:</strong> Scheduled Maintenance (SLA Protected)</span>
               </div>
               <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="display: inline-block; width: 14px; height: 10px; border-radius: 2px; background-color: #6366f1;"></span>
+                <span style="color: #cbd5e1;"><strong>Indigo:</strong> Eco Standby / Sleeping (Zero Power Draw)</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px;">
                 <span style="display: inline-block; width: 14px; height: 10px; border-radius: 2px; background-color: #ef4444;"></span>
                 <span style="color: #cbd5e1;"><strong>Red:</strong> Service Outage</span>
               </div>
@@ -395,7 +399,7 @@
                   <span class="tier-role">Compute &bull; Media Hub &bull; Storage</span>
                 </div>
                 <div class="uptime-tier-sla">
-                  <span class="tier-val">99.99% Uptime</span>
+                  <span class="tier-val" id="uptime-nuc-sla-val">99.99% Uptime</span>
                   <span class="tier-status online" id="nuc-tier-status-badge">Operational</span>
                 </div>
               </div>
@@ -416,7 +420,7 @@
                   <span class="tier-role" id="uptime-bell-role">Direct WAN | IPv4: <span id="tier-bell-ip-text" style="color: #94a3b8; font-style: italic;">Protected (MFA Required)</span></span>
                 </div>
                 <div class="uptime-tier-sla">
-                  <span class="tier-val">99.98% Uptime</span>
+                  <span class="tier-val" id="uptime-isp-sla-val">99.98% Uptime</span>
                   <span class="tier-status online">&plusmn; 0.71 ms Jitter</span>
                 </div>
               </div>
@@ -437,7 +441,7 @@
                   <span class="tier-role">Dual Tunnels &bull; M365 Entra ID SSO</span>
                 </div>
                 <div class="uptime-tier-sla">
-                  <span class="tier-val">100.0% Uptime</span>
+                  <span class="tier-val" id="uptime-edge-sla-val">100.0% Uptime</span>
                   <span class="tier-status online">0 Port Forwards</span>
                 </div>
               </div>
@@ -466,7 +470,7 @@
               <div class="uptime-scale">
                 <span>90 days ago</span>
                 <span>45 days ago</span>
-                <span>Today (Active Interactive Session &bull; 100% Operational)</span>
+                <span id="uptime-desktop-scale-today">Today (Active Interactive Session &bull; 100% Operational)</span>
               </div>
             </div>
           </div>
@@ -1074,7 +1078,7 @@
             <span style="color: #34d399; font-weight: 700;">100% (Bell Fiber)</span>
           </div>
           <div class="health-meter-bar"><div class="health-meter-fill" style="width: 100%;"></div></div>
-          <div style="font-size: 0.72rem; color: #64748b;">Services: Antigravity CLI Daemon (572d607f), High-Speed Torrenting, Git Sync</div>
+          <div style="font-size: 0.72rem; color: #64748b;">Services: Antigravity Autonomous Agent, High-Speed Torrenting, Git Sync</div>
         </div>
 
         <div class="health-radar-row">
