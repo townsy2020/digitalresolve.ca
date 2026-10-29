@@ -878,7 +878,7 @@ button.dropdown-item:active,
 }
 
 /* ==========================================================================
-   🎛️ Interactive Homelab Topology & Circuit Schematic Map
+    Interactive Homelab Topology & Circuit Schematic Map
    ========================================================================== */
 .schematic-section-container {
   background: #080c16;
@@ -4422,7 +4422,7 @@ html.mobile-layout .agy-inline-chips {
 }
 
 /* ==========================================================================
-   🚨 Homelab Disaster Recovery & Resilience Test
+    Homelab Disaster Recovery & Resilience Test
    ========================================================================== */
 .disaster-modal-overlay,
 .chaos-modal-overlay {

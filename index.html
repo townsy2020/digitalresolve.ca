@@ -78,7 +78,7 @@
               <span>Browse Media &amp; Files (NUC)</span>
               <span class="item-tag">Vault</span>
             </a>
-            <a href="#camera-feed-card" class="btn-action-item" title="Penny's Cat Hub • Live Optical Stream &amp; Smart Feeder IoT">
+            <a href="#camera-feed-card" class="btn-action-item" title="Penny's Cat Hub - Live Optical Stream &amp; Smart Feeder IoT">
               <span class="dropdown-dot" style="background-color: #f472b6; box-shadow: 0 0 8px #f472b6;"></span>
               <span>Penny's Cat Hub (Stream &amp; Feeder)</span>
               <span class="item-tag online">Live &bull; 192.168.2.22</span>
@@ -725,7 +725,7 @@
                     </div>
                     <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 6px;">
                       <button type="button" class="btn btn-primary" onclick="loadLiveCameraFeed()" style="font-size: 0.88rem; padding: 8px 22px; display: inline-flex; align-items: center; gap: 8px; font-weight: 700; background: linear-gradient(135deg, #10b981, #059669); border-color: #10b981; box-shadow: 0 0 16px rgba(16, 185, 129, 0.35); cursor: pointer;">
-                        <span>▶</span> Start Live WebRTC Stream
+                        <span>[PLAY]</span> Start Live WebRTC Stream
                       </button>
                       <a href="https://cam.digitalresolve.ca/ai.html?src=pennys_feeder" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.82rem; padding: 8px 16px;" title="Open live feed with TensorFlow AI object detection in an isolated tab">
                         Launch AI Vision Tab &nearr;
@@ -1016,7 +1016,7 @@
                   <span class="pulse-dot" style="background-color: #10b981; width: 6px; height: 6px;"></span> Sentinel Daemon: Armed (3m Loop)
                 </span>
                 <button type="button" class="btn-schematic-chip" onclick="refreshServiceDashboard(this)" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; font-size: 0.76rem; border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;" title="Query all microservice ports and refresh status">
-                  <span id="dash-refresh-icon">â†»</span> Ping Services Now
+                  <svg id="dash-refresh-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle; margin-right:4px;"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>Ping Services Now
                 </button>
               </div>
             </div>
@@ -2745,7 +2745,7 @@
 
       const isOpen = navContainer.classList.toggle('nav-open');
       if (menuToggle) menuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-      if (toggleIcon) toggleIcon.textContent = isOpen ? '✕' : '☰';
+      if (toggleIcon) toggleIcon.textContent = isOpen ? 'X' : '=';
     }
 
     function closeMobileNav() {
@@ -2756,7 +2756,7 @@
 
       navContainer.classList.remove('nav-open');
       if (menuToggle) menuToggle.setAttribute('aria-expanded', 'false');
-      if (toggleIcon) toggleIcon.textContent = '☰';
+      if (toggleIcon) toggleIcon.textContent = '=';
     }
 
     function showToast(statusType, msg, subtext = '', duration = 5000) {
@@ -2967,7 +2967,7 @@
         fDot.style.boxShadow = isOnline ? '0 0 8px #22c55e' : '0 0 8px #22c55e';
       }
       if (fBadge) {
-        fBadge.textContent = target === 'nuc' ? 'Online • 24/7 Core' : 'Online • Active';
+        fBadge.textContent = target === 'nuc' ? 'Online  -  24/7 Core' : 'Online  -  Active';
         fBadge.className = 'item-tag online';
       }
       if (fLat && latencyMs !== null) {
@@ -5274,25 +5274,25 @@
         status: '100% SLA Green',
         statusClass: 'online',
         net: 'Montreal (YUL) & Toronto (YYZ)',
-        sec: 'TLS 1.3 • Automated DDoS Shield',
+        sec: 'TLS 1.3  -  Automated DDoS Shield',
         speed: 'Unmetered Edge Anycast',
         role: 'Origin Shield & HTTP Ingress',
-        services: 'digitalresolve.ca • stream • files • wake • torrents',
-        btnText: 'Test Edge Response →',
+        services: 'digitalresolve.ca  -  stream  -  files  -  wake  -  torrents',
+        btnText: 'Test Edge Response  ->',
         action: () => { checkStatus('both'); showToast('info', 'Edge Trace Dispatched', 'Pinging Cloudflare PoP Montreal (YUL)...'); }
       },
       bell: {
         icon: '\uD83D\uDCE1',
         title: 'Bell Gigabit Fiber (GigaHub 4000)',
-        subtitle: 'FTTH Uplink • 1.5 Gbps Optical Carrier',
+        subtitle: 'FTTH Uplink  -  1.5 Gbps Optical Carrier',
         status: '1.5 Gbps Optimal',
         statusClass: 'online',
-        net: '192.168.2.1 • PPPoE WAN Gateway',
-        sec: 'Direct Fiber Carrier • NAT Firewalled',
+        net: '192.168.2.1  -  PPPoE WAN Gateway',
+        sec: 'Direct Fiber Carrier  -  NAT Firewalled',
         speed: '1,500 Mbps Down / 940 Mbps Up',
         role: 'Physical Residential WAN Gateway',
-        services: 'Direct Fiber SFP+ • Low Jitter (<2ms) • Gigabit Switch Fabric',
-        btnText: 'Run ISP Speedprobe →',
+        services: 'Direct Fiber SFP+  -  Low Jitter (<2ms)  -  Gigabit Switch Fabric',
+        btnText: 'Run ISP Speedprobe  ->',
         action: () => { triggerSpeedtest(); }
       },
       vpn: {
@@ -5301,12 +5301,12 @@
         subtitle: 'Zero-Logging Cryptographic Outbound Proxy',
         status: 'Encrypted & Active',
         statusClass: 'online',
-        net: 'wg0 • UDP:51820 • NYC/Mtl Exit',
-        sec: 'ChaCha20-Poly1305 • Killswitch Active',
+        net: 'wg0  -  UDP:51820  -  NYC/Mtl Exit',
+        sec: 'ChaCha20-Poly1305  -  Killswitch Active',
         speed: 'WireGuard Tunnel (<28ms latency)',
         role: 'High-Speed Torrent & Stream Privacy',
-        services: 'qBittorrent SOCKS5/Tun Ingestion • DNS Leak Shield',
-        btnText: 'Inspect VPN Health →',
+        services: 'qBittorrent SOCKS5/Tun Ingestion  -  DNS Leak Shield',
+        btnText: 'Inspect VPN Health  ->',
         action: () => { openHealthModal(); }
       },
       tunnel: {
@@ -5315,12 +5315,12 @@
         subtitle: 'Zero Trust Outbound Ingress Connector',
         status: 'Connected (Dual-Path)',
         statusClass: 'online',
-        net: 'Local Loopback • Service Host',
-        sec: '0 Open Inbound Ports • M365 SSO Enforced',
+        net: 'Local Loopback  -  Service Host',
+        sec: '0 Open Inbound Ports  -  M365 SSO Enforced',
         speed: 'Direct Quick Tunnel (Quic/HTTP2)',
         role: 'Secure Reverse Proxy Dispatcher',
-        services: 'Tunnel ID 88a10-dr • Zero Router Port Forwarding',
-        btnText: 'Inspect Zero Trust →',
+        services: 'Tunnel ID 88a10-dr  -  Zero Router Port Forwarding',
+        btnText: 'Inspect Zero Trust  ->',
         action: () => { showToast('info', 'Zero Trust Tunnel', 'Argo tunnel active across 24/7 NUC node.'); }
       },
       nuc: {
@@ -5329,12 +5329,12 @@
         subtitle: 'Central Edge Gateway & Service Host',
         status: 'Online (0.4 ms LAN)',
         statusClass: 'online',
-        net: '192.168.2.35 • eth0 Gigabit',
-        sec: 'SSH Keypair • M365 Entra Guard',
+        net: '192.168.2.35  -  eth0 Gigabit',
+        sec: 'SSH Keypair  -  M365 Entra Guard',
         speed: 'Gigabit LAN (0.4 ms SLA)',
         role: 'StreamHub, CatCam, Torrent, Sentinel',
-        services: 'StreamHub (8088) • Files (8085) • qBit (8081) • WoL (8082)',
-        btnText: 'Probe NUC Node →',
+        services: 'StreamHub (8088)  -  Files (8085)  -  qBit (8081)  -  WoL (8082)',
+        btnText: 'Probe NUC Node  ->',
         action: () => { checkStatus('nuc'); }
       },
       desktop: {
@@ -5343,12 +5343,12 @@
         subtitle: 'High-Power Compute, GPU & Autonomous CLI Node',
         status: 'Online (Active Workstation)',
         statusClass: 'online',
-        net: '192.168.2.62 • 2.5 GbE Realtek',
-        sec: 'Continuous Active • High Performance (Sleep Disabled)',
+        net: '192.168.2.62  -  2.5 GbE Realtek',
+        sec: 'Continuous Active  -  High Performance (Sleep Disabled)',
         speed: '2.5 Gbps High-Bandwidth Link',
         role: 'RTX GPU Inference & AGY Agent Runtime',
-        services: 'Antigravity CLI Daemon (572d607f) • Git Mirror • Torrent Seeding',
-        btnText: 'Inspect Desktop →',
+        services: 'Antigravity CLI Daemon (572d607f)  -  Git Mirror  -  Torrent Seeding',
+        btnText: 'Inspect Desktop  ->',
         action: () => { checkStatus('desktop'); }
       },
       storage: {
@@ -5357,12 +5357,12 @@
         subtitle: 'High-Speed Local Storage & Network Shares',
         status: 'Healthy (496 GB Free)',
         statusClass: 'online',
-        net: 'D:\\Torrents & Z:\\Media • SMB 3.1.1',
-        sec: 'BitLocker Protected • SMART Monitored',
-        speed: 'NVMe 3,500 MB/s • SMB LAN 280 MB/s',
+        net: 'D:\\Torrents & Z:\\Media  -  SMB 3.1.1',
+        sec: 'BitLocker Protected  -  SMART Monitored',
+        speed: 'NVMe 3,500 MB/s  -  SMB LAN 280 MB/s',
         role: '4K Stream Staging & Torrent Auto-Unpack',
-        services: 'Local Drive D: (73.4% Full) • Desktop NVMe Backup Pool',
-        btnText: 'Quick Drop Magnet →',
+        services: 'Local Drive D: (73.4% Full)  -  Desktop NVMe Backup Pool',
+        btnText: 'Quick Drop Magnet  ->',
         action: () => { openMagnetModal(); }
       }
     };
@@ -5947,9 +5947,9 @@
         function finalizeBenchmark() {
           if (upEl) upEl.innerHTML = `${gaugeNum.textContent} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
           if (btn) { btn.disabled = false; btn.innerHTML = 'Run Gigabit Speedtest'; }
-          if (stageText) stageText.textContent = `Benchmark Saved: ${downEl.textContent.trim()} Down • ${upEl.textContent.trim()} Up • ${pingEl.textContent.trim()} • Grade A+`;
+          if (stageText) stageText.textContent = `Benchmark Saved: ${downEl.textContent.trim()} Down  -  ${upEl.textContent.trim()} Up  -  ${pingEl.textContent.trim()}  -  Grade A+`;
           playChaosTone(523, 1046, 'triangle', 0.35);
-          showToast('success', 'Gigabit Speedtest Complete', `${downEl.textContent.trim()} Down • ${upEl.textContent.trim()} Up • 0 ms Bufferbloat`);
+          showToast('success', 'Gigabit Speedtest Complete', `${downEl.textContent.trim()} Down  -  ${upEl.textContent.trim()} Up  -  0 ms Bufferbloat`);
           isSpeedtesting = false;
         }
       }, 800);
@@ -5973,7 +5973,7 @@
       const feed = document.getElementById('edge-ai-output-feed');
       const stats = document.getElementById('ai-infer-stats');
       const response = edgeAiResponses[presetKey] || edgeAiResponses.default;
-      if (stats) stats.textContent = 'Generating • 28.4 tok/s...';
+      if (stats) stats.textContent = 'Generating  -  28.4 tok/s...';
       playChaosTone(659, 880, 'sine', 0.1);
 
       if (feed) {
@@ -5984,7 +5984,7 @@
           i++;
           if (i >= response.length) {
             clearInterval(typer);
-            if (stats) stats.textContent = 'Complete (112 tokens • 28.4 tok/s)';
+            if (stats) stats.textContent = 'Complete (112 tokens  -  28.4 tok/s)';
             feed.innerHTML += `<br><span style="color: #34d399; font-size: 0.72rem;">Verified On-Premise Execution</span>`;
           }
         }, 12);
@@ -7101,7 +7101,7 @@
           </div>
           <h4 class="ver-title">Touch-First Adaptive Mobile Engine, Health Radar &amp; Token Savings</h4>
           <ul class="ver-list">
-            <li><strong>Overall Homelab Health Index Radar (0–100%):</strong> Integrated aggregate cluster health indicator into the status ribbon with clickable radar diagnostic modal evaluating NUC 24/7 Server, Desktop Node, WireGuard Privacy, Bell Gigabit Fiber, and Storage.</li>
+            <li><strong>Overall Homelab Health Index Radar (0-100%):</strong> Integrated aggregate cluster health indicator into the status ribbon with clickable radar diagnostic modal evaluating NUC 24/7 Server, Desktop Node, WireGuard Privacy, Bell Gigabit Fiber, and Storage.</li>
             <li><strong>Token Efficiency &amp; Cost Savings Tracker:</strong> Real-time financial and compute efficiency analytics tracking token savings (~$3.12 saved / 95.4% eco efficiency ratio vs frontier Pro rates) across header, ribbon, AGY dropdown, and console modal.</li>
             <li><strong>Multi-Model AI Telemetry &amp; Codebase Metrics:</strong> Live AI token efficiency telemetry (100% Gemini Flash, 318M Context Cache Reused) across header, ribbon, and modal decks, plus persistent Lines of Code (7,291 LOC) counter at the footer.</li>
             <li><strong>Touch-First Mobile Engine:</strong> Integrated automated mobile device detection with fluid single-column card stacking, zero horizontal overflow across 360px-430px viewports, and compliant minimum 44px tap targets for all controls.</li>
