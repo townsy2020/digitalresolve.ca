@@ -54,9 +54,9 @@
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 13025;
-        const baseCssLines = 5713;
-        const baseJsLines = 3803;
+      const baseHtmlLines = 13081;
+        const baseCssLines = 5752;
+        const baseJsLines = 3837;
         const baseCnameLines = 1;
         const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
@@ -67,7 +67,7 @@
         ]).then(([htmlSrc, cssSrc]) => {
           const hLines = htmlSrc ? htmlSrc.split(/\r?\n/).length : baseHtmlLines;
           const cLines = cssSrc ? cssSrc.split(/\r?\n/).length : baseCssLines;
-          const total = 13025 + 3803 + cLines + baseCnameLines;
+          const total = 13081 + 3837 + cLines + baseCnameLines;
           const totalFormatted = total.toLocaleString();
 
           const locEl = document.getElementById('project-loc-count');
@@ -473,7 +473,7 @@
     }
 
     // Check status on load
-    window.addEventListener('DOMContentLoaded', () => {
+    function initApp() {
       document.body.style.overflow = '';
       document.documentElement.style.overflow = '';
       initLayoutMode();
@@ -597,7 +597,12 @@
             }).catch(() => {});
         }
       }, 3000);
-    });
+    }
+    if (document.readyState === "loading") {
+      window.addEventListener("DOMContentLoaded", initApp);
+    } else {
+      initApp();
+    }
 
     // Remote Control Matrix Handler
     // ==========================================
@@ -2297,36 +2302,65 @@
     // 90-Day Uptime Matrix & Sparkline Controller
     function renderUptimeMatrix() {
       const nodes = [
-        { id: 'bars-nuc', type: 'up', title: 'NUC 24/7 Core Server' },
-        { id: 'bars-isp', type: 'up', title: 'Bell Canada Gigabit Fiber' },
-        { id: 'bars-edge', type: 'up', title: 'Cloudflare Zero Trust Edge' },
-        { id: 'bars-desktop', type: 'up', title: 'Desktop Workstation (Active Session)' }
+        { id: 'bars-nuc', type: 'nuc', title: 'NUC 24/7 Core Server' },
+        { id: 'bars-isp', type: 'isp', title: 'Bell Canada Gigabit Fiber' },
+        { id: 'bars-edge', type: 'edge', title: 'Cloudflare Zero Trust Edge' },
+        { id: 'bars-desktop', type: 'desktop', title: 'Desktop Workstation (Active Session)' }
       ];
 
       const now = new Date();
       nodes.forEach(node => {
         const container = document.getElementById(node.id);
         if (!container) return;
-        container.innerHTML = '';
 
-        for (let i = 89; i >= 0; i--) {
-          const d = new Date(now);
-          d.setDate(d.getDate() - i);
-          const dateStr = d.toISOString().split('T')[0];
+        const existingBars = container.querySelectorAll('.uptime-bar');
+        if (existingBars && existingBars.length === 90) {
+          for (let i = 89; i >= 0; i--) {
+            const barIndex = 89 - i;
+            const bar = existingBars[barIndex];
+            const d = new Date(now);
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toISOString().split('T')[0];
 
-          const bar = document.createElement('div');
-          bar.className = 'uptime-bar';
+            if (node.type === 'edge') {
+              bar.classList.add('edge');
+            } else if (node.type === 'isp') {
+              bar.classList.add('isp');
+            }
 
-          if (node.id === 'bars-nuc' && isNucMaintenanceActive() && i === 0) {
-            bar.classList.add('maintenance');
-            const mData = getNucMaintenanceData();
-            const reason = (mData && mData.reason) ? mData.reason : 'Windows Updates & Optimization';
-            bar.title = `${dateStr} | ${node.title}\nStatus: Scheduled Maintenance (SLA Protected)\nAvailability: 100.0% Compliant (Zero Outage Penalty)\nReason: ${reason}`;
-          } else {
-            bar.title = `${dateStr} | ${node.title}\nStatus: 100.0% Operational & Active\nAvailability: 100.0%\nSession: Interactive`;
+            if (node.id === 'bars-nuc' && isNucMaintenanceActive() && i === 0) {
+              bar.classList.add('maintenance');
+              const mData = getNucMaintenanceData();
+              const reason = (mData && mData.reason) ? mData.reason : 'Windows Updates & Optimization';
+              bar.title = `${dateStr} | ${node.title}\nStatus: Scheduled Maintenance (SLA Protected)\nAvailability: 100.0% Compliant (Zero Outage Penalty)\nReason: ${reason}`;
+            } else {
+              bar.classList.remove('maintenance');
+              bar.title = `${dateStr} | ${node.title}\nStatus: 100.0% Operational & Active\nAvailability: 100.0%\nSession: Interactive`;
+            }
           }
+        } else {
+          container.innerHTML = '';
+          for (let i = 89; i >= 0; i--) {
+            const d = new Date(now);
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toISOString().split('T')[0];
 
-          container.appendChild(bar);
+            const bar = document.createElement('div');
+            bar.className = 'uptime-bar';
+            if (node.type === 'edge') bar.classList.add('edge');
+            if (node.type === 'isp') bar.classList.add('isp');
+
+            if (node.id === 'bars-nuc' && isNucMaintenanceActive() && i === 0) {
+              bar.classList.add('maintenance');
+              const mData = getNucMaintenanceData();
+              const reason = (mData && mData.reason) ? mData.reason : 'Windows Updates & Optimization';
+              bar.title = `${dateStr} | ${node.title}\nStatus: Scheduled Maintenance (SLA Protected)\nAvailability: 100.0% Compliant (Zero Outage Penalty)\nReason: ${reason}`;
+            } else {
+              bar.title = `${dateStr} | ${node.title}\nStatus: 100.0% Operational & Active\nAvailability: 100.0%\nSession: Interactive`;
+            }
+
+            container.appendChild(bar);
+          }
         }
       });
 

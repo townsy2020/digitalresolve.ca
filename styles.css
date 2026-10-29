@@ -2475,6 +2475,45 @@ button.dropdown-item:active,
   transform: scaleY(1.4);
 }
 
+.uptime-bar.edge {
+  background-color: #f97316 !important;
+}
+
+.uptime-bar.edge:hover {
+  background-color: #fb923c !important;
+  transform: scaleY(1.35);
+}
+
+.uptime-bar.isp {
+  background-color: #3b82f6 !important;
+}
+
+.uptime-bar.isp:hover {
+  background-color: #60a5fa !important;
+  transform: scaleY(1.35);
+}
+
+.sla-status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #6ee7b7;
+  user-select: none;
+}
+
+.sla-status-indicator.in-maintenance {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: #f59e0b;
+  color: #fef08a;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+}
+
 .btn-control.active-maint {
   background: rgba(245, 158, 11, 0.1);
   border-color: rgba(245, 158, 11, 0.35);
