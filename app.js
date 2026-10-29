@@ -54,8 +54,8 @@
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 13081;
-        const baseCssLines = 5752;
+      const baseHtmlLines = 13140;
+        const baseCssLines = 5753;
         const baseJsLines = 3837;
         const baseCnameLines = 1;
         const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
@@ -67,7 +67,7 @@
         ]).then(([htmlSrc, cssSrc]) => {
           const hLines = htmlSrc ? htmlSrc.split(/\r?\n/).length : baseHtmlLines;
           const cLines = cssSrc ? cssSrc.split(/\r?\n/).length : baseCssLines;
-          const total = 13081 + 3837 + cLines + baseCnameLines;
+          const total = 13140 + 3837 + cLines + baseCnameLines;
           const totalFormatted = total.toLocaleString();
 
           const locEl = document.getElementById('project-loc-count');
@@ -2863,7 +2863,7 @@
         status: 'Online (0.4 ms LAN)',
         statusClass: 'online',
         net: '192.168.2.35  -  eth0 Gigabit',
-        sec: 'SSH Keypair  -  M365 Entra Guard',
+        sec: 'Continuous Active  -  High Performance (Always-On 24/7)',
         speed: 'Gigabit LAN (0.4 ms SLA)',
         role: 'StreamHub, CatCam, Torrent, Sentinel',
         services: 'StreamHub (8088)  -  Files (8085)  -  qBit (8081)  -  WoL (8082)',
