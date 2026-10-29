@@ -74,16 +74,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.11';
+          const activeVer = match ? match[0] : 'v2.8.20';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 13203;
-        const baseCssLines = 5753;
-        const baseJsLines = 3880;
+      const baseHtmlLines = 12996;
+        const baseCssLines = 5901;
+        const baseJsLines = 4010;
         const baseCnameLines = 1;
         const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
@@ -305,6 +305,8 @@
 
     function onPowerTargetChange(target) {
       currentPowerTarget = target;
+      const btnDesk = document.getElementById('btn-target-desktop');
+      const btnNuc = document.getElementById('btn-target-nuc');
       const lDesk = document.getElementById('label-target-desktop');
       const lNuc = document.getElementById('label-target-nuc');
       const descEl = document.getElementById('power-target-desc');
@@ -312,12 +314,16 @@
       const feedbackEl = document.getElementById('pwr-feedback-text');
 
       if (target === 'desktop') {
+        if (btnDesk) btnDesk.classList.add('active');
+        if (btnNuc) btnNuc.classList.remove('active');
         if (lDesk) lDesk.classList.add('active');
         if (lNuc) lNuc.classList.remove('active');
         if (descEl) descEl.innerHTML = 'AMD Ryzen 7 &bull; RTX Workstation &bull; Online';
         if (dotEl) { dotEl.className = 'status-indicator online'; }
         if (feedbackEl) feedbackEl.textContent = 'Ready | Target: Desktop Workstation (192.168.2.62)';
       } else {
+        if (btnNuc) btnNuc.classList.add('active');
+        if (btnDesk) btnDesk.classList.remove('active');
         if (lNuc) lNuc.classList.add('active');
         if (lDesk) lDesk.classList.remove('active');
         if (descEl) descEl.innerHTML = 'Intel Core i5 &bull; 24/7 Core Server &bull; Online';

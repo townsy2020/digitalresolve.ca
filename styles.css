@@ -5751,3 +5751,151 @@ html.mobile-layout .nav-tools-group .dropdown > .btn-nav {
   width: 100% !important;
   min-height: 44px !important;
 }
+
+
+/* ==========================================================================
+   TARGET NODE PILL SELECTOR & POWER ACTION CONTROLS (v2.8.20)
+   ========================================================================== */
+.target-node-pill-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(2, 6, 23, 0.7);
+  padding: 4px 6px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-node-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-family: inherit;
+  color: #94a3b8;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-node-pill:hover {
+  color: #f1f5f9;
+  background: rgba(255, 255, 255, 0.06);
+  transform: translateY(-1px);
+}
+
+.btn-node-pill.active {
+  color: #f8fafc;
+  background: rgba(30, 41, 59, 0.95);
+  border-color: rgba(56, 189, 248, 0.5);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+}
+
+.btn-node-pill#btn-target-nuc.active {
+  border-color: rgba(16, 185, 129, 0.5);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+}
+
+.node-state-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.78rem;
+  color: #cbd5e1;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.btn-control-icon {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 800;
+  font-size: 0.76rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.btn-control-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  line-height: 1.25;
+}
+
+.btn-control-title {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: inherit;
+}
+
+.btn-control-sub {
+  font-size: 0.72rem;
+  opacity: 0.78;
+  font-weight: 500;
+}
+
+.btn-control.action-wake {
+  background: rgba(34, 197, 94, 0.14) !important;
+  border-color: rgba(34, 197, 94, 0.4) !important;
+  color: #86efac !important;
+}
+
+.btn-control.action-wake:hover {
+  background: rgba(34, 197, 94, 0.26) !important;
+  border-color: #22c55e !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px rgba(34, 197, 94, 0.4) !important;
+  transform: translateY(-2px);
+}
+
+.btn-control.action-sleep {
+  background: rgba(99, 102, 241, 0.14) !important;
+  border-color: rgba(99, 102, 241, 0.4) !important;
+  color: #a5b4fc !important;
+}
+
+.btn-control.action-sleep:hover {
+  background: rgba(99, 102, 241, 0.26) !important;
+  border-color: #6366f1 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px rgba(99, 102, 241, 0.4) !important;
+  transform: translateY(-2px);
+}
+
+.btn-control.action-reboot {
+  background: rgba(239, 68, 68, 0.14) !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+  color: #fca5a5 !important;
+}
+
+.btn-control.action-reboot:hover {
+  background: rgba(239, 68, 68, 0.26) !important;
+  border-color: #ef4444 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.4) !important;
+  transform: translateY(-2px);
+}
+
+.btn-control.action-broadcast {
+  background: rgba(168, 85, 247, 0.14) !important;
+  border-color: rgba(168, 85, 247, 0.4) !important;
+  color: #d8b4fe !important;
+}
+
+.btn-control.action-broadcast:hover {
+  background: rgba(168, 85, 247, 0.26) !important;
+  border-color: #a855f7 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.4) !important;
+  transform: translateY(-2px);
+}

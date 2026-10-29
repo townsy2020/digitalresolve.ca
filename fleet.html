@@ -6,8 +6,8 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>Fleet Nodes - Hardware & Cluster Infrastructure</title>
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.19 - Fleet Nodes - Hardware & Cluster Infrastructure">
+  <title>Nodes - Hardware & Cluster Infrastructure</title>
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.20 - Nodes - Hardware & Cluster Infrastructure">
   <link rel="stylesheet" href="styles.css?v=2.8.7">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -49,7 +49,7 @@
         <div class="nav-pages-group">
           <a href="index.html" class="btn-nav">DECK</a>
           <a href="services.html" class="btn-nav">SERVICES</a>
-          <a href="fleet.html" class="btn-nav active">FLEET NODES</a>
+          <a href="fleet.html" class="btn-nav active">NODES</a>
           <a href="uptime.html" class="btn-nav">UPTIME</a>
           <a href="media.html" class="btn-nav">MEDIA</a>
           <a href="penny.html" class="btn-nav">PENNY</a>
@@ -216,7 +216,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.7</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.20</span>)</span>
             </button>
             <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO()" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -307,17 +307,15 @@
         <div class="control-node-bar">
           <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
             <span style="font-size: 0.78rem; text-transform: uppercase; font-weight: 700; color: #94a3b8; letter-spacing: 0.5px;">Target Node:</span>
-            <div class="radio-pill-group" id="power-target-group">
-              <label class="radio-pill-label active" id="label-target-desktop">
-                <input type="radio" name="power_target" value="desktop" checked onchange="onPowerTargetChange('desktop')">
-                <span class="radio-indicator"></span>
-                <span class="radio-text">Desktop Node (192.168.2.62)</span>
-              </label>
-              <label class="radio-pill-label" id="label-target-nuc">
-                <input type="radio" name="power_target" value="nuc" onchange="onPowerTargetChange('nuc')">
-                <span class="radio-indicator"></span>
-                <span class="radio-text">NUC Server (192.168.2.35)</span>
-              </label>
+            <div class="target-node-pill-group" id="power-target-group">
+              <button type="button" class="btn-node-pill active" id="btn-target-desktop" onclick="onPowerTargetChange('desktop')">
+                <span class="dropdown-dot dot-1"></span>
+                <span>Desktop Node (192.168.2.62)</span>
+              </button>
+              <button type="button" class="btn-node-pill" id="btn-target-nuc" onclick="onPowerTargetChange('nuc')">
+                <span class="dropdown-dot dot-2"></span>
+                <span>NUC Server (192.168.2.35)</span>
+              </button>
             </div>
           </div>
           <div class="node-state-pill" id="power-target-status-pill">
@@ -769,12 +767,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.19</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.20</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
         <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 12,336 Lines of Code (HTML: 7,012 lines | CSS: 5,323 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">22,772</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">24,380</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1232,25 +1230,23 @@
           <div class="changelog-ver-header">
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.19 | Current</span>
+            <span class="ver-tag current">v2.8.20 | Current</span>
             <span class="ver-date">October 29, 2026</span>
           </div>
-          <h4 class="ver-title">Instant WebRTC Stream Play, Symmetrical Hardware Telemetry &amp; Remote Power Operations</h4>
+          <h4 class="ver-title">Streamlined Nodes Navigation, Sleek Button Pills &amp; Unified Control Styling</h4>
           <ul class="ver-list">
-            <li><strong>Instant WebRTC Stream Start:</strong> Restored direct, unblocked playback when clicking <em>[PLAY] Start Live WebRTC Stream</em>, camera switching, resolution selection, and Fast/AI stream modes, seamlessly connecting to go2rtc on the NUC.</li>
-            <li><strong>Complete Remote Power Operations:</strong> Wired <code>WoL</code>, <code>Sleep</code>, <code>Reboot</code>, and <code>Broadcast WoL</code> handlers with active target node switching and real-time gateway status feedback.</li>
-            <li><strong>Comprehensive Symmetrical Telemetry:</strong> Added symmetrical Desktop Workstation telemetry (CPU Load %, Memory Allocation %, and NVMe C: Storage Free %) across the Cluster dropdown, Hero Status Ribbon, Fleet Nodes Card, Swarm Dials, and environmental thermals.</li>
-            <li><strong>Universal Navigation Integrity:</strong> Verified all 7 primary category navigation buttons (<code>DECK</code>, <code>SERVICES</code>, <code>FLEET NODES</code>, <code>UPTIME</code>, <code>MEDIA</code>, <code>PENNY</code>, <code>OPS &amp; AI</code>) and audited 100% of links and action handlers across the entire suite.</li>
+            <li><strong>Streamlined Nodes Navigation:</strong> Renamed primary category navigation button from <em>FLEET NODES</em> to <code>NODES</code> across all headers and page titles.</li>
+            <li><strong>Sleek Button Pills &amp; Styling Consistency:</strong> Replaced plain radio controls with sleek, interactive button pills (<code>Desktop Node (192.168.2.62)</code> and <code>NUC Server (192.168.2.35)</code>) with cyan/emerald glowing borders and dedicated typography hierarchy for <code>WoL</code>, <code>Sleep</code>, <code>Reboot</code>, and <code>Broadcast WoL</code>.</li>
           </ul>
         </div>
 
-        <!-- Version 2.8.18 -->
+        <!-- Version 2.8.19 -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag">v2.8.18</span>
+            <span class="ver-tag">v2.8.19</span>
             <span class="ver-date">October 29, 2026</span>
           </div>
-          <h4 class="ver-title">Universal Header Sub-Page Navigation &amp; Real-Time Heartbeat Diagnostic</h4>
+          <h4 class="ver-title">Instant WebRTC Stream Play, Symmetrical Hardware Telemetry &amp; Remote Power Operations</h4>
         </div>
             <span class="ver-date">October 28, 2026</span>
           </div>
