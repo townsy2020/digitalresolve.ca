@@ -860,7 +860,27 @@
           if (nFreeEl && disk.freeGB) {
             nFreeEl.innerHTML = `<span class="legend-dot seg-free"></span> Free (${Math.round(disk.freeGB)} GB)`;
           }
+          const sgTag = document.getElementById('stat-disk-safeguard-tag');
+          if (sgTag) {
+            const headroom = Math.round(disk.freeGB);
+            sgTag.textContent = headroom > 50 ? `Safe (+${headroom} GB)` : `Warning (+${headroom} GB)`;
+            sgTag.className = headroom > 50 ? 'item-tag online' : 'item-tag offline';
+          }
+          const schCap = document.getElementById('schematic-storage-capacity');
+          if (schCap) schCap.textContent = `Capacity: ${disk.freeGB} GB Free (${disk.usedPercent}% Used)`;
         }
+        const schNuc = document.getElementById('schematic-nuc-throughput');
+        if (schNuc) schNuc.textContent = `${latencyMs !== null ? latencyMs : 0.2} ms`;
+        try {
+          if (typeof schematicNodesData !== 'undefined' && schematicNodesData.nuc) {
+            schematicNodesData.nuc.status = isOnline ? `Online (${latencyMs !== null ? latencyMs : 0.2} ms LAN)` : 'Offline (Unreachable)';
+            schematicNodesData.nuc.statusClass = isOnline ? 'online' : 'offline';
+          }
+          if (typeof schematicNodesData !== 'undefined' && schematicNodesData.storage && disk) {
+            schematicNodesData.storage.status = `Healthy (${disk.freeGB} GB Free)`;
+            schematicNodesData.storage.services = `Local Drive D: (${disk.usedPercent}% Full) - Desktop NVMe Backup Pool`;
+          }
+        } catch (e) {}
         ['stag-streamhub', 'stag-files', 'stag-cam', 'stag-wol', 'stag-torrents2'].forEach(id => {
           const el = document.getElementById(id);
           if (el) { el.className = `item-tag ${isOnline ? 'online' : 'offline'}`; el.textContent = isOnline ? 'Operational' : 'Unreachable'; }
@@ -1021,6 +1041,14 @@
             ? `192.168.2.62 • ${latencyMs !== null ? latencyMs : 0} ms (Bell Gigabit)`
             : '192.168.2.62 • Standby (WoL Ready)';
         }
+        const schDesk = document.getElementById('schematic-desktop-throughput');
+        if (schDesk) schDesk.textContent = isOnline ? '2.5 Gbps' : 'Standby';
+        try {
+          if (typeof schematicNodesData !== 'undefined' && schematicNodesData.desktop) {
+            schematicNodesData.desktop.status = isOnline ? 'Online (Active Workstation)' : 'Standby (Eco Mode)';
+            schematicNodesData.desktop.statusClass = isOnline ? 'online' : 'offline';
+          }
+        } catch (e) {}
         const rDesk = document.getElementById('ribbon-desktop');
         if (rDesk) {
           rDesk.innerHTML = `<span class="dropdown-dot dot-1"></span> Bell Fiber | ${isOnline ? 'Online' : 'Standby'}`;
@@ -2213,6 +2241,8 @@
       if (mPro) mPro.innerHTML = `<strong style="font-weight:700; color: #c084fc;">${proPct}%</strong> Pro`;
       const mCache = document.getElementById('menu-pct-cache');
       if (mCache) mCache.innerHTML = `<strong style="font-weight:700;">${cacheFmt}</strong> Cache`;
+      const pBar = document.getElementById('menu-progress-bar');
+      if (pBar) pBar.title = `Gemini Weekly: ${weeklyLimit}% Remaining (Refresh in ${weeklyRef})`;
     }
     function fetchClusterStats() {
       const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
@@ -3612,7 +3642,7 @@
     // ==========================================
     // ==========================================
     // ==========================================
-    const schematicNodesData = {
+    var schematicNodesData = {
       cf: {
         icon: '[EDGE]',
         title: 'Cloudflare Zero Trust Edge Network',

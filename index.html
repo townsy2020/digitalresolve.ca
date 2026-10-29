@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -349,11 +349,11 @@
           </div>
           <div class="ribbon-item">
             <span class="ribbon-label">NUC 24/7 Core</span>
-            <span class="ribbon-value" id="ribbon-nuc"><span class="dropdown-dot dot-2"></span> 0 ms &bull; Online</span>
+            <span class="ribbon-value" id="ribbon-nuc"><span class="dropdown-dot dot-2"></span> Checking...</span>
           </div>
           <div class="ribbon-item">
             <span class="ribbon-label">Desktop Node</span>
-            <span class="ribbon-value" id="ribbon-desktop"><span class="dropdown-dot dot-1"></span> Bell Fiber &bull; Online</span>
+            <span class="ribbon-value" id="ribbon-desktop"><span class="dropdown-dot dot-1"></span> Checking...</span>
           </div>
           <div class="ribbon-item">
             <span class="ribbon-label">NUC Storage (D:)</span>
@@ -619,7 +619,7 @@
                   <div>
                     <div class="stat-card-header" style="margin-bottom: 8px;">
                       <span class="stat-card-title" style="font-size: 0.8rem; color: #94a3b8;">D: Drive Safeguard</span>
-                      <span class="item-tag online" style="font-size: 0.68rem; padding: 2px 7px;">Safe (+476 GB)</span>
+                      <span class="item-tag online" id="stat-disk-safeguard-tag" style="font-size: 0.68rem; padding: 2px 7px;">Safe (-- GB)</span>
                     </div>
                     <div class="stat-big-val" id="stat-disk-free" style="color: #38bdf8;">-- <span style="font-size: 0.85rem; color: #8b949e;">Free</span></div>
                     <div class="stat-subtext" style="margin-top: 4px;">
@@ -637,7 +637,7 @@
                       <span><span class="legend-dot seg-movies"></span> Movies (520 GB)</span>
                       <span><span class="legend-dot seg-tv"></span> Series (410 GB)</span>
                       <span><span class="legend-dot seg-mixes"></span> Mixes (437 GB)</span>
-                      <span id="stat-nuc-free-legend"><span class="legend-dot seg-free"></span> Free (489.2 GB)</span>
+                      <span id="stat-nuc-free-legend"><span class="legend-dot seg-free"></span> Free (-- GB)</span>
                     </div>
                   </div>
                 </div>
@@ -664,10 +664,10 @@
             <div class="stat-metric-card" style="background: rgba(255, 255, 255, 0.02);">
               <div class="stat-card-header">
                 <span class="stat-card-title">Anycast Ping (1.1.1.1)</span>
-                <span class="item-tag online" id="isp-ping-tag">&check; 4.5 ms</span>
+                <span class="item-tag online" id="isp-ping-tag">Measuring...</span>
               </div>
-              <div class="stat-big-val" id="isp-ping-val" style="color: #38bdf8;">4.5 <span style="font-size: 0.9rem; color: #8b949e;">ms</span></div>
-              <div class="stat-subtext" id="isp-ping-sub">Min: 4 ms &bull; Max: 6 ms &bull; Google: 4.5 ms</div>
+              <div class="stat-big-val" id="isp-ping-val" style="color: #38bdf8;">-- <span style="font-size: 0.9rem; color: #8b949e;">ms</span></div>
+              <div class="stat-subtext" id="isp-ping-sub">Measuring latency &amp; route telemetry...</div>
             </div>
 
             <!-- Jitter & Stability -->
@@ -676,8 +676,8 @@
                 <span class="stat-card-title">Latency Variance (Jitter)</span>
                 <span class="item-tag online">&lt; 1 ms</span>
               </div>
-              <div class="stat-big-val" id="isp-jitter-val" style="color: #4ade80;">&plusmn; 0.71 <span style="font-size: 0.9rem; color: #8b949e;">ms</span></div>
-              <div class="stat-subtext" id="isp-loss-sub">Packet Loss: 0.0% &bull; Fiber Optic</div>
+              <div class="stat-big-val" id="isp-jitter-val" style="color: #4ade80;">&plusmn; -- <span style="font-size: 0.9rem; color: #8b949e;">ms</span></div>
+              <div class="stat-subtext" id="isp-loss-sub">Analyzing packet stream...</div>
             </div>
 
             <!-- Carrier & Route -->
@@ -1094,7 +1094,7 @@
                   </div>
                   <div class="dash-card-meta-row">
                     <span>Latency &bull; Watchdog:</span>
-                    <span id="meta-watch-streamhub" style="color: #34d399;">1.1 ms &bull; Sentinel Armed (3m)</span>
+                    <span id="meta-watch-streamhub" style="color: #34d399;">Checking sentinel...</span>
                   </div>
                 </div>
                 <div class="dash-card-footer">
@@ -1126,7 +1126,7 @@
                   </div>
                   <div class="dash-card-meta-row">
                     <span>Latency &bull; Watchdog:</span>
-                    <span id="meta-watch-files" style="color: #34d399;">0.9 ms &bull; Sentinel Armed (3m)</span>
+                    <span id="meta-watch-files" style="color: #34d399;">Checking vault...</span>
                   </div>
                 </div>
                 <div class="dash-card-footer">
@@ -1158,7 +1158,7 @@
                   </div>
                   <div class="dash-card-meta-row">
                     <span>Latency &bull; Watchdog:</span>
-                    <span id="meta-watch-cam" style="color: #34d399;">2.1 ms &bull; go2rtc Daemon Active</span>
+                    <span id="meta-watch-cam" style="color: #34d399;">Checking stream...</span>
                   </div>
                 </div>
                 <div class="dash-card-footer">
@@ -1222,7 +1222,7 @@
                   </div>
                   <div class="dash-card-meta-row">
                     <span>Latency &bull; Watchdog:</span>
-                    <span id="meta-watch-wol" style="color: #34d399;">0.8 ms &bull; Windows Task Supervised</span>
+                    <span id="meta-watch-wol" style="color: #34d399;">Checking gateway...</span>
                   </div>
                 </div>
                 <div class="dash-card-footer">
@@ -1254,7 +1254,7 @@
                   </div>
                   <div class="dash-card-meta-row">
                     <span>Latency &bull; Watchdog:</span>
-                    <span id="meta-watch-torrents2" style="color: #34d399;">1.4 ms &bull; Sentinel Armed (3m)</span>
+                    <span id="meta-watch-torrents2" style="color: #34d399;">Checking swarm...</span>
                   </div>
                 </div>
                 <div class="dash-card-footer">
@@ -1318,7 +1318,7 @@
                   </div>
                   <div class="dash-card-meta-row">
                     <span>Latency &bull; Watchdog:</span>
-                    <span id="meta-watch-cf" style="color: #fb923c;">1.1 ms &bull; Global Anycast Resilient</span>
+                    <span id="meta-watch-cf" style="color: #fb923c;">Checking anycast...</span>
                   </div>
                 </div>
                 <div class="dash-card-footer">
@@ -1488,7 +1488,7 @@
                   </div>
                   <div class="schematic-node-meta">
                     <span>Ports: 8088, 8085, 8081, 8082</span>
-                    <span class="schematic-node-throughput" style="color: #34d399;">0.4 ms</span>
+                    <span class="schematic-node-throughput" style="color: #34d399;" id="schematic-nuc-throughput">-- ms</span>
                   </div>
                 </div>
 
@@ -1506,7 +1506,7 @@
                   </div>
                   <div class="schematic-node-meta">
                     <span>RTX GPU &bull; AGY CLI Daemon</span>
-                    <span class="schematic-node-throughput" style="color: #a78bfa;">2.5 Gbps</span>
+                    <span class="schematic-node-throughput" style="color: #a78bfa;" id="schematic-desktop-throughput">--</span>
                   </div>
                 </div>
 
@@ -1523,7 +1523,7 @@
                     <span class="pulse-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
                   </div>
                   <div class="schematic-node-meta">
-                    <span>Capacity: 496 GB Free (73% Used)</span>
+                    <span id="schematic-storage-capacity">Capacity: -- Free</span>
                     <span class="schematic-node-throughput" style="color: #38bdf8;">3500 MB/s</span>
                   </div>
                 </div>
@@ -1597,7 +1597,7 @@
             <div class="fleet-metrics">
               <div class="metric-row">
                 <span class="metric-name">IP &amp; LAN Latency</span>
-                <span class="metric-val" id="fleet-latency-nuc">192.168.2.35 &bull; 0 ms</span>
+                <span class="metric-val" id="fleet-latency-nuc">192.168.2.35 &bull; Checking...</span>
               </div>
               <div class="metric-row">
                 <span class="metric-name">Media Storage (D:)</span>

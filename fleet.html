@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -518,7 +518,7 @@
                   </div>
                   <div class="schematic-node-meta">
                     <span>Ports: 8088, 8085, 8081, 8082</span>
-                    <span class="schematic-node-throughput" style="color: #34d399;">0.4 ms</span>
+                    <span class="schematic-node-throughput" style="color: #34d399;" id="schematic-nuc-throughput">-- ms</span>
                   </div>
                 </div>
 
@@ -536,7 +536,7 @@
                   </div>
                   <div class="schematic-node-meta">
                     <span>RTX GPU &bull; AGY CLI Daemon</span>
-                    <span class="schematic-node-throughput" style="color: #a78bfa;">2.5 Gbps</span>
+                    <span class="schematic-node-throughput" style="color: #a78bfa;" id="schematic-desktop-throughput">--</span>
                   </div>
                 </div>
 
@@ -553,7 +553,7 @@
                     <span class="pulse-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
                   </div>
                   <div class="schematic-node-meta">
-                    <span>Capacity: 496 GB Free (73% Used)</span>
+                    <span id="schematic-storage-capacity">Capacity: -- Free</span>
                     <span class="schematic-node-throughput" style="color: #38bdf8;">3500 MB/s</span>
                   </div>
                 </div>
@@ -627,7 +627,7 @@
             <div class="fleet-metrics">
               <div class="metric-row">
                 <span class="metric-name">IP &amp; LAN Latency</span>
-                <span class="metric-val" id="fleet-latency-nuc">192.168.2.35 &bull; 0 ms</span>
+                <span class="metric-val" id="fleet-latency-nuc">192.168.2.35 &bull; Checking...</span>
               </div>
               <div class="metric-row">
                 <span class="metric-name">Media Storage (D:)</span>
