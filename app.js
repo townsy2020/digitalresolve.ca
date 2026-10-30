@@ -3195,17 +3195,21 @@
       const isLocalHost = (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
       const targetUrl = `${playerPage}?src=${src}`;
       if (frame && camFeedLoaded) {
-        if (frame.src !== targetUrl) {
+        if (!frame.src.endsWith(targetUrl)) {
           frame.src = targetUrl;
         }
       }
       const directLink = document.getElementById('cam-direct-link');
       if (directLink) {
-        directLink.href = targetUrl;
+        directLink.href = `https://cam.digitalresolve.ca/${targetUrl}`;
+      }
+      const lanLink = document.getElementById('cam-lan-link');
+      if (lanLink) {
+        lanLink.href = `http://192.168.2.35:8089/${targetUrl}`;
       }
       const helperLink = document.getElementById('cam-helper-link');
       if (helperLink) {
-        helperLink.href = targetUrl;
+        helperLink.href = `https://cam.digitalresolve.ca/${targetUrl}`;
       }
       if (title) {
         title.innerText = currentCamTarget === 'bedroom' ? 'Bedroom Cam' : "Penny's Feeder Cam & Feeder IoT";

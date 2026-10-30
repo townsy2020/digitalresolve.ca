@@ -325,13 +325,16 @@
 
         <div class="hud-action-buttons">
           <button type="button" class="btn-stream-launch btn-geeni-live" onclick="reconnect()">
-            <span>&#9654;</span> Connect WebRTC Stream
+            <span>&#9654;</span> Retry Stream
           </button>
+          <a href="https://cam.digitalresolve.ca/webrtc.html?src=pennys_feeder" id="hudBtnSso" target="_blank" rel="noopener noreferrer" class="btn-stream-launch btn-sub-action" style="background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.5); color: #93c5fd !important;" title="Open live feed via Cloudflare Access SSO in top-level tab">
+            &#x1F511; Authenticate SSO &nearr;
+          </a>
+          <a href="http://192.168.2.35:8089/webrtc.html?src=pennys_feeder" id="hudBtnLan" target="_blank" rel="noopener noreferrer" class="btn-stream-launch btn-sub-action" title="Direct LAN Cat Cam Gateway (NUC port 8089)">
+            LAN (:8089) &nearr;
+          </a>
           <a href="https://camview.mygeeni.com" target="_blank" rel="noopener noreferrer" class="btn-stream-launch btn-sub-action" title="Open official Geeni IPC 1080P cloud video player in new tab">
             Geeni Cloud &nearr;
-          </a>
-          <a href="http://192.168.2.35:8089" target="_blank" rel="noopener noreferrer" class="btn-stream-launch btn-sub-action" title="Open NUC Port 8089 Cat Cam Console">
-            LAN Portal (:8089) &nearr;
           </a>
         </div>
       </div>
@@ -408,6 +411,10 @@
       camTitle.innerHTML = activeCam.title;
       hudCamTarget.textContent = activeCam.targetText;
       valIp.textContent = activeCam.ip;
+      const ssoBtn = document.getElementById('hudBtnSso');
+      if (ssoBtn) ssoBtn.href = `https://cam.digitalresolve.ca/webrtc.html?src=${encodeURIComponent(activeCam.stream)}`;
+      const lanBtn = document.getElementById('hudBtnLan');
+      if (lanBtn) lanBtn.href = `http://192.168.2.35:8089/webrtc.html?src=${encodeURIComponent(activeCam.stream)}`;
     }
     applyActiveCamUI();
 
@@ -481,6 +488,11 @@
         }
         ms = null;
       }
+      try {
+        video.removeAttribute('src');
+        video.srcObject = null;
+        video.load();
+      } catch (e) {}
       streamConnected = false;
     }
 
@@ -492,22 +504,36 @@
     // Candidate streaming endpoints prioritizing mixed-content compliance
     function getEndpoints(stream) {
       const endpoints = [];
+      const host = window.location.host;
+      const hostname = window.location.hostname;
       const isHttps = (window.location.protocol === 'https:');
-      const isLocalHost = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.startsWith('192.168.2.') || window.location.protocol === 'file:');
+      const isDirectGo2rtc = (window.location.port === '8089' || hostname === 'cam.digitalresolve.ca');
 
-      if (window.location.port === '8089') {
-        endpoints.push(`ws://${window.location.host}/api/ws?src=${encodeURIComponent(stream)}`);
+      if (isDirectGo2rtc) {
+        const proto = isHttps ? 'wss:' : 'ws:';
+        endpoints.push(`${proto}//${host}/api/ws?src=${encodeURIComponent(stream)}`);
       }
 
       if (isHttps) {
-        // Under HTTPS, mixed-content security forbids ws://. Only wss:// is permitted.
+        // Under HTTPS, mixed-content security forbids ws:// to LAN IP.
         endpoints.push(`wss://cam.digitalresolve.ca/api/ws?src=${encodeURIComponent(stream)}`);
       } else {
-        // Under HTTP or local file: use direct high-speed LAN NUC endpoint, then WAN fallback
+        // Under HTTP or local file: LAN direct NUC port 8089 is ultra-low-latency primary
         endpoints.push(`ws://192.168.2.35:8089/api/ws?src=${encodeURIComponent(stream)}`);
         endpoints.push(`wss://cam.digitalresolve.ca/api/ws?src=${encodeURIComponent(stream)}`);
       }
       return endpoints;
+    }
+
+    function markStreamOnline(modeLabel) {
+      if (streamConnected) return;
+      streamConnected = true;
+      hideSpinner();
+      hud.style.display = 'none';
+      video.style.display = 'block';
+      statusBadge.classList.add('online');
+      statusBadge.classList.remove('standby');
+      statusText.innerHTML = `${modeLabel} &bull; ${activeCam.ip}`;
     }
 
     // Dual-Mode Streaming Pipeline: MSE (WebSocket/TCP) with WebRTC Fallback
@@ -527,8 +553,18 @@
         hideSpinner();
         statusBadge.classList.remove('online');
         statusBadge.classList.add('standby');
-        statusText.textContent = 'FEED STANDBY';
         hud.style.display = 'flex';
+
+        const isHttps = (window.location.protocol === 'https:');
+        if (isHttps) {
+          statusText.textContent = 'FEED STANDBY \u2022 SSO';
+          const subMeta = document.querySelector('.cam-sub-meta');
+          if (subMeta) {
+            subMeta.innerHTML = 'Cloudflare Access SSO authentication required for WAN streaming, or view via direct LAN on port 8089.';
+          }
+        } else {
+          statusText.textContent = 'FEED STANDBY';
+        }
         return;
       }
 
@@ -548,8 +584,6 @@
       video.srcObject = null;
 
       ms.addEventListener('sourceopen', () => {
-        URL.revokeObjectURL(video.src);
-
         try {
           ws = new WebSocket(wsUrl);
           ws.binaryType = 'arraybuffer';
@@ -563,7 +597,7 @@
             try { ws.close(); } catch (e) {}
             startWebRTC(wsUrl, endpoints, idx);
           }
-        }, 3500);
+        }, 4000);
 
         ws.addEventListener('open', () => {
           hasOpened = true;
@@ -597,34 +631,32 @@
                       }
                     }
 
-                    // Keep live latency under 1.5s by pruning older frames
                     if (sourceBuffer && !sourceBuffer.updating && sourceBuffer.buffered && sourceBuffer.buffered.length > 0) {
                       const end = sourceBuffer.buffered.end(sourceBuffer.buffered.length - 1);
-                      const start = end - 4;
                       const start0 = sourceBuffer.buffered.start(0);
-                      if (start > start0) {
-                        try { sourceBuffer.remove(start0, start); } catch (e) {}
+
+                      // Ensure playback triggers as soon as initial buffer is queued
+                      if (video.paused) {
+                        if (video.currentTime < start0) {
+                          video.currentTime = start0;
+                        }
+                        video.play().catch(() => {
+                          video.muted = true;
+                          video.play().catch(() => {});
+                        });
                       }
-                      if (video.currentTime < start) {
-                        video.currentTime = start;
-                      }
+
+                      // Only jump forward if severely lagging behind (> 5.0s)
                       const latency = end - video.currentTime;
-                      if (latency > 1.8) {
-                        video.currentTime = end - 0.2;
+                      if (latency > 5.0) {
+                        video.currentTime = end - 0.5;
+                      }
+
+                      // Prune older buffers to preserve memory
+                      if (end - start0 > 12) {
+                        try { sourceBuffer.remove(start0, end - 8); } catch (e) {}
                       }
                     }
-                  });
-
-                  streamConnected = true;
-                  hideSpinner();
-                  hud.style.display = 'none';
-                  video.style.display = 'block';
-                  statusBadge.classList.add('online');
-                  statusBadge.classList.remove('standby');
-                  statusText.innerHTML = `LIVE MSE &bull; ${activeCam.ip}`;
-                  video.play().catch(() => {
-                    video.muted = true;
-                    video.play().catch(er => console.warn('Autoplay error:', er));
                   });
                 }
               } else if (msg.type === 'error') {
@@ -674,8 +706,11 @@
       if (ws) { try { ws.close(); } catch (e) {} ws = null; }
       if (pc) { try { pc.close(); } catch (e) {} pc = null; }
 
-      video.src = '';
-      video.srcObject = null;
+      try {
+        video.removeAttribute('src');
+        video.srcObject = null;
+        video.load();
+      } catch (e) {}
 
       pc = new RTCPeerConnection({
         iceServers: [{ urls: ['stun:stun.cloudflare.com:3478', 'stun:stun.l.google.com:19302'] }]
@@ -691,6 +726,10 @@
           }
           video.srcObject.addTrack(ev.track);
         }
+        video.play().catch(() => {
+          video.muted = true;
+          video.play().catch(er => console.warn('Autoplay error:', er));
+        });
       };
 
       pc.addTransceiver('video', { direction: 'recvonly' });
@@ -698,14 +737,7 @@
 
       pc.addEventListener('connectionstatechange', () => {
         if (pc.connectionState === 'connected') {
-          streamConnected = true;
-          hideSpinner();
-          hud.style.display = 'none';
-          video.style.display = 'block';
-          statusBadge.classList.add('online');
-          statusBadge.classList.remove('standby');
-          statusText.innerHTML = `LIVE WEBRTC &bull; ${activeCam.ip}`;
-          video.play().catch(e => {
+          video.play().catch(() => {
             video.muted = true;
             video.play().catch(er => console.warn('Autoplay error:', er));
           });
@@ -830,15 +862,17 @@
     setInterval(pollStatus, 5000);
 
     video.addEventListener('loadeddata', () => {
-      hideSpinner();
-      hud.style.display = 'none';
-      video.style.display = 'block';
+      markStreamOnline(ms ? 'LIVE MSE' : 'LIVE WEBRTC');
     });
 
     video.addEventListener('playing', () => {
-      hideSpinner();
-      hud.style.display = 'none';
-      video.style.display = 'block';
+      markStreamOnline(ms ? 'LIVE MSE' : 'LIVE WEBRTC');
+    });
+
+    video.addEventListener('timeupdate', () => {
+      if (!streamConnected && video.currentTime > 0) {
+        markStreamOnline(ms ? 'LIVE MSE' : 'LIVE WEBRTC');
+      }
     });
 
     // Start stream connection immediately

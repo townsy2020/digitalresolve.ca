@@ -442,18 +442,19 @@
 
     function getStreamEndpoints(src) {
       const endpoints = [];
+      const host = window.location.host;
+      const hostname = window.location.hostname;
       const isHttps = (window.location.protocol === 'https:');
-      const isLocalHost = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.startsWith('192.168.2.') || window.location.protocol === 'file:');
+      const isDirectGo2rtc = (window.location.port === '8089' || hostname === 'cam.digitalresolve.ca');
 
-      if (window.location.port === '8089') {
-        endpoints.push(`ws://${window.location.host}/api/ws?src=${encodeURIComponent(src)}`);
+      if (isDirectGo2rtc) {
+        const proto = isHttps ? 'wss:' : 'ws:';
+        endpoints.push(`${proto}//${host}/api/ws?src=${encodeURIComponent(src)}`);
       }
 
       if (isHttps) {
-        // Under HTTPS, mixed-content security forbids ws://
         endpoints.push(`wss://cam.digitalresolve.ca/api/ws?src=${encodeURIComponent(src)}`);
       } else {
-        // Under HTTP or local file: use LAN NUC first, WAN fallback
         endpoints.push(`ws://192.168.2.35:8089/api/ws?src=${encodeURIComponent(src)}`);
         endpoints.push(`wss://cam.digitalresolve.ca/api/ws?src=${encodeURIComponent(src)}`);
       }
@@ -495,8 +496,6 @@
       video.srcObject = null;
 
       ms.addEventListener('sourceopen', () => {
-        URL.revokeObjectURL(video.src);
-
         try {
           ws = new WebSocket(wsUrl);
           ws.binaryType = 'arraybuffer';
@@ -546,23 +545,21 @@
 
                     if (sourceBuffer && !sourceBuffer.updating && sourceBuffer.buffered && sourceBuffer.buffered.length > 0) {
                       const end = sourceBuffer.buffered.end(sourceBuffer.buffered.length - 1);
-                      const start = end - 4;
                       const start0 = sourceBuffer.buffered.start(0);
-                      if (start > start0) {
-                        try { sourceBuffer.remove(start0, start); } catch (e) {}
-                      }
-                      if (video.currentTime < start) {
-                        video.currentTime = start;
+                      if (video.paused) {
+                        if (video.currentTime < start0) video.currentTime = start0;
+                        video.play().catch(() => { video.muted = true; video.play().catch(() => {}); });
                       }
                       const latency = end - video.currentTime;
-                      if (latency > 1.8) {
-                        video.currentTime = end - 0.2;
+                      if (latency > 5.0) {
+                        video.currentTime = end - 0.5;
+                      }
+                      if (end - start0 > 12) {
+                        try { sourceBuffer.remove(start0, end - 8); } catch (e) {}
                       }
                     }
                   });
 
-                  streamConnected = true;
-                  hideSpinner();
                   video.play().catch(() => {
                     video.muted = true;
                     video.play().catch(er => console.warn(er));
@@ -613,8 +610,7 @@
       if (ws) { try { ws.close(); } catch (e) {} ws = null; }
       if (pc) { try { pc.close(); } catch (e) {} pc = null; }
 
-      video.src = '';
-      video.srcObject = null;
+      try { video.removeAttribute('src'); video.srcObject = null; video.load(); } catch (e) {}
 
       pc = new RTCPeerConnection({
         iceServers: [{ urls: ['stun:stun.cloudflare.com:3478', 'stun:stun.l.google.com:19302'] }]
@@ -636,8 +632,6 @@
 
       pc.addEventListener('connectionstatechange', () => {
         if (pc.connectionState === 'connected') {
-          streamConnected = true;
-          hideSpinner();
           video.play().catch(e => {
             video.muted = true;
             video.play().catch(er => console.warn(er));
@@ -711,19 +705,28 @@
       initStream();
     }
 
-    video.addEventListener('loadeddata', () => {
+    function markStreamOnline() {
+      if (streamConnected) return;
+      streamConnected = true;
       hideSpinner();
       streamResEl.textContent = `${video.videoWidth}x${video.videoHeight}`;
       syncCanvasDimensions();
       if (aiModel) startDetectionLoop();
+    }
+
+    video.addEventListener('loadeddata', () => {
+      markStreamOnline();
     });
 
     video.addEventListener('playing', () => {
-      hideSpinner();
-      if (aiModel) startDetectionLoop();
+      markStreamOnline();
     });
 
-    setTimeout(hideSpinner, 3500);
+    video.addEventListener('timeupdate', () => {
+      if (!streamConnected && video.currentTime > 0) {
+        markStreamOnline();
+      }
+    });
 
     function scheduleReconnect() {
       if (reconnectTimeout) return;
