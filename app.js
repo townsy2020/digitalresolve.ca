@@ -146,17 +146,17 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.20';
+          const activeVer = match ? match[0] : 'v2.8.21';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 15167;
-      const baseCssLines = 6081;
-      const baseJsLines = 5528;
-      const baseCnameLines = 17;
+      const baseHtmlLines = 13739;
+      const baseCssLines = 6076;
+      const baseJsLines = 5592;
+      const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
       // Asynchronously count exact live lines via parallel cache-busted fetch
@@ -4145,8 +4145,54 @@
       return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
+    // Dynamic System Release Changelog Ingestion Engine (Non-Hardcoded)
+    function fetchAndRenderChangelog() {
+      const container = document.querySelector('.changelog-body');
+      return fetch('changelog.json?_v=' + Date.now())
+        .then(r => r.json())
+        .then(data => {
+          if (!data || !Array.isArray(data.releases) || data.releases.length === 0) return;
+          const latestVer = data.releases[0].version;
+
+          const menuVer = document.getElementById('menu-changelog-ver');
+          if (menuVer) menuVer.textContent = latestVer;
+          const footerVer = document.getElementById('footer-version-tag');
+          if (footerVer) footerVer.textContent = latestVer;
+
+          if (container) {
+            let html = '';
+            data.releases.forEach((rel, idx) => {
+              const isCurrent = idx === 0;
+              const tagClass = isCurrent ? 'ver-tag current' : 'ver-tag';
+              const tagLabel = isCurrent ? (rel.version + ' | Current') : rel.version;
+              let listItems = '';
+              if (Array.isArray(rel.changes)) {
+                listItems = rel.changes.map(ch => {
+                  const boldPrefix = ch.label ? ('<strong>' + escapeHtml(ch.label) + ':</strong> ') : '';
+                  return '<li>' + boldPrefix + ch.text + '</li>';
+                }).join('');
+              }
+              html += '<div class=\"changelog-entry\">' +
+                '<div class=\"changelog-ver-header\">' +
+                  '<span class=\"' + tagClass + '\">' + escapeHtml(tagLabel) + '</span>' +
+                  '<span class=\"ver-date\">' + escapeHtml(rel.date) + '</span>' +
+                '</div>' +
+                '<h4 class=\"ver-title\">' + escapeHtml(rel.title) + '</h4>' +
+                '<ul class=\"ver-list\">' + listItems + '</ul>' +
+              '</div>';
+            });
+            container.innerHTML = html;
+          }
+        })
+        .catch(err => {
+          console.warn('[Changelog] Ingestion fallback active:', err);
+        });
+    }
+    window.fetchAndRenderChangelog = fetchAndRenderChangelog;
+
     // System Release Changelog Modal Controllers
     function openChangelogModal() {
+      try { fetchAndRenderChangelog(); } catch(e) {}
       const modal = document.getElementById('changelog-modal-overlay');
       if (modal) {
         modal.style.display = 'flex';

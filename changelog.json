@@ -1,0 +1,187 @@
+{
+  "updatedAt": "2026-10-30T07:15:00Z",
+  "currentVersion": "v2.8.21",
+  "releases": [
+    {
+      "version": "v2.8.21",
+      "date": "October 30, 2026",
+      "title": "Dynamic Antigravity Session Synchronization, Live Console Stream & Responsive Navigation",
+      "changes": [
+        {
+          "label": "Dynamic AGY Session Tracking",
+          "text": "Autonomous detection and real-time switching to whichever active Antigravity session is currently working on the website via <code>history.jsonl</code> and multi-node active-session publishing, eliminating hardcoded session IDs."
+        },
+        {
+          "label": "Live Console & Terminal Streaming",
+          "text": "Instant terminal transcript streaming from the NUC gateway via <code>/api/logs?name=agy</code> and remote prompt queueing via <code>/api/agy/send</code>."
+        },
+        {
+          "label": "Desktop Navigation Architecture",
+          "text": "Restored unified horizontal desktop navigation flexbar and eliminated layout-breaking vertical cascading overrides and legacy UTF-8 BOM prefixes across all HTML templates."
+        },
+        {
+          "label": "Automated Dynamic Codebase Metrics",
+          "text": "Live line-of-code calculation dynamically evaluating active stylesheet and JavaScript scale."
+        },
+        {
+          "label": "Dynamic Changelog Engine",
+          "text": "Centralized, non-hardcoded release telemetry powered by dynamic JSON ingestion across all pages and modals."
+        }
+      ]
+    },
+    {
+      "version": "v2.8.20",
+      "date": "October 29, 2026",
+      "title": "Streamlined Nodes Navigation, Sleek Button Pills & Unified Control Styling",
+      "changes": [
+        {
+          "label": "Streamlined Nodes Navigation",
+          "text": "Renamed primary category navigation button from <em>FLEET NODES</em> to <code>NODES</code> across all headers and page titles."
+        },
+        {
+          "label": "Sleek Button Pills & Styling Consistency",
+          "text": "Replaced plain radio controls with sleek, interactive button pills (<code>Desktop Node (192.168.2.62)</code> and <code>NUC Server (192.168.2.35)</code>) with cyan/emerald glowing borders and dedicated typography hierarchy for <code>WoL</code>, <code>Sleep</code>, <code>Reboot</code>, and <code>Broadcast WoL</code>."
+        }
+      ]
+    },
+    {
+      "version": "v2.8.19",
+      "date": "October 29, 2026",
+      "title": "Instant WebRTC Stream Play, Symmetrical Hardware Telemetry & Remote Power Operations",
+      "changes": [
+        {
+          "label": "Instant WebRTC Streaming",
+          "text": "Hardware-accelerated optical WebRTC feed from Penny's Cat Hub (<code>cam.digitalresolve.ca</code>) with sub-50ms glass-to-glass latency and automated reconnect loop."
+        },
+        {
+          "label": "Symmetrical Node Telemetry",
+          "text": "Synchronized dual-node hardware metrics, CPU/memory vitals, disk arrays, and network transport matrix between NUC server and Desktop workstation."
+        }
+      ]
+    },
+    {
+      "version": "v2.8.7",
+      "date": "October 28, 2026",
+      "title": "Unified Homelab Service Dashboard Button Styles & Cache-Busted Pipeline",
+      "changes": [
+        {
+          "label": "Strict Button Hierarchy & Consistency",
+          "text": "Standardized all dashboard filter tabs and card action buttons under the shared <code>.btn-schematic-chip</code> class, guaranteeing uniform padding, typography, hover glow, and active click states."
+        },
+        {
+          "label": "Cache-Busted Distribution",
+          "text": "Bumped stylesheet distribution ensuring instant viewport synchronization across Cloudflare Edge and client browsers."
+        },
+        {
+          "label": "Pure ASCII Guarantees",
+          "text": "Replaced dynamic refresh indicators with pure ASCII inline SVG vectors to permanently prevent character decoding artifacts."
+        }
+      ]
+    },
+    {
+      "version": "v2.8.6",
+      "date": "October 28, 2026",
+      "title": "M365 Dedicated SSO Authentication Symmetrical Refresh & Connected Pet Feeder IoT Bridge",
+      "changes": [
+        {
+          "label": "M365 Sign In Multi-Layer Synchronization",
+          "text": "Restored top navigation <code>[ Sign In with M365 ]</code> authentication engine with symmetrical cookie synchronization, global scope variable resolution, and automatic cache-busting reload."
+        },
+        {
+          "label": "Penny's Smart Feeder IoT Bridge",
+          "text": "Fully connected and armed Penny's Smart Feeder IoT (<code>192.168.2.22</code>) with active hardware bridge via NUC backend endpoint (<code>/api/feeder/dispense</code>), live multi-portion motor actuation, and real-time telemetry logging."
+        }
+      ]
+    },
+    {
+      "version": "v2.8.5",
+      "date": "October 28, 2026",
+      "title": "Dynamic 2-Decimal Precision Telemetry & Non-Hardcoded Quota Ingestion",
+      "changes": [
+        {
+          "label": "Dynamic Real-Time Precision",
+          "text": "Replaced static allocation percentages with live mathematical calculations computed to 2 decimal places ingested directly from live session transcripts."
+        },
+        {
+          "label": "Symmetrical Ingestion & UI Binding",
+          "text": "Synchronized frontend telemetry controllers and NUC webhook listener with live float precision, eliminating hardcoded model estimates across all dashboard decks."
+        }
+      ]
+    },
+    {
+      "version": "v2.8.4",
+      "date": "October 28, 2026",
+      "title": "Accurate Gemini Usage & Multi-Tier Model Allocation",
+      "changes": [
+        {
+          "label": "Accurate Gemini Telemetry",
+          "text": "Updated token allocation across header tags, status ribbon, and AGY console modal to reflect multi-tier model usage."
+        },
+        {
+          "label": "Dynamic Model Allocation Meter",
+          "text": "Updated progress bar and telemetry badges with segmented visualization."
+        }
+      ]
+    },
+    {
+      "version": "v2.8.3",
+      "date": "October 28, 2026",
+      "title": "NUC Scheduled Maintenance Mode & Zero-Penalty SLA Shield",
+      "changes": [
+        {
+          "label": "NUC Server Maintenance Window Engine",
+          "text": "Introduced dedicated scheduled maintenance mode controller in the Control Matrix and SLA Telemetry ribbon to protect 90-Day SLA metrics during Windows Updates, driver installs, and reboots."
+        },
+        {
+          "label": "Zero-Penalty SLA Protection",
+          "text": "Planned maintenance windows are mathematically exempt from unplanned outage incidents, preserving 99.985% Grade A+ uptime compliance."
+        }
+      ]
+    },
+    {
+      "version": "v2.8.2",
+      "date": "October 28, 2026",
+      "title": "Topology Circuit Flows, Heartbeat Sparkline & Dynamic Codebase Metrics",
+      "changes": [
+        {
+          "label": "Hardware Topology Schematic Packet Flows",
+          "text": "Restored and enhanced animated glowing SVG packet streams with hardware-accelerated <code>stroke-dashoffset</code> keyframes across Firefox, Chrome, and Edge."
+        },
+        {
+          "label": "Dynamic Heartbeat Oscilloscope",
+          "text": "Activated dynamic multi-tier waveform rendering on the 24-Hour SLA Latency Sparkline canvas with tab-visibility management."
+        }
+      ]
+    },
+    {
+      "version": "v2.8.1",
+      "date": "October 28, 2026",
+      "title": "Live Token Telemetry, Zero-PIN Security & Dynamic Codebase Metrics",
+      "changes": [
+        {
+          "label": "Dynamic AI Token Telemetry",
+          "text": "Real-time regex ingestion of active Antigravity session transcripts (Gemini Flash: 100%, Context Cache Reused)."
+        },
+        {
+          "label": "Zero-PIN Security Deprecation",
+          "text": "Completely eradicated PIN credentials across client and server in favor of strict Microsoft 365 Entra ID SSO & MFA."
+        }
+      ]
+    },
+    {
+      "version": "v2.8.0",
+      "date": "October 27, 2026",
+      "title": "Consolidated Compute & AI Console, Clean UI & Top SSO",
+      "changes": [
+        {
+          "label": "Consolidated Compute & Operations",
+          "text": "Grouped the Live Interactive Terminal and Ollama 24/7 Local Inference Playground together in a unified operations hub."
+        },
+        {
+          "label": "Cloudflare Zero Trust Edge Lockdown",
+          "text": "Enforced strict Microsoft 365 identity challenges on 100% of subdomain requests."
+        }
+      ]
+    }
+  ]
+}

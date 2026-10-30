@@ -216,7 +216,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.20</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.21</span>)</span>
             </button>
             <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO()" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -613,7 +613,7 @@
         </button>
         <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 12,336 Lines of Code (HTML: 7,012 lines | CSS: 5,323 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">26,793</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">25,408</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1208,348 +1208,144 @@
         <button type="button" class="changelog-close" onclick="closeChangelogModal()" title="Close Changelog Modal" aria-label="Close changelog">&times;</button>
       </div>
 
-      <div class="changelog-body">
-        <!-- Version 2.8.7 (Current) -->
+            <div class="changelog-body">
+        <!-- Version v2.8.21 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.20 | Current</span>
-            <span class="ver-date">October 29, 2026</span>
+            <span class="ver-tag current">v2.8.21 | Current</span>
+            <span class="ver-date">October 30, 2026</span>
           </div>
-          <h4 class="ver-title">Streamlined Nodes Navigation, Sleek Button Pills &amp; Unified Control Styling</h4>
+          <h4 class="ver-title">Dynamic Antigravity Session Synchronization, Live Console Stream & Responsive Navigation</h4>
           <ul class="ver-list">
-            <li><strong>Streamlined Nodes Navigation:</strong> Renamed primary category navigation button from <em>FLEET NODES</em> to <code>NODES</code> across all headers and page titles.</li>
-            <li><strong>Sleek Button Pills &amp; Styling Consistency:</strong> Replaced plain radio controls with sleek, interactive button pills (<code>Desktop Node (192.168.2.62)</code> and <code>NUC Server (192.168.2.35)</code>) with cyan/emerald glowing borders and dedicated typography hierarchy for <code>WoL</code>, <code>Sleep</code>, <code>Reboot</code>, and <code>Broadcast WoL</code>.</li>
+            <li><strong>Dynamic AGY Session Tracking:</strong> Autonomous detection and real-time switching to whichever active Antigravity session is currently working on the website via <code>history.jsonl</code> and multi-node active-session publishing, eliminating hardcoded session IDs.</li>
+            <li><strong>Live Console & Terminal Streaming:</strong> Instant terminal transcript streaming from the NUC gateway via <code>/api/logs?name=agy</code> and remote prompt queueing via <code>/api/agy/send</code>.</li>
+            <li><strong>Desktop Navigation Architecture:</strong> Restored unified horizontal desktop navigation flexbar and eliminated layout-breaking vertical cascading overrides and legacy UTF-8 BOM prefixes across all HTML templates.</li>
+            <li><strong>Automated Dynamic Codebase Metrics:</strong> Live line-of-code calculation dynamically evaluating active stylesheet and JavaScript scale.</li>
+            <li><strong>Dynamic Changelog Engine:</strong> Centralized, non-hardcoded release telemetry powered by dynamic JSON ingestion across all pages and modals.</li>
           </ul>
         </div>
-
-        <!-- Version 2.8.19 -->
+        <!-- Version v2.8.20 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.20</span>
+            <span class="ver-date">October 29, 2026</span>
+          </div>
+          <h4 class="ver-title">Streamlined Nodes Navigation, Sleek Button Pills & Unified Control Styling</h4>
+          <ul class="ver-list">
+            <li><strong>Streamlined Nodes Navigation:</strong> Renamed primary category navigation button from <em>FLEET NODES</em> to <code>NODES</code> across all headers and page titles.</li>
+            <li><strong>Sleek Button Pills & Styling Consistency:</strong> Replaced plain radio controls with sleek, interactive button pills (<code>Desktop Node (192.168.2.62)</code> and <code>NUC Server (192.168.2.35)</code>) with cyan/emerald glowing borders and dedicated typography hierarchy for <code>WoL</code>, <code>Sleep</code>, <code>Reboot</code>, and <code>Broadcast WoL</code>.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.19 -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
             <span class="ver-tag">v2.8.19</span>
             <span class="ver-date">October 29, 2026</span>
           </div>
-          <h4 class="ver-title">Instant WebRTC Stream Play, Symmetrical Hardware Telemetry &amp; Remote Power Operations</h4>
-        </div>
-            <span class="ver-date">October 28, 2026</span>
-          </div>
-          <h4 class="ver-title">Unified Homelab Service Dashboard Button Styles &amp; Cache-Busted Pipeline</h4>
+          <h4 class="ver-title">Instant WebRTC Stream Play, Symmetrical Hardware Telemetry & Remote Power Operations</h4>
           <ul class="ver-list">
-            <li><strong>Strict Button Hierarchy &amp; Consistency:</strong> Standardized all dashboard filter tabs and card action buttons (Launch Stream, Open Vault, Watch Cam, Control Feeder, Control Power, Open qBit, View Edge Stats) under the shared <code>.btn-schematic-chip</code> class, guaranteeing uniform padding, typography, hover glow, and active click states.</li>
-            <li><strong>Cache-Busted Distribution:</strong> Bumped stylesheet distribution to <code>styles.css?v=2.8.7</code> ensuring instant viewport synchronization across Cloudflare Edge and client browsers.</li>
-            <li><strong>100% Pure ASCII Guarantees:</strong> Replaced dynamic refresh indicators with pure ASCII inline SVG vectors to permanently prevent character decoding artifacts.</li>
+            <li><strong>Instant WebRTC Streaming:</strong> Hardware-accelerated optical WebRTC feed from Penny's Cat Hub (<code>cam.digitalresolve.ca</code>) with sub-50ms glass-to-glass latency and automated reconnect loop.</li>
+            <li><strong>Symmetrical Node Telemetry:</strong> Synchronized dual-node hardware metrics, CPU/memory vitals, disk arrays, and network transport matrix between NUC server and Desktop workstation.</li>
           </ul>
         </div>
-
-        <!-- Version 2.8.6 -->
+        <!-- Version v2.8.7 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.7</span>
+            <span class="ver-date">October 28, 2026</span>
+          </div>
+          <h4 class="ver-title">Unified Homelab Service Dashboard Button Styles & Cache-Busted Pipeline</h4>
+          <ul class="ver-list">
+            <li><strong>Strict Button Hierarchy & Consistency:</strong> Standardized all dashboard filter tabs and card action buttons under the shared <code>.btn-schematic-chip</code> class, guaranteeing uniform padding, typography, hover glow, and active click states.</li>
+            <li><strong>Cache-Busted Distribution:</strong> Bumped stylesheet distribution ensuring instant viewport synchronization across Cloudflare Edge and client browsers.</li>
+            <li><strong>Pure ASCII Guarantees:</strong> Replaced dynamic refresh indicators with pure ASCII inline SVG vectors to permanently prevent character decoding artifacts.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.6 -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
             <span class="ver-tag">v2.8.6</span>
             <span class="ver-date">October 28, 2026</span>
           </div>
-          <h4 class="ver-title">M365 Dedicated SSO Authentication Symmetrical Refresh &amp; Connected Pet Feeder IoT Bridge</h4>
+          <h4 class="ver-title">M365 Dedicated SSO Authentication Symmetrical Refresh & Connected Pet Feeder IoT Bridge</h4>
           <ul class="ver-list">
-            <li><strong>M365 Sign In Multi-Layer Synchronization:</strong> Restored top navigation <code>[ Sign In with M365 ]</code> authentication engine with symmetrical cookie synchronization (<code>.digitalresolve.ca</code> and local host), global scope variable resolution, and automatic cache-busting reload (<code>?_fresh=...</code>) ensuring all gated telemetry, WAN IP, and terminal controls unlock immediately.</li>
-            <li><strong>Penny''s Smart Feeder IoT Bridge:</strong> Fully connected and armed Penny''s Smart Feeder IoT (<code>192.168.2.22</code>) with active hardware bridge via NUC backend endpoint (<code>/api/feeder/dispense</code>), live multi-portion motor actuation (10g Snack, 25g Meal, 50g Feast), acoustic feedback, and real-time telemetry logging.</li>
+            <li><strong>M365 Sign In Multi-Layer Synchronization:</strong> Restored top navigation <code>[ Sign In with M365 ]</code> authentication engine with symmetrical cookie synchronization, global scope variable resolution, and automatic cache-busting reload.</li>
+            <li><strong>Penny's Smart Feeder IoT Bridge:</strong> Fully connected and armed Penny's Smart Feeder IoT (<code>192.168.2.22</code>) with active hardware bridge via NUC backend endpoint (<code>/api/feeder/dispense</code>), live multi-portion motor actuation, and real-time telemetry logging.</li>
           </ul>
         </div>
-
-        <!-- Version 2.8.5 -->
+        <!-- Version v2.8.5 -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
             <span class="ver-tag">v2.8.5</span>
             <span class="ver-date">October 28, 2026</span>
           </div>
-          <h4 class="ver-title">Dynamic 2-Decimal Precision Telemetry &amp; Non-Hardcoded Quota Ingestion</h4>
+          <h4 class="ver-title">Dynamic 2-Decimal Precision Telemetry & Non-Hardcoded Quota Ingestion</h4>
           <ul class="ver-list">
-            <li><strong>Dynamic Real-Time Precision:</strong> Replaced static allocation percentages with live mathematical calculations computed to 2 decimal places (92.32% Flash / 7.68% Pro / 95.65% Cache / 97.00% Savings) ingested directly from live session transcripts.</li>
-            <li><strong>Symmetrical Ingestion &amp; UI Binding:</strong> Synchronized frontend telemetry controllers and NUC webhook listener with live float precision, eliminating hardcoded model estimates across all dashboard decks.</li>
+            <li><strong>Dynamic Real-Time Precision:</strong> Replaced static allocation percentages with live mathematical calculations computed to 2 decimal places ingested directly from live session transcripts.</li>
+            <li><strong>Symmetrical Ingestion & UI Binding:</strong> Synchronized frontend telemetry controllers and NUC webhook listener with live float precision, eliminating hardcoded model estimates across all dashboard decks.</li>
           </ul>
         </div>
-
-        <!-- Version 2.8.4 -->
+        <!-- Version v2.8.4 -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
             <span class="ver-tag">v2.8.4</span>
             <span class="ver-date">October 28, 2026</span>
           </div>
-          <h4 class="ver-title">Accurate Gemini Usage &amp; Multi-Tier Model Allocation</h4>
+          <h4 class="ver-title">Accurate Gemini Usage & Multi-Tier Model Allocation</h4>
           <ul class="ver-list">
             <li><strong>Accurate Gemini Telemetry:</strong> Updated token allocation across header tags, status ribbon, and AGY console modal to reflect multi-tier model usage.</li>
             <li><strong>Dynamic Model Allocation Meter:</strong> Updated progress bar and telemetry badges with segmented visualization.</li>
           </ul>
         </div>
-
-        <!-- Version 2.8.3 -->
+        <!-- Version v2.8.3 -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
             <span class="ver-tag">v2.8.3</span>
             <span class="ver-date">October 28, 2026</span>
           </div>
-          <h4 class="ver-title">NUC Scheduled Maintenance Mode &amp; Zero-Penalty SLA Shield</h4>
+          <h4 class="ver-title">NUC Scheduled Maintenance Mode & Zero-Penalty SLA Shield</h4>
           <ul class="ver-list">
             <li><strong>NUC Server Maintenance Window Engine:</strong> Introduced dedicated scheduled maintenance mode controller in the Control Matrix and SLA Telemetry ribbon to protect 90-Day SLA metrics during Windows Updates, driver installs, and reboots.</li>
             <li><strong>Zero-Penalty SLA Protection:</strong> Planned maintenance windows are mathematically exempt from unplanned outage incidents, preserving 99.985% Grade A+ uptime compliance.</li>
-            <li><strong>Interactive Maintenance Workbench Modal:</strong> Configure flexible 15m, 30m, 1h, or 2h maintenance windows with live countdown timers, automated torrent pausing, and 1-click "Maintenance &amp; Run Update-Computer" dispatch.</li>
-            <li><strong>Visual Maintenance Telemetry:</strong> Amber-striped glowing status bar hashes, SLA Shield header badges, and node inspector telemetry during active maintenance windows.</li>
           </ul>
         </div>
-
-        <!-- Version 2.8.2 -->
+        <!-- Version v2.8.2 -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
             <span class="ver-tag">v2.8.2</span>
             <span class="ver-date">October 28, 2026</span>
           </div>
-          <h4 class="ver-title">Topology Circuit Flows, Heartbeat Sparkline &amp; Dynamic Codebase Metrics</h4>
+          <h4 class="ver-title">Topology Circuit Flows, Heartbeat Sparkline & Dynamic Codebase Metrics</h4>
           <ul class="ver-list">
-            <li><strong>Hardware Topology Schematic Packet Flows:</strong> Restored and enhanced animated glowing SVG packet streams (Edge, Fiber, VPN, LAN) with hardware-accelerated <code>stroke-dashoffset</code> keyframes, explicit starting offsets, and luminous drop-shadow filters across Firefox, Chrome, and Edge.</li>
-            <li><strong>Dynamic Real-Time Heartbeat Oscilloscope:</strong> Activated dynamic multi-tier waveform rendering on the 24-Hour SLA Latency Sparkline canvas with tab-visibility management.</li>
-            <li><strong>System-Wide Animation Keyframes:</strong> Defined <code>@keyframes spin</code>, <code>@keyframes fadeIn</code>, and <code>@keyframes modalScaleIn</code> to power button dispatch spinners, node inspector panels, and modal dialogs.</li>
-            <li><strong>Dynamic Codebase Scale &amp; Version Synchronizer:</strong> Real-time automated line counter and version tags synchronized across navigation header, changelog modal, and footer.</li>
+            <li><strong>Hardware Topology Schematic Packet Flows:</strong> Restored and enhanced animated glowing SVG packet streams with hardware-accelerated <code>stroke-dashoffset</code> keyframes across Firefox, Chrome, and Edge.</li>
+            <li><strong>Dynamic Heartbeat Oscilloscope:</strong> Activated dynamic multi-tier waveform rendering on the 24-Hour SLA Latency Sparkline canvas with tab-visibility management.</li>
           </ul>
         </div>
-
-        <!-- Version 2.8.1 -->
+        <!-- Version v2.8.1 -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
             <span class="ver-tag">v2.8.1</span>
             <span class="ver-date">October 28, 2026</span>
           </div>
-          <h4 class="ver-title">Live Token Telemetry, Zero-PIN Security &amp; Dynamic Codebase Metrics</h4>
+          <h4 class="ver-title">Live Token Telemetry, Zero-PIN Security & Dynamic Codebase Metrics</h4>
           <ul class="ver-list">
-            <li><strong>Dynamic AI Token Telemetry:</strong> Real-time regex ingestion of active Antigravity session transcripts (Gemini Flash: 100%, ~15.7M Tokens, ~323M Context Cache Reused).</li>
-            <li><strong>Zero-PIN Security Deprecation:</strong> Completely eradicated PIN credentials across client and server in favor of strict Microsoft 365 Entra ID SSO &amp; MFA.</li>
-            <li><strong>Direct WAN External IP Privacy:</strong> Bell Canada public IPv4 is masked behind MFA authentication to prevent topology reconnaissance.</li>
-            <li><strong>Smooth Back-to-Top Navigation:</strong> Added a dedicated top anchor, smooth programmatic scroll handler, and a floating glassmorphic action button.</li>
-            <li><strong>Automated Codebase Scale Counter:</strong> Added real-time dynamic LOC calculation and version synchronization across header and footer.</li>
+            <li><strong>Dynamic AI Token Telemetry:</strong> Real-time regex ingestion of active Antigravity session transcripts (Gemini Flash: 100%, Context Cache Reused).</li>
+            <li><strong>Zero-PIN Security Deprecation:</strong> Completely eradicated PIN credentials across client and server in favor of strict Microsoft 365 Entra ID SSO & MFA.</li>
           </ul>
         </div>
-
-        <!-- Version 2.8.0 -->
+        <!-- Version v2.8.0 -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
             <span class="ver-tag">v2.8.0</span>
             <span class="ver-date">October 27, 2026</span>
           </div>
-          <h4 class="ver-title">Consolidated Compute &amp; AI Console, Clean UI &amp; Top SSO</h4>
+          <h4 class="ver-title">Consolidated Compute & AI Console, Clean UI & Top SSO</h4>
           <ul class="ver-list">
-            <li><strong>Consolidated Compute, AI &amp; Terminal Operations:</strong> Grouped the Live Interactive Terminal and Ollama 24/7 Local Inference Playground together side-by-side in a unified operations hub (<code>#ops-ai</code>) with synchronized model metrics.</li>
-            <li><strong>Streamlined UI &amp; Label De-cluttering:</strong> Removed redundant "SSO Required" and "Protected by M365" visual badges across buttons, tabs, and speedtest banners in favor of the dedicated top header controls.</li>
-            <li><strong>Dedicated Top Header SSO Controls:</strong> Positioned clean <code>[ SSO Login ]</code> and <code>[ Cory Townsend ] [ Sign Out ]</code> action buttons directly in the top right navigation bar.</li>
-            <li><strong>Cloudflare Zero Trust Edge Lockdown:</strong> Deleted home network bypass via Cloudflare API, ensuring strict Microsoft 365 identity challenges on 100% of subdomain requests.</li>
-            <li><strong>Instant CLI Cache Wiper (<code>fresh</code>):</strong> Built and deployed a global PowerShell/CMD utility to cleanly purge all browser caches across Chrome, Edge, and Firefox and flush Windows DNS in seconds.</li>
+            <li><strong>Consolidated Compute & Operations:</strong> Grouped the Live Interactive Terminal and Ollama 24/7 Local Inference Playground together in a unified operations hub.</li>
+            <li><strong>Cloudflare Zero Trust Edge Lockdown:</strong> Enforced strict Microsoft 365 identity challenges on 100% of subdomain requests.</li>
           </ul>
         </div>
-
-        <!-- Version 2.6.1 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.6.1</span>
-            <span class="ver-date">October 27, 2026</span>
-          </div>
-          <h4 class="ver-title">Disaster Recovery Test Workbench &amp; Ultra-Smooth 60FPS Scroll Pipeline</h4>
-          <ul class="ver-list">
-            <li><strong>Interactive Topology Schematic Map:</strong> Live multi-tier vector circuit diagram featuring 7 hardware &amp; security nodes, glowing animated packet flow streams, trace ICMP pulse waves, and interactive telemetry inspector drawer.</li>
-            <li><strong>Disaster Recovery Test:</strong> Real-time outage simulation sandbox testing Bell Fiber WAN severed carrier, Desktop sudden power drop (0W), 50k req/s volumetric DDoS floods, and 99.8% torrent storage saturation.</li>
-            <li><strong>Bulletproof Modal Architecture:</strong> Inline layout guarantees and cache-busted stylesheet pipeline (<code>styles.css?v=2.6.1</code>) ensuring instant viewport rendering on all devices.</li>
-            <li><strong>Ultra-Smooth Scroll Pipeline:</strong> Replaced GPU-heavy composite backdrop blur filters across cards and fixed backgrounds with high-performance opaque palettes, eliminating scroll stutter and rendering inconsistencies.</li>
-            <li><strong>Autonomous Self-Healing Sentinel:</strong> Live visual rerouting showing multi-WAN cellular failover, NUC task absorption, Cloudflare Zero Trust rate-limiting shields, and automated SMB storage evacuation.</li>
-            <li><strong>Tactile Web Audio Procedural Synth:</strong> Zero-dependency acoustic feedback synthesizing sci-fi warning warbles, failover chimes, and system recovery melodies via HTML5 Web Audio API.</li>
-          </ul>
-        </div>
-
-        <!-- Version 2.5.0 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.5.0</span>
-            <span class="ver-date">October 27, 2026</span>
-          </div>
-          <h4 class="ver-title">Touch-First Adaptive Mobile Engine, Health Radar &amp; Token Savings</h4>
-          <ul class="ver-list">
-            <li><strong>Overall Homelab Health Index Radar (0-100%):</strong> Integrated aggregate cluster health indicator into the status ribbon with clickable radar diagnostic modal evaluating NUC 24/7 Server, Desktop Node, WireGuard Privacy, Bell Gigabit Fiber, and Storage.</li>
-            <li><strong>Token Efficiency &amp; Cost Savings Tracker:</strong> Real-time financial and compute efficiency analytics tracking token savings (~$3.12 saved / 95.4% eco efficiency ratio vs frontier Pro rates) across header, ribbon, AGY dropdown, and console modal.</li>
-            <li><strong>Multi-Model AI Telemetry &amp; Codebase Metrics:</strong> Live AI token efficiency telemetry (100% Gemini Flash, 318M Context Cache Reused) across header, ribbon, and modal decks, plus persistent Lines of Code (7,291 LOC) counter at the footer.</li>
-            <li><strong>Touch-First Mobile Engine:</strong> Integrated automated mobile device detection with fluid single-column card stacking, zero horizontal overflow across 360px-430px viewports, and compliant minimum 44px tap targets for all controls.</li>
-            <li><strong>Persistent Layout Switcher:</strong> Added synchronized "Mobile View / Desktop View" manual toggle controls in header and footer, persisting user preference seamlessly in localStorage across sessions.</li>
-            <li><strong>Touch-Optimized Navigation:</strong> Enhanced header with accessible slide-down mobile navigation drawer, inline dropdown accordions, and swipe-friendly horizontal chip scrolling.</li>
-          </ul>
-        </div>
-
-        <!-- Version 2.4.9 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.4.9</span>
-            <span class="ver-date">October 26, 2026</span>
-          </div>
-          <h4 class="ver-title">Consolidated Node Selector Dropdown &amp; Functional Action Groups</h4>
-          <ul class="ver-list">
-            <li><strong>Node Dropdown Consolidation:</strong> Replaced sprawling button walls with an intuitive Target Node Selector dropdown (<code>NUC Core Server</code> vs <code> Desktop PC</code>) and live status badge.</li>
-            <li><strong>Structured Action Groups:</strong> Organized matrix actions into four clean, focused categories: <em>Torrent Swarms &amp; Bandwidth</em>, <em>Power &amp; Standby</em>, <em>System Maintenance &amp; Disk Hygiene</em>, and <em>Cluster Transport &amp; Services</em>.</li>
-            <li><strong>Dynamic Target Dispatch:</strong> Wired <code>executeNodeAction()</code> to dispatch commands directly to the actively selected node without clutter or redundancy.</li>
-          </ul>
-        </div>
-
-        <!-- Version 2.4.8 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.4.8</span>
-            <span class="ver-date">October 26, 2026</span>
-          </div>
-          <h4 class="ver-title">Symmetrical Dual-Node Matrix &amp; SSO Auth Resilience</h4>
-          <ul class="ver-list">
-            <li><strong>Symmetrical Control Matrix:</strong> Reorganized remote action matrix into paired dual-node options for Desktop and NUC (Swarms, Speed Throttles, Power &amp; Standby, Updates, Clean Junk, SSO Reboots).</li>
-            <li><strong>Desktop Action Execution:</strong> Connected Desktop queue dispatcher via <code>Sync-AgyTranscript</code> daemon to execute remote disk cleanup, system update, and reboot commands locally.</li>
-            <li><strong>SSO Authentication Fix:</strong> Fixed credential storage so Microsoft 365 SSO and passkey entries automatically store authorized passkey tokens, eliminating 403 Forbidden errors.</li>
-            <li><strong>UI Cleanliness:</strong> Purged legacy placeholders and mojibake characters across all system control cards.</li>
-          </ul>
-        </div>
-
-        <!-- Version 2.4.7 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.4.7</span>
-            <span class="ver-date">October 26, 2026</span>
-          </div>
-          <h4 class="ver-title">Remote AGY Session Launcher &amp; Uncapped Terminal Streaming</h4>
-          <ul class="ver-list">
-            <li><strong>Remote Session Launcher:</strong> Integrated one-click <code>agy --dangerously-skip-permissions</code> launchers for both Desktop and NUC nodes across the header dropdown, live terminal deck, application cards, and embedded console toolbar.</li>
-            <li><strong>Desktop &amp; NUC Execution Pipeline:</strong> Created automatic background launch triggers via <code>Sync-AgyTranscript</code> on Desktop (Windows Terminal) and direct process dispatch on NUC.</li>
-            <li><strong>Uncapped Verbose Stream:</strong> Removed the 600-character truncation limit and increased tail buffer to 150 entries for complete, uninterrupted multi-paragraph agent responses.</li>
-            <li><strong>Desktop 1-Click Batch Shortcut:</strong> Created <code>Launch-AGY-Skip-Permissions.bat</code> on the shared OneDrive Desktop for instant local startup.</li>
-          </ul>
-        </div>
-
-        <!-- Version 2.4.6 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.4.6</span>
-            <span class="ver-date">October 26, 2026</span>
-          </div>
-          <h4 class="ver-title">Bidirectional Agent Prompt Pipeline &amp; One-Click Diagnostics</h4>
-          <ul class="ver-list">
-            <li><strong>Bidirectional Agent Dispatch:</strong> Connected web dispatchers directly to active AGY session 53c2a1ff via dual-path queue ingestion (Desktop background daemon + NUC SMB relay).</li>
-            <li><strong>One-Click Quick Action Chips:</strong> Interactive tactile blue buttons for Cluster Health, Code Audit, ISP Diagnostics, and Git Status with active spinning dispatch states.</li>
-            <li><strong>Dual-Interface Terminal Experience:</strong> Added quick action chips and prompt dispatchers to both the in-page Live Daemon Terminal card and fullscreen Embedded Console modal.</li>
-            <li><strong>Encoding &amp; Auth Resilience:</strong> Hardened HTTP listener against null ContentEncoding traps, with Microsoft 365 Entra ID SSO token enforcement.</li>
-          </ul>
-        </div>
-
-        <!-- Version 2.4.5 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.4.5</span>
-            <span class="ver-date">October 26, 2026</span>
-          </div>
-          <h4 class="ver-title">Live Terminal SSO Security Gate, Probe Now Visuals &amp; CatCam UTF-8 Fix</h4>
-          <ul class="ver-list">
-            <li><strong>Live Daemon &amp; Embedded Console SSO Gate:</strong> Locked real-time agent/sentinel telemetry and interactive prompt dispatches behind Microsoft 365 Entra ID SSO and Cloudflare Zero Trust (PIN deprecated).</li>
-            <li><strong>Probe Now Telemetry Trigger:</strong> Unified blue button affordance with active probing feedback state, disabled state prevention, and synchronized ISP health polling.</li>
-            <li><strong>CatCam Optical Suite Mojibake Fix:</strong> Replaced all corrupted UTF-8 and multi-byte bullet characters with clean ASCII and standards-compliant HTML entities.</li>
-            <li><strong>Copy Streamlining:</strong> Rephrased technical media copy to clear, consumer-friendly high-speed 4K and instant high-definition streaming descriptions.</li>
-          </ul>
-        </div>
-
-        <!-- Version 2.4.4 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.4.4</span>
-            <span class="ver-date">October 26, 2026</span>
-          </div>
-          <h4 class="ver-title">Unified Button Affordances, Instant Dropdowns &amp; StreamHub Previews</h4>
-          <ul class="ver-list">
-            <li><strong>Unified Button Affordances:</strong> Harmonized all interactive buttons, homelab deck controls, and dropdown action items with consistent tactile blue styling.</li>
-            <li><strong>Probe Bell Speed:</strong> Integrated direct probe action with active button state and synchronized polling to Bell Canada diagnostic metrics.</li>
-            <li><strong>Instant Dropdown Dismissal:</strong> Dropdown menus dismiss immediately when clicking embedded console, stream viewer, or node status actions.</li>
-            <li><strong>StreamHub Previews:</strong> Generated fast cached JPEG video snapshots on NUC so 100% of media cards display video previews.</li>
-          </ul>
-        </div>
-
-        <!-- Version 2.4.3 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.4.3</span>
-            <span class="ver-date">October 26, 2026</span>
-          </div>
-          <h4 class="ver-title">Real-Time In-Page Terminal Stream &amp; Header Fluid Scaling</h4>
-          <ul class="ver-list">
-            <li><strong>Inline Live Stream Poller Fix:</strong> Repaired template string interpolation in DOMContentLoaded poller; terminal entries now stream immediately on page load without getting stuck.</li>
-            <li><strong>Header &amp; Deck Scaling:</strong> Fluid <code>.logo-deck-badge</code> and multi-tier responsive media queries prevent wrapping or clipping on mobile and narrow tablet views.</li>
-            <li><strong>StreamHub Recovery &amp; Remux:</strong> Revived port 8088 service behind M365 SSO, remuxed complete 3 Body Problem Season 1 to faststart MP4, and added VLC/download player controls.</li>
-            <li><strong>In-Memory Cache Layer:</strong> Added 2.5s caching in <code>wol-listener.ps1</code> for instantaneous sub-millisecond API responses under concurrent polling.</li>
-          </ul>
-        </div>
-
-        <!-- Version 2.4.2 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.4.2</span>
-            <span class="ver-date">October 26, 2026</span>
-          </div>
-          <h4 class="ver-title">Live Embedded AGY Terminal Console &amp; Apex Redirection</h4>
-          <ul class="ver-list">
-            <li><strong>Interactive Embedded Console:</strong> Full-screen in-browser terminal connected to active session (<code>53c2a1ff-4c8c</code>) with verbose turn streaming, command chip shortcuts, and 2.5s auto-polling.</li>
-            <li><strong>Bi-Directional NUC &harr; Desktop Proxy:</strong> Zero-latency background sync daemon and Entra ID SSO authorization for prompt injection.</li>
-            <li><strong>Apex Domain Enforcement:</strong> Seamless canonical routing ensuring <code>www.digitalresolve.ca</code> immediately redirects to <code>https://digitalresolve.ca</code>.</li>
-            <li><strong>Clickable Footer Versioning:</strong> Integrated system release changelog accessible directly from the operations deck.</li>
-          </ul>
-        </div>
-
-        <!-- Version 2.4.0 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.4.0</span>
-            <span class="ver-date">October 26, 2026</span>
-          </div>
-          <h4 class="ver-title">Multi-Modal AGY Sessions &amp; Geeni WebRTC Gateway</h4>
-          <ul class="ver-list">
-            <li><strong>Antigravity Multi-Modal Launcher:</strong> Support for Google Web Console (Cloud), native app protocol (<code>conversation://</code>), and live transcript viewing.</li>
-            <li><strong>Geeni Camera Gateway Fix:</strong> Replaced retired <code>my.geenismart.com</code> with verified live <code>camview.mygeeni.com</code> and local SSO stream <code>cam.digitalresolve.ca</code>.</li>
-            <li><strong>ISP Telemetry Fixes:</strong> Resolved undefined jitter and latency metrics in Bell Canada fiber optic diagnostic card.</li>
-          </ul>
-        </div>
-
-        <!-- Version 2.3.0 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.3.0</span>
-            <span class="ver-date">October 25, 2026</span>
-          </div>
-          <h4 class="ver-title">M365 Entra ID Reboot Shield &amp; SLA Status Legend</h4>
-          <ul class="ver-list">
-            <li><strong>Remote Reboot Protection:</strong> Shielded NUC power actions exclusively behind Microsoft 365 Entra ID SSO token verification.</li>
-            <li><strong>SLA Uptime Matrix Legend:</strong> Added operational status guide for 100% Operational, Smart Eco Sleep, Maintenance, Outages, and Day Inspection.</li>
-            <li><strong>Watch Library Rebranding:</strong> Re-branded media streaming node to <em>Review &amp; Watch Library</em> for <code>D:\Torrents</code>.</li>
-          </ul>
-        </div>
-
-        <!-- Version 2.2.0 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.2.0</span>
-            <span class="ver-date">October 25, 2026</span>
-          </div>
-          <h4 class="ver-title">Autonomous ISP Diagnostics &amp; Self-Healing Sentinel</h4>
-          <ul class="ver-list">
-            <li><strong>ISP Health Engine:</strong> ICMP jitter analysis, Cloudflare edge latency variance, and automated speed telemetry.</li>
-            <li><strong>Self-Healing Sentinel Watchdog:</strong> Proactive HTTP probing across all edge endpoints with autonomous service restart.</li>
-          </ul>
-        </div>
-
-        <!-- Version 2.0.0 -->
-        <div class="changelog-entry">
-          <div class="changelog-ver-header">
-            <span class="ver-tag">v2.0.0</span>
-            <span class="ver-date">October 23, 2026</span>
-          </div>
-          <h4 class="ver-title">Dual-Node Hybrid Homelab Foundation</h4>
-          <ul class="ver-list">
-            <li><strong>Core Infrastructure:</strong> Unified 24/7 Intel NUC Server (<code>192.168.2.35</code>) and High-Power Desktop Workstation (<code>192.168.2.62</code>).</li>
-            <li><strong>Zero Trust Edge Tunnels:</strong> Cloudflare edge routing, WireGuard VPN ingestion, and Wake-on-LAN power state switching.</li>
-          </ul>
-        </div>
-      </div>
+      </div></div>
     </div>
   </div>
   <!-- NUC Server Scheduled Maintenance & SLA Protection Modal -->
