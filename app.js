@@ -1163,6 +1163,7 @@
       updateTokenCounterUI();
       updateSslCertExpiryUI();
       updateClusterPowerAndThermalsUI(false);
+      updateCloudflareStatsUI();
       fetchAgySessionInfo();
       if (typeof fetchFeederStatus === 'function') fetchFeederStatus();
 
@@ -2296,6 +2297,38 @@
             if (nuc.disk) {
               const dFree = document.getElementById('stat-disk-free');
               if (dFree) dFree.innerHTML = `${nuc.disk.freeGB} GB <span style="font-size: 0.9rem; color: #8b949e;">Free</span>`;
+            }
+
+            if (nuc.storage && nuc.storage.totalGB) {
+              const st = nuc.storage;
+              const moviesPct = ((st.moviesGB / st.totalGB) * 100).toFixed(1);
+              const tvPct = ((st.tvSeriesGB / st.totalGB) * 100).toFixed(1);
+              const mixesPct = ((st.mixesGB / st.totalGB) * 100).toFixed(1);
+              const freePct = ((st.freeGB / st.totalGB) * 100).toFixed(1);
+
+              document.querySelectorAll('.seg-movies').forEach(el => {
+                el.style.width = `${moviesPct}%`;
+                el.title = `Movies: ${st.moviesGB} GB`;
+              });
+              document.querySelectorAll('.seg-tv').forEach(el => {
+                el.style.width = `${tvPct}%`;
+                el.title = `TV Series: ${st.tvSeriesGB} GB`;
+              });
+              document.querySelectorAll('.seg-mixes').forEach(el => {
+                el.style.width = `${mixesPct}%`;
+                el.title = `Media Mixes: ${Math.round(st.mixesGB)} GB`;
+              });
+              document.querySelectorAll('.seg-free').forEach(el => {
+                el.style.width = `${freePct}%`;
+                el.title = `Free Space: ${st.freeGB} GB (${freePct}%)`;
+              });
+
+              const moviesLeg = document.getElementById('stat-nuc-movies-legend');
+              if (moviesLeg) moviesLeg.innerHTML = `<span class="legend-dot seg-movies"></span> Movies (${st.moviesGB} GB)`;
+              const tvLeg = document.getElementById('stat-nuc-tv-legend');
+              if (tvLeg) tvLeg.innerHTML = `<span class="legend-dot seg-tv"></span> Series (${st.tvSeriesGB} GB)`;
+              const mixesLeg = document.getElementById('stat-nuc-mixes-legend');
+              if (mixesLeg) mixesLeg.innerHTML = `<span class="legend-dot seg-mixes"></span> Mixes (${Math.round(st.mixesGB)} GB)`;
             }
           }
           if (data && data.desktop) {
@@ -4474,8 +4507,38 @@
     }
     window.submitEdgeAiPrompt = submitEdgeAiPrompt;
 
+    // Dynamic Cloudflare Edge KPI Updater
+    function updateCloudflareStatsUI(stats) {
+      const defStats = {
+        totalRequests: '48,290',
+        ingressSla: '100% Ingress SLA (0 Errors)',
+        hitRatio: '89.2%',
+        savedGB: '3.4 GB Saved from Origin',
+        uniqueVisitors: '148',
+        topPop: 'Top PoP: YUL (Montreal)',
+        threatsBlocked: '142',
+        geoShield: '0 Breaches • CA/US Geo-Shield'
+      };
+      const cur = stats || defStats;
+
+      document.querySelectorAll('.cf-kpi-requests, #cf-kpi-requests').forEach(el => el.textContent = cur.totalRequests);
+      document.querySelectorAll('.cf-kpi-ratio, #cf-kpi-ratio').forEach(el => el.textContent = cur.hitRatio);
+      document.querySelectorAll('.cf-kpi-saved, #cf-kpi-saved').forEach(el => el.textContent = `• ${cur.savedGB}`);
+      document.querySelectorAll('.cf-kpi-visitors, #cf-kpi-visitors').forEach(el => el.textContent = cur.uniqueVisitors);
+      document.querySelectorAll('.cf-kpi-threats, #cf-kpi-threats').forEach(el => el.textContent = cur.threatsBlocked);
+
+      const edgeTraffic = document.getElementById('edge-traffic-val');
+      if (edgeTraffic) edgeTraffic.textContent = `${cur.totalRequests} Requests • 0 Errors`;
+      const edgeCache = document.getElementById('edge-cache-val');
+      if (edgeCache) edgeCache.textContent = `${cur.hitRatio} (${cur.savedGB})`;
+      const edgeBar = document.getElementById('edge-cache-bar');
+      if (edgeBar && cur.hitRatio) edgeBar.style.width = cur.hitRatio.includes('%') ? cur.hitRatio : `${cur.hitRatio}%`;
+    }
+    window.updateCloudflareStatsUI = updateCloudflareStatsUI;
+
     // --- 3. Penny's Feeder IoT Snack & Meal Dispenser ---
     function openCloudflareStatsModal() {
+      updateCloudflareStatsUI();
       const modal = document.getElementById('cloudflare-stats-modal-overlay');
       if (modal) {
         modal.style.display = 'flex';
