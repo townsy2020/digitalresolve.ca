@@ -6032,3 +6032,46 @@ html.mobile-layout .node-decks-grid {
   box-shadow: 0 0 16px rgba(168, 85, 247, 0.4) !important;
   transform: translateY(-2px);
 }
+
+
+/* Universal Inline Check / Retry Button for Telemetry & Null Metrics */
+.btn-check-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 7px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1.4;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+.btn-check-inline:hover {
+  background: rgba(56, 189, 248, 0.25);
+  border-color: #38bdf8;
+  color: #ffffff;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
+}
+
+.btn-check-inline.checking {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.btn-check-inline .check-icon {
+  font-size: 0.75rem;
+  display: inline-block;
+  transition: transform 0.4s ease;
+}
+
+.btn-check-inline:hover .check-icon {
+  transform: rotate(180deg);
+}

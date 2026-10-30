@@ -66,6 +66,58 @@
     }
     window.scrollToSection = scrollToSection;
 
+    // Universal Safe Metric Formatter & Null-to-Check Architecture
+    function safeMetric(val, unit = '', target = 'nuc') {
+      if (val !== null && val !== undefined && !Number.isNaN(val) && val !== 'NaN') {
+        return `${val}${unit ? ' ' + unit : ''}`;
+      }
+      const action = target === 'nuc' ? "checkStatus('nuc')"
+        : target === 'desktop' ? "checkStatus('desktop')"
+        : target === 'feeder' ? "fetchFeederStatus()"
+        : target === 'uptime' ? "renderUptimeMatrix()"
+        : target === 'token' ? "fetchAgySessionInfo()"
+        : target === 'isp' ? "fetchISPHistory()"
+        : "pollRealData(this)";
+      return `<button type="button" class="btn-check-inline" onclick="${action}; event.stopPropagation();" title="Telemetry unavailable. Click to check now."><span class="check-icon">&#8635;</span> Check</button>`;
+    }
+    window.safeMetric = safeMetric;
+
+    function universalCheck(target, btnEl) {
+      if (btnEl) {
+        btnEl.classList.add('checking');
+        btnEl.textContent = 'Checking...';
+      }
+      const task = (target === 'nuc' || target === 'desktop') ? checkStatus(target)
+        : target === 'feeder' ? fetchFeederStatus()
+        : target === 'uptime' ? renderUptimeMatrix()
+        : target === 'token' ? fetchAgySessionInfo()
+        : target === 'isp' ? fetchISPHistory()
+        : pollRealData(btnEl);
+      if (task && typeof task.finally === 'function') {
+        task.finally(() => { if (btnEl) btnEl.classList.remove('checking'); });
+      } else {
+        setTimeout(() => { if (btnEl) btnEl.classList.remove('checking'); }, 1000);
+      }
+    }
+    window.universalCheck = universalCheck;
+
+    function auditAndAttachCheckButtons() {
+      const metricSelectors = [
+        '.metric-val', '.stat-big-val', '.disk-val',
+        '#app-card-tokens', '#uptime-mttr-val', '#st-val-ping', '#st-val-jitter',
+        '#feeder-card-kibble'
+      ];
+      metricSelectors.forEach(sel => {
+        document.querySelectorAll(sel).forEach(el => {
+          const txt = el.textContent ? el.textContent.trim() : '';
+          if (txt === 'null' || txt === 'undefined' || txt === 'NaN' || txt === 'null ms' || txt === 'undefined ms' || (txt === '0 ms' && el.classList.contains('offline'))) {
+            el.innerHTML = `<button type="button" class="btn-check-inline" onclick="pollRealData(this); event.stopPropagation();" title="Null value detected. Click to check real data"><span class="check-icon">&#8635;</span> Check</button>`;
+          }
+        });
+      });
+    }
+    window.auditAndAttachCheckButtons = auditAndAttachCheckButtons;
+
     // Dynamic Codebase Scale & Version Synchronizer
     function updateCodebaseMetrics() {
       try {
@@ -4963,6 +5015,8 @@
 
     // Auto-fetch feeder status on page load
     setTimeout(fetchFeederStatus, 1200);
+    setTimeout(() => { if (typeof auditAndAttachCheckButtons === 'function') auditAndAttachCheckButtons(); }, 1600);
+    setInterval(() => { if (typeof auditAndAttachCheckButtons === 'function') auditAndAttachCheckButtons(); }, 5000);
 
     // Global Escape Key Handler to dismiss all modals & restore scroll
     document.addEventListener('keydown', (e) => {

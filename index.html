@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -810,8 +810,11 @@
                     <!-- Live Dynamic Hopper Telemetry & Optical Watchdog -->
                     <div style="display: flex; justify-content: space-between; align-items: baseline; margin: 8px 0 4px 0;">
                       <div style="font-size: 1.7rem; font-weight: 800; color: #f472b6; font-family: 'JetBrains Mono', monospace;">
-                        <span id="feeder-hopper-pct">0%</span> <span id="feeder-hopper-sub" style="font-size: 0.82rem; color: #f87171; font-weight: 600;">(0g - EMPTY - Refill Needed)</span>
+                        <span id="feeder-hopper-pct">--%</span> <span id="feeder-hopper-sub" style="font-size: 0.82rem; color: #94a3b8; font-weight: 600;">(Checking status...)</span>
                       </div>
+                      <button type="button" class="btn btn-secondary" onclick="fetchFeederStatus()" style="font-size: 0.7rem; padding: 3px 8px; border-color: rgba(56, 189, 248, 0.35); color: #38bdf8; margin-right: 6px;" title="Query live feeder hopper and motor watchdog">
+                        Check Feeder
+                      </button>
                       <button type="button" class="btn btn-secondary" onclick="refillFeederHopper()" style="font-size: 0.7rem; padding: 3px 8px; border-color: rgba(244, 114, 182, 0.35); color: #f472b6;" title="Mark hopper refilled to 100% (1,500g)">
                         Refill Hopper
                       </button>
@@ -904,9 +907,9 @@
             <div class="stat-metric-card">
               <div class="stat-card-header">
                 <span class="stat-card-title">Mean Time to Recovery (MTTR)</span>
-                <span class="item-tag" style="background: rgba(168, 85, 247, 0.2); color: #c084fc;">Instant</span>
+                <span class="item-tag" id="uptime-mttr-tag" style="background: rgba(168, 85, 247, 0.2); color: #c084fc;">Instant</span>
               </div>
-              <div class="stat-big-val" style="color: #c084fc;">&lt; 1.2 <span style="font-size: 0.9rem; color: #8b949e;">sec</span></div>
+              <div class="stat-big-val" id="uptime-mttr-val" style="color: #c084fc;">&lt; 1.2 <span style="font-size: 0.9rem; color: #8b949e;">sec</span></div>
               <div class="stat-subtext">Automated Sentinel daemon watchdog</div>
             </div>
           </div>
@@ -2422,7 +2425,7 @@
               <div class="app-card-desc">
                 Autonomous agentic coding and cluster operations harness managing daemon health, automated recovery, and git sync.
                 <div style="margin-top: 8px; font-size: 0.8rem; color: #38bdf8;">
-                  Token Usage: <strong id="app-card-tokens" class="mono">15,524,784</strong> &bull; <span id="app-card-models"><span style="color: #38bdf8; font-weight: 600;">92.32% Gemini Flash</span> &bull; <span style="color: #c084fc; font-weight: 600;">7.68% Pro</span> &bull; <span style="color: #34d399; font-weight: 600;">412M Cache Read</span></span>
+                  Token Usage: <strong id="app-card-tokens" class="mono">Calculating...</strong> &bull; <span id="app-card-models"><span style="color: #94a3b8;">Calculating breakdown...</span></span>
                 </div>
               </div>
             </div>
