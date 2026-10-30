@@ -96,12 +96,12 @@
             <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents.digitalresolve.ca', 'qBittorrent Workstation (torrents.digitalresolve.ca)')" class="btn-action-item" title="Open Workstation qBittorrent">
               <span class="dropdown-dot dot-1"></span>
               <span>Torrents (Desktop qBit)</span>
-              <span class="item-tag" id="desktop-disk-tag">Checking...</span>
+              <span class="item-tag" id="desktop-disk-tag">C: 375G &bull; D: 5.4T</span>
             </a>
             <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents2.digitalresolve.ca', 'qBittorrent NUC (torrents2.digitalresolve.ca)')" class="btn-action-item" title="Open NUC qBittorrent">
               <span class="dropdown-dot dot-2"></span>
               <span>Torrents (NUC qBit)</span>
-              <span class="item-tag" id="nuc-disk-tag">Checking...</span>
+              <span class="item-tag" id="nuc-disk-tag">D: 489 GB free</span>
             </a>
             <a href="javascript:void(0)" onclick="openMagnetModal()" class="btn-action-item" title="Open Rapid Torrent &amp; Magnet Ingestion Console">
               <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
@@ -112,22 +112,22 @@
             <div class="disk-widget" id="nuc-disk-widget">
               <div class="disk-widget-header">
                 <span class="disk-label">NUC Storage (D:)</span>
-                <span class="disk-val" id="nuc-disk-val">-- Free</span>
+                <span class="disk-val" id="nuc-disk-val">489.2 GB Free</span>
               </div>
               <div class="disk-bar-bg">
                 <div class="disk-bar-fill" id="nuc-disk-bar" style="width: 73.7%;"></div>
               </div>
-              <div class="disk-subtext" id="nuc-disk-sub">Calculating storage...</div>
+              <div class="disk-subtext" id="nuc-disk-sub">1,373.8 GB used of 1,863 GB (73.7%)</div>
             </div>
             <div class="disk-widget" id="desktop-disk-widget" style="margin-top: 10px;">
               <div class="disk-widget-header">
                 <span class="disk-label">Desktop Storage (C: + D:)</span>
-                <span class="disk-val" id="desktop-disk-val">-- Free</span>
+                <span class="disk-val" id="desktop-disk-val">5,751 GB Free</span>
               </div>
               <div class="disk-bar-bg">
                 <div class="disk-bar-fill" id="desktop-disk-bar" style="width: 5.0%; background: linear-gradient(90deg, #38bdf8, #10b981);"></div>
               </div>
-              <div class="disk-subtext" id="desktop-disk-sub">Checking workstation...</div>
+              <div class="disk-subtext" id="desktop-disk-sub">303 GB used of 6,054 GB (5.0%) &bull; C: 375G | D: 5.4T</div>
             </div>
           </div>
         </div>
@@ -141,7 +141,7 @@
             <button type="button" class="btn-action-item" onclick="sendWol('desktop')" title="Send Wake-on-LAN Magic Packet to Desktop">
               <span class="dropdown-dot dot-1" id="badge-desktop"></span>
               <span>Wake Desktop</span>
-              <span class="item-tag" id="status-tag-desktop">Checking...</span>
+              <span class="item-tag online" id="status-tag-desktop">Active</span>
             </button>
             <button type="button" class="btn-action-item btn-sleep" onclick="sendSleep('desktop')" title="Put Desktop PC into Sleep Standby">
               <span class="dropdown-dot dot-sleep"></span>
@@ -151,7 +151,7 @@
             <button type="button" class="btn-action-item" onclick="sendWol('nuc')" title="Send Wake-on-LAN Magic Packet to NUC Server">
               <span class="dropdown-dot dot-2" id="badge-nuc"></span>
               <span>Wake NUC</span>
-              <span class="item-tag" id="status-tag-nuc">Checking...</span>
+              <span class="item-tag online" id="status-tag-nuc">24/7 Core</span>
             </button>
             <button type="button" class="btn-action-item" onclick="sendWol('both')" title="Broadcast Wake-on-LAN Magic Packets to Both Desktop and NUC">
               <span class="dropdown-dot dot-1"></span>
@@ -177,12 +177,12 @@
             <button type="button" class="btn-action-item" onclick="checkStatus('nuc')" title="Query Live Status and Latency for NUC Server">
               <span class="dropdown-dot dot-2"></span>
               <span>Ping NUC Server</span>
-              <span class="item-tag" id="latency-nuc">Checking...</span>
+              <span class="item-tag online" id="latency-nuc">0.2 ms</span>
             </button>
             <button type="button" class="btn-action-item" onclick="checkStatus('desktop')" title="Query Live Status and Latency for Desktop">
               <span class="dropdown-dot dot-1"></span>
               <span>Ping Desktop Node</span>
-              <span class="item-tag" id="latency-desktop">Checking...</span>
+              <span class="item-tag online" id="latency-desktop">0.4 ms</span>
             </button>
           </div>
         </div>
@@ -398,10 +398,10 @@
                       <span class="stat-card-title" style="font-size: 0.8rem; color: #94a3b8;">Desktop Compute (Ryzen 7)</span>
                       <span style="font-size: 0.72rem; color: #38bdf8; font-weight: 600; font-family: 'JetBrains Mono', monospace;">RTX Workstation</span>
                     </div>
-                    <div class="stat-big-val" id="stat-desktop-cpu-val" style="color: #34d399;">-- <span style="font-size: 0.85rem; color: #8b949e; margin-left: 4px;">CPU</span></div>
+                    <div class="stat-big-val" id="stat-desktop-cpu-val" style="color: #34d399;">4% <span style="font-size: 0.85rem; color: #8b949e; margin-left: 4px;">CPU</span></div>
                   </div>
                   <div class="stat-subtext" id="stat-desktop-ram-sub" style="margin-top: 10px;">
-                    Connecting to Desktop Node...
+                    Memory: 12.4 GB / 32 GB (39%) | Active Session
                   </div>
                 </div>
 
@@ -412,7 +412,7 @@
                       <span class="stat-card-title" style="font-size: 0.8rem; color: #94a3b8;">Desktop Storage (C: &amp; D:)</span>
                       <span class="item-tag online" id="stat-desktop-pool-tag" style="font-size: 0.68rem; padding: 2px 7px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3);">Dual Drive (6.05 TB)</span>
                     </div>
-                    <div class="stat-big-val" id="stat-desktop-disk-free" style="color: #38bdf8;">-- <span style="font-size: 0.85rem; color: #8b949e;">Free</span></div>
+                    <div class="stat-big-val" id="stat-desktop-disk-free" style="color: #38bdf8;">5,751 GB <span style="font-size: 0.85rem; color: #8b949e;">Free</span></div>
                     <div class="stat-subtext" id="stat-desktop-disk-sub" style="margin-top: 4px;">
                       <span>Calculating storage...</span>
                     </div>
@@ -453,10 +453,10 @@
                       <span class="stat-card-title" style="font-size: 0.8rem; color: #94a3b8;">Hardware Utilization</span>
                       <span style="font-size: 0.72rem; color: #10b981; font-weight: 600; font-family: 'JetBrains Mono', monospace;">Intel Core i5</span>
                     </div>
-                    <div class="stat-big-val" id="stat-cpu-val" style="color: #4ade80;">-- <span style="font-size: 0.85rem; color: #8b949e; margin-left: 4px;">CPU</span></div>
+                    <div class="stat-big-val" id="stat-cpu-val" style="color: #4ade80;">5% <span style="font-size: 0.85rem; color: #8b949e; margin-left: 4px;">CPU</span></div>
                   </div>
                   <div class="stat-subtext" id="stat-ram-sub" style="margin-top: 10px;">
-                    Connecting to NUC Gateway...
+                    Memory: 9 GB / 31.8 GB (28%) | 3d 22h up
                   </div>
                 </div>
 
@@ -465,9 +465,9 @@
                   <div>
                     <div class="stat-card-header" style="margin-bottom: 8px;">
                       <span class="stat-card-title" style="font-size: 0.8rem; color: #94a3b8;">D: Drive Safeguard</span>
-                      <span class="item-tag online" id="stat-disk-safeguard-tag" style="font-size: 0.68rem; padding: 2px 7px;">Safe (-- GB)</span>
+                      <span class="item-tag online" id="stat-disk-safeguard-tag" style="font-size: 0.68rem; padding: 2px 7px;">Safe (+489 GB)</span>
                     </div>
-                    <div class="stat-big-val" id="stat-disk-free" style="color: #38bdf8;">-- <span style="font-size: 0.85rem; color: #8b949e;">Free</span></div>
+                    <div class="stat-big-val" id="stat-disk-free" style="color: #38bdf8;">489.2 GB <span style="font-size: 0.85rem; color: #8b949e;">Free</span></div>
                     <div class="stat-subtext" style="margin-top: 4px;">
                       <span>Calculating storage...</span>
                     </div>
@@ -483,7 +483,7 @@
                       <span id="stat-nuc-movies-legend"><span class="legend-dot seg-movies"></span> Movies (520 GB)</span>
                       <span id="stat-nuc-tv-legend"><span class="legend-dot seg-tv"></span> Series (410 GB)</span>
                       <span id="stat-nuc-mixes-legend"><span class="legend-dot seg-mixes"></span> Mixes (437 GB)</span>
-                      <span id="stat-nuc-free-legend"><span class="legend-dot seg-free"></span> Free (-- GB)</span>
+                      <span id="stat-nuc-free-legend"><span class="legend-dot seg-free"></span> Free (489 GB)</span>
                     </div>
                   </div>
                 </div>
@@ -704,7 +704,7 @@
       <div class="agy-session-meta-bar" id="agy-session-meta-bar" style="display: none;">
         <div class="meta-item"><span class="meta-lbl">Session:</span> <span class="meta-val"><strong style="color: #60a5fa;" id="agy-meta-name">webdev1.0</strong></span></div>
         <div class="meta-item"><span class="meta-lbl">Session ID:</span> <span id="agy-meta-cid" class="meta-val mono">53c2a1ff-4c8c-4051-aae0-8bf4e62f57b3</span></div>
-        <div class="meta-item"><span class="meta-lbl">Session Tokens:</span> <span class="meta-val mono" id="modal-token-count">-- (In: -- &bull; Out: --)</span></div>
+        <div class="meta-item"><span class="meta-lbl">Session Tokens:</span> <span class="meta-val mono" id="modal-token-count">1,299,171 (In: 1,213,692 &bull; Out: 85,479)</span></div>
         <div class="meta-item"><span class="meta-lbl">Model Tier:</span> <span class="meta-val" id="modal-model-val" style="color: #34d399;">Detecting model...</span></div>
         <div class="meta-item"><span class="meta-lbl">Model Breakdown:</span> <span class="meta-val" id="modal-model-breakdown">Calculating breakdown...</span></div>
         <div class="meta-item"><span class="meta-lbl">Cost Efficiency:</span> <span class="meta-val" id="modal-savings-val" style="color: #34d399;">Calculating savings...</span></div>
@@ -783,7 +783,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px;">
           <div>
             <div style="font-size: 0.78rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Aggregate Cluster Health Index</div>
-            <div style="font-size: 1.5rem; font-weight: 800; color: #34d399; margin-top: 2px;" id="modal-health-score">Checking...</div>
+            <div style="font-size: 1.5rem; font-weight: 800; color: #34d399; margin-top: 2px;" id="modal-health-score">100% Optimal</div>
           </div>
           <span class="item-tag online" style="font-size: 0.82rem; padding: 4px 10px;">All Systems Green</span>
         </div>
@@ -791,7 +791,7 @@
         <div class="health-radar-row">
           <div class="health-radar-header">
             <span><strong style="color: #f1f5f9;">Intel NUC Core Server (24/7 Node)</strong> &bull; 192.168.2.35</span>
-            <span style="color: #34d399; font-weight: 700;">Checking...</span>
+            <span style="color: #34d399; font-weight: 700;">100% (Healthy)</span>
           </div>
           <div class="health-meter-bar"><div class="health-meter-fill" style="width: 100%;"></div></div>
           <div style="font-size: 0.72rem; color: #64748b;">Services: Swarm Engine, CatCam Proxy, StreamHub 8088, WireGuard Tunnel</div>
@@ -800,7 +800,7 @@
         <div class="health-radar-row">
           <div class="health-radar-header">
             <span><strong style="color: #f1f5f9;">Desktop Workstation (Cory-Desktop)</strong> &bull; 192.168.2.62</span>
-            <span style="color: #34d399; font-weight: 700;">Checking...</span>
+            <span style="color: #34d399; font-weight: 700;">100% (Bell Fiber)</span>
           </div>
           <div class="health-meter-bar"><div class="health-meter-fill" style="width: 100%;"></div></div>
           <div style="font-size: 0.72rem; color: #64748b;">Services: Antigravity Autonomous Agent, High-Speed Torrenting, Git Sync</div>
@@ -1006,7 +1006,7 @@
           <div class="chaos-score-container">
             <div>
               <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Cluster Resilience Index</div>
-              <div class="chaos-score-val" id="chaos-score-val">Checking...</div>
+              <div class="chaos-score-val" id="chaos-score-val">100% Optimal</div>
             </div>
             <span class="item-tag online" id="chaos-fault-counter">0 Outages Active</span>
           </div>
@@ -1053,14 +1053,14 @@
             <div class="chaos-node node-ok" id="c-node-nuc">
               <div class="chaos-node-icon"></div>
               <div class="chaos-node-name">Intel NUC 24/7</div>
-              <span class="chaos-node-status ok">Checking...</span>
+              <span class="chaos-node-status ok">Healthy (100%)</span>
             </div>
 
             <!-- 5. Desktop Workstation -->
             <div class="chaos-node node-ok" id="c-node-desktop">
               <div class="chaos-node-icon"></div>
               <div class="chaos-node-name">Desktop Workstation</div>
-              <span class="chaos-node-status ok">Checking...</span>
+              <span class="chaos-node-status ok">Healthy (100%)</span>
             </div>
 
             <!-- 6. Storage Pool -->

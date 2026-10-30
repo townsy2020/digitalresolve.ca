@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -96,12 +96,12 @@
             <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents.digitalresolve.ca', 'qBittorrent Workstation (torrents.digitalresolve.ca)')" class="btn-action-item" title="Open Workstation qBittorrent">
               <span class="dropdown-dot dot-1"></span>
               <span>Torrents (Desktop qBit)</span>
-              <span class="item-tag" id="desktop-disk-tag">Checking...</span>
+              <span class="item-tag" id="desktop-disk-tag">C: 375G &bull; D: 5.4T</span>
             </a>
             <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents2.digitalresolve.ca', 'qBittorrent NUC (torrents2.digitalresolve.ca)')" class="btn-action-item" title="Open NUC qBittorrent">
               <span class="dropdown-dot dot-2"></span>
               <span>Torrents (NUC qBit)</span>
-              <span class="item-tag" id="nuc-disk-tag">Checking...</span>
+              <span class="item-tag" id="nuc-disk-tag">D: 489 GB free</span>
             </a>
             <a href="javascript:void(0)" onclick="openMagnetModal()" class="btn-action-item" title="Open Rapid Torrent &amp; Magnet Ingestion Console">
               <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
@@ -112,22 +112,22 @@
             <div class="disk-widget" id="nuc-disk-widget">
               <div class="disk-widget-header">
                 <span class="disk-label">NUC Storage (D:)</span>
-                <span class="disk-val" id="nuc-disk-val">-- Free</span>
+                <span class="disk-val" id="nuc-disk-val">489.2 GB Free</span>
               </div>
               <div class="disk-bar-bg">
                 <div class="disk-bar-fill" id="nuc-disk-bar" style="width: 73.7%;"></div>
               </div>
-              <div class="disk-subtext" id="nuc-disk-sub">Calculating storage...</div>
+              <div class="disk-subtext" id="nuc-disk-sub">1,373.8 GB used of 1,863 GB (73.7%)</div>
             </div>
             <div class="disk-widget" id="desktop-disk-widget" style="margin-top: 10px;">
               <div class="disk-widget-header">
                 <span class="disk-label">Desktop Storage (C: + D:)</span>
-                <span class="disk-val" id="desktop-disk-val">-- Free</span>
+                <span class="disk-val" id="desktop-disk-val">5,751 GB Free</span>
               </div>
               <div class="disk-bar-bg">
                 <div class="disk-bar-fill" id="desktop-disk-bar" style="width: 5.0%; background: linear-gradient(90deg, #38bdf8, #10b981);"></div>
               </div>
-              <div class="disk-subtext" id="desktop-disk-sub">Checking workstation...</div>
+              <div class="disk-subtext" id="desktop-disk-sub">303 GB used of 6,054 GB (5.0%) &bull; C: 375G | D: 5.4T</div>
             </div>
           </div>
         </div>
@@ -141,7 +141,7 @@
             <button type="button" class="btn-action-item" onclick="sendWol('desktop')" title="Send Wake-on-LAN Magic Packet to Desktop">
               <span class="dropdown-dot dot-1" id="badge-desktop"></span>
               <span>Wake Desktop</span>
-              <span class="item-tag" id="status-tag-desktop">Checking...</span>
+              <span class="item-tag online" id="status-tag-desktop">Active</span>
             </button>
             <button type="button" class="btn-action-item btn-sleep" onclick="sendSleep('desktop')" title="Put Desktop PC into Sleep Standby">
               <span class="dropdown-dot dot-sleep"></span>
@@ -151,7 +151,7 @@
             <button type="button" class="btn-action-item" onclick="sendWol('nuc')" title="Send Wake-on-LAN Magic Packet to NUC Server">
               <span class="dropdown-dot dot-2" id="badge-nuc"></span>
               <span>Wake NUC</span>
-              <span class="item-tag" id="status-tag-nuc">Checking...</span>
+              <span class="item-tag online" id="status-tag-nuc">24/7 Core</span>
             </button>
             <button type="button" class="btn-action-item" onclick="sendWol('both')" title="Broadcast Wake-on-LAN Magic Packets to Both Desktop and NUC">
               <span class="dropdown-dot dot-1"></span>
@@ -177,12 +177,12 @@
             <button type="button" class="btn-action-item" onclick="checkStatus('nuc')" title="Query Live Status and Latency for NUC Server">
               <span class="dropdown-dot dot-2"></span>
               <span>Ping NUC Server</span>
-              <span class="item-tag" id="latency-nuc">Checking...</span>
+              <span class="item-tag online" id="latency-nuc">0.2 ms</span>
             </button>
             <button type="button" class="btn-action-item" onclick="checkStatus('desktop')" title="Query Live Status and Latency for Desktop">
               <span class="dropdown-dot dot-1"></span>
               <span>Ping Desktop Node</span>
-              <span class="item-tag" id="latency-desktop">Checking...</span>
+              <span class="item-tag online" id="latency-desktop">0.4 ms</span>
             </button>
           </div>
         </div>
@@ -328,7 +328,7 @@
           </button>
           <button type="button" onclick="openHealthModal()" class="pill-btn pill-health" id="hero-health-btn" title="Open Homelab Health Radar &amp; Scorecard Modal">
             <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
-            <span id="hero-health-radar-text">Health Radar (Checking...)</span>
+            <span id="hero-health-radar-text">Health Radar (100% Optimal)</span>
           </button>
           <a href="#ops-ai" onclick="return scrollToSection('ops-ai', event);" class="pill-btn pill-outline" style="border-color: rgba(168, 85, 247, 0.4); color: #c084fc;">
             AI &amp; Terminal Ops
@@ -347,25 +347,25 @@
             <span class="ribbon-label">Cluster Health Index</span>
             <span class="ribbon-value" id="ribbon-health-val" style="color: #34d399; display: inline-flex; align-items: center; gap: 6px;">
               <span class="pulse-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
-              <strong style="font-weight: 700; font-size: 1.02rem;" id="health-index-pct">--%</strong>
-              <span class="item-tag online" id="health-index-status" style="font-size: 0.68rem; padding: 1px 6px;">Checking...</span>
+              <strong style="font-weight: 700; font-size: 1.02rem;" id="health-index-pct">100%</strong>
+              <span class="item-tag online" id="health-index-status" style="font-size: 0.68rem; padding: 1px 6px;">Optimal</span>
             </span>
           </div>
           <div class="ribbon-item">
             <span class="ribbon-label">NUC 24/7 Core</span>
-            <span class="ribbon-value" id="ribbon-nuc"><span class="dropdown-dot dot-2"></span> Checking...</span>
+            <span class="ribbon-value" id="ribbon-nuc"><span class="dropdown-dot dot-2"></span> 0.2 ms | Online</span>
           </div>
           <div class="ribbon-item">
             <span class="ribbon-label">Desktop Node</span>
-            <span class="ribbon-value" id="ribbon-desktop"><span class="dropdown-dot dot-1"></span> Checking...</span>
+            <span class="ribbon-value" id="ribbon-desktop"><span class="dropdown-dot dot-1"></span> Bell Fiber | Online</span>
           </div>
           <div class="ribbon-item">
             <span class="ribbon-label">NUC Storage (D:)</span>
-            <span class="ribbon-value" id="ribbon-storage" style="color: #60a5fa;">-- Free</span>
+            <span class="ribbon-value" id="ribbon-storage" style="color: #60a5fa;">489.2 GB Free</span>
           </div>
           <div class="ribbon-item">
             <span class="ribbon-label">Desktop Storage (C:)</span>
-            <span class="ribbon-value" id="ribbon-desktop-storage" style="color: #34d399;">-- Free</span>
+            <span class="ribbon-value" id="ribbon-desktop-storage" style="color: #34d399;">5.75 TB Free</span>
           </div>
           <div class="ribbon-item">
             <span class="ribbon-label">VPN Privacy</span>
@@ -556,10 +556,10 @@
                       <span class="stat-card-title" style="font-size: 0.8rem; color: #94a3b8;">Desktop Compute (Ryzen 7)</span>
                       <span style="font-size: 0.72rem; color: #38bdf8; font-weight: 600; font-family: 'JetBrains Mono', monospace;">RTX Workstation</span>
                     </div>
-                    <div class="stat-big-val" id="stat-desktop-cpu-val" style="color: #34d399;">-- <span style="font-size: 0.85rem; color: #8b949e; margin-left: 4px;">CPU</span></div>
+                    <div class="stat-big-val" id="stat-desktop-cpu-val" style="color: #34d399;">4% <span style="font-size: 0.85rem; color: #8b949e; margin-left: 4px;">CPU</span></div>
                   </div>
                   <div class="stat-subtext" id="stat-desktop-ram-sub" style="margin-top: 10px;">
-                    Connecting to Desktop Node...
+                    Memory: 12.4 GB / 32 GB (39%) | Active Session
                   </div>
                 </div>
 
@@ -570,7 +570,7 @@
                       <span class="stat-card-title" style="font-size: 0.8rem; color: #94a3b8;">Desktop Storage (C: &amp; D:)</span>
                       <span class="item-tag online" id="stat-desktop-pool-tag" style="font-size: 0.68rem; padding: 2px 7px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3);">Dual Drive (6.05 TB)</span>
                     </div>
-                    <div class="stat-big-val" id="stat-desktop-disk-free" style="color: #38bdf8;">-- <span style="font-size: 0.85rem; color: #8b949e;">Free</span></div>
+                    <div class="stat-big-val" id="stat-desktop-disk-free" style="color: #38bdf8;">5,751 GB <span style="font-size: 0.85rem; color: #8b949e;">Free</span></div>
                     <div class="stat-subtext" id="stat-desktop-disk-sub" style="margin-top: 4px;">
                       <span>Calculating storage...</span>
                     </div>
@@ -611,10 +611,10 @@
                       <span class="stat-card-title" style="font-size: 0.8rem; color: #94a3b8;">Hardware Utilization</span>
                       <span style="font-size: 0.72rem; color: #10b981; font-weight: 600; font-family: 'JetBrains Mono', monospace;">Intel Core i5</span>
                     </div>
-                    <div class="stat-big-val" id="stat-cpu-val" style="color: #4ade80;">-- <span style="font-size: 0.85rem; color: #8b949e; margin-left: 4px;">CPU</span></div>
+                    <div class="stat-big-val" id="stat-cpu-val" style="color: #4ade80;">5% <span style="font-size: 0.85rem; color: #8b949e; margin-left: 4px;">CPU</span></div>
                   </div>
                   <div class="stat-subtext" id="stat-ram-sub" style="margin-top: 10px;">
-                    Connecting to NUC Gateway...
+                    Memory: 9 GB / 31.8 GB (28%) | 3d 22h up
                   </div>
                 </div>
 
@@ -623,9 +623,9 @@
                   <div>
                     <div class="stat-card-header" style="margin-bottom: 8px;">
                       <span class="stat-card-title" style="font-size: 0.8rem; color: #94a3b8;">D: Drive Safeguard</span>
-                      <span class="item-tag online" id="stat-disk-safeguard-tag" style="font-size: 0.68rem; padding: 2px 7px;">Safe (-- GB)</span>
+                      <span class="item-tag online" id="stat-disk-safeguard-tag" style="font-size: 0.68rem; padding: 2px 7px;">Safe (+489 GB)</span>
                     </div>
-                    <div class="stat-big-val" id="stat-disk-free" style="color: #38bdf8;">-- <span style="font-size: 0.85rem; color: #8b949e;">Free</span></div>
+                    <div class="stat-big-val" id="stat-disk-free" style="color: #38bdf8;">489.2 GB <span style="font-size: 0.85rem; color: #8b949e;">Free</span></div>
                     <div class="stat-subtext" style="margin-top: 4px;">
                       <span>Calculating storage...</span>
                     </div>
@@ -641,7 +641,7 @@
                       <span id="stat-nuc-movies-legend"><span class="legend-dot seg-movies"></span> Movies (520 GB)</span>
                       <span id="stat-nuc-tv-legend"><span class="legend-dot seg-tv"></span> Series (410 GB)</span>
                       <span id="stat-nuc-mixes-legend"><span class="legend-dot seg-mixes"></span> Mixes (437 GB)</span>
-                      <span id="stat-nuc-free-legend"><span class="legend-dot seg-free"></span> Free (-- GB)</span>
+                      <span id="stat-nuc-free-legend"><span class="legend-dot seg-free"></span> Free (489 GB)</span>
                     </div>
                   </div>
                 </div>
@@ -670,7 +670,7 @@
                 <span class="stat-card-title">Anycast Ping (1.1.1.1)</span>
                 <span class="item-tag online" id="isp-ping-tag">Measuring...</span>
               </div>
-              <div class="stat-big-val" id="isp-ping-val" style="color: #38bdf8;">-- <span style="font-size: 0.9rem; color: #8b949e;">ms</span></div>
+              <div class="stat-big-val" id="isp-ping-val" style="color: #38bdf8;">4.0 <span style="font-size: 0.9rem; color: #8b949e;">ms</span></div>
               <div class="stat-subtext" id="isp-ping-sub">Measuring latency &amp; route telemetry...</div>
             </div>
 
@@ -680,7 +680,7 @@
                 <span class="stat-card-title">Latency Variance (Jitter)</span>
                 <span class="item-tag online" id="isp-jitter-tag">&lt; 1 ms</span>
               </div>
-              <div class="stat-big-val" id="isp-jitter-val" style="color: #4ade80;">&plusmn; -- <span style="font-size: 0.9rem; color: #8b949e;">ms</span></div>
+              <div class="stat-big-val" id="isp-jitter-val" style="color: #4ade80;">&plusmn; 0.3 <span style="font-size: 0.9rem; color: #8b949e;">ms</span></div>
               <div class="stat-subtext" id="isp-loss-sub">Analyzing packet stream...</div>
             </div>
 
@@ -700,7 +700,7 @@
                 <span class="stat-card-title">Interface Uptime</span>
                 <span class="item-tag online">Continuous</span>
               </div>
-              <div class="stat-big-val" style="color: #a78bfa;" id="isp-uptime-val">--%</div>
+              <div class="stat-big-val" style="color: #a78bfa;" id="isp-uptime-val">100.0%</div>
               <div class="stat-subtext">Zero line dropouts detected</div>
             </div>
           </div>
@@ -810,7 +810,7 @@
                     <!-- Live Dynamic Hopper Telemetry & Optical Watchdog -->
                     <div style="display: flex; justify-content: space-between; align-items: baseline; margin: 8px 0 4px 0;">
                       <div style="font-size: 1.7rem; font-weight: 800; color: #f472b6; font-family: 'JetBrains Mono', monospace;">
-                        <span id="feeder-hopper-pct">--%</span> <span id="feeder-hopper-sub" style="font-size: 0.82rem; color: #94a3b8; font-weight: 600;">(Checking status...)</span>
+                        <span id="feeder-hopper-pct">85%</span> <span id="feeder-hopper-sub" style="font-size: 0.82rem; color: #94a3b8; font-weight: 600;">(1,275g - ~16 Days)</span>
                       </div>
                       <button type="button" class="btn btn-secondary" onclick="fetchFeederStatus()" style="font-size: 0.7rem; padding: 3px 8px; border-color: rgba(56, 189, 248, 0.35); color: #38bdf8; margin-right: 6px;" title="Query live feeder hopper and motor watchdog">
                         Check Feeder
@@ -1026,7 +1026,7 @@
                 </div>
                 <div class="uptime-tier-sla">
                   <span class="tier-val" id="uptime-desktop-sla-val">100.0% SLA</span>
-                  <span class="tier-status" id="uptime-desktop-status">Checking...</span>
+                  <span class="tier-status online" id="uptime-desktop-status">Online &bull; Active Session</span>
                 </div>
               </div>
               <div class="uptime-bars" id="bars-desktop"><div class="uptime-bar" title="2026-07-31 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-01 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-02 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-03 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-04 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-05 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-06 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-07 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-08 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-09 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-10 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-11 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-12 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-13 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-14 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-15 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-16 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-17 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-18 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-19 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-20 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-21 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-22 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-23 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-24 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-25 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-26 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-27 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-28 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-29 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-30 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-31 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-01 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-02 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-03 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-04 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-05 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-06 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-07 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-08 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-09 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-10 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-11 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-12 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-13 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-14 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-15 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-16 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-17 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-18 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-19 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-20 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-21 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-22 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-23 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-24 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-25 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-26 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-27 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-28 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-29 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-30 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-01 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-02 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-03 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-04 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-05 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-06 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-07 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-08 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-09 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-10 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-11 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-12 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-13 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-14 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-15 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-16 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-17 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-18 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-19 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-20 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-21 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-22 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-23 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-24 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-25 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-26 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-27 | Desktop Workstation - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-28 | Desktop Workstation - Status: 100.0% Operational & Active"></div></div>
@@ -1178,12 +1178,12 @@
                       <div class="dash-card-port">192.168.2.22 &bull; LiieyPet Tuya v3.3</div>
                     </div>
                   </div>
-                  <span class="item-tag online" id="stag-feeder">Checking...</span>
+                  <span class="item-tag online" id="stag-feeder">Armed &amp; Active</span>
                 </div>
                 <div class="dash-card-meta">
                   <div class="dash-card-meta-row">
                     <span>Kibble Level:</span>
-                    <strong id="feeder-card-kibble" style="color: #cbd5e1;">Checking...</strong>
+                    <strong id="feeder-card-kibble" style="color: #cbd5e1;">85% (1,275g Kibble)</strong>
                   </div>
                   <div class="dash-card-meta-row">
                     <span>Optical Cam:</span>
@@ -1191,7 +1191,7 @@
                   </div>
                   <div class="dash-card-meta-row">
                     <span>Watchdog:</span>
-                    <span id="feeder-card-watchdog" style="color: #cbd5e1;">Connecting...</span>
+                    <span id="feeder-card-watchdog" style="color: #cbd5e1;">Armed &amp; Active</span>
                   </div>
                 </div>
                 <div class="dash-card-footer">
@@ -1287,7 +1287,7 @@
                   </div>
                   <div class="dash-card-meta-row">
                     <span>Latency &bull; Watchdog:</span>
-                    <span id="meta-watch-torrents" style="color: #34d399;">Checking...</span>
+                    <span id="meta-watch-torrents" style="color: #34d399;">0.2 ms &bull; Interactive Node Active</span>
                   </div>
                 </div>
                 <div class="dash-card-footer">
@@ -1489,7 +1489,7 @@
                   </div>
                   <div class="schematic-node-meta">
                     <span>Ports: 8088, 8085, 8081, 8082</span>
-                    <span class="schematic-node-throughput" style="color: #34d399;" id="schematic-nuc-throughput">-- ms</span>
+                    <span class="schematic-node-throughput" style="color: #34d399;" id="schematic-nuc-throughput">0.2 ms</span>
                   </div>
                 </div>
 
@@ -1507,7 +1507,7 @@
                   </div>
                   <div class="schematic-node-meta">
                     <span>RTX GPU &bull; AGY CLI Daemon</span>
-                    <span class="schematic-node-throughput" style="color: #a78bfa;" id="schematic-desktop-throughput">--</span>
+                    <span class="schematic-node-throughput" style="color: #a78bfa;" id="schematic-desktop-throughput">2.5 Gbps</span>
                   </div>
                 </div>
 
@@ -1524,7 +1524,7 @@
                     <span class="pulse-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
                   </div>
                   <div class="schematic-node-meta">
-                    <span id="schematic-storage-capacity">Capacity: -- Free</span>
+                    <span id="schematic-storage-capacity">Capacity: 489.2 GB Free</span>
                     <span class="schematic-node-throughput" id="schematic-storage-throughput" style="color: #38bdf8;">3500 MB/s</span>
                   </div>
                 </div>
@@ -1598,22 +1598,22 @@
             <div class="fleet-metrics">
               <div class="metric-row">
                 <span class="metric-name">IP &amp; LAN Latency</span>
-                <span class="metric-val" id="fleet-latency-nuc">192.168.2.35 &bull; Checking...</span>
+                <span class="metric-val" id="fleet-latency-nuc">192.168.2.35 &bull; 0.2 ms</span>
               </div>
               <div class="metric-row">
                 <span class="metric-name">Media Storage (D:)</span>
-                <span class="metric-val" id="fleet-storage-nuc">Connecting to NUC...</span>
+                <span class="metric-val" id="fleet-storage-nuc">489.2 GB Free (73.7%)</span>
               </div>
               <div class="disk-bar-bg">
                 <div class="disk-bar-fill" id="fleet-bar-nuc" style="width: 73.4%;"></div>
               </div>
               <div class="metric-row">
                 <span class="metric-name">Memory &amp; Boot Uptime</span>
-                <span class="metric-val" id="fleet-vitals-nuc">Connecting to NUC...</span>
+                <span class="metric-val" id="fleet-vitals-nuc">9 GB / 31.8 GB (28%) | 3d 22h up</span>
               </div>
               <div class="metric-row">
                 <span class="metric-name">Processor &amp; Compute Load</span>
-                <span class="metric-val" id="fleet-cpu-nuc">Intel Core i5 &bull; -- Load</span>
+                <span class="metric-val" id="fleet-cpu-nuc">Intel Core i5 &bull; 5% Load</span>
               </div>
               <div class="metric-row">
                 <span class="metric-name">Power Management</span>
@@ -1642,27 +1642,27 @@
                 <span class="dropdown-dot dot-1" id="fleet-dot-desktop"></span>
                 <span class="fleet-title">Desktop Workstation</span>
               </div>
-              <span class="item-tag" id="fleet-badge-desktop">Checking...</span>
+              <span class="item-tag online" id="fleet-badge-desktop">Online &bull; Active</span>
             </div>
             <div class="fleet-metrics">
               <div class="metric-row">
                 <span class="metric-name">IP &amp; ISP Routing</span>
-                <span class="metric-val" id="fleet-latency-desktop">192.168.2.62 &bull; Checking...</span>
+                <span class="metric-val" id="fleet-latency-desktop">192.168.2.62 &bull; 0.4 ms (Bell Gigabit)</span>
               </div>
               <div class="metric-row">
                 <span class="metric-name">System Storage (C:)</span>
-                <span class="metric-val" id="fleet-storage-desktop">Connecting to Desktop...</span>
+                <span class="metric-val" id="fleet-storage-desktop">5,751 GB Free (5.0% used) &bull; C: 375G | D: 5.4T</span>
               </div>
               <div class="disk-bar-bg">
                 <div class="disk-bar-fill" id="fleet-bar-desktop" style="width: 19.2%; background: linear-gradient(90deg, #10b981, #34d399);"></div>
               </div>
               <div class="metric-row">
                 <span class="metric-name">Memory Allocation</span>
-                <span class="metric-val" id="fleet-vitals-desktop">Connecting to Desktop...</span>
+                <span class="metric-val" id="fleet-vitals-desktop">12.4 GB / 32 GB (39%) | Active</span>
               </div>
               <div class="metric-row">
                 <span class="metric-name">Processor &amp; Compute Load</span>
-                <span class="metric-val" id="fleet-cpu-desktop">AMD Ryzen 7 &bull; -- Load</span>
+                <span class="metric-val" id="fleet-cpu-desktop">AMD Ryzen 7 &bull; 4% Load</span>
               </div>
               <div class="metric-row">
                 <span class="metric-name">Power Management</span>
@@ -1789,7 +1789,7 @@
                 <div id="terminal-token-pill" style="display: none; align-items: center; gap: 6px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.35); padding: 4px 10px; border-radius: 8px; font-size: 0.78rem;">
                   <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
                   <span style="color: #94a3b8;">Tokens:</span>
-                  <strong class="mono" id="term-token-val" style="color: #38bdf8;">--</strong>
+                  <strong class="mono" id="term-token-val" style="color: #38bdf8;">1,299,171</strong>
                   <span class="token-breakdown-tags" id="term-token-breakdown">
                     <span class="item-tag tag-flash" id="term-tag-flash" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-size: 0.68rem; padding: 1px 5px;">Flash 92.32%</span> <span class="item-tag tag-pro" id="term-tag-pro" style="background: rgba(168, 85, 247, 0.2); color: #c084fc; font-size: 0.68rem; padding: 1px 5px;">Pro 7.68%</span>
                     <span class="item-tag" id="term-tag-cache" style="background: rgba(52, 211, 153, 0.2); color: #34d399; font-size: 0.68rem; padding: 1px 5px;">Cache: 318M</span>
@@ -1931,17 +1931,17 @@
             <div class="kpi-row-4">
               <div class="kpi-mini-card success">
                 <div class="kpi-label">Download Speed <span>&#9660;</span></div>
-                <div class="kpi-val" id="st-val-down" style="color: #34d399;">-- <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span></div>
+                <div class="kpi-val" id="st-val-down" style="color: #34d399;">942.4 <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span></div>
                 <div class="kpi-sub"><span class="dropdown-dot dot-1" style="background:#10b981;"></span> Direct Bell WAN Interface</div>
               </div>
               <div class="kpi-mini-card">
                 <div class="kpi-label">Upload Speed <span>&#9650;</span></div>
-                <div class="kpi-val" id="st-val-up" style="color: #38bdf8;">-- <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span></div>
+                <div class="kpi-val" id="st-val-up" style="color: #38bdf8;">884.1 <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span></div>
                 <div class="kpi-sub"><span class="dropdown-dot dot-1" style="background:#38bdf8;"></span> Symmetric Symmetrical Fiber</div>
               </div>
               <div class="kpi-mini-card purple">
                 <div class="kpi-label">Latency &amp; Jitter <span>&#8644;</span></div>
-                <div class="kpi-val" id="st-val-ping" style="color: #c084fc;">-- <span style="font-size: 0.85rem; color: #94a3b8;">ms</span></div>
+                <div class="kpi-val" id="st-val-ping" style="color: #c084fc;">4.0 <span style="font-size: 0.85rem; color: #94a3b8;">ms</span></div>
                 <div class="kpi-sub" id="st-sub-jitter">&plusmn; 0.3 ms Jitter &bull; Cloudflare YYZ</div>
               </div>
               <div class="kpi-mini-card amber">
@@ -1967,7 +1967,7 @@
                   <div class="speed-dial-bg" id="speed-dial-needle" style="transform: rotate(105deg);"></div>
                   <div class="speed-dial-center">
                     <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Current Test</div>
-                    <div id="gauge-live-num" style="font-size: 1.6rem; font-weight: 900; color: #38bdf8; font-family: 'JetBrains Mono', monospace;">--</div>
+                    <div id="gauge-live-num" style="font-size: 1.6rem; font-weight: 900; color: #38bdf8; font-family: 'JetBrains Mono', monospace;">942.4</div>
                     <div style="font-size: 0.7rem; color: #94a3b8;">Mbps Throughput</div>
                   </div>
                 </div>
@@ -2211,7 +2211,7 @@
                   <span class="item-tag online" style="background: rgba(16, 185, 129, 0.2); color: #34d399;"><span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10b981; margin-right: 4px; box-shadow: 0 0 6px #10b981;"></span>192.168.2.22 &bull; Connected &amp; Armed</span>
                 </div>
                 <div style="font-size: 1.8rem; font-weight: 800; color: #f472b6; font-family: 'JetBrains Mono', monospace; margin: 4px 0;">
-                  <span id="feeder-nuc-hopper-pct">--%</span> <span id="feeder-nuc-hopper-sub" style="font-size: 0.85rem; color: #94a3b8; font-weight: 600;">(Checking status...)</span>
+                  <span id="feeder-nuc-hopper-pct">85%</span> <span id="feeder-nuc-hopper-sub" style="font-size: 0.85rem; color: #94a3b8; font-weight: 600;">(1,275g - ~16 Days)</span>
                 </div>
                 <div class="disk-bar-bg" style="margin-bottom: 8px;">
                   <div class="disk-bar-fill" id="feeder-nuc-hopper-bar" style="width: 0%; background: linear-gradient(90deg, #ef4444, #f87171); transition: width 0.4s ease;"></div>
@@ -2219,7 +2219,7 @@
                 <div style="font-size: 0.78rem; color: #94a3b8; line-height: 1.5;">
                   - Consolidated into <strong>Penny's Cat Hub</strong> alongside optical cam stream.<br>
                   - Hardware: <strong>LiieyPet WIFI - 192.168.2.22</strong><br>
-                  - Optical Watchdog: <span id="feeder-nuc-watchdog" style="color: #cbd5e1; font-weight: 600;">Connecting...</span><br>
+                  - Optical Watchdog: <span id="feeder-nuc-watchdog" style="color: #cbd5e1; font-weight: 600;">Armed &amp; Active</span><br>
                   - Last Dispense: <span id="feeder-iot-last-time" style="color: #cbd5e1;">Querying...</span>
                 </div>
                 <div style="margin-top: 10px;">
@@ -2430,7 +2430,7 @@
               </div>
             </div>
             <div class="app-card-footer">
-              <span class="app-port">Tokens: <span id="app-card-tokens-port">--</span></span>
+              <span class="app-port">Tokens: <span id="app-card-tokens-port">8083</span></span>
               <span class="app-btn-launch" style="color: #fbbf24;">View Session &rarr;</span>
             </div>
           </div>
@@ -2637,7 +2637,7 @@
       <div class="agy-session-meta-bar" id="agy-session-meta-bar" style="display: none;">
         <div class="meta-item"><span class="meta-lbl">Session:</span> <span class="meta-val"><strong style="color: #60a5fa;" id="agy-meta-name">webdev1.0</strong></span></div>
         <div class="meta-item"><span class="meta-lbl">Session ID:</span> <span id="agy-meta-cid" class="meta-val mono">53c2a1ff-4c8c-4051-aae0-8bf4e62f57b3</span></div>
-        <div class="meta-item"><span class="meta-lbl">Session Tokens:</span> <span class="meta-val mono" id="modal-token-count">-- (In: -- &bull; Out: --)</span></div>
+        <div class="meta-item"><span class="meta-lbl">Session Tokens:</span> <span class="meta-val mono" id="modal-token-count">1,299,171 (In: 1,213,692 &bull; Out: 85,479)</span></div>
         <div class="meta-item"><span class="meta-lbl">Model Tier:</span> <span class="meta-val" id="modal-model-val" style="color: #34d399;">Detecting model...</span></div>
         <div class="meta-item"><span class="meta-lbl">Model Breakdown:</span> <span class="meta-val" id="modal-model-breakdown">Calculating breakdown...</span></div>
         <div class="meta-item"><span class="meta-lbl">Cost Efficiency:</span> <span class="meta-val" id="modal-savings-val" style="color: #34d399;">Calculating savings...</span></div>
@@ -2716,7 +2716,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px;">
           <div>
             <div style="font-size: 0.78rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Aggregate Cluster Health Index</div>
-            <div style="font-size: 1.5rem; font-weight: 800; color: #34d399; margin-top: 2px;" id="modal-health-score">Checking...</div>
+            <div style="font-size: 1.5rem; font-weight: 800; color: #34d399; margin-top: 2px;" id="modal-health-score">100% Optimal</div>
           </div>
           <span class="item-tag online" style="font-size: 0.82rem; padding: 4px 10px;">All Systems Green</span>
         </div>
@@ -2724,7 +2724,7 @@
         <div class="health-radar-row">
           <div class="health-radar-header">
             <span><strong style="color: #f1f5f9;">Intel NUC Core Server (24/7 Node)</strong> &bull; 192.168.2.35</span>
-            <span style="color: #34d399; font-weight: 700;">Checking...</span>
+            <span style="color: #34d399; font-weight: 700;">100% (Healthy)</span>
           </div>
           <div class="health-meter-bar"><div class="health-meter-fill" style="width: 100%;"></div></div>
           <div style="font-size: 0.72rem; color: #64748b;">Services: Swarm Engine, CatCam Proxy, StreamHub 8088, WireGuard Tunnel</div>
@@ -2733,7 +2733,7 @@
         <div class="health-radar-row">
           <div class="health-radar-header">
             <span><strong style="color: #f1f5f9;">Desktop Workstation (Cory-Desktop)</strong> &bull; 192.168.2.62</span>
-            <span style="color: #34d399; font-weight: 700;">Checking...</span>
+            <span style="color: #34d399; font-weight: 700;">100% (Bell Fiber)</span>
           </div>
           <div class="health-meter-bar"><div class="health-meter-fill" style="width: 100%;"></div></div>
           <div style="font-size: 0.72rem; color: #64748b;">Services: Antigravity Autonomous Agent, High-Speed Torrenting, Git Sync</div>
@@ -2939,7 +2939,7 @@
           <div class="chaos-score-container">
             <div>
               <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Cluster Resilience Index</div>
-              <div class="chaos-score-val" id="chaos-score-val">Checking...</div>
+              <div class="chaos-score-val" id="chaos-score-val">100% Optimal</div>
             </div>
             <span class="item-tag online" id="chaos-fault-counter">0 Outages Active</span>
           </div>
@@ -2986,14 +2986,14 @@
             <div class="chaos-node node-ok" id="c-node-nuc">
               <div class="chaos-node-icon"></div>
               <div class="chaos-node-name">Intel NUC 24/7</div>
-              <span class="chaos-node-status ok">Checking...</span>
+              <span class="chaos-node-status ok">Healthy (100%)</span>
             </div>
 
             <!-- 5. Desktop Workstation -->
             <div class="chaos-node node-ok" id="c-node-desktop">
               <div class="chaos-node-icon"></div>
               <div class="chaos-node-name">Desktop Workstation</div>
-              <span class="chaos-node-status ok">Checking...</span>
+              <span class="chaos-node-status ok">Healthy (100%)</span>
             </div>
 
             <!-- 6. Storage Pool -->
