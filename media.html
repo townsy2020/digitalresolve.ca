@@ -338,10 +338,10 @@
         <div class="control-matrix-card" style="margin-bottom: 24px;">
           <div class="control-matrix-header">
             <div class="control-matrix-title">
-              <span>[STAT]</span> Live Swarm Telemetry &amp; Storage Footprint
+              <span>[STAT]</span> Live Swarm Telemetry &amp; Media Storage Footprint
             </div>
             <div style="font-size: 0.8rem; color: #8b949e;">
-              High-Speed Bell Fiber &bull; D: &amp; C: Drive Allocation
+              High-Speed Bell Fiber &bull; NUC Dedicated Media Array (D: Drive)
             </div>
           </div>
         <div class="homelab-stats-section">
@@ -377,123 +377,36 @@
                 <span style="color: #a5b4fc;">Dual Gigabit Routing</span>
               </div>
             </div>
+            <!-- NUC Dedicated Media Storage Safeguard Tile -->
+            <div class="stat-metric-card" style="min-width: 300px;">
+              <div>
+                <div class="stat-card-header">
+                  <span class="stat-card-title">Media Storage Pool (NUC D:)</span>
+                  <span class="item-tag online" id="stat-disk-safeguard-tag" style="font-size: 0.68rem; padding: 2px 7px;">Safe (+489 GB)</span>
+                </div>
+                <div class="stat-big-val" id="stat-disk-free" style="color: #38bdf8;">489.2 GB <span style="font-size: 0.85rem; color: #8b949e;">Free</span></div>
+                <div class="stat-subtext" id="stat-disk-sub" style="margin-top: 4px;">
+                  <span>Calculating storage...</span>
+                </div>
+              </div>
+              <div class="storage-segments-wrap" style="margin-top: 12px;">
+                <div class="storage-segments-bar">
+                  <div class="seg-movies" style="width: 28%;" title="Movies: 520 GB"></div>
+                  <div class="seg-tv" style="width: 22%;" title="TV Series: 410 GB"></div>
+                  <div class="seg-mixes" style="width: 23.4%;" title="Media Mixes: 437 GB"></div>
+                  <div class="seg-free" style="width: 26.6%;" title="Free Space: 496 GB"></div>
+                </div>
+                <div class="storage-legend">
+                  <span id="stat-nuc-movies-legend"><span class="legend-dot seg-movies"></span> Movies (520 GB)</span>
+                  <span id="stat-nuc-tv-legend"><span class="legend-dot seg-tv"></span> Series (410 GB)</span>
+                  <span id="stat-nuc-mixes-legend"><span class="legend-dot seg-mixes"></span> Mixes (437 GB)</span>
+                  <span id="stat-nuc-free-legend"><span class="legend-dot seg-free"></span> Free (489 GB)</span>
+                </div>
+              </div>
+            </div>
           </div>
-
-          <!-- Consolidated Node Hardware Decks (Desktop & NUC) -->
-          <div class="node-decks-grid">
-            <!-- Desktop Workstation Node Deck -->
-            <div class="node-deck-card desktop-deck">
-              <div class="stat-card-header" style="padding-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 4px;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
-                  <span style="font-weight: 700; font-size: 0.95rem; color: #f8fafc; letter-spacing: 0.3px;">Desktop Node (192.168.2.62)</span>
-                </div>
-                <span class="item-tag online" id="stat-desktop-hw-tag" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3);">Online</span>
-              </div>
-              <div class="node-deck-metrics">
-                <!-- Desktop Compute Subcard -->
-                <div class="node-metric-subcard">
-                  <div>
-                    <div class="stat-card-header" style="margin-bottom: 8px;">
-                      <span class="stat-card-title" style="font-size: 0.8rem; color: #94a3b8;">Desktop Compute (Ryzen 7)</span>
-                      <span style="font-size: 0.72rem; color: #38bdf8; font-weight: 600; font-family: 'JetBrains Mono', monospace;">RTX Workstation</span>
-                    </div>
-                    <div class="stat-big-val" id="stat-desktop-cpu-val" style="color: #34d399;">6% <span style="font-size: 0.85rem; color: #8b949e; margin-left: 4px;">CPU</span></div>
-                  </div>
-                  <div class="stat-subtext" id="stat-desktop-ram-sub" style="margin-top: 10px;">
-                    Memory: 12.4 GB / 32 GB (39%) | Active Session
-                  </div>
-                </div>
-
-                <!-- Desktop Storage Safeguard Subcard (C: NVMe + D: Apps) -->
-                <div class="node-metric-subcard">
-                  <div>
-                    <div class="stat-card-header" style="margin-bottom: 8px;">
-                      <span class="stat-card-title" style="font-size: 0.8rem; color: #94a3b8;">Desktop Storage (C: &amp; D:)</span>
-                      <span class="item-tag online" id="stat-desktop-pool-tag" style="font-size: 0.68rem; padding: 2px 7px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3);">Dual Drive (6.05 TB)</span>
-                    </div>
-                    <div class="stat-big-val" id="stat-desktop-disk-free" style="color: #38bdf8;">5,751 GB <span style="font-size: 0.85rem; color: #8b949e;">Free</span></div>
-                    <div class="stat-subtext" id="stat-desktop-disk-sub" style="margin-top: 4px;">
-                      <span>Calculating storage...</span>
-                    </div>
-                  </div>
-                  <!-- Multi-Segment Storage Bar showing C: and D: drives -->
-                  <div class="storage-segments-wrap" style="margin-top: 12px;">
-                    <div class="storage-segments-bar">
-                      <div style="width: 8%; background: #38bdf8;" title="C: NVMe Used: 90 GB (19.4%)"></div>
-                      <div style="width: 32%; background: rgba(56, 189, 248, 0.35);" title="C: NVMe Free: 375 GB (80.6%)"></div>
-                      <div style="width: 4%; background: #10b981;" title="D: Apps Used: 213 GB (3.8%)"></div>
-                      <div style="width: 56%; background: rgba(16, 185, 129, 0.25);" title="D: Apps Free: 5,376 GB (96.2%)"></div>
-                    </div>
-                    <div class="storage-legend">
-                      <span id="stat-desktop-c-used"><span class="legend-dot" style="background: #38bdf8;"></span> C: 90G Used</span>
-                      <span id="stat-desktop-c-free"><span class="legend-dot" style="background: rgba(56, 189, 248, 0.45);"></span> C: 375G Free</span>
-                      <span id="stat-desktop-d-used"><span class="legend-dot" style="background: #10b981;"></span> D: 213G Used</span>
-                      <span id="stat-desktop-d-free"><span class="legend-dot" style="background: rgba(16, 185, 129, 0.35);"></span> D: 5.38T Free</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- NUC Server Node Deck -->
-            <div class="node-deck-card nuc-deck">
-              <div class="stat-card-header" style="padding-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); margin-bottom: 4px;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
-                  <span style="font-weight: 700; font-size: 0.95rem; color: #f8fafc; letter-spacing: 0.3px;">NUC Server Node (192.168.2.35)</span>
-                </div>
-                <span class="item-tag online" id="stat-hw-tag">Online</span>
-              </div>
-              <div class="node-deck-metrics">
-                <!-- NUC Compute Subcard -->
-                <div class="node-metric-subcard">
-                  <div>
-                    <div class="stat-card-header" style="margin-bottom: 8px;">
-                      <span class="stat-card-title" style="font-size: 0.8rem; color: #94a3b8;">Hardware Utilization</span>
-                      <span style="font-size: 0.72rem; color: #10b981; font-weight: 600; font-family: 'JetBrains Mono', monospace;">Intel Core i5</span>
-                    </div>
-                    <div class="stat-big-val" id="stat-cpu-val" style="color: #4ade80;">5% <span style="font-size: 0.85rem; color: #8b949e; margin-left: 4px;">CPU</span></div>
-                  </div>
-                  <div class="stat-subtext" id="stat-ram-sub" style="margin-top: 10px;">
-                    Memory: 9 GB / 31.8 GB (28%) | 3d 22h up
-                  </div>
-                </div>
-
-                <!-- NUC Storage Safeguard Subcard -->
-                <div class="node-metric-subcard">
-                  <div>
-                    <div class="stat-card-header" style="margin-bottom: 8px;">
-                      <span class="stat-card-title" style="font-size: 0.8rem; color: #94a3b8;">D: Drive Safeguard</span>
-                      <span class="item-tag online" id="stat-disk-safeguard-tag" style="font-size: 0.68rem; padding: 2px 7px;">Safe (+489 GB)</span>
-                    </div>
-                    <div class="stat-big-val" id="stat-disk-free" style="color: #38bdf8;">489.2 GB <span style="font-size: 0.85rem; color: #8b949e;">Free</span></div>
-                    <div class="stat-subtext" id="stat-disk-sub" style="margin-top: 4px;">
-                      <span>Calculating storage...</span>
-                    </div>
-                  </div>
-                  <div class="storage-segments-wrap" style="margin-top: 12px;">
-                    <div class="storage-segments-bar">
-                      <div class="seg-movies" style="width: 28%;" title="Movies: 520 GB"></div>
-                      <div class="seg-tv" style="width: 22%;" title="TV Series: 410 GB"></div>
-                      <div class="seg-mixes" style="width: 23.4%;" title="Media Mixes: 437 GB"></div>
-                      <div class="seg-free" style="width: 26.6%;" title="Free Space: 496 GB"></div>
-                    </div>
-                    <div class="storage-legend">
-                      <span id="stat-nuc-movies-legend"><span class="legend-dot seg-movies"></span> Movies (520 GB)</span>
-                      <span id="stat-nuc-tv-legend"><span class="legend-dot seg-tv"></span> Series (410 GB)</span>
-                      <span id="stat-nuc-mixes-legend"><span class="legend-dot seg-mixes"></span> Mixes (437 GB)</span>
-                      <span id="stat-nuc-free-legend"><span class="legend-dot seg-free"></span> Free (489 GB)</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div></div>
-
-
-
-        <!-- ISP Health, Jitter, Packet Loss & Throughput Monitor -->
+        </div>
+        <!-- End Swarm Telemetry & Storage Card -->
         </div>
         <div class="control-matrix-card" style="margin-bottom: 24px;">
           <div class="control-matrix-header">
