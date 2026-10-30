@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -626,7 +626,7 @@
                       <span class="item-tag online" id="stat-disk-safeguard-tag" style="font-size: 0.68rem; padding: 2px 7px;">Safe (+489 GB)</span>
                     </div>
                     <div class="stat-big-val" id="stat-disk-free" style="color: #38bdf8;">489.2 GB <span style="font-size: 0.85rem; color: #8b949e;">Free</span></div>
-                    <div class="stat-subtext" style="margin-top: 4px;">
+                    <div class="stat-subtext" id="stat-disk-sub" style="margin-top: 4px;">
                       <span>Calculating storage...</span>
                     </div>
                   </div>
@@ -812,7 +812,7 @@
                       <div style="font-size: 1.7rem; font-weight: 800; color: #f472b6; font-family: 'JetBrains Mono', monospace;">
                         <span id="feeder-hopper-pct">85%</span> <span id="feeder-hopper-sub" style="font-size: 0.82rem; color: #94a3b8; font-weight: 600;">(1,275g - ~16 Days)</span>
                       </div>
-                      <button type="button" class="btn btn-secondary" onclick="fetchFeederStatus()" style="font-size: 0.7rem; padding: 3px 8px; border-color: rgba(56, 189, 248, 0.35); color: #38bdf8; margin-right: 6px;" title="Query live feeder hopper and motor watchdog">
+                      <button type="button" class="btn btn-secondary" style="font-size: 0.72rem; padding: 3px 8px; color: #f472b6 !important; border-color: rgba(244, 114, 182, 0.35); margin-right: 6px;" onclick="fetchFeederStatus()" title="Poll Smart Feeder Telemetry">
                         Check Feeder
                       </button>
                       <button type="button" class="btn btn-secondary" onclick="refillFeederHopper()" style="font-size: 0.7rem; padding: 3px 8px; border-color: rgba(244, 114, 182, 0.35); color: #f472b6;" title="Mark hopper refilled to 100% (1,500g)">
@@ -1629,6 +1629,7 @@
               </div>
             </div>
             <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; gap: 8px; flex-wrap: wrap;">
+              <button type="button" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; color: #34d399 !important;" onclick="checkStatus('nuc')" title="Query live telemetry for NUC Server">Check Status</button>
               <button type="button" onclick="launchProtectedService('https://stream.digitalresolve.ca', 'StreamHub (Port 8088)')" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; color: #c4b5fd !important; border-color: rgba(139, 92, 246, 0.4); cursor: pointer;">StreamHub</button>
               <button type="button" onclick="launchProtectedService('https://files.digitalresolve.ca/files/', 'File Server (Port 8085)')" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; cursor: pointer;">Files</button>
               <button type="button" onclick="launchProtectedService('https://torrents2.digitalresolve.ca', 'qBittorrent NUC (Port 8081)')" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; cursor: pointer;">qBittorrent</button>
@@ -2222,7 +2223,8 @@
                   - Optical Watchdog: <span id="feeder-nuc-watchdog" style="color: #cbd5e1; font-weight: 600;">Armed &amp; Active</span><br>
                   - Last Dispense: <span id="feeder-iot-last-time" style="color: #cbd5e1;">Querying...</span>
                 </div>
-                <div style="margin-top: 10px;">
+                <div style="margin-top: 10px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                  <button type="button" class="btn btn-secondary" style="font-size: 0.72rem; padding: 3px 8px; color: #f472b6 !important;" onclick="fetchFeederStatus()" title="Poll Smart Feeder Telemetry">Check Feeder</button>
                   <a href="#camera-feed-card" class="btn btn-secondary" style="font-size: 0.76rem; padding: 5px 12px; color: #f472b6 !important; border-color: rgba(244, 114, 182, 0.4); display: inline-flex; align-items: center; gap: 6px;" title="Open Penny's Cat Hub (Stream &amp; Feeder)">
                     <span>Open Penny's Cat Hub (Stream &amp; Controls) &rarr;</span>
                   </a>

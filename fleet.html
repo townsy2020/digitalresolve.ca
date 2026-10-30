@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -662,6 +662,7 @@
               </div>
             </div>
             <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; gap: 8px; flex-wrap: wrap;">
+              <button type="button" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; color: #34d399 !important;" onclick="checkStatus('nuc')" title="Query live telemetry for NUC Server">Check Status</button>
               <button type="button" onclick="launchProtectedService('https://stream.digitalresolve.ca', 'StreamHub (Port 8088)')" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; color: #c4b5fd !important; border-color: rgba(139, 92, 246, 0.4); cursor: pointer;">StreamHub</button>
               <button type="button" onclick="launchProtectedService('https://files.digitalresolve.ca/files/', 'File Server (Port 8085)')" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; cursor: pointer;">Files</button>
               <button type="button" onclick="launchProtectedService('https://torrents2.digitalresolve.ca', 'qBittorrent NUC (Port 8081)')" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; cursor: pointer;">qBittorrent</button>

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -374,9 +374,12 @@
                       <div style="font-size: 1.7rem; font-weight: 800; color: #f472b6; font-family: 'JetBrains Mono', monospace;">
                         <span id="feeder-hopper-pct">85%</span> <span id="feeder-hopper-sub" style="font-size: 0.82rem; color: #94a3b8; font-weight: 600;">(1,275g - ~16 Days)</span>
                       </div>
-                      <button type="button" class="btn btn-secondary" onclick="refillFeederHopper()" style="font-size: 0.7rem; padding: 3px 8px; border-color: rgba(244, 114, 182, 0.35); color: #f472b6;" title="Mark hopper refilled to 100% (1,500g)">
-                        Refill Hopper
-                      </button>
+                      <div style="display: flex; gap: 6px;">
+                        <button type="button" class="btn btn-secondary" style="font-size: 0.72rem; padding: 3px 8px; color: #f472b6 !important;" onclick="fetchFeederStatus()" title="Poll Smart Feeder Telemetry">Check Feeder</button>
+                        <button type="button" class="btn btn-secondary" onclick="refillFeederHopper()" style="font-size: 0.7rem; padding: 3px 8px; border-color: rgba(244, 114, 182, 0.35); color: #f472b6;" title="Mark hopper refilled to 100% (1,500g)">
+                          Refill Hopper
+                        </button>
+                      </div>
                     </div>
                     <div class="disk-bar-bg" style="margin-bottom: 10px;">
                       <div class="disk-bar-fill" id="feeder-hopper-bar" style="width: 0%; background: linear-gradient(90deg, #ef4444, #f87171); transition: width 0.4s ease;"></div>

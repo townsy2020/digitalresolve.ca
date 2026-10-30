@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -917,7 +917,8 @@
                   - Optical Watchdog: <span id="feeder-nuc-watchdog" style="color: #cbd5e1; font-weight: 600;">Armed &amp; Active</span><br>
                   - Last Dispense: <span id="feeder-iot-last-time" style="color: #cbd5e1;">Querying...</span>
                 </div>
-                <div style="margin-top: 10px;">
+                <div style="margin-top: 10px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                  <button type="button" class="btn btn-secondary" style="font-size: 0.72rem; padding: 3px 8px; color: #f472b6 !important;" onclick="fetchFeederStatus()" title="Poll Smart Feeder Telemetry">Check Feeder</button>
                   <a href="#camera-feed-card" class="btn btn-secondary" style="font-size: 0.76rem; padding: 5px 12px; color: #f472b6 !important; border-color: rgba(244, 114, 182, 0.4); display: inline-flex; align-items: center; gap: 6px;" title="Open Penny's Cat Hub (Stream &amp; Feeder)">
                     <span>Open Penny's Cat Hub (Stream &amp; Controls) &rarr;</span>
                   </a>
