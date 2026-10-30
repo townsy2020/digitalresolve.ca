@@ -5016,25 +5016,25 @@
     // Dynamic Cloudflare Edge KPI Updater
     function updateCloudflareStatsUI(cfData) {
       const defStats = {
-        totalRequests: '48,290',
-        ingressSla: '100% Ingress SLA (0 Errors)',
-        hitRatio: '89.2%',
-        savedGB: '3.4 GB Saved from Origin',
-        uniqueVisitors: '148',
+        totalRequests: '568,400',
+        ingressSla: '99.98% Ingress SLA',
+        hitRatio: '89.8%',
+        savedGB: '3.42 GB Saved from Origin',
+        uniqueVisitors: '152',
         topPop: 'Top PoP: YUL (Montreal)',
-        threatsBlocked: '142',
+        threatsBlocked: '156',
         geoShield: '0 Breaches • CA/US Geo-Shield',
-        edgeThreats: '142 Threats Neutralized • CA/US Shield',
-        edgeIngress: 'Active • 100% Ingress',
+        edgeThreats: '156 Threats Neutralized • CA/US Shield',
+        edgeIngress: 'Active • 4 HA Connections',
         edgePops: 'YUL (Montreal) • YYZ (Toronto)',
         subRequests: {
           apex: '21,450',
-          wake: '12,680',
-          cam: '8,920',
-          torrents: '6,340',
-          torrents2: '5,110',
-          stream: '4,280',
-          files: '2,190'
+          wake: '238,700',
+          cam: '125,000',
+          torrents: '79,500',
+          torrents2: '68,200',
+          stream: '34,100',
+          files: '22,700'
         }
       };
 
@@ -5170,7 +5170,7 @@
         document.body.style.overflow = 'hidden';
       }
       try {
-        const kpis = document.querySelectorAll('.cf-kpi-requests, .cf-kpi-ratio, .cf-kpi-visitors, .cf-kpi-threats, .cf-kpi-sla');
+        const kpis = document.querySelectorAll('.cf-kpi-requests, .cf-kpi-ratio, .cf-kpi-visitors, .cf-kpi-threats, .cf-kpi-sla, .cf-kpi-saved, .cf-kpi-toppop, .cf-kpi-geoshield');
         kpis.forEach(el => {
           el.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
           el.style.opacity = '0.7';
