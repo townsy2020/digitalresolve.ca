@@ -37,7 +37,7 @@
       display: none;
       z-index: 5;
     }
-    /* Hardware Terminal HUD */
+    /* Hardware Terminal HUD Overlay (shown when connecting / standby / error) */
     #terminal-hud {
       position: absolute;
       inset: 0;
@@ -46,10 +46,10 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
-      background: radial-gradient(circle at 50% 30%, rgba(15, 23, 42, 0.9), #020617 80%);
+      background: radial-gradient(circle at 50% 30%, rgba(15, 23, 42, 0.92), #020617 80%);
       z-index: 2;
+      transition: opacity 0.3s ease;
     }
-    /* Grid background effect */
     #terminal-hud::before {
       content: "";
       position: absolute;
@@ -78,6 +78,11 @@
       -webkit-backdrop-filter: blur(8px);
       color: #6ee7b7;
       z-index: 10;
+      pointer-events: none;
+    }
+    .hud-badge-top.standby {
+      border-color: rgba(245, 158, 11, 0.4);
+      color: #fcd34d;
     }
     .pulse-dot {
       width: 8px;
@@ -86,6 +91,10 @@
       background: #10b981;
       box-shadow: 0 0 8px #10b981;
       animation: pulse 1.5s infinite;
+    }
+    .hud-badge-top.standby .pulse-dot {
+      background: #f59e0b;
+      box-shadow: 0 0 8px #f59e0b;
     }
     @keyframes pulse {
       0% { transform: scale(0.9); opacity: 0.7; }
@@ -100,104 +109,107 @@
       flex-direction: column;
       align-items: flex-end;
       gap: 3px;
-      font-family: 'JetBrains Mono', monospace, -apple-system;
-      font-size: 0.72rem;
-      background: rgba(0, 0, 0, 0.65);
-      backdrop-filter: blur(4px);
-      padding: 5px 10px;
-      border-radius: 6px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.68rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       z-index: 10;
+      pointer-events: none;
     }
     .terminal-center-card {
       position: relative;
-      max-width: 640px;
-      width: 100%;
+      max-width: 520px;
+      width: 90%;
       background: rgba(15, 23, 42, 0.75);
-      border: 1px solid rgba(56, 189, 248, 0.2);
-      border-radius: 12px;
-      padding: 20px 24px;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(12px);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 14px;
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       text-align: center;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6), 0 0 30px rgba(56, 189, 248, 0.1);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       z-index: 3;
     }
     .cam-icon-glow {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
       width: 48px;
       height: 48px;
-      border-radius: 50%;
-      background: rgba(16, 185, 129, 0.15);
-      border: 1px solid rgba(16, 185, 129, 0.4);
-      color: #10b981;
-      font-size: 1.4rem;
-      margin-bottom: 10px;
-      box-shadow: 0 0 20px rgba(16, 185, 129, 0.25);
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(16, 185, 129, 0.2));
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 12px;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
     }
     .cam-main-title {
       font-size: 1.15rem;
       font-weight: 800;
       color: #f8fafc;
+      letter-spacing: -0.3px;
       margin-bottom: 4px;
     }
     .cam-sub-meta {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: #94a3b8;
-      margin-bottom: 16px;
-      line-height: 1.4;
+      line-height: 1.45;
+      margin-bottom: 18px;
+      max-width: 440px;
     }
     .hud-metrics-row {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      width: 100%;
       margin-bottom: 18px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.74rem;
     }
     .hud-metric-pill {
-      background: rgba(2, 6, 23, 0.6);
+      background: rgba(2, 6, 23, 0.65);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 4px 10px;
       border-radius: 6px;
-      color: #cbd5e1;
+      padding: 6px 10px;
+      font-size: 0.72rem;
+      color: #94a3b8;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     .hud-metric-pill strong {
-      color: #38bdf8;
+      color: #f1f5f9;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     }
     .hud-metric-pill.online strong {
-      color: #10b981;
+      color: #34d399;
     }
     .hud-action-buttons {
       display: flex;
       gap: 10px;
-      justify-content: center;
       flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
     }
     .btn-stream-launch {
-      padding: 8px 18px;
-      border-radius: 8px;
-      font-size: 0.82rem;
-      font-weight: 700;
-      cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
       text-decoration: none;
       transition: all 0.2s ease;
-      border: none;
+      cursor: pointer;
+    }
+    .btn-stream-launch:hover {
+      transform: translateY(-1px);
     }
     .btn-geeni-live {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      background: linear-gradient(135deg, #10b981, #059669);
       color: #ffffff !important;
-      box-shadow: 0 0 16px rgba(16, 185, 129, 0.35);
-    }
-    .btn-geeni-live:hover {
-      background: linear-gradient(135deg, #059669 0%, #047857 100%);
-      transform: translateY(-1px);
-      box-shadow: 0 0 24px rgba(16, 185, 129, 0.55);
+      border: 1px solid #10b981;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.45);
     }
     .btn-sub-action {
       background: rgba(56, 189, 248, 0.12);
@@ -207,21 +219,28 @@
     .btn-sub-action:hover {
       background: rgba(56, 189, 248, 0.22);
       border-color: #38bdf8;
-      transform: translateY(-1px);
     }
+
+    /* Floating On-Video Bottom Toolbar */
     .hud-bottom-bar {
       position: absolute;
-      bottom: 10px;
+      bottom: 12px;
       left: 14px;
       right: 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       z-index: 10;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    #player-wrap:hover .hud-bottom-bar,
+    #player-wrap:focus-within .hud-bottom-bar {
+      opacity: 1;
     }
     .hud-btn {
       background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.18);
       color: #cbd5e1;
       padding: 5px 12px;
       border-radius: 6px;
@@ -232,12 +251,13 @@
       align-items: center;
       gap: 5px;
       backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       transition: all 0.15s ease;
       text-decoration: none;
     }
     .hud-btn:hover {
       background: rgba(30, 41, 59, 0.95);
-      border-color: rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.35);
       color: #fff;
     }
     .hud-btn.active {
@@ -245,74 +265,111 @@
       border-color: #10b981;
       color: #6ee7b7;
     }
+
+    /* Loading Spinner */
+    #loading-spinner {
+      position: absolute;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      z-index: 20;
+      transition: opacity 0.25s ease;
+    }
+    .spin {
+      width: 32px;
+      height: 32px;
+      border: 3px solid rgba(56, 189, 248, 0.2);
+      border-top-color: #38bdf8;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
   <div id="player-wrap">
     <video id="video" autoplay playsinline muted></video>
 
-    <!-- Terminal HUD Overlay (Replaces Mockup / Black Box) -->
+    <!-- Top Badge Overlay -->
+    <div class="hud-badge-top" id="status-badge">
+      <div class="pulse-dot"></div>
+      <span id="status-text">CONNECTING WEBRTC...</span>
+    </div>
+
+    <!-- Top Right Meta -->
+    <div class="hud-top-right">
+      <span style="color:#38bdf8; font-weight:700;" id="hudCamTarget">CAM 1: LIVING ROOM TOWER</span>
+      <span id="hudClock" style="color:#94a3b8;">UTC SYNCING...</span>
+      <span style="color:#10b981;">1080P HD &bull; H.264 &bull; AUTO NIGHT</span>
+    </div>
+
+    <!-- Fallback / Standby HUD (only shown before stream connects or if disconnected) -->
     <div id="terminal-hud">
-      <div class="hud-badge-top" id="status-badge">
-        <div class="pulse-dot"></div>
-        <span id="status-text">HARDWARE ONLINE &bull; 2.4 ms</span>
-      </div>
-
-      <div class="hud-top-right">
-        <span style="color:#38bdf8; font-weight:700;" id="hudCamTarget">CAM 1: LIVING ROOM TOWER</span>
-        <span id="hudClock" style="color:#94a3b8;">UTC SYNCING...</span>
-        <span style="color:#10b981;">1080P HD &bull; H.264 &bull; AUTO NIGHT</span>
-      </div>
-
       <div class="terminal-center-card">
         <div class="cam-icon-glow">&#128247;</div>
         <div class="cam-main-title" id="camTitle">Penny's Feeder &bull; Cat Cam 1</div>
         <div class="cam-sub-meta">
-          Genuine 1080P Geeni Smart Security camera active on local high-speed mesh network. 
-          Stream directly via official cloud gateway or NUC proxy console.
+          Genuine 1080P Geeni Smart Security camera active on local high-speed mesh network via Tuya IoT protocol.
         </div>
 
         <div class="hud-metrics-row">
           <div class="hud-metric-pill online">State: <strong id="valState">ONLINE</strong></div>
           <div class="hud-metric-pill">IP: <strong id="valIp">192.168.2.24</strong></div>
           <div class="hud-metric-pill">Latency: <strong id="valLatency">2.4 ms</strong></div>
-          <div class="hud-metric-pill">Vendor: <strong>Geeni (Tuya IoT)</strong></div>
+          <div class="hud-metric-pill">Gateway: <strong>go2rtc (NUC)</strong></div>
         </div>
 
         <div class="hud-action-buttons">
-          <a href="https://camview.mygeeni.com" target="_blank" rel="noopener noreferrer" class="btn-stream-launch btn-geeni-live" title="Open official Geeni IPC 1080P cloud video player in new tab">
-            <span>&#9654;</span> Launch 1080P Geeni Stream &nearr;
-          </a>
-          <a href="https://ipc.ismartlife.me" target="_blank" rel="noopener noreferrer" class="btn-stream-launch btn-sub-action" title="Open Tuya Smart Life IPC player">
-            Smart Life Web &nearr;
+          <button type="button" class="btn-stream-launch btn-geeni-live" onclick="reconnect()">
+            <span>&#9654;</span> Connect WebRTC Stream
+          </button>
+          <a href="https://camview.mygeeni.com" target="_blank" rel="noopener noreferrer" class="btn-stream-launch btn-sub-action" title="Open official Geeni IPC 1080P cloud video player in new tab">
+            Geeni Cloud &nearr;
           </a>
           <a href="http://192.168.2.35:8089" target="_blank" rel="noopener noreferrer" class="btn-stream-launch btn-sub-action" title="Open NUC Port 8089 Cat Cam Console">
             LAN Portal (:8089) &nearr;
           </a>
         </div>
       </div>
+    </div>
 
-      <div class="hud-bottom-bar">
-        <div style="display: flex; gap: 8px;">
-          <button type="button" class="hud-btn" id="btn-night" onclick="toggleNight()">
-            &#127769; Night Vision Filter
-          </button>
-          <button type="button" class="hud-btn" onclick="pollStatus()">
-            &#8635; Refresh Ping
-          </button>
-        </div>
-        <div style="display: flex; gap: 8px;">
-          <button type="button" class="hud-btn" onclick="toggleFullscreen()">
-            &#9974; Fullscreen
-          </button>
-        </div>
+    <!-- On-Video Floating Controls -->
+    <div class="hud-bottom-bar">
+      <div style="display: flex; gap: 8px;">
+        <button type="button" class="hud-btn" id="btn-audio" onclick="toggleAudio()">
+          &#128263; Audio
+        </button>
+        <button type="button" class="hud-btn" id="btn-night" onclick="toggleNight()">
+          &#127769; Night Vision Filter
+        </button>
+        <button type="button" class="hud-btn" onclick="reconnect()">
+          &#8635; Reload Stream
+        </button>
       </div>
+      <div style="display: flex; gap: 8px;">
+        <button type="button" class="hud-btn" onclick="toggleFullscreen()">
+          &#9974; Fullscreen
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loading-spinner">
+      <div class="spin"></div>
+      <div style="font-size: 0.85rem; font-weight: 700; color: #f1f5f9;">Connecting Live WebRTC...</div>
+      <div style="font-size: 0.72rem; color: #64748b; font-family: monospace;">Tuya H.264 &bull; Zero-Lag NUC Gateway</div>
     </div>
   </div>
 
   <script>
     const video = document.getElementById('video');
     const hud = document.getElementById('terminal-hud');
+    const spinner = document.getElementById('loading-spinner');
+    const statusBadge = document.getElementById('status-badge');
     const statusText = document.getElementById('status-text');
     const hudCamTarget = document.getElementById('hudCamTarget');
     const hudClock = document.getElementById('hudClock');
@@ -321,8 +378,12 @@
     const valIp = document.getElementById('valIp');
     const valLatency = document.getElementById('valLatency');
     const btnNight = document.getElementById('btn-night');
+    const btnAudio = document.getElementById('btn-audio');
 
     let nightFilter = false;
+    let pc = null;
+    let ws = null;
+    let reconnectTimeout = null;
 
     // Detect target camera from URL
     const params = new URLSearchParams(window.location.search);
@@ -348,6 +409,30 @@
     setInterval(updateClock, 1000);
     updateClock();
 
+    function hideSpinner() {
+      if (spinner && spinner.style.display !== 'none') {
+        spinner.style.opacity = '0';
+        setTimeout(() => { spinner.style.display = 'none'; }, 250);
+      }
+    }
+
+    function showSpinner(text) {
+      if (spinner) {
+        if (text) {
+          const t = spinner.querySelector('div:nth-child(2)');
+          if (t) t.textContent = text;
+        }
+        spinner.style.display = 'flex';
+        spinner.style.opacity = '1';
+      }
+    }
+
+    function toggleAudio() {
+      video.muted = !video.muted;
+      btnAudio.innerHTML = video.muted ? '&#128263; Audio' : '&#128266; Audio ON';
+      btnAudio.classList.toggle('active', !video.muted);
+    }
+
     function toggleNight() {
       nightFilter = !nightFilter;
       btnNight.classList.toggle('active', nightFilter);
@@ -365,6 +450,141 @@
       }
     }
 
+    function reconnect() {
+      showSpinner('Connecting Live WebRTC...');
+      initWebRTC();
+    }
+
+    // High-Speed WebRTC Streaming Pipeline via go2rtc
+    function initWebRTC() {
+      if (reconnectTimeout) clearTimeout(reconnectTimeout);
+      if (pc) { try { pc.close(); } catch(e){} }
+      if (ws) { try { ws.close(); } catch(e){} }
+
+      statusBadge.classList.remove('standby');
+      statusBadge.classList.add('online');
+      statusText.textContent = 'CONNECTING WEBRTC...';
+
+      pc = new RTCPeerConnection({
+        iceServers: [{ urls: ['stun:stun.cloudflare.com:3478', 'stun:stun.l.google.com:19302'] }]
+      });
+
+      const tracks = ['video', 'audio'].map(kind => pc.addTransceiver(kind, { direction: 'recvonly' }).receiver.track);
+      video.srcObject = new MediaStream(tracks);
+
+      pc.addEventListener('connectionstatechange', () => {
+        if (pc.connectionState === 'connected') {
+          hideSpinner();
+          hud.style.display = 'none';
+          video.style.display = 'block';
+          statusBadge.classList.add('online');
+          statusBadge.classList.remove('standby');
+          statusText.innerHTML = `LIVE WEBRTC &bull; ${activeCam.ip}`;
+          video.play().catch(e => console.warn('Auto-play:', e));
+        } else if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
+          statusBadge.classList.remove('online');
+          statusBadge.classList.add('standby');
+          statusText.textContent = 'RECONNECTING...';
+          reconnectTimeout = setTimeout(initWebRTC, 4000);
+        }
+      });
+
+      // Stream targets: map srcParam to actual stream name
+      let streamName = srcParam;
+      if (streamName.includes('bedroom') || streamName.includes('cam2')) {
+        streamName = streamName.includes('sd') ? 'bedroom_sd' : 'bedroom';
+      } else {
+        streamName = streamName.includes('sd') ? 'pennys_feeder_sd' : 'pennys_feeder';
+      }
+
+      // Establish connection candidates: prioritize local LAN NUC endpoint, then WAN
+      const endpoints = [];
+      const currentHost = window.location.hostname;
+      const isLocalHost = (currentHost === 'localhost' || currentHost === '127.0.0.1' || currentHost.startsWith('192.168.2.') || window.location.protocol === 'file:');
+
+      if (window.location.port === '8089') {
+        endpoints.push(`ws://${window.location.host}/api/ws?src=${encodeURIComponent(streamName)}`);
+      }
+      if (isLocalHost) {
+        endpoints.push(`ws://192.168.2.35:8089/api/ws?src=${encodeURIComponent(streamName)}`);
+        endpoints.push(`wss://cam.digitalresolve.ca/api/ws?src=${encodeURIComponent(streamName)}`);
+      } else {
+        endpoints.push(`wss://cam.digitalresolve.ca/api/ws?src=${encodeURIComponent(streamName)}`);
+        endpoints.push(`ws://192.168.2.35:8089/api/ws?src=${encodeURIComponent(streamName)}`);
+      }
+
+      connectToWs(endpoints, 0);
+    }
+
+    function connectToWs(endpoints, idx) {
+      if (idx >= endpoints.length) {
+        hideSpinner();
+        statusBadge.classList.remove('online');
+        statusBadge.classList.add('standby');
+        statusText.textContent = 'FEED STANDBY';
+        hud.style.display = 'flex';
+        return;
+      }
+
+      const wsUrl = endpoints[idx];
+      let hasOpened = false;
+
+      try {
+        ws = new WebSocket(wsUrl);
+      } catch (err) {
+        return connectToWs(endpoints, idx + 1);
+      }
+
+      const timeout = setTimeout(() => {
+        if (!hasOpened && ws.readyState !== WebSocket.OPEN) {
+          try { ws.close(); } catch(e){}
+          connectToWs(endpoints, idx + 1);
+        }
+      }, 3000);
+
+      ws.addEventListener('open', () => {
+        hasOpened = true;
+        clearTimeout(timeout);
+
+        pc.addEventListener('icecandidate', ev => {
+          if (!ev.candidate || ws.readyState !== WebSocket.OPEN) return;
+          ws.send(JSON.stringify({ type: 'webrtc/candidate', value: ev.candidate.candidate }));
+        });
+
+        pc.createOffer().then(offer => pc.setLocalDescription(offer)).then(() => {
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: 'webrtc/offer', value: pc.localDescription.sdp }));
+          }
+        }).catch(err => {
+          console.warn('Offer creation failed:', err);
+        });
+      });
+
+      ws.addEventListener('message', ev => {
+        try {
+          const msg = JSON.parse(ev.data);
+          if (msg.type === 'webrtc/candidate') {
+            pc.addIceCandidate({ candidate: msg.value, sdpMid: '0' }).catch(e => {});
+          } else if (msg.type === 'webrtc/answer') {
+            pc.setRemoteDescription({ type: 'answer', sdp: msg.value }).catch(e => {});
+          }
+        } catch (e) {}
+      });
+
+      ws.addEventListener('error', () => {
+        if (!hasOpened) {
+          clearTimeout(timeout);
+          connectToWs(endpoints, idx + 1);
+        }
+      });
+
+      ws.addEventListener('close', () => {
+        if (pc.connectionState !== 'connected') {
+          hideSpinner();
+        }
+      });
+    }
+
     // Active Camera Ping Telemetry
     async function pollStatus() {
       const endpoints = [
@@ -375,7 +595,7 @@
       for (const ep of endpoints) {
         try {
           const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
-          const tid = ctrl ? setTimeout(() => ctrl.abort(), 2500) : null;
+          const tid = ctrl ? setTimeout(() => ctrl.abort(), 2000) : null;
           const res = await fetch(ep, ctrl ? { signal: ctrl.signal } : {});
           if (tid) clearTimeout(tid);
           if (res.ok) {
@@ -388,7 +608,9 @@
               valIp.textContent = c.ip;
               const lat = c.latencyMs ? c.latencyMs + ' ms' : '2.4 ms';
               valLatency.textContent = lat;
-              statusText.innerHTML = `HARDWARE ONLINE &bull; ${lat}`;
+              if (pc && pc.connectionState !== 'connected') {
+                statusText.innerHTML = `HARDWARE ONLINE &bull; ${lat}`;
+              }
               return;
             }
           }
@@ -397,41 +619,24 @@
     }
 
     pollStatus();
-    setInterval(pollStatus, 4000);
+    setInterval(pollStatus, 5000);
 
-    // Optional WebRTC Ingestion check: if video receives a track, show video immediately
-    function attemptWebRtcStream() {
-      try {
-        const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        let wsHost = window.location.host;
-        if (window.location.hostname === 'digitalresolve.ca' || window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:' || window.location.hostname === 'localhost') {
-          wsHost = 'cam.digitalresolve.ca';
-        }
-        const ws = new WebSocket(`${proto}//${wsHost}/api/ws?src=${encodeURIComponent(srcParam)}`);
-        ws.addEventListener('open', () => {
-          const pc = new RTCPeerConnection({
-            iceServers: [{ urls: ['stun:stun.cloudflare.com:3478', 'stun:stun.l.google.com:19302'] }]
-          });
-          const tracks = ['video', 'audio'].map(kind => pc.addTransceiver(kind, { direction: 'recvonly' }).receiver.track);
-          video.srcObject = new MediaStream(tracks);
-          pc.addEventListener('track', ev => {
-            if (ev.track) {
-              video.style.display = 'block';
-              hud.style.display = 'none';
-              video.play().catch(e => console.warn(e));
-            }
-          });
-          pc.createOffer().then(o => pc.setLocalDescription(o)).then(() => {
-            if (ws.readyState === WebSocket.OPEN) {
-              ws.send(JSON.stringify({ type: 'webrtc/offer', value: pc.localDescription.sdp }));
-            }
-          });
-        });
-      } catch (e) {
-        // Stay in high-tech HUD mode
-      }
-    }
-    attemptWebRtcStream();
+    video.addEventListener('loadeddata', () => {
+      hideSpinner();
+      hud.style.display = 'none';
+      video.style.display = 'block';
+    });
+
+    video.addEventListener('playing', () => {
+      hideSpinner();
+      hud.style.display = 'none';
+      video.style.display = 'block';
+    });
+
+    // Start WebRTC connection immediately
+    window.addEventListener('DOMContentLoaded', () => {
+      initWebRTC();
+    });
   </script>
 </body>
 </html>
