@@ -383,23 +383,33 @@
     let nightFilter = false;
     let pc = null;
     let ws = null;
+    let ms = null;
+    let sourceBuffer = null;
+    let bufferQueue = [];
     let reconnectTimeout = null;
+    let streamConnected = false;
 
     // Detect target camera from URL
     const params = new URLSearchParams(window.location.search);
     const srcParam = (params.get('src') || 'pennys_feeder').toLowerCase();
     const isCam2 = srcParam.includes('bedroom') || srcParam.includes('cam2');
+    const isSd = srcParam.includes('sd');
+    let streamName = isCam2 ? (isSd ? 'bedroom_sd' : 'bedroom') : (isSd ? 'pennys_feeder_sd' : 'pennys_feeder');
 
     const activeCam = {
       id: isCam2 ? 'cam2' : 'cam1',
+      stream: streamName,
       title: isCam2 ? "Penny's Perch &bull; Cat Cam 2" : "Penny's Feeder &bull; Cat Cam 1",
       targetText: isCam2 ? "CAM 2: PERCH / FOOD STATION" : "CAM 1: LIVING ROOM TOWER",
       ip: isCam2 ? '192.168.2.25' : '192.168.2.24'
     };
 
-    camTitle.innerHTML = activeCam.title;
-    hudCamTarget.textContent = activeCam.targetText;
-    valIp.textContent = activeCam.ip;
+    function applyActiveCamUI() {
+      camTitle.innerHTML = activeCam.title;
+      hudCamTarget.textContent = activeCam.targetText;
+      valIp.textContent = activeCam.ip;
+    }
+    applyActiveCamUI();
 
     // Live clock update
     function updateClock() {
@@ -450,73 +460,69 @@
       }
     }
 
-    function reconnect() {
-      showSpinner('Connecting Live WebRTC...');
-      initWebRTC();
+    function cleanupStream() {
+      if (reconnectTimeout) {
+        clearTimeout(reconnectTimeout);
+        reconnectTimeout = null;
+      }
+      if (ws) {
+        try { ws.close(); } catch (e) {}
+        ws = null;
+      }
+      if (pc) {
+        try { pc.close(); } catch (e) {}
+        pc = null;
+      }
+      sourceBuffer = null;
+      bufferQueue = [];
+      if (ms) {
+        if (ms.readyState === 'open') {
+          try { ms.endOfStream(); } catch (e) {}
+        }
+        ms = null;
+      }
+      streamConnected = false;
     }
 
-    // High-Speed WebRTC Streaming Pipeline via go2rtc
-    function initWebRTC() {
-      if (reconnectTimeout) clearTimeout(reconnectTimeout);
-      if (pc) { try { pc.close(); } catch(e){} }
-      if (ws) { try { ws.close(); } catch(e){} }
+    function reconnect() {
+      showSpinner('Connecting Live Stream...');
+      initStream();
+    }
+
+    // Candidate streaming endpoints prioritizing mixed-content compliance
+    function getEndpoints(stream) {
+      const endpoints = [];
+      const isHttps = (window.location.protocol === 'https:');
+      const isLocalHost = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.startsWith('192.168.2.') || window.location.protocol === 'file:');
+
+      if (window.location.port === '8089') {
+        endpoints.push(`ws://${window.location.host}/api/ws?src=${encodeURIComponent(stream)}`);
+      }
+
+      if (isHttps) {
+        // Under HTTPS, mixed-content security forbids ws://. Only wss:// is permitted.
+        endpoints.push(`wss://cam.digitalresolve.ca/api/ws?src=${encodeURIComponent(stream)}`);
+      } else {
+        // Under HTTP or local file: use direct high-speed LAN NUC endpoint, then WAN fallback
+        endpoints.push(`ws://192.168.2.35:8089/api/ws?src=${encodeURIComponent(stream)}`);
+        endpoints.push(`wss://cam.digitalresolve.ca/api/ws?src=${encodeURIComponent(stream)}`);
+      }
+      return endpoints;
+    }
+
+    // Dual-Mode Streaming Pipeline: MSE (WebSocket/TCP) with WebRTC Fallback
+    function initStream() {
+      cleanupStream();
 
       statusBadge.classList.remove('standby');
       statusBadge.classList.add('online');
-      statusText.textContent = 'CONNECTING WEBRTC...';
+      statusText.textContent = 'CONNECTING STREAM...';
 
-      pc = new RTCPeerConnection({
-        iceServers: [{ urls: ['stun:stun.cloudflare.com:3478', 'stun:stun.l.google.com:19302'] }]
-      });
-
-      const tracks = ['video', 'audio'].map(kind => pc.addTransceiver(kind, { direction: 'recvonly' }).receiver.track);
-      video.srcObject = new MediaStream(tracks);
-
-      pc.addEventListener('connectionstatechange', () => {
-        if (pc.connectionState === 'connected') {
-          hideSpinner();
-          hud.style.display = 'none';
-          video.style.display = 'block';
-          statusBadge.classList.add('online');
-          statusBadge.classList.remove('standby');
-          statusText.innerHTML = `LIVE WEBRTC &bull; ${activeCam.ip}`;
-          video.play().catch(e => console.warn('Auto-play:', e));
-        } else if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
-          statusBadge.classList.remove('online');
-          statusBadge.classList.add('standby');
-          statusText.textContent = 'RECONNECTING...';
-          reconnectTimeout = setTimeout(initWebRTC, 4000);
-        }
-      });
-
-      // Stream targets: map srcParam to actual stream name
-      let streamName = srcParam;
-      if (streamName.includes('bedroom') || streamName.includes('cam2')) {
-        streamName = streamName.includes('sd') ? 'bedroom_sd' : 'bedroom';
-      } else {
-        streamName = streamName.includes('sd') ? 'pennys_feeder_sd' : 'pennys_feeder';
-      }
-
-      // Establish connection candidates: prioritize local LAN NUC endpoint, then WAN
-      const endpoints = [];
-      const currentHost = window.location.hostname;
-      const isLocalHost = (currentHost === 'localhost' || currentHost === '127.0.0.1' || currentHost.startsWith('192.168.2.') || window.location.protocol === 'file:');
-
-      if (window.location.port === '8089') {
-        endpoints.push(`ws://${window.location.host}/api/ws?src=${encodeURIComponent(streamName)}`);
-      }
-      if (isLocalHost) {
-        endpoints.push(`ws://192.168.2.35:8089/api/ws?src=${encodeURIComponent(streamName)}`);
-        endpoints.push(`wss://cam.digitalresolve.ca/api/ws?src=${encodeURIComponent(streamName)}`);
-      } else {
-        endpoints.push(`wss://cam.digitalresolve.ca/api/ws?src=${encodeURIComponent(streamName)}`);
-        endpoints.push(`ws://192.168.2.35:8089/api/ws?src=${encodeURIComponent(streamName)}`);
-      }
-
-      connectToWs(endpoints, 0);
+      const endpoints = getEndpoints(activeCam.stream);
+      connectEndpoint(endpoints, 0);
     }
 
-    function connectToWs(endpoints, idx) {
+    function connectEndpoint(endpoints, idx) {
       if (idx >= endpoints.length) {
         hideSpinner();
         statusBadge.classList.remove('online');
@@ -527,18 +533,198 @@
       }
 
       const wsUrl = endpoints[idx];
-      let hasOpened = false;
 
+      // Primary Transport: MSE over WebSocket (fMP4 chunks over Cloudflare Tunnel TCP)
+      if ('MediaSource' in window) {
+        startMSE(wsUrl, endpoints, idx);
+      } else {
+        startWebRTC(wsUrl, endpoints, idx);
+      }
+    }
+
+    function startMSE(wsUrl, endpoints, idx) {
+      ms = new MediaSource();
+      video.src = URL.createObjectURL(ms);
+      video.srcObject = null;
+
+      ms.addEventListener('sourceopen', () => {
+        URL.revokeObjectURL(video.src);
+
+        try {
+          ws = new WebSocket(wsUrl);
+          ws.binaryType = 'arraybuffer';
+        } catch (err) {
+          return connectEndpoint(endpoints, idx + 1);
+        }
+
+        let hasOpened = false;
+        const connTimeout = setTimeout(() => {
+          if (!hasOpened && ws && ws.readyState !== WebSocket.OPEN) {
+            try { ws.close(); } catch (e) {}
+            startWebRTC(wsUrl, endpoints, idx);
+          }
+        }, 3500);
+
+        ws.addEventListener('open', () => {
+          hasOpened = true;
+          clearTimeout(connTimeout);
+
+          // Negotiate codecs with go2rtc
+          const supportedCodecs = [
+            'avc1.640029', 'avc1.64002A', 'avc1.640033', 'avc1.42001F',
+            'mp4a.40.2', 'opus'
+          ].filter(c => MediaSource.isTypeSupported(`video/mp4; codecs="${c}"`)).join();
+
+          ws.send(JSON.stringify({ type: 'mse', value: supportedCodecs || 'avc1.42001F' }));
+        });
+
+        ws.addEventListener('message', ev => {
+          if (typeof ev.data === 'string') {
+            try {
+              const msg = JSON.parse(ev.data);
+              if (msg.type === 'mse') {
+                if (ms && ms.readyState === 'open') {
+                  sourceBuffer = ms.addSourceBuffer(msg.value);
+                  sourceBuffer.mode = 'segments';
+
+                  sourceBuffer.addEventListener('updateend', () => {
+                    if (sourceBuffer && !sourceBuffer.updating && bufferQueue.length > 0) {
+                      try {
+                        const chunk = bufferQueue.shift();
+                        sourceBuffer.appendBuffer(chunk);
+                      } catch (e) {
+                        console.warn('MSE buffer append error:', e);
+                      }
+                    }
+
+                    // Keep live latency under 1.5s by pruning older frames
+                    if (sourceBuffer && !sourceBuffer.updating && sourceBuffer.buffered && sourceBuffer.buffered.length > 0) {
+                      const end = sourceBuffer.buffered.end(sourceBuffer.buffered.length - 1);
+                      const start = end - 4;
+                      const start0 = sourceBuffer.buffered.start(0);
+                      if (start > start0) {
+                        try { sourceBuffer.remove(start0, start); } catch (e) {}
+                      }
+                      if (video.currentTime < start) {
+                        video.currentTime = start;
+                      }
+                      const latency = end - video.currentTime;
+                      if (latency > 1.8) {
+                        video.currentTime = end - 0.2;
+                      }
+                    }
+                  });
+
+                  streamConnected = true;
+                  hideSpinner();
+                  hud.style.display = 'none';
+                  video.style.display = 'block';
+                  statusBadge.classList.add('online');
+                  statusBadge.classList.remove('standby');
+                  statusText.innerHTML = `LIVE MSE &bull; ${activeCam.ip}`;
+                  video.play().catch(() => {
+                    video.muted = true;
+                    video.play().catch(er => console.warn('Autoplay error:', er));
+                  });
+                }
+              } else if (msg.type === 'error') {
+                console.warn('go2rtc MSE error:', msg.value);
+                startWebRTC(wsUrl, endpoints, idx);
+              }
+            } catch (e) {
+              console.warn('MSE message parse error:', e);
+            }
+          } else {
+            // Binary fMP4 chunk
+            if (sourceBuffer) {
+              if (sourceBuffer.updating || bufferQueue.length > 0) {
+                bufferQueue.push(ev.data);
+                if (bufferQueue.length > 50) bufferQueue.shift();
+              } else {
+                try {
+                  sourceBuffer.appendBuffer(ev.data);
+                } catch (e) {
+                  bufferQueue.push(ev.data);
+                }
+              }
+            }
+          }
+        });
+
+        ws.addEventListener('error', () => {
+          if (!hasOpened) {
+            clearTimeout(connTimeout);
+            connectEndpoint(endpoints, idx + 1);
+          } else if (!streamConnected) {
+            startWebRTC(wsUrl, endpoints, idx);
+          }
+        });
+
+        ws.addEventListener('close', () => {
+          if (!streamConnected) {
+            startWebRTC(wsUrl, endpoints, idx);
+          } else {
+            reconnectTimeout = setTimeout(initStream, 4000);
+          }
+        });
+      }, { once: true });
+    }
+
+    function startWebRTC(wsUrl, endpoints, idx) {
+      if (ws) { try { ws.close(); } catch (e) {} ws = null; }
+      if (pc) { try { pc.close(); } catch (e) {} pc = null; }
+
+      video.src = '';
+      video.srcObject = null;
+
+      pc = new RTCPeerConnection({
+        iceServers: [{ urls: ['stun:stun.cloudflare.com:3478', 'stun:stun.l.google.com:19302'] }]
+      });
+
+      // Pure dynamic track assignment: never pre-allocate dummy audio tracks that stall HTML5 clock
+      pc.ontrack = ev => {
+        if (ev.streams && ev.streams[0]) {
+          video.srcObject = ev.streams[0];
+        } else {
+          if (!video.srcObject) {
+            video.srcObject = new MediaStream();
+          }
+          video.srcObject.addTrack(ev.track);
+        }
+      };
+
+      pc.addTransceiver('video', { direction: 'recvonly' });
+      pc.addTransceiver('audio', { direction: 'recvonly' });
+
+      pc.addEventListener('connectionstatechange', () => {
+        if (pc.connectionState === 'connected') {
+          streamConnected = true;
+          hideSpinner();
+          hud.style.display = 'none';
+          video.style.display = 'block';
+          statusBadge.classList.add('online');
+          statusBadge.classList.remove('standby');
+          statusText.innerHTML = `LIVE WEBRTC &bull; ${activeCam.ip}`;
+          video.play().catch(e => {
+            video.muted = true;
+            video.play().catch(er => console.warn('Autoplay error:', er));
+          });
+        } else if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
+          reconnectTimeout = setTimeout(initStream, 4000);
+        }
+      });
+
+      let hasOpened = false;
       try {
         ws = new WebSocket(wsUrl);
       } catch (err) {
-        return connectToWs(endpoints, idx + 1);
+        return connectEndpoint(endpoints, idx + 1);
       }
 
       const timeout = setTimeout(() => {
-        if (!hasOpened && ws.readyState !== WebSocket.OPEN) {
-          try { ws.close(); } catch(e){}
-          connectToWs(endpoints, idx + 1);
+        if (!hasOpened && ws && ws.readyState !== WebSocket.OPEN) {
+          try { ws.close(); } catch (e) {}
+          connectEndpoint(endpoints, idx + 1);
         }
       }, 3000);
 
@@ -574,16 +760,38 @@
       ws.addEventListener('error', () => {
         if (!hasOpened) {
           clearTimeout(timeout);
-          connectToWs(endpoints, idx + 1);
+          connectEndpoint(endpoints, idx + 1);
         }
       });
 
       ws.addEventListener('close', () => {
-        if (pc.connectionState !== 'connected') {
-          hideSpinner();
+        if (pc.connectionState !== 'connected' && !streamConnected) {
+          connectEndpoint(endpoints, idx + 1);
         }
       });
     }
+
+    // Dynamic Camera Switcher API
+    function selectCam(targetSrc) {
+      const p = (targetSrc || 'pennys_feeder').toLowerCase();
+      const isC2 = p.includes('bedroom') || p.includes('cam2');
+      const isS = p.includes('sd');
+
+      activeCam.id = isC2 ? 'cam2' : 'cam1';
+      activeCam.stream = isC2 ? (isS ? 'bedroom_sd' : 'bedroom') : (isS ? 'pennys_feeder_sd' : 'pennys_feeder');
+      activeCam.title = isC2 ? "Penny's Perch &bull; Cat Cam 2" : "Penny's Feeder &bull; Cat Cam 1";
+      activeCam.targetText = isC2 ? "CAM 2: PERCH / FOOD STATION" : "CAM 1: LIVING ROOM TOWER";
+      activeCam.ip = isC2 ? '192.168.2.25' : '192.168.2.24';
+
+      applyActiveCamUI();
+      reconnect();
+    }
+    window.selectCamera = selectCam;
+
+    window.addEventListener('popstate', () => {
+      const p = new URLSearchParams(window.location.search);
+      selectCam(p.get('src'));
+    });
 
     // Active Camera Ping Telemetry
     async function pollStatus() {
@@ -608,7 +816,7 @@
               valIp.textContent = c.ip;
               const lat = c.latencyMs ? c.latencyMs + ' ms' : '2.4 ms';
               valLatency.textContent = lat;
-              if (pc && pc.connectionState !== 'connected') {
+              if (!streamConnected) {
                 statusText.innerHTML = `HARDWARE ONLINE &bull; ${lat}`;
               }
               return;
@@ -633,9 +841,9 @@
       video.style.display = 'block';
     });
 
-    // Start WebRTC connection immediately
+    // Start stream connection immediately
     window.addEventListener('DOMContentLoaded', () => {
-      initWebRTC();
+      initStream();
     });
   </script>
 </body>
