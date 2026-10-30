@@ -228,7 +228,9 @@
     function updateLayoutToggleButtons(mode) {
       const isMobile = mode === 'mobile';
       const actionText = isMobile ? 'Desktop View' : 'Mobile View';
-      const icon = isMobile ? '[DESK]' : '[MOB]';
+      const iconSvg = isMobile
+        ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px;"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>'
+        : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px;"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>';
       const currentModeText = isMobile ? 'Mobile' : 'Desktop';
       const title = 'Currently in ' + currentModeText + ' View. Click to switch to ' + actionText + '.';
 
@@ -240,7 +242,7 @@
         navBtn.setAttribute('aria-label', title);
       }
       if (navText) navText.textContent = actionText;
-      if (navIcon) navIcon.textContent = icon;
+      if (navIcon) navIcon.innerHTML = iconSvg;
 
       const footerBtn = document.getElementById('layout-toggle-footer');
       const footerText = document.getElementById('layout-toggle-footer-text');
@@ -250,7 +252,7 @@
         footerBtn.setAttribute('aria-label', title);
       }
       if (footerText) footerText.textContent = actionText;
-      if (footerIcon) footerIcon.textContent = icon;
+      if (footerIcon) footerIcon.innerHTML = iconSvg;
     }
 
     function setLayoutMode(mode, savePreference = true) {

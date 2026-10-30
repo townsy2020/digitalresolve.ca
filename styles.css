@@ -5732,8 +5732,6 @@ a.btn-schematic-chip {
   }
 }
 
-html:not(.desktop-layout) .nav-pages-group,
-html:not(.desktop-layout) .nav-tools-group,
 html.mobile-layout .nav-pages-group,
 html.mobile-layout .nav-tools-group {
   width: 100% !important;
@@ -5742,9 +5740,6 @@ html.mobile-layout .nav-tools-group {
   gap: 8px !important;
 }
 
-html:not(.desktop-layout) .nav-pages-group > .btn-nav,
-html:not(.desktop-layout) .nav-tools-group .dropdown,
-html:not(.desktop-layout) .nav-tools-group .dropdown > .btn-nav,
 html.mobile-layout .nav-pages-group > .btn-nav,
 html.mobile-layout .nav-tools-group .dropdown,
 html.mobile-layout .nav-tools-group .dropdown > .btn-nav {
