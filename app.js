@@ -2530,8 +2530,8 @@
 
       const hFlash = document.getElementById('header-tag-flash');
       if (hFlash) {
-        hFlash.textContent = `Flash ${flashPct}%`;
-        hFlash.title = `Gemini Flash: ${flashPct}% (${formatTokenNumber(inTok)})`;
+        hFlash.textContent = `In: ${inFmt}`;
+        hFlash.title = `Prompt Input: ${inFmt} tokens (${flashPct}%)`;
       }
       const hArgon = document.getElementById('header-tag-argon');
       if (hArgon) {
@@ -2540,8 +2540,8 @@
       const hPro = document.getElementById('header-tag-pro');
       if (hPro) {
         hPro.style.display = 'inline-flex';
-        hPro.textContent = `Pro ${proPct}%`;
-        hPro.title = `Gemini Pro: ${proPct}% (${formatTokenNumber(outTok)})`;
+        hPro.textContent = `Out: ${outFmt}`;
+        hPro.title = `Completion Output: ${outFmt} tokens (${proPct}%)`;
       }
 
       // Update Status Ribbon
@@ -2549,32 +2549,32 @@
       if (ribbonVal) ribbonVal.textContent = totalFmt;
 
       const rFlash = document.getElementById('ribbon-flash');
-      if (rFlash) rFlash.textContent = `${flashPct}% Flash`;
+      if (rFlash) rFlash.textContent = `${inFmt} In (${flashPct}%)`;
       const rArgon = document.getElementById('ribbon-argon');
       if (rArgon) rArgon.style.display = 'none';
       const rCache = document.getElementById('ribbon-cache');
-      if (rCache) rCache.textContent = `${cacheFmt} Cache Read`;
+      if (rCache) rCache.textContent = `${cacheFmt} Cached`;
       const rPro = document.getElementById('ribbon-pro');
       if (rPro) {
         rPro.style.display = 'inline';
         rPro.style.color = '#c084fc';
         rPro.style.fontWeight = '600';
-        rPro.textContent = `${proPct}% Pro`;
+        rPro.textContent = `${outFmt} Out (${proPct}%)`;
       }
 
       const rSavings = document.getElementById('ribbon-token-savings');
-      if (rSavings) rSavings.textContent = `Saved ~${savedFmt} (${savingsPct}%)`;
+      if (rSavings) { rSavings.textContent = `${cachePct}% Cache Hit`; rSavings.title = `Context Cache Hit Rate: ${cacheFmt} tokens reused from prompt cache (${cachePct}%)`; }
 
       // Update Terminal Deck
       const termVal = document.getElementById('term-token-val');
       if (termVal) termVal.textContent = fullTotalStr;
 
       const tFlash = document.getElementById('term-tag-flash');
-      if (tFlash) tFlash.textContent = `Flash ${flashPct}%`;
+      if (tFlash) tFlash.textContent = `In: ${inFmt} (${flashPct}%)`;
       const tPro = document.getElementById('term-tag-pro');
       if (tPro) {
         tPro.style.display = 'inline-flex';
-        tPro.textContent = `Pro ${proPct}%`;
+        tPro.textContent = `Out: ${outFmt} (${proPct}%)`;
       }
       const tArgon = document.getElementById('term-tag-argon');
       if (tArgon) tArgon.style.display = 'none';
@@ -2587,12 +2587,12 @@
 
       const modalBreakdown = document.getElementById('modal-model-breakdown');
       if (modalBreakdown) {
-        modalBreakdown.innerHTML = `<span style="color: #38bdf8; font-weight: 600;">Flash: ${flashPct}% (${formatTokenNumber(inTok)})</span> &bull; <span style="color: #c084fc; font-weight: 600;">Pro: ${proPct}% (${formatTokenNumber(outTok)})</span> &bull; <span style="color: #34d399; font-weight: 600;">Cache: ${cacheFmt} Reused</span>`;
+        modalBreakdown.innerHTML = `<span style="color: #38bdf8; font-weight: 600;">Prompt In: ${flashPct}% (${formatTokenNumber(inTok)})</span> &bull; <span style="color: #c084fc; font-weight: 600;">Output: ${proPct}% (${formatTokenNumber(outTok)})</span> &bull; <span style="color: #34d399; font-weight: 600;">Cache: ${cacheFmt} Reused (${cachePct}%)</span>`;
       }
 
       const modalSavings = document.getElementById('modal-savings-val');
       if (modalSavings) {
-        modalSavings.innerHTML = `<strong style="color: #4ade80;">${savingsPct}% Eco Savings</strong> (~${savedFmt} saved vs Frontier Pro rates)`;
+        modalSavings.innerHTML = `<strong style="color: #4ade80;">${cachePct}% Cache Hit Rate</strong> (${cacheFmt} tokens reused from prompt cache)`;
       }
 
       // Update App Card
@@ -2601,7 +2601,7 @@
 
       const appModels = document.getElementById('app-card-models');
       if (appModels) {
-        appModels.innerHTML = `<span style="color: #38bdf8; font-weight: 600;">${flashPct}% Gemini Flash</span> &bull; <span style="color: #c084fc; font-weight: 600;">${proPct}% Pro</span> &bull; <span style="color: #34d399; font-weight: 600;">${cacheFmt} Cache Read</span>`;
+        appModels.innerHTML = `<span style="color: #38bdf8; font-weight: 600;">${inFmt} Prompt In (${flashPct}%)</span> &bull; <span style="color: #c084fc; font-weight: 600;">${outFmt} Output (${proPct}%)</span> &bull; <span style="color: #34d399; font-weight: 600;">${cacheFmt} Cached</span>`;
       }
       document.querySelectorAll('#app-card-tokens-port').forEach(el => {
         el.textContent = totalFmt;
