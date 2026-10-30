@@ -470,6 +470,9 @@
         }
         if (data.tokens && typeof updateTokenCounterUI === 'function') {
           updateTokenCounterUI(data.tokens);
+      }
+      if (data.cameras) {
+        updateCamerasUI(data.cameras);
         }
       } catch (e) {
         console.warn('Hydration cache error:', e);
@@ -2720,8 +2723,27 @@
       if (data.tokens) {
         updateTokenCounterUI(data.tokens);
       }
+      if (data.cameras) {
+        updateCamerasUI(data.cameras);
+      }
       return data;
     }
+
+    function updateCamerasUI(cams) {
+      const list = Array.isArray(cams) ? cams : (cams && cams.value ? cams.value : []);
+      const activeCount = list.filter(c => c && c.online).length;
+      const camTag = document.getElementById('camera-status-tag');
+      if (camTag) {
+        if (activeCount > 0) {
+          camTag.className = 'item-tag online';
+          camTag.innerHTML = `<span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span> ${activeCount} Camera${activeCount > 1 ? 's' : ''} Active &bull; Feeder Online`;
+        } else {
+          camTag.className = 'item-tag offline';
+          camTag.innerHTML = `<span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 8px #ef4444;"></span> Cameras Offline &bull; Feeder Standby`;
+        }
+      }
+    }
+    window.updateCamerasUI = updateCamerasUI;
 
     function fetchClusterStats() {
       const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
