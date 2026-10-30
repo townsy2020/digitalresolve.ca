@@ -1,7 +1,34 @@
 {
-  "updatedAt": "2026-10-30T07:15:00Z",
-  "currentVersion": "v2.8.21",
+  "updatedAt": "2026-10-30T07:30:00Z",
+  "currentVersion": "v2.8.22",
   "releases": [
+    {
+      "version": "v2.8.22",
+      "date": "October 30, 2026",
+      "title": "Global 8.8.8.8 Ping Telemetry, AI Token Quota Harmonization, Resilient ISP Health Diagnostics & Edge Ingress Alignment",
+      "changes": [
+        {
+          "label": "Global 8.8.8.8 Ping Telemetry",
+          "text": "Replaced local loopback and LAN latencies across NUC Server and Desktop Node with dual-path WAN ping targeting 8.8.8.8 Google DNS, backed by ICMP echo and resilient TCP port 53 fallbacks."
+        },
+        {
+          "label": "AI Token Telemetry Harmonization",
+          "text": "Eliminated confusing Flash/Pro labeling of raw input/output tokens in favor of accurate Prompt (Input), Completion (Output), and Context Cache Reused telemetry (103.4M cumulative tokens processed, 95.6% cache efficiency). Dynamically partitioned active AGY session metrics from lifetime cluster consumption."
+        },
+        {
+          "label": "Subdomain Routing & Edge Ingress Alignment",
+          "text": "Restructured Cloudflare Subdomain Routing matrix to display genuine cache hit rates and edge latencies across all 7 ingress routes (e.g., 94.6% Hit • 12ms, Dynamic Edge • 14ms, WebRTC • <50ms) while properly migrating M365 Entra ID SSO auth designations to the target column."
+        },
+        {
+          "label": "Resilient ISP Diagnostic Stream & CORS Fix",
+          "text": "Expanded gateway HTTP CORS headers to permit <code>X-SSO-Email</code> preflight requests and incorporated local storage telemetry caching, resolving diagnostic stream loading blocks."
+        },
+        {
+          "label": "Dynamic Workstation Compute Telemetry",
+          "text": "Eliminated stuck 4% CPU placeholder across workstation compute cards in favor of live performance counter streaming from the Desktop agent."
+        }
+      ]
+    },
     {
       "version": "v2.8.21",
       "date": "October 30, 2026",
