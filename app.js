@@ -2610,8 +2610,8 @@
     }
     function fetchClusterStats() {
       const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-      const timeoutId = controller ? setTimeout(() => controller.abort(), 4000) : null;
-      return fetch(`${GATEWAY}/stats`, controller ? { signal: controller.signal } : {})
+      const timeoutId = controller ? setTimeout(() => controller.abort(), 6000) : null;
+      return fetch(`${GATEWAY}/stats`, controller ? { signal: controller.signal, cache: 'no-store' } : { cache: 'no-store' })
         .then(r => r.json())
         .then(data => {
           if (timeoutId) clearTimeout(timeoutId);
@@ -5169,6 +5169,23 @@
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
       }
+      try {
+        const kpis = document.querySelectorAll('.cf-kpi-requests, .cf-kpi-ratio, .cf-kpi-visitors, .cf-kpi-threats, .cf-kpi-sla');
+        kpis.forEach(el => {
+          el.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+          el.style.opacity = '0.7';
+        });
+        const p = fetchClusterStats();
+        if (p && typeof p.finally === 'function') {
+          p.finally(() => {
+            kpis.forEach(el => {
+              el.style.opacity = '1';
+              el.style.transform = 'scale(1.02)';
+              setTimeout(() => { el.style.transform = 'scale(1)'; }, 200);
+            });
+          });
+        }
+      } catch (e) {}
     }
     window.openCloudflareStatsModal = openCloudflareStatsModal;
 
