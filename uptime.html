@@ -177,12 +177,12 @@
             <button type="button" class="btn-action-item" onclick="checkStatus('nuc')" title="Query Live Status and Latency for NUC Server">
               <span class="dropdown-dot dot-2"></span>
               <span>Ping NUC Server</span>
-              <span class="item-tag online" id="latency-nuc">0.2 ms</span>
+              <span class="item-tag online" id="latency-nuc">-- ms</span>
             </button>
             <button type="button" class="btn-action-item" onclick="checkStatus('desktop')" title="Query Live Status and Latency for Desktop">
               <span class="dropdown-dot dot-1"></span>
               <span>Ping Desktop Node</span>
-              <span class="item-tag online" id="latency-desktop">0.4 ms</span>
+              <span class="item-tag online" id="latency-desktop">-- ms</span>
             </button>
           </div>
         </div>
@@ -359,7 +359,7 @@
                 <span>24-Hour Real-Time Latency &amp; Response Heartbeat (<span id="spark-scale-range">0 - 10 ms</span>)</span>
               </div>
               <div style="display: flex; gap: 14px; font-size: 0.75rem; font-family: monospace;">
-                <span style="color: #6ee7b7;"><span style="display:inline-block; width:10px; height:10px; background:#10b981; border-radius:2px; margin-right:4px;"></span>NUC Server (<span id="spark-leg-nuc">0.2 ms</span>)</span>
+                <span style="color: #6ee7b7;"><span style="display:inline-block; width:10px; height:10px; background:#10b981; border-radius:2px; margin-right:4px;"></span>NUC Server (<span id="spark-leg-nuc">-- ms</span>)</span>
                 <span style="color: #fb923c;"><span style="display:inline-block; width:10px; height:10px; background:#f97316; border-radius:2px; margin-right:4px; box-shadow: 0 0 6px rgba(249, 115, 22, 0.6);"></span>Cloudflare Edge (<span id="spark-leg-edge">1.1 ms</span>)</span>
                 <span style="color: #93c5fd;"><span style="display:inline-block; width:10px; height:10px; background:#3b82f6; border-radius:2px; margin-right:4px; box-shadow: 0 0 6px rgba(59, 130, 246, 0.6);"></span>Bell Fiber (<span id="spark-leg-bell">4.5 ms</span>)</span>
               </div>
@@ -728,7 +728,7 @@
                   </div>
                   <div class="dash-card-meta-row">
                     <span>Latency &bull; Watchdog:</span>
-                    <span id="meta-watch-torrents" style="color: #34d399;">0.2 ms &bull; Interactive Node Active</span>
+                    <span id="meta-watch-torrents" style="color: #34d399;">-- ms &bull; Active Node</span>
                   </div>
                 </div>
                 <div class="dash-card-footer">
@@ -977,7 +977,7 @@
       <div class="agy-session-meta-bar" id="agy-session-meta-bar" style="display: none;">
         <div class="meta-item"><span class="meta-lbl">Session:</span> <span class="meta-val"><strong style="color: #60a5fa;" id="agy-meta-name">webdev (53c2a1ff)</strong></span></div>
         <div class="meta-item"><span class="meta-lbl">Session ID:</span> <span id="agy-meta-cid" class="meta-val mono">53c2a1ff-4c8c-4051-aae0-8bf4e62f57b3</span></div>
-        <div class="meta-item"><span class="meta-lbl">Session Tokens:</span> <span class="meta-val mono" id="modal-token-count">13.48M (In: 12.64M &bull; Out: 835K)</span></div>
+        <div class="meta-item"><span class="meta-lbl">Session Tokens:</span> <span class="meta-val mono" id="modal-token-count">-- (Syncing...)</span></div>
         <div class="meta-item"><span class="meta-lbl">Model Tier:</span> <span class="meta-val" id="modal-model-val" style="color: #34d399;">Detecting model...</span></div>
         <div class="meta-item"><span class="meta-lbl">Model Breakdown:</span> <span class="meta-val" id="modal-model-breakdown">Calculating breakdown...</span></div>
         <div class="meta-item"><span class="meta-lbl">Cost Efficiency:</span> <span class="meta-val" id="modal-savings-val" style="color: #34d399;">Calculating savings...</span></div>

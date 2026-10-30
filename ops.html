@@ -177,12 +177,12 @@
             <button type="button" class="btn-action-item" onclick="checkStatus('nuc')" title="Query Live Status and Latency for NUC Server">
               <span class="dropdown-dot dot-2"></span>
               <span>Ping NUC Server</span>
-              <span class="item-tag online" id="latency-nuc">0.2 ms</span>
+              <span class="item-tag online" id="latency-nuc">-- ms</span>
             </button>
             <button type="button" class="btn-action-item" onclick="checkStatus('desktop')" title="Query Live Status and Latency for Desktop">
               <span class="dropdown-dot dot-1"></span>
               <span>Ping Desktop Node</span>
-              <span class="item-tag online" id="latency-desktop">0.4 ms</span>
+              <span class="item-tag online" id="latency-desktop">-- ms</span>
             </button>
           </div>
         </div>
@@ -484,7 +484,7 @@
                 <div id="terminal-token-pill" style="display: none; align-items: center; gap: 6px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.35); padding: 4px 10px; border-radius: 8px; font-size: 0.78rem;">
                   <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
                   <span style="color: #94a3b8;">Tokens:</span>
-                  <strong class="mono" id="term-token-val" style="color: #38bdf8;">1,299,171</strong>
+                  <strong class="mono" id="term-token-val" style="color: #38bdf8;">--</strong>
                   <span class="token-breakdown-tags" id="term-token-breakdown">
                     <span class="item-tag tag-flash" id="term-tag-flash" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-size: 0.68rem; padding: 1px 5px;">Flash 92.32%</span> <span class="item-tag tag-pro" id="term-tag-pro" style="background: rgba(168, 85, 247, 0.2); color: #c084fc; font-size: 0.68rem; padding: 1px 5px;">Pro 7.68%</span>
                     <span class="item-tag" id="term-tag-cache" style="background: rgba(52, 211, 153, 0.2); color: #34d399; font-size: 0.68rem; padding: 1px 5px;">Cache: 318M</span>
@@ -944,14 +944,14 @@
                   <tr>
                     <td><strong>Review &amp; Watch Library</strong> (StreamHub :8088)</td>
                     <td>NUC (192.168.2.35)</td>
-                    <td><span class="mono" id="kuma-lat-stream" style="color: #34d399;">0.2 ms</span></td>
+                    <td><span class="mono" id="kuma-lat-stream" style="color: #34d399;">-- ms</span></td>
                     <td id="kuma-uptime-stream">100.0%</td>
                     <td><span class="item-tag online" id="kuma-status-stream">Healthy</span></td>
                   </tr>
                   <tr>
                     <td><strong>FileBrowser Media Cloud</strong> (:8085)</td>
                     <td>NUC (192.168.2.35)</td>
-                    <td><span class="mono" id="kuma-lat-files" style="color: #34d399;">0.2 ms</span></td>
+                    <td><span class="mono" id="kuma-lat-files" style="color: #34d399;">-- ms</span></td>
                     <td id="kuma-uptime-files">100.0%</td>
                     <td><span class="item-tag online" id="kuma-status-files">Healthy</span></td>
                   </tr>
@@ -965,7 +965,7 @@
                   <tr>
                     <td><strong>WoL &amp; Power Orchestration Gateway</strong> (:8082)</td>
                     <td>NUC / Desktop Cluster</td>
-                    <td><span class="mono" id="kuma-lat-wol" style="color: #34d399;">0.2 ms</span></td>
+                    <td><span class="mono" id="kuma-lat-wol" style="color: #34d399;">-- ms</span></td>
                     <td id="kuma-uptime-wol">100.0%</td>
                     <td><span class="item-tag online" id="kuma-status-wol">Healthy</span></td>
                   </tr>
@@ -1103,7 +1103,7 @@
       <div class="agy-session-meta-bar" id="agy-session-meta-bar" style="display: none;">
         <div class="meta-item"><span class="meta-lbl">Session:</span> <span class="meta-val"><strong style="color: #60a5fa;" id="agy-meta-name">webdev (53c2a1ff)</strong></span></div>
         <div class="meta-item"><span class="meta-lbl">Session ID:</span> <span id="agy-meta-cid" class="meta-val mono">53c2a1ff-4c8c-4051-aae0-8bf4e62f57b3</span></div>
-        <div class="meta-item"><span class="meta-lbl">Session Tokens:</span> <span class="meta-val mono" id="modal-token-count">13.48M (In: 12.64M &bull; Out: 835K)</span></div>
+        <div class="meta-item"><span class="meta-lbl">Session Tokens:</span> <span class="meta-val mono" id="modal-token-count">-- (Syncing...)</span></div>
         <div class="meta-item"><span class="meta-lbl">Model Tier:</span> <span class="meta-val" id="modal-model-val" style="color: #34d399;">Detecting model...</span></div>
         <div class="meta-item"><span class="meta-lbl">Model Breakdown:</span> <span class="meta-val" id="modal-model-breakdown">Calculating breakdown...</span></div>
         <div class="meta-item"><span class="meta-lbl">Cost Efficiency:</span> <span class="meta-val" id="modal-savings-val" style="color: #34d399;">Calculating savings...</span></div>

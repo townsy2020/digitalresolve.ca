@@ -411,7 +411,7 @@
                 const nodeData = stats[target];
                 return {
                   online: nodeData.online !== false,
-                  latencyMs: nodeData.latencyMs !== undefined ? nodeData.latencyMs : (target === 'nuc' ? 0.2 : 0.4),
+                  latencyMs: nodeData.latencyMs !== undefined ? nodeData.latencyMs : null,
                   disk: nodeData.disk || (target === 'nuc' ? stats.nuc && stats.nuc.disk : null),
                   vitals: nodeData.vitals || (target === 'nuc' ? stats.nuc && stats.nuc.vitals : null),
                   torrent: nodeData.torrent || (target === 'nuc' ? stats.nuc && stats.nuc.swarm : null)
@@ -429,7 +429,7 @@
                       if (node) {
                         return {
                           online: node.status !== 'offline',
-                          latencyMs: target === 'nuc' ? 0.2 : 0.4,
+                          latencyMs: null,
                           disk: null,
                           vitals: null,
                           torrent: null
@@ -440,7 +440,7 @@
                       const nodeData = data2[target] || data2;
                       return {
                         online: nodeData.online !== false,
-                        latencyMs: nodeData.latencyMs !== undefined ? nodeData.latencyMs : (target === 'nuc' ? 0.2 : 0.4),
+                  latencyMs: nodeData.latencyMs !== undefined ? nodeData.latencyMs : null,
                         disk: nodeData.disk || (target === 'nuc' ? (data2.nuc && data2.nuc.disk) : null),
                         vitals: nodeData.vitals || (target === 'nuc' ? (data2.nuc && data2.nuc.vitals) : null),
                         torrent: nodeData.torrent || (target === 'nuc' ? (data2.nuc && data2.nuc.swarm) : null)
@@ -460,24 +460,8 @@
     function hydrateTelemetryFromCache() {
       try {
         const raw = localStorage.getItem('dr_telemetry_cache');
-        let data = raw ? JSON.parse(raw) : null;
-        if (!data) {
-          data = {
-            nuc: {
-              online: true,
-              latencyMs: 0.2,
-              disk: { freeGB: 489.2, totalGB: 1863, usedGB: 1373.8, usedPercent: 73.7 },
-              vitals: { ramPercent: 28, ramUsedGB: 9, ramTotalGB: 31.8, uptime: "3d 22h", vpn: "Mullvad us-nyc-wg-806 (USA, New York)", cpuLoad: 5 }
-            },
-            desktop: {
-              online: true,
-              latencyMs: 0.4,
-              disk: { freeGB: 5751, totalGB: 6054, usedGB: 303, usedPercent: 5.0, cFreeGB: 375, cTotalGB: 465, dFreeGB: 5376, dTotalGB: 5589 },
-              vitals: { ramPercent: 39, ramUsedGB: 12.4, ramTotalGB: 32.0, cpuLoad: 4 }
-            }
-          };
-          try { localStorage.setItem('dr_telemetry_cache', JSON.stringify(data)); } catch (e) {}
-        }
+        const data = raw ? JSON.parse(raw) : null;
+        if (!data) return; // Zero hardcoding: wait for live telemetry stream
         if (data.nuc) {
           updateStatusUI('nuc', data.nuc.online !== false, data.nuc.latencyMs, data.nuc.disk, data.nuc.swarm || data.nuc.torrent, data.nuc.vitals);
         }
@@ -1155,7 +1139,7 @@
         const mCam = document.getElementById('meta-watch-cam');
         if (mCam) mCam.innerHTML = isOnline ? '&lt;50ms Low-Latency WebRTC' : 'Unreachable &bull; Offline';
         const mWol = document.getElementById('meta-watch-wol');
-        if (mWol) mWol.innerHTML = isOnline ? '0.2 ms LAN &bull; Fast-Path' : 'Unreachable &bull; Offline';
+        if (mWol) mWol.innerHTML = isOnline ? `${latencyMs ? latencyMs + ' ms' : '< 1 ms'} &bull; Fast-Path` : 'Unreachable &bull; Offline';
         const mTorrents2 = document.getElementById('meta-watch-torrents2');
         if (mTorrents2) mTorrents2.innerHTML = isOnline ? `${latencyMs !== null ? latencyMs : 0.8} ms &bull; Swarm Active` : 'Unreachable &bull; Offline';
         const mCf = document.getElementById('meta-watch-cf');
@@ -1292,7 +1276,7 @@
         const metaTorrents = document.getElementById('meta-watch-torrents');
         if (metaTorrents) {
           metaTorrents.style.color = isOnline ? '#34d399' : '#94a3b8';
-          metaTorrents.innerHTML = isOnline ? '0.2 ms &bull; Interactive Node Active' : 'Standby &bull; Sleeping (WoL Ready)';
+          metaTorrents.innerHTML = isOnline ? `${latencyMs ? latencyMs + ' ms' : '< 1 ms'} &bull; Interactive Node Active` : 'Standby &bull; Sleeping (WoL Ready)';
         }
         const stDesk = document.getElementById('status-tag-desktop');
         if (stDesk) { stDesk.textContent = isOnline ? 'Active' : 'Standby'; stDesk.className = 'item-tag ' + (isOnline ? 'online' : 'offline'); }
@@ -2425,28 +2409,8 @@
         const stored = localStorage.getItem(TOKEN_METRICS_KEY);
         if (stored) return JSON.parse(stored);
       } catch (e) {}
-      return {
-        inputTokens: 90118663,
-        outputTokens: 7948163,
-        cacheTokens: 1964994985,
-        totalTokens: 98066826,
-        model: 'Gemini 3.8 Flash (91.9%) / Pro (8.1%)',
-        efficiency: 'Optimal (91.9% Token Efficiency)',
-        breakdown: {
-          flash: { name: 'Gemini Flash', percent: 91.9, tokens: 90118663 },
-          cache: { name: 'Cache Read', percent: 95.61, tokens: 1964994985 },
-          pro:   { name: 'Gemini Pro', percent: 8.1, tokens: 7948163 }
-        },
-        weeklyLimitRemaining: 74.52,
-        weeklyRefresh: "103h 10m",
-        fiveHourLimitRemaining: 94.92,
-        fiveHourRefresh: "3h 31m",
-        claudeWeeklyRemaining: 100.0,
-        claudeLimitRemaining: 100.0,
-        account: "coryrobertleetownsend@gmail.com"
-      };
+      return null; // Zero hardcoding: return null until live stream arrives
     }
-
     function formatTokenNumber(num) {
       if (!num || isNaN(num)) return '0';
       if (num >= 1000000) return (num / 1000000).toFixed(2) + 'M';
@@ -2487,15 +2451,15 @@
       const fullTotalStr = Number(metrics.totalTokens).toLocaleString();
 
       // Dynamic live breakdown calculation to 2 decimal places (Real-time Transcript Ingestion)
-      const inTok = Number(metrics.inputTokens) || 90118663;
-      const outTok = Number(metrics.outputTokens) || 7948163;
-      const cacheTok = Number(metrics.cacheTokens) || 1964994985;
+      const inTok = Number(metrics.inputTokens) || 0;
+      const outTok = Number(metrics.outputTokens) || 0;
+      const cacheTok = Number(metrics.cacheTokens) || 0;
       const totalTokens = Number(metrics.totalTokens) || (inTok + outTok);
 
-      let flashPctNum = (totalTokens > 0) ? ((inTok / totalTokens) * 100) : 91.9;
-      let proPctNum = (totalTokens > 0) ? ((outTok / totalTokens) * 100) : 8.1;
+      let flashPctNum = (totalTokens > 0) ? ((inTok / totalTokens) * 100) : 0;
+      let proPctNum = (totalTokens > 0) ? ((outTok / totalTokens) * 100) : 0;
       const contextTotal = cacheTok + inTok;
-      let cachePctNum = (contextTotal > 0) ? ((cacheTok / contextTotal) * 100) : 95.61;
+      let cachePctNum = (contextTotal > 0) ? ((cacheTok / contextTotal) * 100) : 0;
 
       if (metrics.breakdown && metrics.breakdown.flash && metrics.breakdown.flash.percent !== undefined) {
         flashPctNum = Number(metrics.breakdown.flash.percent);
@@ -2655,120 +2619,145 @@
         }
       });
     }
+    function applyClusterStatsPayload(data) {
+      if (!data) return null;
+      try { localStorage.setItem('dr_cluster_stats', JSON.stringify(data)); } catch (e) {}
+      if (data.status === 'success' && data.nuc) {
+        const nuc = data.nuc;
+        if (nuc.swarm) {
+          const sw = nuc.swarm;
+          const swAct = document.getElementById('stat-swarm-active');
+          const dht = document.getElementById('stat-dht');
+          const vpnIp = document.getElementById('stat-vpn-ip');
+          const dlSpd = document.getElementById('stat-dl-speed');
+          const upSpd = document.getElementById('stat-up-speed');
+          const throttleTag = document.getElementById('stat-throttle-tag');
+          const swTag = document.getElementById('swarm-tag');
+
+          if (swAct) swAct.textContent = `${sw.activeDl} Active | ${sw.totalTorrents - sw.activeDl} Seed`;
+          if (swTag) swTag.textContent = `${sw.totalTorrents} Managed`;
+          if (dht) dht.textContent = `DHT: ${sw.dhtNodes} Nodes`;
+          if (vpnIp && sw.vpnExitIp) vpnIp.textContent = `VPN: ${sw.vpnExitIp}`;
+          
+          const dlText = sw.dlSpeed >= 1048576 ? `${(sw.dlSpeed / 1048576).toFixed(1)} MB/s` : `${Math.round(sw.dlSpeed / 1024)} KB/s`;
+          const upText = sw.upSpeed >= 1048576 ? `${(sw.upSpeed / 1048576).toFixed(1)} MB/s` : `${Math.round(sw.upSpeed / 1024)} KB/s`;
+          if (dlSpd) dlSpd.innerHTML = `${dlText} <span style="font-size: 0.95rem; color: #8b949e; margin-left: 6px;">&darr;</span>`;
+          if (upSpd) upSpd.textContent = upText;
+
+          if (throttleTag) {
+            if (sw.dlRateLimit > 0) {
+              throttleTag.textContent = `Eco-Throttled (${Math.round(sw.dlRateLimit / 1024)} KB/s)`;
+              throttleTag.style.background = 'rgba(245, 158, 11, 0.2)';
+              throttleTag.style.color = '#fde047';
+            } else {
+              throttleTag.textContent = 'Unconstrained';
+              throttleTag.style.background = 'rgba(59, 130, 246, 0.2)';
+              throttleTag.style.color = '#60a5fa';
+            }
+          }
+        }
+
+        const cpuVal = document.getElementById('stat-cpu-val');
+        const ramSub = document.getElementById('stat-ram-sub');
+        if (cpuVal && nuc.cpuLoad !== undefined) cpuVal.innerHTML = `${nuc.cpuLoad}% <span style="font-size: 0.9rem; color: #8b949e;">CPU</span>`;
+        if (ramSub && nuc.vitals) {
+          ramSub.textContent = `Memory: ${nuc.vitals.ramUsedGB} GB / ${nuc.vitals.ramTotalGB} GB (${nuc.vitals.ramPercent}%) | ${nuc.vitals.uptime} up`;
+        }
+
+        if (nuc.disk) {
+          const dFree = document.getElementById('stat-disk-free');
+          if (dFree) dFree.innerHTML = `${nuc.disk.freeGB} GB <span style="font-size: 0.9rem; color: #8b949e;">Free</span>`;
+          const statDiskSub = document.getElementById('stat-disk-sub');
+          if (statDiskSub) {
+            statDiskSub.innerHTML = `<span>Total ${nuc.disk.totalGB} GB (${nuc.disk.usedPercent}% Used &bull; ${nuc.disk.usedGB} GB)</span>`;
+          }
+        }
+
+        if (nuc.storage && nuc.storage.totalGB) {
+          const st = nuc.storage;
+          const moviesPct = ((st.moviesGB / st.totalGB) * 100).toFixed(1);
+          const tvPct = ((st.tvSeriesGB / st.totalGB) * 100).toFixed(1);
+          const mixesPct = ((st.mixesGB / st.totalGB) * 100).toFixed(1);
+          const freePct = ((st.freeGB / st.totalGB) * 100).toFixed(1);
+
+          document.querySelectorAll('.seg-movies').forEach(el => {
+            el.style.width = `${moviesPct}%`;
+            el.title = `Movies: ${st.moviesGB} GB`;
+          });
+          document.querySelectorAll('.seg-tv').forEach(el => {
+            el.style.width = `${tvPct}%`;
+            el.title = `TV Series: ${st.tvSeriesGB} GB`;
+          });
+          document.querySelectorAll('.seg-mixes').forEach(el => {
+            el.style.width = `${mixesPct}%`;
+            el.title = `Media Mixes: ${Math.round(st.mixesGB)} GB`;
+          });
+          document.querySelectorAll('.seg-free').forEach(el => {
+            el.style.width = `${freePct}%`;
+            el.title = `Free Space: ${st.freeGB} GB (${freePct}%)`;
+          });
+
+          const moviesLeg = document.getElementById('stat-nuc-movies-legend');
+          if (moviesLeg) moviesLeg.innerHTML = `<span class="legend-dot seg-movies"></span> Movies (${st.moviesGB} GB)`;
+          const tvLeg = document.getElementById('stat-nuc-tv-legend');
+          if (tvLeg) tvLeg.innerHTML = `<span class="legend-dot seg-tv"></span> Series (${st.tvSeriesGB} GB)`;
+          const mixesLeg = document.getElementById('stat-nuc-mixes-legend');
+          if (mixesLeg) mixesLeg.innerHTML = `<span class="legend-dot seg-mixes"></span> Mixes (${Math.round(st.mixesGB)} GB)`;
+        }
+      }
+      if (data.cloudflare) {
+        updateCloudflareStatsUI(data.cloudflare);
+      }
+      if (data.desktop) {
+        updateStatusUI('desktop', data.desktop.online, data.desktop.latencyMs, data.desktop.disk, data.desktop.torrent, data.desktop.vitals);
+        if (data.desktop.cpuLoad !== undefined && data.desktop.online) {
+          const sDeskCpu = document.getElementById('stat-desktop-cpu-val');
+          if (sDeskCpu) sDeskCpu.innerHTML = `${data.desktop.cpuLoad}% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>`;
+          const fCpu = document.getElementById('fleet-cpu-desktop');
+          if (fCpu) fCpu.textContent = `AMD Ryzen 7 | ${data.desktop.cpuLoad}% Load (8C / 16T)`;
+        }
+      }
+      if (data.tokens) {
+        updateTokenCounterUI(data.tokens);
+      }
+      return data;
+    }
+
     function fetchClusterStats() {
       const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
       const timeoutId = controller ? setTimeout(() => controller.abort(), 6000) : null;
+      
+      // Primary Route: Query ${GATEWAY}/stats with cache: no-store
       return fetch(`${GATEWAY}/stats`, controller ? { signal: controller.signal, cache: 'no-store' } : { cache: 'no-store' })
-        .then(r => r.json())
+        .then(r => {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        })
         .then(data => {
           if (timeoutId) clearTimeout(timeoutId);
-          if (data && data.status === 'success' && data.nuc) {
-            const nuc = data.nuc;
-            if (nuc.swarm) {
-              const sw = nuc.swarm;
-              const swAct = document.getElementById('stat-swarm-active');
-              const dht = document.getElementById('stat-dht');
-              const vpnIp = document.getElementById('stat-vpn-ip');
-              const dlSpd = document.getElementById('stat-dl-speed');
-              const upSpd = document.getElementById('stat-up-speed');
-              const throttleTag = document.getElementById('stat-throttle-tag');
-              const swTag = document.getElementById('swarm-tag');
-
-              if (swAct) swAct.textContent = `${sw.activeDl} Active | ${sw.totalTorrents - sw.activeDl} Seed`;
-              if (swTag) swTag.textContent = `${sw.totalTorrents} Managed`;
-              if (dht) dht.textContent = `DHT: ${sw.dhtNodes} Nodes`;
-              if (vpnIp && sw.vpnExitIp) vpnIp.textContent = `VPN: ${sw.vpnExitIp}`;
-              
-              const dlText = sw.dlSpeed >= 1048576 ? `${(sw.dlSpeed / 1048576).toFixed(1)} MB/s` : `${Math.round(sw.dlSpeed / 1024)} KB/s`;
-              const upText = sw.upSpeed >= 1048576 ? `${(sw.upSpeed / 1048576).toFixed(1)} MB/s` : `${Math.round(sw.upSpeed / 1024)} KB/s`;
-              if (dlSpd) dlSpd.innerHTML = `${dlText} <span style="font-size: 0.95rem; color: #8b949e; margin-left: 6px;">&darr;</span>`;
-              if (upSpd) upSpd.textContent = upText;
-
-              if (throttleTag) {
-                if (sw.dlRateLimit > 0) {
-                  throttleTag.textContent = `Eco-Throttled (${Math.round(sw.dlRateLimit / 1024)} KB/s)`;
-                  throttleTag.style.background = 'rgba(245, 158, 11, 0.2)';
-                  throttleTag.style.color = '#fde047';
-                } else {
-                  throttleTag.textContent = 'Unconstrained';
-                  throttleTag.style.background = 'rgba(59, 130, 246, 0.2)';
-                  throttleTag.style.color = '#60a5fa';
-                }
-              }
-            }
-
-            const cpuVal = document.getElementById('stat-cpu-val');
-            const ramSub = document.getElementById('stat-ram-sub');
-            if (cpuVal && nuc.cpuLoad !== undefined) cpuVal.innerHTML = `${nuc.cpuLoad}% <span style="font-size: 0.9rem; color: #8b949e;">CPU</span>`;
-            if (ramSub && nuc.vitals) {
-              ramSub.textContent = `Memory: ${nuc.vitals.ramUsedGB} GB / ${nuc.vitals.ramTotalGB} GB (${nuc.vitals.ramPercent}%) | ${nuc.vitals.uptime} up`;
-            }
-
-            if (nuc.disk) {
-              const dFree = document.getElementById('stat-disk-free');
-              if (dFree) dFree.innerHTML = `${nuc.disk.freeGB} GB <span style="font-size: 0.9rem; color: #8b949e;">Free</span>`;
-              const statDiskSub = document.getElementById('stat-disk-sub');
-              if (statDiskSub) {
-                statDiskSub.innerHTML = `<span>Total ${nuc.disk.totalGB} GB (${nuc.disk.usedPercent}% Used &bull; ${nuc.disk.usedGB} GB)</span>`;
-              }
-            }
-
-            if (nuc.storage && nuc.storage.totalGB) {
-              const st = nuc.storage;
-              const moviesPct = ((st.moviesGB / st.totalGB) * 100).toFixed(1);
-              const tvPct = ((st.tvSeriesGB / st.totalGB) * 100).toFixed(1);
-              const mixesPct = ((st.mixesGB / st.totalGB) * 100).toFixed(1);
-              const freePct = ((st.freeGB / st.totalGB) * 100).toFixed(1);
-
-              document.querySelectorAll('.seg-movies').forEach(el => {
-                el.style.width = `${moviesPct}%`;
-                el.title = `Movies: ${st.moviesGB} GB`;
-              });
-              document.querySelectorAll('.seg-tv').forEach(el => {
-                el.style.width = `${tvPct}%`;
-                el.title = `TV Series: ${st.tvSeriesGB} GB`;
-              });
-              document.querySelectorAll('.seg-mixes').forEach(el => {
-                el.style.width = `${mixesPct}%`;
-                el.title = `Media Mixes: ${Math.round(st.mixesGB)} GB`;
-              });
-              document.querySelectorAll('.seg-free').forEach(el => {
-                el.style.width = `${freePct}%`;
-                el.title = `Free Space: ${st.freeGB} GB (${freePct}%)`;
-              });
-
-              const moviesLeg = document.getElementById('stat-nuc-movies-legend');
-              if (moviesLeg) moviesLeg.innerHTML = `<span class="legend-dot seg-movies"></span> Movies (${st.moviesGB} GB)`;
-              const tvLeg = document.getElementById('stat-nuc-tv-legend');
-              if (tvLeg) tvLeg.innerHTML = `<span class="legend-dot seg-tv"></span> Series (${st.tvSeriesGB} GB)`;
-              const mixesLeg = document.getElementById('stat-nuc-mixes-legend');
-              if (mixesLeg) mixesLeg.innerHTML = `<span class="legend-dot seg-mixes"></span> Mixes (${Math.round(st.mixesGB)} GB)`;
-            }
-          }
-          if (data && data.cloudflare) {
-            updateCloudflareStatsUI(data.cloudflare);
-          }
-          if (data && data.desktop) {
-            updateStatusUI('desktop', data.desktop.online, data.desktop.latencyMs, data.desktop.disk, data.desktop.torrent, data.desktop.vitals);
-            if (data.desktop.cpuLoad !== undefined && data.desktop.online) {
-              const sDeskCpu = document.getElementById('stat-desktop-cpu-val');
-              if (sDeskCpu) sDeskCpu.innerHTML = `${data.desktop.cpuLoad}% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>`;
-              const fCpu = document.getElementById('fleet-cpu-desktop');
-              if (fCpu) fCpu.textContent = `AMD Ryzen 7 | ${data.desktop.cpuLoad}% Load (8C / 16T)`;
-            }
-          }
-          if (data && data.tokens) {
-            updateTokenCounterUI(data.tokens);
-          }
-          return data;
+          return applyClusterStatsPayload(data);
         })
         .catch(() => {
           if (timeoutId) clearTimeout(timeoutId);
-          try { updateCloudflareStatsUI(); } catch (e) {}
-          return null;
+          // Failover Method 1: Alternate endpoint or direct LAN
+          const isHttps = typeof window !== 'undefined' && window.location && window.location.protocol === 'https:';
+          const altStatsUrl = isHttps ? `${GATEWAY}/status?target=all` : `http://192.168.2.35:8082/stats`;
+          return fetch(altStatsUrl, { cache: 'no-store' })
+            .then(r => r.json())
+            .then(altData => {
+              return applyClusterStatsPayload(altData);
+            })
+            .catch(() => {
+              // Failover Method 2: Hydrate from persistent local storage cache
+              try {
+                const cached = localStorage.getItem('dr_cluster_stats');
+                if (cached) return applyClusterStatsPayload(JSON.parse(cached));
+              } catch (e) {}
+              try { updateCloudflareStatsUI(); } catch (e) {}
+              return null;
+            });
         });
     }
-
     // Terminal Log Streamer
     // currentLogTab hoisted to global script top
     function loadLog(name) {
@@ -3890,6 +3879,7 @@
       if (typeof fetchFeederStatus === 'function') pollTasks.push(fetchFeederStatus());
       if (typeof renderUptimeMatrix === 'function') pollTasks.push(renderUptimeMatrix());
       if (typeof fetchAgySessionInfo === 'function') pollTasks.push(fetchAgySessionInfo());
+      if (typeof updateCodebaseMetrics === 'function') pollTasks.push(Promise.resolve().then(() => updateCodebaseMetrics()));
       if (typeof checkStatus === 'function') {
         pollTasks.push(checkStatus('nuc'));
         pollTasks.push(checkStatus('desktop'));
@@ -4344,11 +4334,11 @@
         icon: '[SERVER]',
         title: 'Intel NUC Core Server (Always-On 24/7)',
         subtitle: 'Central Edge Gateway & Service Host',
-        status: 'Online (0.4 ms LAN)',
+        status: 'Online (WAN / LAN)',
         statusClass: 'online',
         net: '192.168.2.35  -  eth0 Gigabit',
         sec: 'Continuous Active  -  High Performance (Always-On 24/7)',
-        speed: 'Gigabit LAN (0.4 ms SLA)',
+        speed: 'Gigabit LAN (Zero-Loss SLA)',
         role: 'StreamHub, CatCam, Torrent, Sentinel',
         services: 'StreamHub (8088)  -  Files (8085)  -  qBit (8081)  -  WoL (8082)',
         btnText: 'Probe NUC Node  ->',
