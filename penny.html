@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -195,7 +195,7 @@
           <div class="dropdown-menu">
             <button type="button" class="btn-action-item agy-session-link-btn" onclick="openEmbeddedConsole()" title="Open Live Interactive Terminal for Active Session 53c2a1ff">
               <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
-              <span>Open AGY Terminal (webdev1.0)</span>
+              <span>Open AGY Terminal (webdev)</span>
               <span class="item-tag online">Live</span>
             </button>
             <a href="ops.html#ops-ai" class="btn-action-item" title="Jump to In-Page Compute, AI &amp; Terminal Operations Console">
@@ -515,7 +515,7 @@
         </div>
         <div class="agy-console-header-actions">
           <span class="item-tag online" id="agy-console-status">ONLINE (Desktop :8082)</span>
-          <button type="button" class="btn-console-act" onclick="resumeAgySessionOnDesktop()" style="color: #34d399; border-color: rgba(52, 211, 153, 0.4);" title="Resume Session webdev1.0 in Windows Terminal on Desktop">Resume on Desktop &nearr;</button>
+          <button type="button" class="btn-console-act" onclick="resumeAgySessionOnDesktop()" style="color: #34d399; border-color: rgba(52, 211, 153, 0.4);" title="Resume Session webdev in Windows Terminal on Desktop">Resume on Desktop &nearr;</button>
           <button type="button" class="btn-console-act" onclick="startNewAgySession('desktop')" style="color: #60a5fa; border-color: rgba(59, 130, 246, 0.4);" title="Start New AGY Session on Desktop: agy --dangerously-skip-permissions">+ New: Desktop</button>
           <button type="button" class="btn-console-act" onclick="startNewAgySession('nuc')" style="color: #c084fc; border-color: rgba(192, 132, 252, 0.4);" title="Start New AGY Session on NUC: agy --dangerously-skip-permissions">+ New: NUC</button>
           <button type="button" class="btn-console-act" onclick="toggleConsoleAutoPoll()" id="btn-console-poll" title="Toggle 2s Live Auto-Polling">Auto-Stream: ON</button>
@@ -526,7 +526,7 @@
 
       <!-- Quick Session Bar -->
       <div class="agy-session-meta-bar" id="agy-session-meta-bar" style="display: none;">
-        <div class="meta-item"><span class="meta-lbl">Session:</span> <span class="meta-val"><strong style="color: #60a5fa;" id="agy-meta-name">webdev1.0</strong></span></div>
+        <div class="meta-item"><span class="meta-lbl">Session:</span> <span class="meta-val"><strong style="color: #60a5fa;" id="agy-meta-name">webdev (53c2a1ff)</strong></span></div>
         <div class="meta-item"><span class="meta-lbl">Session ID:</span> <span id="agy-meta-cid" class="meta-val mono">53c2a1ff-4c8c-4051-aae0-8bf4e62f57b3</span></div>
         <div class="meta-item"><span class="meta-lbl">Session Tokens:</span> <span class="meta-val mono" id="modal-token-count">1,299,171 (In: 1,213,692 &bull; Out: 85,479)</span></div>
         <div class="meta-item"><span class="meta-lbl">Model Tier:</span> <span class="meta-val" id="modal-model-val" style="color: #34d399;">Detecting model...</span></div>

@@ -1763,7 +1763,7 @@
         if (modalScreen) modalScreen.style.display = 'block';
         if (modalChips) modalChips.style.display = 'flex';
         if (modalInput) modalInput.style.display = 'flex';
-        if (modalTitle) modalTitle.innerHTML = 'Antigravity (AGY) Live Terminal | <span class="mono" style="color: #60a5fa;">' + (window.AGY_SESSION_NAME || 'webdev1.0') + ' (' + (window.AGY_SESSION_ID || '53c2a1ff').substring(0,8) + ')</span>';
+        if (modalTitle) modalTitle.innerHTML = 'Antigravity (AGY) Live Terminal | <span class="mono" style="color: #60a5fa;">' + (window.AGY_SESSION_NAME || ('webdev (' + (window.AGY_SESSION_ID || '53c2a1ff').substring(0,8) + ')')) + '</span>';
         const isDeskOnline = window.DESKTOP_IS_ONLINE !== undefined ? window.DESKTOP_IS_ONLINE : true;
         if (modalPulse) { modalPulse.style.background = isDeskOnline ? '#10b981' : '#6366f1'; modalPulse.style.boxShadow = isDeskOnline ? '0 0 8px #10b981' : '0 0 8px #6366f1'; }
         if (modalStatus) { modalStatus.textContent = isDeskOnline ? 'ONLINE (Desktop :8082)' : 'STANDBY (Desktop Sleeping • WoL Ready)'; modalStatus.className = `item-tag ${isDeskOnline ? 'online' : 'offline'}`; }
@@ -1995,18 +1995,19 @@
 
     // Multi-modal AGY session launcher
     function launchAgySession(target) {
-      const cid = '53c2a1ff-4c8c-4051-aae0-8bf4e62f57b3';
+      const cid = window.AGY_SESSION_ID || '53c2a1ff-4c8c-4051-aae0-8bf4e62f57b3';
+      const shortId = cid.substring(0, 8);
       if (target === 'stream' || !target) {
         loadLog('agy');
         const term = document.getElementById('terminal-card');
         if (term) term.scrollIntoView({ behavior: 'smooth' });
-        showToast('info', 'AGY Live Terminal', 'Streaming active session 53c2a1ff...');
+        showToast('info', 'AGY Live Terminal', `Streaming active session ${shortId}...`);
       } else if (target === 'app') {
         if (!isSSOAuthenticated()) {
           openGlobalSSOModal('Antigravity Session Launcher', () => launchAgySession(target));
           return;
         }
-        showToast('loading', 'Launching Antigravity App...', 'Connecting to conversation://53c2a1ff-4c8c...', 3000);
+        showToast('loading', 'Launching Antigravity App...', `Connecting to conversation://${shortId}...`, 3000);
         window.location.href = `conversation://${cid}`;
         setTimeout(() => {
           loadLog('agy');
@@ -2094,26 +2095,29 @@
       }, 2500);
     }
 
-    window.AGY_SESSION_NAME = 'webdev1.0';
+    window.AGY_SESSION_NAME = 'webdev (53c2a1ff)';
     window.AGY_SESSION_ID = '53c2a1ff-4c8c-4051-aae0-8bf4e62f57b3';
 
     function updateAgySessionDisplay(cid, name) {
       if (!cid) cid = window.AGY_SESSION_ID || '53c2a1ff-4c8c-4051-aae0-8bf4e62f57b3';
       window.AGY_SESSION_ID = cid;
-      if (name) window.AGY_SESSION_NAME = name;
-      const sName = window.AGY_SESSION_NAME || 'webdev1.0';
       const shortId = cid.substring(0, 8);
+      if (!name || name === 'webdev1.0') {
+        name = `webdev (${shortId})`;
+      }
+      window.AGY_SESSION_NAME = name;
+      const sName = window.AGY_SESSION_NAME;
       const isOnline = window.DESKTOP_IS_ONLINE !== undefined ? window.DESKTOP_IS_ONLINE : true;
 
       const tab = document.getElementById('tab-agy');
       if (tab) {
-        tab.textContent = `[AGY] ${sName} (${shortId})`;
-        tab.title = `View Active Antigravity Autonomous Agent Stream (${sName} | ${shortId})`;
+        tab.textContent = `[AGY] ${sName}`;
+        tab.title = `View Active Antigravity Autonomous Agent Stream (${sName} | ${cid})`;
       }
 
       const modalTitle = document.getElementById('agy-modal-title-text');
       if (modalTitle) {
-        modalTitle.innerHTML = `Antigravity (AGY) Live Terminal | <span class="mono" style="color: #60a5fa;">${sName} (${shortId})</span>`;
+        modalTitle.innerHTML = `Antigravity (AGY) Live Terminal | <span class="mono" style="color: #60a5fa;">${sName}</span>`;
       }
 
       const metaName = document.getElementById('agy-meta-name');
@@ -2126,9 +2130,9 @@
       if (connLine) connLine.textContent = `[SYSTEM] Connected to AGY conversation stream: ${sName} (${cid})`;
 
       document.querySelectorAll('.agy-session-link-btn').forEach(btn => {
-        btn.title = `Open Interactive Terminal for Active Session ${sName} (${shortId})`;
+        btn.title = `Open Interactive Terminal for Active Session ${sName}`;
         const span = btn.querySelector('span:not(.dropdown-dot)');
-        if (span) span.textContent = isOnline ? `Open AGY Terminal (${sName})` : `AGY Terminal (${shortId} • Standby)`;
+        if (span) span.textContent = isOnline ? `Open AGY Terminal (${sName})` : `AGY Terminal (${shortId} \u2022 Standby)`;
         const tag = btn.querySelector('.item-tag');
         if (tag) {
           tag.textContent = isOnline ? 'Live' : 'Standby';
@@ -2138,10 +2142,15 @@
 
       const headerBtn = document.getElementById('agy-header-session-btn');
       if (headerBtn) {
-        headerBtn.title = `Open Interactive Terminal for Active Session ${sName} (${shortId})`;
+        headerBtn.title = `Open Interactive Terminal for Active Session ${sName}`;
         const dotColor = isOnline ? '#10b981' : '#6366f1';
         headerBtn.innerHTML = `<span class="dropdown-dot" style="background-color: ${dotColor}; box-shadow: 0 0 8px ${dotColor};"></span> ${isOnline ? 'Open Live Console' : 'Console Standby'}: ${sName} &rarr;`;
       }
+
+      // Dynamically update card titles & session headers across all pages
+      document.querySelectorAll('.agy-card-session-name').forEach(el => {
+        el.textContent = sName;
+      });
     }
 
     function fetchAgySessionInfo(callback) {
@@ -2149,13 +2158,20 @@
         .then(r => r.json())
         .then(data => {
           if (data && data.conversationId) {
-            updateAgySessionDisplay(data.conversationId, data.sessionName || 'webdev1.0');
+            const prevCid = window.AGY_SESSION_ID;
+            updateAgySessionDisplay(data.conversationId, data.sessionName);
+            if (prevCid && prevCid !== data.conversationId) {
+              console.log(`[AGY] Active session transitioned: ${prevCid} -> ${data.conversationId}`);
+              if (typeof currentLogTab !== 'undefined' && currentLogTab === 'agy') {
+                if (typeof loadLog === 'function') loadLog('agy');
+              }
+            }
           }
           if (callback) callback(data);
           return data;
         })
         .catch(() => {
-          updateAgySessionDisplay('53c2a1ff-4c8c-4051-aae0-8bf4e62f57b3', 'webdev1.0');
+          updateAgySessionDisplay(window.AGY_SESSION_ID || '53c2a1ff-4c8c-4051-aae0-8bf4e62f57b3', window.AGY_SESSION_NAME || 'webdev');
           if (callback) callback(null);
           return null;
         });
@@ -2166,7 +2182,7 @@
         openGlobalSSOModal('Resume Active AGY Session on Desktop', resumeAgySessionOnDesktop);
         return;
       }
-      const sName = window.AGY_SESSION_NAME || 'webdev1.0';
+      const sName = window.AGY_SESSION_NAME || 'webdev';
       const cid = window.AGY_SESSION_ID || '53c2a1ff-4c8c-4051-aae0-8bf4e62f57b3';
       const ssoEmail = localStorage.getItem('dr_sso_email') || 'cory.townsend@digitalresolve.ca';
       showToast('loading', `Resuming ${sName} on Desktop...`, `Opening Windows Terminal: agy --conversation ${cid.substring(0,8)}...`, 4000);
