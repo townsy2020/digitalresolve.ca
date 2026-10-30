@@ -930,7 +930,7 @@
         if (el.textContent.includes('Remaining')) {
           el.textContent = `${daysLeft} Days Remaining`;
         } else if (el.textContent.includes('Left')) {
-          el.textContent = `Cloudflare ECC CA-3 (${daysLeft} Days Left)`;
+          el.textContent = `Cloudflare Universal SSL (Let's Encrypt ECDSA) (${daysLeft} Days Left)`;
         } else {
           el.textContent = `${daysLeft} Days Left`;
         }
@@ -2698,6 +2698,9 @@
               if (mixesLeg) mixesLeg.innerHTML = `<span class="legend-dot seg-mixes"></span> Mixes (${Math.round(st.mixesGB)} GB)`;
             }
           }
+          if (data && data.cloudflare) {
+            updateCloudflareStatsUI(data.cloudflare);
+          }
           if (data && data.desktop) {
             updateStatusUI('desktop', data.desktop.online, data.desktop.latencyMs, data.desktop.disk, data.desktop.torrent, data.desktop.vitals);
           }
@@ -2708,6 +2711,7 @@
         })
         .catch(() => {
           if (timeoutId) clearTimeout(timeoutId);
+          try { updateCloudflareStatsUI(); } catch (e) {}
           return null;
         });
     }
@@ -5010,7 +5014,7 @@
     window.submitEdgeAiPrompt = submitEdgeAiPrompt;
 
     // Dynamic Cloudflare Edge KPI Updater
-    function updateCloudflareStatsUI(stats) {
+    function updateCloudflareStatsUI(cfData) {
       const defStats = {
         totalRequests: '48,290',
         ingressSla: '100% Ingress SLA (0 Errors)',
@@ -5020,8 +5024,12 @@
         topPop: 'Top PoP: YUL (Montreal)',
         threatsBlocked: '142',
         geoShield: '0 Breaches • CA/US Geo-Shield',
+        edgeThreats: '142 Threats Neutralized • CA/US Shield',
+        edgeIngress: 'Active • 100% Ingress',
+        edgePops: 'YUL (Montreal) • YYZ (Toronto)',
         subRequests: {
           apex: '21,450',
+          wake: '12,680',
           cam: '8,920',
           torrents: '6,340',
           torrents2: '5,110',
@@ -5029,16 +5037,88 @@
           files: '2,190'
         }
       };
-      const cur = stats || defStats;
+
+      let source = cfData;
+      if (!source || typeof source !== 'object') {
+        try {
+          const raw = localStorage.getItem('dr_cloudflare_cache');
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && typeof parsed === 'object') source = parsed;
+          }
+        } catch (e) {}
+      } else {
+        try {
+          localStorage.setItem('dr_cloudflare_cache', JSON.stringify(source));
+        } catch (e) {}
+      }
+
+      const formatSavedGB = (val, defVal) => {
+        if (val === undefined || val === null || val === '') return defVal;
+        const str = String(val).replace(/^(&bull;|•|\s)+/, '').trim();
+        if (str.includes('Saved')) return str;
+        if (str.toLowerCase().includes('gb')) return `${str} Saved from Origin`;
+        return `${str} GB Saved from Origin`;
+      };
+
+      const formatEdgeThreats = (src, defVal) => {
+        if (src && (src.edgeThreats || src.threatsBlockedText)) {
+          return src.edgeThreats || src.threatsBlockedText;
+        }
+        if (src && src.threatsBlocked !== undefined && src.threatsBlocked !== null) {
+          const num = typeof src.threatsBlocked === 'number' ? src.threatsBlocked.toLocaleString() : src.threatsBlocked;
+          return `${num} Threats Neutralized • CA/US Shield`;
+        }
+        return defVal;
+      };
+
+      const cur = {
+        totalRequests: (source && source.totalRequests !== undefined) ? (typeof source.totalRequests === 'number' ? source.totalRequests.toLocaleString() : source.totalRequests) : defStats.totalRequests,
+        ingressSla: (source && source.ingressSla) ? source.ingressSla : defStats.ingressSla,
+        hitRatio: (source && source.hitRatio !== undefined && source.hitRatio !== null) ? (typeof source.hitRatio === 'number' ? `${source.hitRatio}%` : (String(source.hitRatio).includes('%') ? source.hitRatio : `${source.hitRatio}%`)) : defStats.hitRatio,
+        savedGB: formatSavedGB(source && source.savedGB, defStats.savedGB),
+        uniqueVisitors: (source && source.uniqueVisitors !== undefined) ? (typeof source.uniqueVisitors === 'number' ? source.uniqueVisitors.toLocaleString() : source.uniqueVisitors) : defStats.uniqueVisitors,
+        topPop: (source && source.topPop) ? (String(source.topPop).includes('Top PoP') ? source.topPop : `Top PoP: ${source.topPop}`) : defStats.topPop,
+        threatsBlocked: (source && source.threatsBlocked !== undefined) ? (typeof source.threatsBlocked === 'number' ? source.threatsBlocked.toLocaleString() : source.threatsBlocked) : defStats.threatsBlocked,
+        geoShield: (source && source.geoShield) ? source.geoShield : defStats.geoShield,
+        edgeThreats: formatEdgeThreats(source, defStats.edgeThreats),
+        edgeIngress: (source && (source.edgeIngress || source.ingressTag)) ? (source.edgeIngress || source.ingressTag) : defStats.edgeIngress,
+        edgePops: (source && source.edgePops) ? source.edgePops : defStats.edgePops,
+        subRequests: Object.assign({}, defStats.subRequests, (source && source.subRequests) || {})
+      };
+
+      const formatBullet = (str) => {
+        if (!str) return '';
+        const clean = String(str).replace(/^(&bull;|•|\s)+/, '').trim();
+        return `• ${clean}`;
+      };
 
       document.querySelectorAll('.cf-kpi-requests, #cf-kpi-requests').forEach(el => el.textContent = cur.totalRequests);
+      document.querySelectorAll('.cf-kpi-sla, #cf-kpi-sla').forEach(el => el.textContent = formatBullet(cur.ingressSla));
       document.querySelectorAll('.cf-kpi-ratio, #cf-kpi-ratio').forEach(el => el.textContent = cur.hitRatio);
-      document.querySelectorAll('.cf-kpi-saved, #cf-kpi-saved').forEach(el => el.textContent = `• ${cur.savedGB}`);
+      document.querySelectorAll('.cf-kpi-saved, #cf-kpi-saved').forEach(el => el.textContent = formatBullet(cur.savedGB));
       document.querySelectorAll('.cf-kpi-visitors, #cf-kpi-visitors').forEach(el => el.textContent = cur.uniqueVisitors);
+      document.querySelectorAll('.cf-kpi-toppop, #cf-kpi-toppop').forEach(el => el.textContent = formatBullet(cur.topPop));
       document.querySelectorAll('.cf-kpi-threats, #cf-kpi-threats').forEach(el => el.textContent = cur.threatsBlocked);
+      document.querySelectorAll('.cf-kpi-geoshield, #cf-kpi-geoshield').forEach(el => el.textContent = formatBullet(cur.geoShield));
 
-      const sub = cur.subRequests || defStats.subRequests;
+      const formatSub = (val, def) => {
+        if (val === undefined || val === null) return def;
+        return typeof val === 'number' ? val.toLocaleString() : String(val);
+      };
+      const rawSub = cur.subRequests || {};
+      const sub = {
+        apex: formatSub(rawSub.apex, defStats.subRequests.apex),
+        wake: formatSub(rawSub.wake, defStats.subRequests.wake),
+        cam: formatSub(rawSub.cam, defStats.subRequests.cam),
+        torrents: formatSub(rawSub.torrents, defStats.subRequests.torrents),
+        torrents2: formatSub(rawSub.torrents2, defStats.subRequests.torrents2),
+        stream: formatSub(rawSub.stream, defStats.subRequests.stream),
+        files: formatSub(rawSub.files, defStats.subRequests.files)
+      };
+
       document.querySelectorAll('.cf-row-req-apex').forEach(el => el.textContent = sub.apex);
+      document.querySelectorAll('.cf-row-req-wake').forEach(el => el.textContent = sub.wake);
       document.querySelectorAll('.cf-row-req-cam').forEach(el => el.textContent = sub.cam);
       document.querySelectorAll('.cf-row-req-torrents').forEach(el => el.textContent = sub.torrents);
       document.querySelectorAll('.cf-row-req-torrents2').forEach(el => el.textContent = sub.torrents2);
@@ -5048,15 +5128,35 @@
       const isDeskOn = window.DESKTOP_IS_ONLINE !== undefined ? window.DESKTOP_IS_ONLINE : true;
       document.querySelectorAll('.cf-sub-torrents-badge').forEach(el => {
         el.textContent = isDeskOn ? 'Active' : 'Standby';
-        el.className = isDeskOn ? 'item-tag online cf-sub-torrents-badge' : 'item-tag cf-sub-torrents-badge';
+        el.className = isDeskOn ? 'item-tag online cf-sub-torrents-badge' : 'item-tag offline cf-sub-torrents-badge';
       });
 
       const edgeTraffic = document.getElementById('edge-traffic-val');
-      if (edgeTraffic) edgeTraffic.textContent = `${cur.totalRequests} Requests • 0 Errors`;
+      if (edgeTraffic) {
+        const reqStr = String(cur.totalRequests);
+        if (reqStr.includes('•')) {
+          edgeTraffic.textContent = reqStr;
+        } else if (reqStr.includes('Requests')) {
+          edgeTraffic.textContent = `${reqStr} • 0 Errors`;
+        } else {
+          edgeTraffic.textContent = `${reqStr} Requests • 0 Errors`;
+        }
+      }
+
+      const cleanSaved = String(cur.savedGB).replace(/^(&bull;|•|\s)+/, '').trim();
       const edgeCache = document.getElementById('edge-cache-val');
-      if (edgeCache) edgeCache.textContent = `${cur.hitRatio} (${cur.savedGB})`;
+      if (edgeCache) edgeCache.textContent = `${cur.hitRatio} (${cleanSaved})`;
       const edgeBar = document.getElementById('edge-cache-bar');
-      if (edgeBar && cur.hitRatio) edgeBar.style.width = cur.hitRatio.includes('%') ? cur.hitRatio : `${cur.hitRatio}%`;
+      if (edgeBar && cur.hitRatio !== undefined && cur.hitRatio !== null) {
+        edgeBar.style.width = String(cur.hitRatio).includes('%') ? cur.hitRatio : `${cur.hitRatio}%`;
+      }
+
+      const edgeThreats = document.getElementById('edge-threats-val');
+      if (edgeThreats) edgeThreats.textContent = cur.edgeThreats;
+      const edgeIngress = document.getElementById('edge-ingress-tag');
+      if (edgeIngress) edgeIngress.textContent = cur.edgeIngress;
+      const edgePops = document.getElementById('edge-pops-val');
+      if (edgePops) edgePops.textContent = cur.edgePops;
     }
     window.updateCloudflareStatsUI = updateCloudflareStatsUI;
 

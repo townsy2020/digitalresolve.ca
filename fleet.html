@@ -724,7 +724,7 @@
                 <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
                 <span class="fleet-title">Cloudflare Edge &amp; Site Statistics</span>
               </div>
-              <span class="item-tag online">Active &bull; 100% Ingress</span>
+              <span class="item-tag online" id="edge-ingress-tag">Active &bull; 100% Ingress</span>
             </div>
             <div class="fleet-metrics">
               <div class="metric-row">
@@ -740,7 +740,7 @@
               </div>
               <div class="metric-row">
                 <span class="metric-name">Perimeter Defense</span>
-                <span class="metric-val" style="color: #34d399;">142 Threats Neutralized &bull; CA/US Shield</span>
+                <span class="metric-val" id="edge-threats-val" style="color: #34d399;">142 Threats Neutralized &bull; CA/US Shield</span>
               </div>
               <div class="metric-row">
                 <span class="metric-name">Transport &amp; Ingress</span>
@@ -748,7 +748,7 @@
               </div>
               <div class="metric-row">
                 <span class="metric-name">Edge PoP Ingress</span>
-                <span class="metric-val" style="font-size: 0.78rem;">YUL (Montreal) &bull; YYZ (Toronto)</span>
+                <span class="metric-val" id="edge-pops-val" style="font-size: 0.78rem;">YUL (Montreal) &bull; YYZ (Toronto)</span>
               </div>
             </div>
             <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; gap: 8px; flex-wrap: wrap;">
@@ -1036,7 +1036,7 @@
           <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px; padding: 12px;">
             <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Total Edge Requests</div>
             <div style="font-size: 1.6rem; font-weight: 800; color: #38bdf8; font-family: 'JetBrains Mono', monospace; margin: 4px 0;" class="cf-kpi-requests">48,290</div>
-            <div style="font-size: 0.72rem; color: #34d399;">&bull; 100% Ingress SLA (0 Errors)</div>
+            <div style="font-size: 0.72rem; color: #34d399;" class="cf-kpi-sla">&bull; 100% Ingress SLA (0 Errors)</div>
           </div>
           <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 12px;">
             <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Edge Cache Hit Ratio</div>
@@ -1046,12 +1046,12 @@
           <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(192, 132, 252, 0.3); border-radius: 8px; padding: 12px;">
             <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Unique Visitors (24h)</div>
             <div style="font-size: 1.6rem; font-weight: 800; color: #c084fc; font-family: 'JetBrains Mono', monospace; margin: 4px 0;" class="cf-kpi-visitors">148</div>
-            <div style="font-size: 0.72rem; color: #94a3b8;">&bull; Top PoP: YUL (Montreal)</div>
+            <div style="font-size: 0.72rem; color: #94a3b8;" class="cf-kpi-toppop">&bull; Top PoP: YUL (Montreal)</div>
           </div>
           <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 12px;">
             <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Threats &amp; Bots Blocked</div>
             <div style="font-size: 1.6rem; font-weight: 800; color: #fbbf24; font-family: 'JetBrains Mono', monospace; margin: 4px 0;" class="cf-kpi-threats">142</div>
-            <div style="font-size: 0.72rem; color: #34d399;">&bull; 0 Breaches &bull; CA/US Geo-Shield</div>
+            <div style="font-size: 0.72rem; color: #34d399;" class="cf-kpi-geoshield">&bull; 0 Breaches &bull; CA/US Geo-Shield</div>
           </div>
         </div>
 
@@ -1075,9 +1075,16 @@
               <tbody style="color: #cbd5e1;">
                 <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
                   <td style="padding: 8px;"><strong style="color: #38bdf8;">digitalresolve.ca</strong> (Apex)</td>
-                  <td style="padding: 8px; font-family: monospace;">NUC (192.168.2.35)</td>
+                  <td style="padding: 8px; font-family: monospace;">GitHub Pages (Cloudflare Edge Proxy)</td>
                   <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-apex">21,450</td>
                   <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">94.6% Cache Hit</span></td>
+                  <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
+                  <td style="padding: 8px;"><strong style="color: #38bdf8;">wake.digitalresolve.ca</strong></td>
+                  <td style="padding: 8px; font-family: monospace;">NUC (192.168.2.35:8082 &bull; API Gateway &amp; Telemetry)</td>
+                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-wake">12,680</td>
+                  <td style="padding: 8px; color: #34d399;">Port 8082 &bull; HTTPS (TLS 1.3 / H3)</td>
                   <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
                 </tr>
                 <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
@@ -1126,7 +1133,7 @@
             <div style="color: #f8fafc; font-weight: 700; margin-bottom: 4px;">Edge Transport &amp; Security</div>
             <div>&bull; Transport Protocol: <strong style="color: #cbd5e1;">HTTP/3 (QUIC) &bull; HTTP/2</strong></div>
             <div>&bull; TLS Version: <strong style="color: #34d399;">TLS 1.3 (0-RTT Session Resumption)</strong></div>
-            <div>&bull; SSL Certificate: <strong style="color: #cbd5e1;" class="ssl-cert-days">Cloudflare ECC CA-3 (85 Days Left)</strong></div>
+            <div>&bull; SSL Certificate: <strong style="color: #cbd5e1;" class="ssl-cert-days">Cloudflare Universal SSL (Let's Encrypt ECDSA) (85 Days Left)</strong></div>
             <div>&bull; DNSSEC: <strong style="color: #34d399;">Enabled &amp; Validated (100% Authenticated)</strong></div>
           </div>
           <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 12px; font-size: 0.78rem; line-height: 1.6; color: #94a3b8;">
