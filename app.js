@@ -3171,7 +3171,7 @@
       const frame = document.getElementById('camera-live-frame');
       const title = document.getElementById('cam-header-active-name');
       const isLocalHost = (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-      const targetUrl = isLocalHost ? `${playerPage}?src=${src}` : `https://cam.digitalresolve.ca/${playerPage}?src=${src}`;
+      const targetUrl = `${playerPage}?src=${src}`;
       if (frame && camFeedLoaded) {
         if (frame.src !== targetUrl) {
           frame.src = targetUrl;

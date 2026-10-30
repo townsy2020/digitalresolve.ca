@@ -279,6 +279,12 @@
         statusText.textContent = 'DISCONNECTED';
       });
 
+      ws.addEventListener('error', () => {
+        statusBadge.classList.remove('online');
+        statusText.textContent = 'AUTH / GATEWAY REQUIRED';
+        hideSpinner();
+      });
+
       video.addEventListener('loadeddata', hideSpinner);
       video.addEventListener('playing', hideSpinner);
       setTimeout(hideSpinner, 3500);
