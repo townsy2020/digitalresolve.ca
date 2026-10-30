@@ -683,6 +683,13 @@
       if (dnsRoutes) dnsRoutes.textContent = '6 LAN Routes';
       const dnsDaemon = document.getElementById('dns-kpi-daemon');
       if (dnsDaemon) dnsDaemon.textContent = 'Awaiting Install';
+      document.querySelectorAll('#schematic-cf-throughput').forEach(el => el.textContent = '100% Shield');
+      document.querySelectorAll('#schematic-bell-throughput').forEach(el => el.textContent = '1.5G / 940M');
+      document.querySelectorAll('#schematic-vpn-throughput').forEach(el => el.textContent = 'NYC Relay');
+      document.querySelectorAll('#schematic-tunnel-throughput').forEach(el => el.textContent = 'Tunnel OK');
+      document.querySelectorAll('#ai-model-footprint').forEach(el => el.textContent = '2.0 GB');
+      document.querySelectorAll('#nuc-hw-ram').forEach(el => el.textContent = '32 GB');
+      document.querySelectorAll('#spark-scale-range').forEach(el => el.textContent = '0 - 10 ms');
 
       // 3. Uptime Kuma Heartbeat Table Latencies
       const nucLat = (window.LAST_NUC_LATENCY !== undefined && window.LAST_NUC_LATENCY !== null) ? window.LAST_NUC_LATENCY : 0.2;

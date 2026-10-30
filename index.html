@@ -912,7 +912,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
               <div style="font-size: 0.85rem; font-weight: 700; color: #f0f6fc; display: flex; align-items: center; gap: 8px;">
                 <span class="dropdown-dot dot-2"></span>
-                <span>24-Hour Real-Time Latency &amp; Response Heartbeat (0 - 10 ms)</span>
+                <span>24-Hour Real-Time Latency &amp; Response Heartbeat (<span id="spark-scale-range">0 - 10 ms</span>)</span>
               </div>
               <div style="display: flex; gap: 14px; font-size: 0.75rem; font-family: monospace;">
                 <span style="color: #6ee7b7;"><span style="display:inline-block; width:10px; height:10px; background:#10b981; border-radius:2px; margin-right:4px;"></span>NUC Server (<span id="spark-leg-nuc">0.2 ms</span>)</span>
@@ -1394,7 +1394,7 @@
                   </div>
                   <div class="schematic-node-meta">
                     <span>Protocol: TLS 1.3 / HTTP/3</span>
-                    <span class="schematic-node-throughput">100% Shield</span>
+                    <span class="schematic-node-throughput" id="schematic-cf-throughput">100% Shield</span>
                   </div>
                 </div>
 
@@ -1412,7 +1412,7 @@
                   </div>
                   <div class="schematic-node-meta">
                     <span>Carrier: PPPoE / Fiber</span>
-                    <span class="schematic-node-throughput" style="color: #34d399;">1.5G / 940M</span>
+                    <span class="schematic-node-throughput" style="color: #34d399;" id="schematic-bell-throughput">1.5G / 940M</span>
                   </div>
                 </div>
               </div>
@@ -1438,7 +1438,7 @@
                   </div>
                   <div class="schematic-node-meta">
                     <span>Privacy: Killswitch Active</span>
-                    <span class="schematic-node-throughput" style="color: #34d399;">NYC Relay</span>
+                    <span class="schematic-node-throughput" style="color: #34d399;" id="schematic-vpn-throughput">NYC Relay</span>
                   </div>
                 </div>
 
@@ -1456,7 +1456,7 @@
                   </div>
                   <div class="schematic-node-meta">
                     <span>Firewall: 0 Open Inbound Ports</span>
-                    <span class="schematic-node-throughput">Tunnel OK</span>
+                    <span class="schematic-node-throughput" id="schematic-tunnel-throughput">Tunnel OK</span>
                   </div>
                 </div>
               </div>
@@ -1740,7 +1740,7 @@
           <div class="kpi-mini-card purple">
             <div class="kpi-label">Active Local Model</div>
             <div class="kpi-val" style="color: #d8b4fe; font-size: 1.15rem;">Llama 3.2 3B</div>
-            <div class="kpi-sub">Q4_K_M &bull; 2.0 GB Memory Footprint</div>
+            <div class="kpi-sub">Q4_K_M &bull; <span id="ai-model-footprint">2.0 GB</span> Memory Footprint</div>
           </div>
           <div class="kpi-mini-card success">
             <div class="kpi-label">Generation Speed</div>
@@ -1896,7 +1896,7 @@
         <div class="section-header">
           <span class="section-tag" style="background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3);">NUC 24/7 Telemetry &amp; Microservices</span>
           <h2>Homelab Edge Intelligence &amp; Services Suite</h2>
-          <p>High-density 24/7 services hosted on the Intel NUC core server (32 GB RAM) with hardware isolation, zero-trust security, and real-time observability.</p>
+          <p>High-density 24/7 services hosted on the Intel NUC core server (<span id="nuc-hw-ram">32 GB</span> RAM) with hardware isolation, zero-trust security, and real-time observability.</p>
         </div>
 
         <div class="nuc-services-container">
