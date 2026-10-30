@@ -2405,17 +2405,24 @@
         if (stored) return JSON.parse(stored);
       } catch (e) {}
       return {
-        inputTokens: 18740837,
-        outputTokens: 1560124,
-        cacheTokens: 412231730,
-        totalTokens: 20300961,
-        model: 'Gemini 3.8 Flash (92.32%) / Pro (7.68%)',
-        efficiency: 'Optimal (92.32% Token Efficiency)',
+        inputTokens: 90118663,
+        outputTokens: 7948163,
+        cacheTokens: 1964994985,
+        totalTokens: 98066826,
+        model: 'Gemini 3.8 Flash (91.9%) / Pro (8.1%)',
+        efficiency: 'Optimal (91.9% Token Efficiency)',
         breakdown: {
-          flash: { name: 'Gemini Flash', percent: 92.32, tokens: 18740837 },
-          cache: { name: 'Cache Read', percent: 95.65, tokens: 412231730 },
-          pro:   { name: 'Gemini Pro', percent: 7.68, tokens: 1560124 }
-        }
+          flash: { name: 'Gemini Flash', percent: 91.9, tokens: 90118663 },
+          cache: { name: 'Cache Read', percent: 95.61, tokens: 1964994985 },
+          pro:   { name: 'Gemini Pro', percent: 8.1, tokens: 7948163 }
+        },
+        weeklyLimitRemaining: 74.52,
+        weeklyRefresh: "103h 10m",
+        fiveHourLimitRemaining: 94.92,
+        fiveHourRefresh: "3h 31m",
+        claudeWeeklyRemaining: 100.0,
+        claudeLimitRemaining: 100.0,
+        account: "coryrobertleetownsend@gmail.com"
       };
     }
 
@@ -2444,7 +2451,9 @@
           fiveHourLimitRemaining: metrics.fiveHourLimitRemaining !== undefined ? metrics.fiveHourLimitRemaining : defMetrics.fiveHourLimitRemaining,
           weeklyRefresh: metrics.weeklyRefresh || defMetrics.weeklyRefresh,
           fiveHourRefresh: metrics.fiveHourRefresh || defMetrics.fiveHourRefresh,
-          claudeLimitRemaining: metrics.claudeLimitRemaining !== undefined ? metrics.claudeLimitRemaining : defMetrics.claudeLimitRemaining
+          claudeWeeklyRemaining: metrics.claudeWeeklyRemaining !== undefined ? metrics.claudeWeeklyRemaining : (metrics.claudeLimitRemaining !== undefined ? metrics.claudeLimitRemaining : defMetrics.claudeWeeklyRemaining),
+          claudeLimitRemaining: metrics.claudeLimitRemaining !== undefined ? metrics.claudeLimitRemaining : (metrics.claudeWeeklyRemaining !== undefined ? metrics.claudeWeeklyRemaining : defMetrics.claudeLimitRemaining),
+          account: metrics.account || defMetrics.account
         };
         metrics = parsed;
         try { localStorage.setItem(TOKEN_METRICS_KEY, JSON.stringify(metrics)); } catch (e) {}
@@ -2457,15 +2466,15 @@
       const fullTotalStr = Number(metrics.totalTokens).toLocaleString();
 
       // Dynamic live breakdown calculation to 2 decimal places (Real-time Transcript Ingestion)
-      const inTok = Number(metrics.inputTokens) || 18740837;
-      const outTok = Number(metrics.outputTokens) || 1560124;
-      const cacheTok = Number(metrics.cacheTokens) || 412231730;
+      const inTok = Number(metrics.inputTokens) || 90118663;
+      const outTok = Number(metrics.outputTokens) || 7948163;
+      const cacheTok = Number(metrics.cacheTokens) || 1964994985;
       const totalTokens = Number(metrics.totalTokens) || (inTok + outTok);
 
-      let flashPctNum = (totalTokens > 0) ? ((inTok / totalTokens) * 100) : 92.32;
-      let proPctNum = (totalTokens > 0) ? ((outTok / totalTokens) * 100) : 7.68;
+      let flashPctNum = (totalTokens > 0) ? ((inTok / totalTokens) * 100) : 91.9;
+      let proPctNum = (totalTokens > 0) ? ((outTok / totalTokens) * 100) : 8.1;
       const contextTotal = cacheTok + inTok;
-      let cachePctNum = (contextTotal > 0) ? ((cacheTok / contextTotal) * 100) : 95.65;
+      let cachePctNum = (contextTotal > 0) ? ((cacheTok / contextTotal) * 100) : 95.61;
 
       if (metrics.breakdown && metrics.breakdown.flash && metrics.breakdown.flash.percent !== undefined) {
         flashPctNum = Number(metrics.breakdown.flash.percent);
@@ -2582,10 +2591,10 @@
 
       // Update Header Dropdown Progress Bar
       const menuVal = document.getElementById('menu-token-val');
-      const weeklyLimit = (metrics.weeklyLimitRemaining !== undefined) ? metrics.weeklyLimitRemaining : 88.16;
-      const fiveHourLimit = (metrics.fiveHourLimitRemaining !== undefined) ? metrics.fiveHourLimitRemaining : 83.84;
-      const weeklyRef = metrics.weeklyRefresh || "129h 38m";
-      const fiveHourRef = metrics.fiveHourRefresh || "1h 16m";
+      const weeklyLimit = (metrics.weeklyLimitRemaining !== undefined) ? metrics.weeklyLimitRemaining : 74.52;
+      const fiveHourLimit = (metrics.fiveHourLimitRemaining !== undefined) ? metrics.fiveHourLimitRemaining : 94.92;
+      const weeklyRef = metrics.weeklyRefresh || "103h 10m";
+      const fiveHourRef = metrics.fiveHourRefresh || "3h 31m";
       if (menuVal) menuVal.textContent = `${weeklyLimit}% Weekly`;
       const barFlash = document.getElementById('menu-bar-flash');
       if (barFlash) barFlash.style.width = `${weeklyLimit}%`;
@@ -2604,9 +2613,13 @@
       const pBar = document.getElementById('menu-progress-bar');
       if (pBar) pBar.title = `Gemini Weekly: ${weeklyLimit}% Remaining (Refresh in ${weeklyRef})`;
       document.querySelectorAll('#menu-claude-pct').forEach(el => {
-        const claudePct = (metrics.claudeLimitRemaining !== undefined) ? metrics.claudeLimitRemaining : 100;
+        const claudePct = (metrics.claudeWeeklyRemaining !== undefined) ? metrics.claudeWeeklyRemaining : ((metrics.claudeLimitRemaining !== undefined) ? metrics.claudeLimitRemaining : 100);
         el.textContent = `${claudePct}%`;
       });
+      const accountUser = document.getElementById('menu-account-user');
+      if (accountUser && metrics.account) {
+        accountUser.textContent = metrics.account.includes('@') ? metrics.account.split('@')[0] : metrics.account;
+      }
     }
     function fetchClusterStats() {
       const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
