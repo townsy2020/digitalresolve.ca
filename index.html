@@ -249,7 +249,7 @@
               </div>
               <div style="margin-top: 6px; font-size: 0.68rem; color: #64748b; display: flex; justify-content: space-between;">
                 <span>Account: <span style="color: #cbd5e1;">coryrobertleetownsend</span></span>
-                <span>Claude/GPT: <span style="color: #34d399; font-weight: 700;">100%</span></span>
+                <span>Claude/GPT: <span id="menu-claude-pct" style="color: #34d399; font-weight: 700;">100%</span></span>
               </div>
             </div>
           </div>
@@ -564,7 +564,7 @@
                   <div>
                     <div class="stat-card-header" style="margin-bottom: 8px;">
                       <span class="stat-card-title" style="font-size: 0.8rem; color: #94a3b8;">Desktop Storage (C: &amp; D:)</span>
-                      <span class="item-tag online" style="font-size: 0.68rem; padding: 2px 7px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3);">Dual Drive (6.05 TB)</span>
+                      <span class="item-tag online" id="stat-desktop-pool-tag" style="font-size: 0.68rem; padding: 2px 7px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3);">Dual Drive (6.05 TB)</span>
                     </div>
                     <div class="stat-big-val" id="stat-desktop-disk-free" style="color: #38bdf8;">-- <span style="font-size: 0.85rem; color: #8b949e;">Free</span></div>
                     <div class="stat-subtext" id="stat-desktop-disk-sub" style="margin-top: 4px;">
@@ -674,7 +674,7 @@
             <div class="stat-metric-card" style="background: rgba(255, 255, 255, 0.02);">
               <div class="stat-card-header">
                 <span class="stat-card-title">Latency Variance (Jitter)</span>
-                <span class="item-tag online">&lt; 1 ms</span>
+                <span class="item-tag online" id="isp-jitter-tag">&lt; 1 ms</span>
               </div>
               <div class="stat-big-val" id="isp-jitter-val" style="color: #4ade80;">&plusmn; -- <span style="font-size: 0.9rem; color: #8b949e;">ms</span></div>
               <div class="stat-subtext" id="isp-loss-sub">Analyzing packet stream...</div>
@@ -875,7 +875,7 @@
                 <span class="stat-card-title">90-Day SLA Availability</span>
                 <span class="item-tag online">Grade A+</span>
               </div>
-              <div class="stat-big-val" style="color: #6ee7b7;">99.985%</div>
+              <div class="stat-big-val" id="uptime-sla-val" style="color: #6ee7b7;">99.985%</div>
               <div class="stat-subtext">Across 4 monitored cluster tiers</div>
             </div>
 
@@ -884,7 +884,7 @@
                 <span class="stat-card-title">Continuous Monitored Time</span>
                 <span class="item-tag" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8;">24/7 Heartbeat</span>
               </div>
-              <div class="stat-big-val" style="color: #38bdf8;">2,160 <span style="font-size: 0.9rem; color: #8b949e;">Hours</span></div>
+              <div class="stat-big-val" id="uptime-hours-val" style="color: #38bdf8;">2,160 <span style="font-size: 0.9rem; color: #8b949e;">Hours</span></div>
               <div class="stat-subtext">Zero lost heartbeat cycles</div>
             </div>
 
@@ -893,7 +893,7 @@
                 <span class="stat-card-title">Unplanned Outages</span>
                 <span class="item-tag online">Zero Loss</span>
               </div>
-              <div class="stat-big-val" style="color: #4ade80;">0 <span style="font-size: 0.9rem; color: #8b949e;">Incidents</span></div>
+              <div class="stat-big-val" id="uptime-outages-val" style="color: #4ade80;">0 <span style="font-size: 0.9rem; color: #8b949e;">Incidents</span></div>
               <div class="stat-subtext">Autonomous self-healing active</div>
             </div>
 
@@ -915,9 +915,9 @@
                 <span>24-Hour Real-Time Latency &amp; Response Heartbeat (0 - 10 ms)</span>
               </div>
               <div style="display: flex; gap: 14px; font-size: 0.75rem; font-family: monospace;">
-                <span style="color: #6ee7b7;"><span style="display:inline-block; width:10px; height:10px; background:#10b981; border-radius:2px; margin-right:4px;"></span>NUC Server (0.2 ms)</span>
-                <span style="color: #fb923c;"><span style="display:inline-block; width:10px; height:10px; background:#f97316; border-radius:2px; margin-right:4px; box-shadow: 0 0 6px rgba(249, 115, 22, 0.6);"></span>Cloudflare Edge (1.1 ms)</span>
-                <span style="color: #93c5fd;"><span style="display:inline-block; width:10px; height:10px; background:#3b82f6; border-radius:2px; margin-right:4px; box-shadow: 0 0 6px rgba(59, 130, 246, 0.6);"></span>Bell Fiber (4.5 ms)</span>
+                <span style="color: #6ee7b7;"><span style="display:inline-block; width:10px; height:10px; background:#10b981; border-radius:2px; margin-right:4px;"></span>NUC Server (<span id="spark-leg-nuc">0.2 ms</span>)</span>
+                <span style="color: #fb923c;"><span style="display:inline-block; width:10px; height:10px; background:#f97316; border-radius:2px; margin-right:4px; box-shadow: 0 0 6px rgba(249, 115, 22, 0.6);"></span>Cloudflare Edge (<span id="spark-leg-edge">1.1 ms</span>)</span>
+                <span style="color: #93c5fd;"><span style="display:inline-block; width:10px; height:10px; background:#3b82f6; border-radius:2px; margin-right:4px; box-shadow: 0 0 6px rgba(59, 130, 246, 0.6);"></span>Bell Fiber (<span id="spark-leg-bell">4.5 ms</span>)</span>
               </div>
             </div>
             <div style="position: relative; width: 100%; height: 80px;">
@@ -977,14 +977,14 @@
                 </div>
                 <div class="uptime-tier-sla">
                   <span class="tier-val" id="uptime-isp-sla-val">99.98% Uptime</span>
-                  <span class="tier-status online">&plusmn; 0.71 ms Jitter</span>
+                  <span class="tier-status online" id="uptime-isp-jitter-status">&plusmn; 0.71 ms Jitter</span>
                 </div>
               </div>
               <div class="uptime-bars" id="bars-isp"><div class="uptime-bar" title="2026-07-31 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-01 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-02 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-03 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-04 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-05 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-06 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-07 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-08 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-09 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-10 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-11 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-12 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-13 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-14 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-15 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-16 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-17 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-18 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-19 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-20 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-21 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-22 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-23 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-24 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-25 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-26 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-27 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-28 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-29 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-30 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-08-31 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-01 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-02 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-03 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-04 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-05 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-06 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-07 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-08 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-09 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-10 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-11 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-12 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-13 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-14 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-15 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-16 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-17 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-18 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-19 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-20 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-21 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-22 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-23 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-24 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-25 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-26 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-27 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-28 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-29 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-09-30 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-01 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-02 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-03 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-04 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-05 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-06 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-07 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-08 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-09 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-10 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-11 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-12 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-13 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-14 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-15 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-16 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-17 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-18 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-19 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-20 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-21 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-22 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-23 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-24 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-25 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-26 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-27 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div><div class="uptime-bar" title="2026-10-28 | Bell Canada Gigabit Fiber - Status: 100.0% Operational & Active"></div></div>
               <div class="uptime-scale">
                 <span>90 days ago</span>
                 <span>45 days ago</span>
-                <span>Today (4.5 ms ping)</span>
+                <span id="uptime-scale-bell-today">Today (4.5 ms ping)</span>
               </div>
             </div>
 
@@ -1518,7 +1518,7 @@
                   </div>
                   <div class="schematic-node-meta">
                     <span id="schematic-storage-capacity">Capacity: -- Free</span>
-                    <span class="schematic-node-throughput" style="color: #38bdf8;">3500 MB/s</span>
+                    <span class="schematic-node-throughput" id="schematic-storage-throughput" style="color: #38bdf8;">3500 MB/s</span>
                   </div>
                 </div>
               </div>
@@ -1935,12 +1935,12 @@
               <div class="kpi-mini-card purple">
                 <div class="kpi-label">Latency &amp; Jitter <span>&#8644;</span></div>
                 <div class="kpi-val" id="st-val-ping" style="color: #c084fc;">-- <span style="font-size: 0.85rem; color: #94a3b8;">ms</span></div>
-                <div class="kpi-sub">&plusmn; 0.3 ms Jitter &bull; Cloudflare YYZ</div>
+                <div class="kpi-sub" id="st-sub-jitter">&plusmn; 0.3 ms Jitter &bull; Cloudflare YYZ</div>
               </div>
               <div class="kpi-mini-card amber">
                 <div class="kpi-label">Bufferbloat Rating</div>
                 <div class="kpi-val" id="st-val-grade" style="color: #fbbf24;">Grade A+</div>
-                <div class="kpi-sub">+0 ms latency under full saturation</div>
+                <div class="kpi-sub" id="st-sub-bloat">+0 ms latency under full saturation</div>
               </div>
             </div>
 
@@ -1997,17 +1997,17 @@
               </div>
               <div class="kpi-mini-card success">
                 <div class="kpi-label">Split-Horizon Rewrites</div>
-                <div class="kpi-val" style="color: #34d399;">6 LAN Routes</div>
+                <div class="kpi-val" id="dns-kpi-routes" style="color: #34d399;">6 LAN Routes</div>
                 <div class="kpi-sub"><span class="dropdown-dot dot-1" style="background:#10b981;"></span> Zero NAT Loopback</div>
               </div>
               <div class="kpi-mini-card purple">
                 <div class="kpi-label">Curated Blocklists</div>
-                <div class="kpi-val" style="color: #c084fc;">412,850</div>
+                <div class="kpi-val" id="dns-kpi-blocklists" style="color: #c084fc;">412,850</div>
                 <div class="kpi-sub">OISD Full + HaGeZi Multi PRO</div>
               </div>
               <div class="kpi-mini-card amber">
                 <div class="kpi-label">Service Daemon</div>
-                <div class="kpi-val" style="color: #fbbf24;">Awaiting Install</div>
+                <div class="kpi-val" id="dns-kpi-daemon" style="color: #fbbf24;">Awaiting Install</div>
                 <div class="kpi-sub">Intel NUC (192.168.2.35:3000)</div>
               </div>
             </div>
@@ -2193,7 +2193,7 @@
                 <div style="font-size: 0.78rem; color: #94a3b8; line-height: 1.5;">
                   &bull; NUC Core CPU: <strong id="iot-nuc-cpu-temp">42&deg;C</strong> (Fan 1200 RPM)<br>
                   &bull; Desktop Ryzen CPU: <strong id="iot-desk-cpu-temp">46&deg;C</strong> (AIO Liquid Cooled)<br>
-                  &bull; Ambient Room Thermostat: <strong>21.2&deg;C</strong><br>
+                  &bull; Ambient Room Thermostat: <strong id="iot-room-thermostat">21.2&deg;C</strong><br>
                   &bull; Air Circulation: Active &bull; Zero Thermal Throttling
                 </div>
               </div>
@@ -2242,42 +2242,42 @@
                     <td><strong>Review &amp; Watch Library</strong> (StreamHub :8088)</td>
                     <td>NUC (192.168.2.35)</td>
                     <td><span class="mono" id="kuma-lat-stream" style="color: #34d399;">0.2 ms</span></td>
-                    <td>100.0%</td>
+                    <td id="kuma-uptime-stream">100.0%</td>
                     <td><span class="item-tag online" id="kuma-status-stream">Healthy</span></td>
                   </tr>
                   <tr>
                     <td><strong>FileBrowser Media Cloud</strong> (:8085)</td>
                     <td>NUC (192.168.2.35)</td>
                     <td><span class="mono" id="kuma-lat-files" style="color: #34d399;">0.2 ms</span></td>
-                    <td>100.0%</td>
+                    <td id="kuma-uptime-files">100.0%</td>
                     <td><span class="item-tag online" id="kuma-status-files">Healthy</span></td>
                   </tr>
                   <tr>
                     <td><strong>qBittorrent VPN Daemon</strong> (:8081)</td>
                     <td>NUC (WireGuard Mullvad)</td>
                     <td><span class="mono" id="kuma-lat-qbit" style="color: #34d399;">0.3 ms</span></td>
-                    <td>100.0%</td>
+                    <td id="kuma-uptime-qbit">100.0%</td>
                     <td><span class="item-tag online" id="kuma-status-qbit">Healthy</span></td>
                   </tr>
                   <tr>
                     <td><strong>WoL &amp; Power Orchestration Gateway</strong> (:8082)</td>
                     <td>NUC / Desktop Cluster</td>
                     <td><span class="mono" id="kuma-lat-wol" style="color: #34d399;">0.2 ms</span></td>
-                    <td>100.0%</td>
+                    <td id="kuma-uptime-wol">100.0%</td>
                     <td><span class="item-tag online" id="kuma-status-wol">Healthy</span></td>
                   </tr>
                   <tr>
                     <td><strong>Optical Cat Cam WebRTC Engine</strong> (:8089)</td>
                     <td>NUC (Hardware go2rtc)</td>
                     <td><span class="mono" id="kuma-lat-catcam" style="color: #34d399;">1.9 ms</span></td>
-                    <td>100.0%</td>
+                    <td id="kuma-uptime-catcam">100.0%</td>
                     <td><span class="item-tag online" id="kuma-status-catcam">Healthy</span></td>
                   </tr>
                   <tr>
                     <td><strong>Cloudflare Zero Trust Edge Mesh</strong> (Tunnel)</td>
                     <td>Global Edge Anycast</td>
                     <td><span class="mono" id="kuma-lat-cf" style="color: #38bdf8;">4.2 ms</span></td>
-                    <td>100.0%</td>
+                    <td id="kuma-uptime-cf">100.0%</td>
                     <td><span class="item-tag online" id="kuma-status-cf">Shield Active</span></td>
                   </tr>
                 </tbody>

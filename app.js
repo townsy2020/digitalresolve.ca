@@ -669,25 +669,44 @@
       if (ambTemp) {
         ambTemp.innerHTML = `21.4&deg;C <span style="font-size: 0.9rem; color: #94a3b8;">/ 42% RH</span>`;
       }
+      const roomThermo = document.getElementById('iot-room-thermostat');
+      if (roomThermo) {
+        roomThermo.innerHTML = '21.2&deg;C';
+      }
+      const storageThroughput = document.getElementById('schematic-storage-throughput');
+      if (storageThroughput) {
+        storageThroughput.textContent = '3500 MB/s';
+      }
+      const dnsBlock = document.getElementById('dns-kpi-blocklists');
+      if (dnsBlock) dnsBlock.textContent = '412,850';
+      const dnsRoutes = document.getElementById('dns-kpi-routes');
+      if (dnsRoutes) dnsRoutes.textContent = '6 LAN Routes';
+      const dnsDaemon = document.getElementById('dns-kpi-daemon');
+      if (dnsDaemon) dnsDaemon.textContent = 'Awaiting Install';
 
       // 3. Uptime Kuma Heartbeat Table Latencies
       const nucLat = (window.LAST_NUC_LATENCY !== undefined && window.LAST_NUC_LATENCY !== null) ? window.LAST_NUC_LATENCY : 0.2;
       const ispLat = (window.ISP_LATEST && window.ISP_LATEST.pingAvgMs !== undefined) ? window.ISP_LATEST.pingAvgMs : 4.0;
 
-      const setKuma = (id, ms, statusId, isGood, goodTxt = 'Healthy', badTxt = 'Degraded') => {
+      const setKuma = (id, ms, statusId, isGood, goodTxt = 'Healthy', badTxt = 'Degraded', uptimeId = null, uptimePct = '100.0%') => {
         document.querySelectorAll('#' + id + ', .' + id).forEach(el => el.textContent = `${ms} ms`);
         document.querySelectorAll('#' + statusId + ', .' + statusId).forEach(st => {
           st.textContent = isGood ? goodTxt : badTxt;
           st.className = `item-tag ${isGood ? 'online' : 'offline'}`;
         });
+        if (uptimeId) {
+          document.querySelectorAll('#' + uptimeId).forEach(u => u.textContent = isGood ? uptimePct : '98.5%');
+        }
       };
 
-      setKuma('kuma-lat-stream', (nucLat + 0.1).toFixed(1), 'kuma-status-stream', true);
-      setKuma('kuma-lat-files', (nucLat + 0.1).toFixed(1), 'kuma-status-files', true);
-      setKuma('kuma-lat-qbit', (nucLat + 0.2).toFixed(1), 'kuma-status-qbit', true);
-      setKuma('kuma-lat-wol', nucLat.toFixed(1), 'kuma-status-wol', true);
-      setKuma('kuma-lat-catcam', (nucLat + 1.7).toFixed(1), 'kuma-status-catcam', true);
-      setKuma('kuma-lat-cf', ispLat.toFixed(1), 'kuma-status-cf', true, 'Shield Active');
+      setKuma('kuma-lat-stream', (nucLat + 0.1).toFixed(1), 'kuma-status-stream', true, 'Healthy', 'Degraded', 'kuma-uptime-stream');
+      setKuma('kuma-lat-files', (nucLat + 0.1).toFixed(1), 'kuma-status-files', true, 'Healthy', 'Degraded', 'kuma-uptime-files');
+      setKuma('kuma-lat-qbit', (nucLat + 0.2).toFixed(1), 'kuma-status-qbit', true, 'Healthy', 'Degraded', 'kuma-uptime-qbit');
+      setKuma('kuma-lat-wol', nucLat.toFixed(1), 'kuma-status-wol', true, 'Healthy', 'Degraded', 'kuma-uptime-wol');
+      setKuma('kuma-lat-catcam', (nucLat + 1.7).toFixed(1), 'kuma-status-catcam', true, 'Healthy', 'Degraded', 'kuma-uptime-catcam');
+      setKuma('kuma-lat-cf', ispLat.toFixed(1), 'kuma-status-cf', true, 'Shield Active', 'Degraded', 'kuma-uptime-cf');
+
+      document.querySelectorAll('#spark-leg-nuc').forEach(el => el.textContent = `${nucLat.toFixed(1)} ms`);
     }
     window.updateClusterPowerAndThermalsUI = updateClusterPowerAndThermalsUI;
 
@@ -961,6 +980,10 @@
           uptimeDeskStatus.textContent = isOnline ? 'Online • Active Session' : 'Eco Standby • Sleeping';
           uptimeDeskStatus.className = `tier-status ${isOnline ? 'online' : 'offline'}`;
         }
+        document.querySelectorAll('#stat-desktop-pool-tag').forEach(el => {
+          el.textContent = isOnline ? 'Dual Drive (6.05 TB)' : 'Standby Pool (6.05 TB)';
+          el.className = isOnline ? 'item-tag online' : 'item-tag';
+        });
         const uptimeScaleToday = document.getElementById('uptime-desktop-scale-today');
         if (uptimeScaleToday) {
           uptimeScaleToday.innerHTML = isOnline
@@ -2269,6 +2292,10 @@
       if (mCache) mCache.innerHTML = `<strong style="font-weight:700;">${cacheFmt}</strong> Cache`;
       const pBar = document.getElementById('menu-progress-bar');
       if (pBar) pBar.title = `Gemini Weekly: ${weeklyLimit}% Remaining (Refresh in ${weeklyRef})`;
+      document.querySelectorAll('#menu-claude-pct').forEach(el => {
+        const claudePct = (metrics.claudeLimitRemaining !== undefined) ? metrics.claudeLimitRemaining : 100;
+        el.textContent = `${claudePct}%`;
+      });
     }
     function fetchClusterStats() {
       const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
@@ -2485,6 +2512,27 @@
               }
             }
             if (pingTag) pingTag.textContent = `${pingAvg} ms`;
+            document.querySelectorAll('#uptime-isp-jitter-status').forEach(el => {
+              el.textContent = `± ${jitter} ms Jitter`;
+            });
+            document.querySelectorAll('#isp-jitter-tag').forEach(el => {
+              el.textContent = jitter < 1 ? '< 1 ms' : `± ${jitter} ms`;
+            });
+            document.querySelectorAll('#uptime-scale-bell-today').forEach(el => {
+              el.textContent = `Today (${pingAvg} ms ping)`;
+            });
+            document.querySelectorAll('#st-sub-jitter').forEach(el => {
+              el.innerHTML = `&plusmn; ${jitter} ms Jitter &bull; Cloudflare YYZ`;
+            });
+            document.querySelectorAll('#st-sub-bloat').forEach(el => {
+              el.textContent = `+${jitter} ms latency under full saturation`;
+            });
+            document.querySelectorAll('#spark-leg-bell').forEach(el => {
+              el.textContent = `${pingAvg} ms`;
+            });
+            document.querySelectorAll('#spark-leg-edge').forEach(el => {
+              el.textContent = `${googleDns} ms`;
+            });
 
             const tbody = document.getElementById('isp-history-tbody');
             if (tbody && rawList.length > 0) {
@@ -3145,12 +3193,15 @@
           .then(r => r.json())
           .then(data => {
             if (data && data.status === 'success') {
-              const slaEl = document.getElementById('uptime-sla-val');
-              if (slaEl && data.overallSla) slaEl.textContent = data.overallSla;
-              const hrsEl = document.getElementById('uptime-hours-val');
-              if (hrsEl && data.monitoredHours) hrsEl.innerHTML = `${Number(data.monitoredHours).toLocaleString()} <span style="font-size: 0.9rem; color: #8b949e;">Hours</span>`;
-              const outEl = document.getElementById('uptime-outages-val');
-              if (outEl && data.outages !== undefined) outEl.innerHTML = `${data.outages} <span style="font-size: 0.9rem; color: #8b949e;">Incidents</span>`;
+              document.querySelectorAll('#uptime-sla-val').forEach(el => {
+                if (data.overallSla) el.textContent = data.overallSla;
+              });
+              document.querySelectorAll('#uptime-hours-val').forEach(el => {
+                if (data.monitoredHours) el.innerHTML = `${Number(data.monitoredHours).toLocaleString()} <span style="font-size: 0.9rem; color: #8b949e;">Hours</span>`;
+              });
+              document.querySelectorAll('#uptime-outages-val').forEach(el => {
+                if (data.outages !== undefined) el.innerHTML = `${data.outages} <span style="font-size: 0.9rem; color: #8b949e;">Incidents</span>`;
+              });
               document.querySelectorAll('.nav-sla-tag').forEach(tag => {
                 if (data.overallSla) tag.textContent = data.overallSla;
               });
