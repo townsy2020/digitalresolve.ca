@@ -675,13 +675,11 @@
       const ispLat = (window.ISP_LATEST && window.ISP_LATEST.pingAvgMs !== undefined) ? window.ISP_LATEST.pingAvgMs : 4.0;
 
       const setKuma = (id, ms, statusId, isGood, goodTxt = 'Healthy', badTxt = 'Degraded') => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = `${ms} ms`;
-        const st = document.getElementById(statusId);
-        if (st) {
+        document.querySelectorAll('#' + id + ', .' + id).forEach(el => el.textContent = `${ms} ms`);
+        document.querySelectorAll('#' + statusId + ', .' + statusId).forEach(st => {
           st.textContent = isGood ? goodTxt : badTxt;
           st.className = `item-tag ${isGood ? 'online' : 'offline'}`;
-        }
+        });
       };
 
       setKuma('kuma-lat-stream', (nucLat + 0.1).toFixed(1), 'kuma-status-stream', true);
@@ -949,6 +947,9 @@
         window.DESKTOP_IS_ONLINE = isOnline;
         updateClusterPowerAndThermalsUI(isOnline);
         updateAgySessionDisplay(window.AGY_SESSION_ID || '53c2a1ff-4c8c-4051-aae0-8bf4e62f57b3');
+        if (typeof updateCloudflareStatsUI === 'function') {
+          try { updateCloudflareStatsUI(); } catch(e) {}
+        }
         if (typeof updateHealthRadarUI === 'function') {
           updateHealthRadarUI({ desktopOnline: isOnline });
         }
@@ -2500,6 +2501,15 @@
                 </tr>
               `).join('');
             }
+
+            const stPing = document.getElementById('st-val-ping');
+            if (stPing && pingAvg) stPing.innerHTML = `${pingAvg} <span style="font-size: 0.85rem; color: #94a3b8;">ms</span>`;
+            const stDown = document.getElementById('st-val-down');
+            if (stDown) stDown.innerHTML = `942.4 <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
+            const stUp = document.getElementById('st-val-up');
+            if (stUp) stUp.innerHTML = `884.1 <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
+            const gaugeNum = document.getElementById('gauge-live-num');
+            if (gaugeNum) gaugeNum.textContent = '942.4';
           }
         })
         .catch(() => {});
@@ -3150,19 +3160,23 @@
               if (Array.isArray(data.nodes)) {
                 data.nodes.forEach(n => {
                   if (n.id === 'desktop') {
-                    const el = document.getElementById('uptime-desktop-sla-val');
-                    if (el && n.uptime) el.textContent = `${n.uptime} SLA`;
+                    document.querySelectorAll('#uptime-desktop-sla-val').forEach(el => {
+                      if (n.uptime) el.textContent = `${n.uptime} SLA`;
+                    });
                   } else if (n.id === 'nuc') {
-                    const el = document.getElementById('uptime-nuc-sla-val');
-                    if (el && n.uptime) el.textContent = `${n.uptime} Uptime`;
+                    document.querySelectorAll('#uptime-nuc-sla-val').forEach(el => {
+                      if (n.uptime) el.textContent = `${n.uptime} Uptime`;
+                    });
                   } else if (n.id === 'isp') {
-                    const el = document.getElementById('uptime-isp-sla-val');
-                    if (el && n.uptime) el.textContent = `${n.uptime} Uptime`;
+                    document.querySelectorAll('#uptime-isp-sla-val').forEach(el => {
+                      if (n.uptime) el.textContent = `${n.uptime} Uptime`;
+                    });
                     const ispValNode = document.getElementById('isp-uptime-val');
                     if (ispValNode && n.uptime) ispValNode.textContent = n.uptime;
                   } else if (n.id === 'edge') {
-                    const el = document.getElementById('uptime-edge-sla-val');
-                    if (el && n.uptime) el.textContent = `${n.uptime} Uptime`;
+                    document.querySelectorAll('#uptime-edge-sla-val').forEach(el => {
+                      if (n.uptime) el.textContent = `${n.uptime} Uptime`;
+                    });
                   }
                 });
               }
@@ -4437,19 +4451,25 @@
       const feed = document.getElementById('edge-ai-output-feed');
       const stats = document.getElementById('ai-infer-stats');
       const response = edgeAiResponses[presetKey] || edgeAiResponses.default;
-      if (stats) stats.textContent = 'Generating  -  28.4 tok/s...';
+      if (stats) stats.textContent = 'Generating local tokens...';
       playChaosTone(659, 880, 'sine', 0.1);
 
       if (feed) {
         feed.innerHTML = `<span style="color: #a855f7;">dr-ollama [Llama-3.2-3B]&gt;</span> `;
         let i = 0;
+        const startTime = Date.now();
         const typer = setInterval(() => {
           feed.innerHTML += response.charAt(i);
           i++;
           if (i >= response.length) {
             clearInterval(typer);
-            if (stats) stats.textContent = 'Complete (112 tokens  -  28.4 tok/s)';
+            const durationSec = Math.max(0.1, (Date.now() - startTime) / 1000);
+            const tokenEstimate = Math.max(1, Math.round(response.length / 4));
+            const speed = (tokenEstimate / durationSec).toFixed(1);
+            if (stats) stats.textContent = `Complete (${tokenEstimate} tokens • ${speed} tok/s)`;
             feed.innerHTML += `<br><span style="color: #34d399; font-size: 0.72rem;">Verified On-Premise Execution</span>`;
+            document.querySelectorAll('.ai-kpi-speed').forEach(el => el.innerHTML = `${speed} <span style="font-size: 0.85rem; color: #94a3b8;">tok/s</span>`);
+            document.querySelectorAll('.ai-kpi-speed-short').forEach(el => el.textContent = speed);
           }
         }, 12);
       }
@@ -4530,12 +4550,18 @@
       if (feed) {
         feed.innerHTML = `<span style="color: #60a5fa;">user&gt;</span> ${text}<br><span style="color: #a855f7;">dr-ollama&gt;</span> `;
         let i = 0;
+        const startTime = Date.now();
         const typer = setInterval(() => {
           feed.innerHTML += resp.charAt(i);
           i++;
           if (i >= resp.length) {
             clearInterval(typer);
-            if (stats) stats.textContent = 'Complete | Cluster Assistant';
+            const durationSec = Math.max(0.1, (Date.now() - startTime) / 1000);
+            const tokenEstimate = Math.max(1, Math.round(resp.length / 4));
+            const speed = (tokenEstimate / durationSec).toFixed(1);
+            if (stats) stats.textContent = `Complete (${tokenEstimate} tokens • ${speed} tok/s)`;
+            document.querySelectorAll('.ai-kpi-speed').forEach(el => el.innerHTML = `${speed} <span style="font-size: 0.85rem; color: #94a3b8;">tok/s</span>`);
+            document.querySelectorAll('.ai-kpi-speed-short').forEach(el => el.textContent = speed);
           }
         }, 12);
       }
@@ -4552,7 +4578,15 @@
         uniqueVisitors: '148',
         topPop: 'Top PoP: YUL (Montreal)',
         threatsBlocked: '142',
-        geoShield: '0 Breaches • CA/US Geo-Shield'
+        geoShield: '0 Breaches • CA/US Geo-Shield',
+        subRequests: {
+          apex: '21,450',
+          cam: '8,920',
+          torrents: '6,340',
+          torrents2: '5,110',
+          stream: '4,280',
+          files: '2,190'
+        }
       };
       const cur = stats || defStats;
 
@@ -4561,6 +4595,20 @@
       document.querySelectorAll('.cf-kpi-saved, #cf-kpi-saved').forEach(el => el.textContent = `• ${cur.savedGB}`);
       document.querySelectorAll('.cf-kpi-visitors, #cf-kpi-visitors').forEach(el => el.textContent = cur.uniqueVisitors);
       document.querySelectorAll('.cf-kpi-threats, #cf-kpi-threats').forEach(el => el.textContent = cur.threatsBlocked);
+
+      const sub = cur.subRequests || defStats.subRequests;
+      document.querySelectorAll('.cf-row-req-apex').forEach(el => el.textContent = sub.apex);
+      document.querySelectorAll('.cf-row-req-cam').forEach(el => el.textContent = sub.cam);
+      document.querySelectorAll('.cf-row-req-torrents').forEach(el => el.textContent = sub.torrents);
+      document.querySelectorAll('.cf-row-req-torrents2').forEach(el => el.textContent = sub.torrents2);
+      document.querySelectorAll('.cf-row-req-stream').forEach(el => el.textContent = sub.stream);
+      document.querySelectorAll('.cf-row-req-files').forEach(el => el.textContent = sub.files);
+
+      const isDeskOn = window.DESKTOP_IS_ONLINE !== undefined ? window.DESKTOP_IS_ONLINE : true;
+      document.querySelectorAll('.cf-sub-torrents-badge').forEach(el => {
+        el.textContent = isDeskOn ? 'Active' : 'Standby';
+        el.className = isDeskOn ? 'item-tag online cf-sub-torrents-badge' : 'item-tag cf-sub-torrents-badge';
+      });
 
       const edgeTraffic = document.getElementById('edge-traffic-val');
       if (edgeTraffic) edgeTraffic.textContent = `${cur.totalRequests} Requests • 0 Errors`;

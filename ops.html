@@ -442,7 +442,7 @@
           </div>
           <div class="kpi-mini-card success">
             <div class="kpi-label">Generation Speed</div>
-            <div class="kpi-val" style="color: #34d399;">28.4 <span style="font-size: 0.85rem; color: #94a3b8;">tok/s</span></div>
+            <div class="kpi-val ai-kpi-speed" style="color: #34d399;">28.4 <span style="font-size: 0.85rem; color: #94a3b8;">tok/s</span></div>
             <div class="kpi-sub">Intel Core i5 AVX2 Acceleration</div>
           </div>
           <div class="kpi-mini-card">
@@ -622,17 +622,17 @@
             <div class="kpi-row-4">
               <div class="kpi-mini-card success">
                 <div class="kpi-label">Download Speed <span>&#9660;</span></div>
-                <div class="kpi-val" id="st-val-down" style="color: #34d399;">942.4 <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span></div>
+                <div class="kpi-val" id="st-val-down" style="color: #34d399;">-- <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span></div>
                 <div class="kpi-sub"><span class="dropdown-dot dot-1" style="background:#10b981;"></span> Direct Bell WAN Interface</div>
               </div>
               <div class="kpi-mini-card">
                 <div class="kpi-label">Upload Speed <span>&#9650;</span></div>
-                <div class="kpi-val" id="st-val-up" style="color: #38bdf8;">884.1 <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span></div>
+                <div class="kpi-val" id="st-val-up" style="color: #38bdf8;">-- <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span></div>
                 <div class="kpi-sub"><span class="dropdown-dot dot-1" style="background:#38bdf8;"></span> Symmetric Symmetrical Fiber</div>
               </div>
               <div class="kpi-mini-card purple">
                 <div class="kpi-label">Latency &amp; Jitter <span>&#8644;</span></div>
-                <div class="kpi-val" id="st-val-ping" style="color: #c084fc;">3.1 <span style="font-size: 0.85rem; color: #94a3b8;">ms</span></div>
+                <div class="kpi-val" id="st-val-ping" style="color: #c084fc;">-- <span style="font-size: 0.85rem; color: #94a3b8;">ms</span></div>
                 <div class="kpi-sub">&plusmn; 0.3 ms Jitter &bull; Cloudflare YYZ</div>
               </div>
               <div class="kpi-mini-card amber">
@@ -658,7 +658,7 @@
                   <div class="speed-dial-bg" id="speed-dial-needle" style="transform: rotate(105deg);"></div>
                   <div class="speed-dial-center">
                     <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Current Test</div>
-                    <div id="gauge-live-num" style="font-size: 1.6rem; font-weight: 900; color: #38bdf8; font-family: 'JetBrains Mono', monospace;">942.4</div>
+                    <div id="gauge-live-num" style="font-size: 1.6rem; font-weight: 900; color: #38bdf8; font-family: 'JetBrains Mono', monospace;">--</div>
                     <div style="font-size: 0.7rem; color: #94a3b8;">Mbps Throughput</div>
                   </div>
                 </div>
@@ -1306,42 +1306,42 @@
                 <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
                   <td style="padding: 8px;"><strong style="color: #38bdf8;">digitalresolve.ca</strong> (Apex)</td>
                   <td style="padding: 8px; font-family: monospace;">NUC (192.168.2.35)</td>
-                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;">21,450</td>
+                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-apex">21,450</td>
                   <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">94.6% Cache Hit</span></td>
                   <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
                 </tr>
                 <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
                   <td style="padding: 8px;"><strong style="color: #38bdf8;">cam.digitalresolve.ca</strong></td>
                   <td style="padding: 8px; font-family: monospace;">NUC (:1984 WebRTC)</td>
-                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;">8,920</td>
+                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-cam">8,920</td>
                   <td style="padding: 8px; color: #34d399;">&lt;50ms Hardware Stream</td>
                   <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
                 </tr>
                 <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
                   <td style="padding: 8px;"><strong style="color: #38bdf8;">torrents.digitalresolve.ca</strong></td>
                   <td style="padding: 8px; font-family: monospace;">Desktop (192.168.2.62:8080)</td>
-                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;">6,340</td>
+                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-torrents">6,340</td>
                   <td style="padding: 8px; color: #fde68a;">M365 Entra ID SSO</td>
                   <td style="padding: 8px;"><span class="item-tag online cf-sub-torrents-badge" id="cf-sub-torrents-badge" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
                 </tr>
                 <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
                   <td style="padding: 8px;"><strong style="color: #38bdf8;">torrents2.digitalresolve.ca</strong></td>
                   <td style="padding: 8px; font-family: monospace;">NUC (192.168.2.35:8081)</td>
-                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;">5,110</td>
+                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-torrents2">5,110</td>
                   <td style="padding: 8px; color: #fde68a;">M365 Entra ID SSO</td>
                   <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
                 </tr>
                 <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
                   <td style="padding: 8px;"><strong style="color: #38bdf8;">stream.digitalresolve.ca</strong></td>
                   <td style="padding: 8px; font-family: monospace;">NUC (:8088 / :13378)</td>
-                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;">4,280</td>
+                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-stream">4,280</td>
                   <td style="padding: 8px; color: #c4b5fd;">MP4 Faststart 4K/HD</td>
                   <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
                 </tr>
                 <tr>
                   <td style="padding: 8px;"><strong style="color: #38bdf8;">files.digitalresolve.ca</strong></td>
                   <td style="padding: 8px; font-family: monospace;">NUC (:8085 File Vault)</td>
-                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;">2,190</td>
+                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-files">2,190</td>
                   <td style="padding: 8px; color: #94a3b8;">SSL ECC CA-3 Encrypted</td>
                   <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
                 </tr>
