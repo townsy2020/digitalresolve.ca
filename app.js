@@ -153,34 +153,34 @@
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 12871;
-        const baseCssLines = 5922;
-        const baseJsLines = 4067;
-        const baseCnameLines = 1;
-        const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
+      const baseHtmlLines = 15167;
+      const baseCssLines = 6081;
+      const baseJsLines = 5528;
+      const baseCnameLines = 17;
+      const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
-        // Asynchronously count exact live lines via parallel cache-busted fetch
-        Promise.all([
-          fetch('index.html?_t=' + Date.now()).then(r => r.ok ? r.text() : null).catch(() => null),
-          fetch('styles.css?_t=' + Date.now()).then(r => r.ok ? r.text() : null).catch(() => null)
-        ]).then(([htmlSrc, cssSrc]) => {
-          const hLines = htmlSrc ? htmlSrc.split(/\r?\n/).length : baseHtmlLines;
-          const cLines = cssSrc ? cssSrc.split(/\r?\n/).length : baseCssLines;
-          const total = 13203 + 3880 + cLines + baseCnameLines;
-          const totalFormatted = total.toLocaleString();
+      // Asynchronously count exact live lines via parallel cache-busted fetch
+      Promise.all([
+        fetch('styles.css?_t=' + Date.now()).then(r => r.ok ? r.text() : null).catch(() => null),
+        fetch('app.js?_t=' + Date.now()).then(r => r.ok ? r.text() : null).catch(() => null)
+      ]).then(([cssSrc, jsSrc]) => {
+        const cLines = cssSrc ? cssSrc.split(/\r?\n/).length : baseCssLines;
+        const jLines = jsSrc ? jsSrc.split(/\r?\n/).length : baseJsLines;
+        const total = baseHtmlLines + cLines + jLines + baseCnameLines;
+        const totalFormatted = total.toLocaleString();
 
-          const locEl = document.getElementById('project-loc-count');
-          if (locEl) locEl.textContent = totalFormatted;
+        const locEl = document.getElementById('project-loc-count');
+        if (locEl) locEl.textContent = totalFormatted;
 
-          const locBadge = document.getElementById('footer-loc-badge');
-          if (locBadge) {
-            locBadge.title = `Project Codebase Scale: ${totalFormatted} Lines of Code (HTML: ${hLines.toLocaleString()} lines | CSS: ${cLines.toLocaleString()} lines | CNAME)`;
-          }
-        }).catch(() => {
-          const totalFormatted = defaultTotal.toLocaleString();
-          const locEl = document.getElementById('project-loc-count');
-          if (locEl) locEl.textContent = totalFormatted;
-        });
+        const locBadge = document.getElementById('footer-loc-badge');
+        if (locBadge) {
+          locBadge.title = `Project Codebase Scale: ${totalFormatted} Lines of Code (HTML: ${baseHtmlLines.toLocaleString()} lines | CSS: ${cLines.toLocaleString()} lines | JS: ${jLines.toLocaleString()} lines | CNAME)`;
+        }
+      }).catch(() => {
+        const totalFormatted = defaultTotal.toLocaleString();
+        const locEl = document.getElementById('project-loc-count');
+        if (locEl) locEl.textContent = totalFormatted;
+      });
       } catch(err) {
         console.error('Error updating codebase metrics:', err);
       }
