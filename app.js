@@ -1115,7 +1115,6 @@
     function updateHealthIndexScore() {
       const hPct = document.getElementById('health-index-pct');
       const hStatus = document.getElementById('health-index-status');
-      if (!hPct && !hStatus) return;
       const nucOn = window.NUC_IS_ONLINE !== undefined ? window.NUC_IS_ONLINE : true;
       const deskOn = window.DESKTOP_IS_ONLINE !== undefined ? window.DESKTOP_IS_ONLINE : false;
       let score = 100;
@@ -1142,6 +1141,31 @@
       if (hStatus) {
         hStatus.textContent = statusText;
         hStatus.className = statusClass;
+      }
+      document.querySelectorAll('#modal-health-score').forEach(el => {
+        el.textContent = `${score}% ${statusText}`;
+      });
+      document.querySelectorAll('#chaos-score-val').forEach(el => {
+        el.textContent = `${score}% ${statusText}`;
+      });
+      const heroBtn = document.getElementById('hero-health-radar-text');
+      if (heroBtn) {
+        heroBtn.textContent = `Health Radar (${score}% ${statusText})`;
+      }
+      const cNuc = document.getElementById('c-node-nuc');
+      if (cNuc) {
+        const st = cNuc.querySelector('.chaos-node-status');
+        if (st && !cNuc.classList.contains('severed')) st.textContent = nucOn ? 'Online (24/7 Node)' : 'Offline (Unreachable)';
+      }
+      const cDesk = document.getElementById('c-node-desktop');
+      if (cDesk) {
+        const st = cDesk.querySelector('.chaos-node-status');
+        if (st && !cDesk.classList.contains('severed')) st.textContent = deskOn ? 'Online (2.5 GbE)' : 'Standby (Eco Mode)';
+      }
+      const cStorage = document.getElementById('c-node-storage');
+      if (cStorage && window.LAST_NUC_DISK) {
+        const st = cStorage.querySelector('.chaos-node-status');
+        if (st && !cStorage.classList.contains('severed')) st.textContent = `Healthy (${Math.round(window.LAST_NUC_DISK.usedPercent)}% Used)`;
       }
     }
 
@@ -3970,7 +3994,8 @@
       const scoreEl = document.getElementById('chaos-score-val');
       const badgeEl = document.getElementById('chaos-fault-counter');
 
-      let label = '99% Optimal';
+      const baseScore = window.DESKTOP_IS_ONLINE ? '100% Optimal' : '98% Optimal (Eco)';
+      let label = baseScore;
       let stateClass = 'ok';
 
       if (activeCount === 1) {
@@ -4179,9 +4204,9 @@
         { id: 'c-node-bell', status: '1.5 Gbps (Optimal)' },
         { id: 'c-node-vpn', status: 'Encrypted (WireGuard)' },
         { id: 'c-node-nuc', status: 'Online (24/7 Node)' },
-        { id: 'c-node-desktop', status: 'Online (2.5 GbE)' },
+        { id: 'c-node-desktop', status: window.DESKTOP_IS_ONLINE ? 'Online (2.5 GbE)' : 'Standby (Eco Mode)' },
         { id: 'c-node-cf', status: 'Active (Zero Trust)' },
-        { id: 'c-node-storage', status: 'Healthy (42% Pool)' }
+        { id: 'c-node-storage', status: window.LAST_NUC_DISK ? `Healthy (${Math.round(window.LAST_NUC_DISK.usedPercent)}% Pool)` : 'Healthy (Pool Online)' }
       ];
 
       nodes.forEach(n => {
@@ -4212,7 +4237,8 @@
         playChaosTone(523, 1046, 'sine', 0.28);
         addChaosLog('heal', '[RESTORE ALL] Master sentinel override dispatched. All 6 nodes restored to 100% optimal.');
       } else {
-        addChaosLog('sys', '[DIAGNOSTIC] All topology nodes verified green. Cluster health is 99% optimal.');
+        const baseScore = window.DESKTOP_IS_ONLINE ? '100% Optimal' : '98% Optimal (Eco)';
+        addChaosLog('sys', `[DIAGNOSTIC] All topology nodes verified green. Cluster health is ${baseScore}.`);
       }
 
       updateChaosScoreUI();
@@ -4444,17 +4470,26 @@
 
       // 2. System / Health / Cluster / Nodes / Status
       if (q.match(/\b(status|cluster|nodes?|system|vitals|health|uptime|load|nuc|desktop)\b/)) {
-        return `Cluster Status Report: Health Index is 99% Optimal. 24/7 Intel NUC (192.168.2.35) is Online with 31.8 GB RAM and Mullvad WireGuard privacy tunnel. Active Desktop Workstation (192.168.2.62) is ready for heavy compute. All ingress is gated behind Cloudflare Zero Trust with 0 open WAN ports.`;
+        const deskState = window.DESKTOP_IS_ONLINE ? 'Online (Active)' : 'Standby (Eco Mode)';
+        const nucState = (window.NUC_IS_ONLINE !== false) ? 'Online' : 'Offline';
+        const healthScore = window.DESKTOP_IS_ONLINE ? '100% Optimal' : '98% Optimal (Eco)';
+        return `Cluster Status Report: Health Index is ${healthScore}. 24/7 Intel NUC (192.168.2.35) is ${nucState} with 31.8 GB RAM and Mullvad WireGuard privacy tunnel. Workstation (192.168.2.62) is in ${deskState}. All ingress is gated behind Cloudflare Zero Trust with 0 open WAN ports.`;
       }
 
       // 3. Storage / Disk / Torrents / Downloads
       if (q.match(/\b(storage|disk|space|torrent|torrents|download|seed|qbittorrent)\b/)) {
-        return `Storage & Ingestion Telemetry: NUC (D:\\Torrents) has ~489 GB free of 1.8 TB (73% used). Workstation has 1.8 TB high-speed NVMe storage. P2P swarm traffic is protected through an isolated Mullvad WireGuard VPN interface.`;
+        const freeG = window.LAST_NUC_DISK ? Math.round(window.LAST_NUC_DISK.freeGB) : 489;
+        const usedP = window.LAST_NUC_DISK ? Math.round(window.LAST_NUC_DISK.usedPercent) : 74;
+        return `Storage & Ingestion Telemetry: NUC (D:\\Torrents) has ~${freeG} GB free of 1.8 TB (${usedP}% used). Workstation has 5.75 TB high-speed NVMe/HDD storage. P2P swarm traffic is protected through an isolated Mullvad WireGuard VPN interface.`;
       }
 
       // 4. Cat Feeder / Penny / Camera
       if (q.match(/\b(cat|penny|feeder|kibble|food|snack|feed|cam|camera)\b/)) {
-        return `Penny's Cat Hub: Smart Feeder (192.168.2.22) is Online. Live state: Hopper is currently EMPTY (0g remaining - refill required). Optical camera watchdog is active on the NUC at <50ms latency.`;
+        const f = window.LAST_FEEDER_STATE;
+        const fill = f ? f.fillPercent : 81;
+        const remG = f ? f.remainingGrams : 1220;
+        const days = f ? f.estimatedDaysLeft : 15.2;
+        return `Penny's Cat Hub: Smart Feeder (192.168.2.22) is Online. Live state: Hopper is ${fill}% full (${remG}g remaining - ~${days} days). Optical camera watchdog is active on the NUC at <50ms latency.`;
       }
 
       // 5. DNS / AdGuard / Threat Shield
@@ -4609,6 +4644,7 @@
     // ========================================================
     function updateFeederUI(state) {
       if (!state) return;
+      window.LAST_FEEDER_STATE = state;
       const pctEl = document.getElementById('feeder-hopper-pct');
       const subEl = document.getElementById('feeder-hopper-sub');
       const barEl = document.getElementById('feeder-hopper-bar');

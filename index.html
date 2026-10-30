@@ -324,7 +324,7 @@
           </button>
           <button type="button" onclick="openHealthModal()" class="pill-btn pill-health" id="hero-health-btn" title="Open Homelab Health Radar &amp; Scorecard Modal">
             <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
-            <span>Health Radar (99% Optimal)</span>
+            <span id="hero-health-radar-text">Health Radar (Checking...)</span>
           </button>
           <a href="#ops-ai" onclick="return scrollToSection('ops-ai', event);" class="pill-btn pill-outline" style="border-color: rgba(168, 85, 247, 0.4); color: #c084fc;">
             AI &amp; Terminal Ops
@@ -2715,7 +2715,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px;">
           <div>
             <div style="font-size: 0.78rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Aggregate Cluster Health Index</div>
-            <div style="font-size: 1.5rem; font-weight: 800; color: #34d399; margin-top: 2px;" id="modal-health-score">99% Optimal</div>
+            <div style="font-size: 1.5rem; font-weight: 800; color: #34d399; margin-top: 2px;" id="modal-health-score">Checking...</div>
           </div>
           <span class="item-tag online" style="font-size: 0.82rem; padding: 4px 10px;">All Systems Green</span>
         </div>
@@ -2938,7 +2938,7 @@
           <div class="chaos-score-container">
             <div>
               <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Cluster Resilience Index</div>
-              <div class="chaos-score-val" id="chaos-score-val">99% Optimal</div>
+              <div class="chaos-score-val" id="chaos-score-val">Checking...</div>
             </div>
             <span class="item-tag online" id="chaos-fault-counter">0 Outages Active</span>
           </div>
@@ -2985,21 +2985,21 @@
             <div class="chaos-node node-ok" id="c-node-nuc">
               <div class="chaos-node-icon"></div>
               <div class="chaos-node-name">Intel NUC 24/7</div>
-              <span class="chaos-node-status ok">Online (24/7 Node)</span>
+              <span class="chaos-node-status ok">Checking...</span>
             </div>
 
             <!-- 5. Desktop Workstation -->
             <div class="chaos-node node-ok" id="c-node-desktop">
               <div class="chaos-node-icon"></div>
               <div class="chaos-node-name">Desktop Workstation</div>
-              <span class="chaos-node-status ok">Online (2.5 GbE)</span>
+              <span class="chaos-node-status ok">Checking...</span>
             </div>
 
             <!-- 6. Storage Pool -->
             <div class="chaos-node node-ok" id="c-node-storage">
               <div class="chaos-node-icon"></div>
               <div class="chaos-node-name">Storage Pools</div>
-              <span class="chaos-node-status ok">Healthy (42% Pool)</span>
+              <span class="chaos-node-status ok">Healthy (Storage Online)</span>
             </div>
           </div>
         </div>
