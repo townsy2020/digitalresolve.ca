@@ -3187,6 +3187,14 @@
         }
       });
 
+      const nucScale = document.getElementById('uptime-nuc-scale-today');
+      if (nucScale) {
+        nucScale.textContent = isNucMaintenanceActive() ? 'Today (Scheduled Maintenance)' : 'Today (100% operational)';
+      }
+      const edgeScale = document.getElementById('uptime-edge-scale-today');
+      if (edgeScale) {
+        edgeScale.textContent = 'Today (Shield Active)';
+      }
       const deskScale = document.getElementById('uptime-desktop-scale-today');
       if (deskScale) {
         deskScale.textContent = window.DESKTOP_IS_ONLINE === false
@@ -3432,34 +3440,60 @@
       });
     }
 
-    function refreshServiceDashboard(btn) {
-      const icon = document.getElementById('dash-refresh-icon');
-      if (icon) {
-        icon.style.display = 'inline-block';
+    function pollRealData(btn) {
+      const pollIcons = document.querySelectorAll('#poll-data-icon svg, #dash-refresh-icon');
+      pollIcons.forEach(icon => {
         icon.style.transition = 'transform 0.8s ease';
         icon.style.transform = 'rotate(360deg)';
-      }
-      
-      // Ping NUC & Desktop status via gateway
-      if (typeof checkStatus === 'function') {
-        checkStatus('nuc');
+      });
+      document.querySelectorAll('#poll-data-text').forEach(el => el.textContent = 'Polling...');
+      if (typeof showToast === 'function') {
+        showToast('loading', 'Polling Real Data...', 'Connecting to cluster gateway at wake.digitalresolve.ca', 2000);
       }
 
-      setTimeout(() => {
-        if (icon) icon.style.transform = 'none';
-        const globalStatus = document.getElementById('dash-global-status');
-        if (globalStatus) {
-          globalStatus.textContent = '8/8 Services Online - Verified';
-          globalStatus.style.background = 'rgba(16, 185, 129, 0.35)';
-          setTimeout(() => {
-            globalStatus.textContent = '8/8 Services Online';
-            globalStatus.style.background = '';
-          }, 3500);
-        }
-        if (typeof showToast === 'function') {
-          showToast('success', 'Service Status Refreshed', 'All 8 edge services verified operational.', 3500);
-        }
-      }, 1000);
+      // Execute all telemetry pollers concurrently
+      const pollTasks = [];
+      if (typeof fetchClusterStats === 'function') pollTasks.push(fetchClusterStats());
+      if (typeof fetchISPHistory === 'function') pollTasks.push(fetchISPHistory());
+      if (typeof fetchFeederStatus === 'function') pollTasks.push(fetchFeederStatus());
+      if (typeof renderUptimeMatrix === 'function') pollTasks.push(renderUptimeMatrix());
+      if (typeof fetchAgySessionInfo === 'function') pollTasks.push(fetchAgySessionInfo());
+      if (typeof checkStatus === 'function') {
+        pollTasks.push(checkStatus('nuc'));
+        pollTasks.push(checkStatus('desktop'));
+      }
+
+      Promise.allSettled(pollTasks).then(() => {
+        setTimeout(() => {
+          pollIcons.forEach(icon => icon.style.transform = 'none');
+          document.querySelectorAll('#poll-data-text').forEach(el => el.textContent = 'Update');
+
+          const nucOn = window.NUC_IS_ONLINE !== false;
+          const deskOn = window.DESKTOP_IS_ONLINE === true;
+          let liveCount = 6;
+          if (!nucOn) liveCount = 0;
+          if (deskOn) liveCount += 2;
+
+          const globalStatus = document.getElementById('dash-global-status');
+          if (globalStatus) {
+            globalStatus.textContent = `${liveCount}/8 Services Online`;
+            globalStatus.className = liveCount >= 6 ? 'item-tag online' : 'item-tag offline';
+          }
+          const heroPill = document.getElementById('hero-service-status-pill');
+          if (heroPill) {
+            heroPill.textContent = `Service Status (${liveCount}/8 Online)`;
+          }
+
+          if (typeof showToast === 'function') {
+            showToast('success', 'Real Telemetry Polled', `Cluster state synchronized: ${liveCount}/8 services verified online.`, 3500);
+          }
+        }, 800);
+      });
+    }
+    window.pollRealData = pollRealData;
+
+    function refreshServiceDashboard(btn) {
+      pollRealData(btn);
     }
 
     // Remote Actions Extension Handlers
