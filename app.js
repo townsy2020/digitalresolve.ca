@@ -2612,14 +2612,27 @@
       if (mCache) mCache.innerHTML = `<strong style="font-weight:700;">${cacheFmt}</strong> Cache`;
       const pBar = document.getElementById('menu-progress-bar');
       if (pBar) pBar.title = `Gemini Weekly: ${weeklyLimit}% Remaining (Refresh in ${weeklyRef})`;
+
+      // Decouple model bars: wire model breakdown bars explicitly to breakdown percentages
+      document.querySelectorAll('.model-bar-flash, #model-bar-flash, [data-model="flash"]').forEach(el => {
+        el.style.width = `${flashPct}%`;
+      });
+      document.querySelectorAll('.model-bar-pro, #model-bar-pro, [data-model="pro"]').forEach(el => {
+        el.style.width = `${proPct}%`;
+      });
+      document.querySelectorAll('.model-bar-cache, #model-bar-cache, [data-model="cache"]').forEach(el => {
+        el.style.width = `${cachePct}%`;
+      });
+
       document.querySelectorAll('#menu-claude-pct').forEach(el => {
         const claudePct = (metrics.claudeWeeklyRemaining !== undefined) ? metrics.claudeWeeklyRemaining : ((metrics.claudeLimitRemaining !== undefined) ? metrics.claudeLimitRemaining : 100);
         el.textContent = `${claudePct}%`;
       });
-      const accountUser = document.getElementById('menu-account-user');
-      if (accountUser && metrics.account) {
-        accountUser.textContent = metrics.account.includes('@') ? metrics.account.split('@')[0] : metrics.account;
-      }
+      document.querySelectorAll('#menu-account-user').forEach(el => {
+        if (metrics.account) {
+          el.textContent = metrics.account.includes('@') ? metrics.account.split('@')[0] : metrics.account;
+        }
+      });
     }
     function fetchClusterStats() {
       const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
