@@ -2427,12 +2427,12 @@
       if (!metrics) {
         metrics = getLiveTokenMetrics();
       } else {
-        const defMetrics = getLiveTokenMetrics();
+        const defMetrics = getLiveTokenMetrics() || {};
         const parsed = {
           inputTokens: metrics.input !== undefined ? metrics.input : (metrics.inputTokens || defMetrics.inputTokens),
           outputTokens: metrics.output !== undefined ? metrics.output : (metrics.outputTokens || defMetrics.outputTokens),
           cacheTokens: metrics.cache !== undefined ? metrics.cache : (metrics.cacheTokens || defMetrics.cacheTokens),
-          totalTokens: metrics.total !== undefined ? metrics.total : (metrics.totalTokens || ((metrics.input || defMetrics.inputTokens) + (metrics.output || defMetrics.outputTokens))),
+          totalTokens: metrics.total !== undefined ? metrics.total : (metrics.totalTokens || ((metrics.input || defMetrics.inputTokens || 0) + (metrics.output || defMetrics.outputTokens || 0))),
           model: metrics.model || defMetrics.model,
           efficiency: metrics.efficiency || defMetrics.efficiency,
           breakdown: metrics.breakdown || defMetrics.breakdown,
@@ -2447,6 +2447,7 @@
         metrics = parsed;
         try { localStorage.setItem(TOKEN_METRICS_KEY, JSON.stringify(metrics)); } catch (e) {}
       }
+      if (!metrics) return;
 
       const totalFmt = formatTokenNumber(metrics.totalTokens);
       const inFmt = formatTokenNumber(metrics.inputTokens);
