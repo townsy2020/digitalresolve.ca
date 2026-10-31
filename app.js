@@ -2103,7 +2103,7 @@
 
       const tab = document.getElementById('tab-agy');
       if (tab) {
-        tab.textContent = `[AGY] ${sName}`;
+        tab.textContent = '[AGY]';
         tab.title = `View Active Antigravity Autonomous Agent Stream (${sName} | ${cid})`;
       }
 

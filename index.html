@@ -1780,7 +1780,7 @@
                 <span id="terminal-title-text">Live Interactive Terminal</span>
               </div>
               <div class="terminal-tabs" id="terminal-tabs-group" style="display: none;">
-                <button type="button" class="terminal-tab active" id="tab-agy" onclick="loadLog('agy')" title="View Active Antigravity Autonomous Agent Stream (webdev &bull; 53c2a1ff)">[AGY] webdev (53c2a1ff)</button>
+                <button type="button" class="terminal-tab active" id="tab-agy" onclick="loadLog('agy')" title="View Active Antigravity Autonomous Agent Stream">[AGY]</button>
                 <button type="button" class="terminal-tab" id="tab-sentinel" onclick="loadLog('sentinel')" title="View Sentinel Watchdog Security &amp; Fleet Health Audit Log">Sentinel</button>
                 <button type="button" class="terminal-tab" id="tab-power" onclick="loadLog('power')" title="View Smart Power Optimizer &amp; Dynamic Standby Log">Power</button>
                 <button type="button" class="terminal-tab" id="tab-report" onclick="loadLog('report')" title="View Comprehensive Daily Homelab Morning Briefing">Briefing</button>
@@ -2327,10 +2327,7 @@
               </div>
             </div>
             <div class="app-card-footer" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08);">
-              <button type="button" id="agy-header-session-btn" onclick="openEmbeddedConsole()" class="btn-nav" title="Open In-Browser Live Interactive Terminal for Active Session webdev (53c2a1ff)" style="font-size: 0.82rem; height: 32px; padding: 4px 14px; background: rgba(16, 185, 129, 0.25); border-color: #10b981; color: #a7f3d0; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
-                <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span> Open Live Console: <span class="agy-card-session-name">webdev (53c2a1ff)</span> &rarr;
-              </button>
-              <button type="button" onclick="resumeAgySessionOnDesktop()" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px; color: #34d399 !important; border-color: rgba(52, 211, 153, 0.4);" title="Resume Active AGY Session in Windows Terminal on Desktop">
+              <button type="button" onclick="resumeAgySessionOnDesktop()" class="btn-nav" style="font-size: 0.82rem; height: 32px; padding: 4px 14px; background: rgba(16, 185, 129, 0.25); border-color: #10b981; color: #a7f3d0 !important; font-weight: 700;" title="Resume Active AGY Session in Windows Terminal on Desktop">
                 Resume on Desktop &nearr;
               </button>
               <button type="button" onclick="startNewAgySession('desktop')" class="btn-nav" style="font-size: 0.8rem; height: 32px; padding: 4px 10px; color: #93c5fd !important; border-color: rgba(59, 130, 246, 0.4);" title="Start New AGY Session on Desktop: agy --dangerously-skip-permissions">
