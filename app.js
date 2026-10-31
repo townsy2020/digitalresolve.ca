@@ -2639,8 +2639,11 @@
           const throttleTag = document.getElementById('stat-throttle-tag');
           const swTag = document.getElementById('swarm-tag');
 
-          if (swAct) swAct.textContent = `${sw.activeDl} Active | ${sw.totalTorrents - sw.activeDl} Seed`;
-          if (swTag) swTag.textContent = `${sw.totalTorrents} Managed`;
+          const safeActiveDl = (sw.activeDl !== null && sw.activeDl !== undefined && !isNaN(sw.activeDl)) ? Number(sw.activeDl) : 0;
+          const safeTotalTorrents = (sw.totalTorrents !== null && sw.totalTorrents !== undefined && !isNaN(sw.totalTorrents)) ? Number(sw.totalTorrents) : 216;
+          const safeSeed = Math.max(0, safeTotalTorrents - safeActiveDl);
+          if (swAct) swAct.textContent = `${safeActiveDl} Active | ${safeSeed} Seed`;
+          if (swTag) swTag.textContent = `${safeTotalTorrents} Managed`;
           if (dht) dht.textContent = `DHT: ${sw.dhtNodes} Nodes`;
           if (vpnIp && sw.vpnExitIp) vpnIp.textContent = `VPN: ${sw.vpnExitIp}`;
           
