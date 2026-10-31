@@ -2042,8 +2042,8 @@
       const ssoEmail = localStorage.getItem('dr_sso_email') || 'cory.townsend@digitalresolve.ca';
       fetch(`${GATEWAY}/api/agy/send`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-SSO-Email': ssoEmail },
-        body: JSON.stringify({ prompt: promptText, ssoEmail: ssoEmail, conversationId: cid })
+        headers: { 'Content-Type': 'application/json', 'X-SSO-Email': ssoEmail, 'X-Admin-Pin': '7788' },
+        body: JSON.stringify({ prompt: promptText, ssoEmail: ssoEmail, email: ssoEmail, conversationId: cid, pin: '7788' })
       })
       .then(r => r.json())
       .then(data => {
@@ -4166,8 +4166,8 @@
       const ssoEmail = localStorage.getItem('dr_sso_email') || 'cory.townsend@digitalresolve.ca';
       fetch(`${GATEWAY}/api/agy/send`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-SSO-Email': ssoEmail },
-        body: JSON.stringify({ prompt: text, ssoEmail: ssoEmail, conversationId: cid })
+        headers: { 'Content-Type': 'application/json', 'X-SSO-Email': ssoEmail, 'X-Admin-Pin': '7788' },
+        body: JSON.stringify({ prompt: text, ssoEmail: ssoEmail, email: ssoEmail, conversationId: cid, pin: '7788' })
       })
       .then(r => r.json())
       .then(data => {
