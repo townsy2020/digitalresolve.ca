@@ -2151,6 +2151,7 @@
         .then(data => {
           if (data && data.conversationId) {
             const prevCid = window.AGY_SESSION_ID;
+            if (data.workspace) window.AGY_WORKSPACE = data.workspace;
             updateAgySessionDisplay(data.conversationId, data.sessionName);
             if (prevCid && prevCid !== data.conversationId) {
               console.log(`[AGY] Active session transitioned: ${prevCid} -> ${data.conversationId}`);
@@ -2183,7 +2184,7 @@
       fetch(`${GATEWAY}/api/agy/launch`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-SSO-Email': ssoEmail },
-        body: JSON.stringify({ target: 'desktop', action: 'resume', ssoEmail: ssoEmail })
+        body: JSON.stringify({ target: 'desktop', action: 'resume', ssoEmail: ssoEmail, workspace: window.AGY_WORKSPACE || 'C:\\Users\\CoryTownsend\\Projects\\website' })
       })
       .then(r => r.json())
       .then(data => {
