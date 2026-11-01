@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0">
   <title>Media Suite & Torrent Swarm - Homelab</title>
   <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.20 - Media Suite & Torrent Swarm - Homelab">
-  <link rel="stylesheet" href="styles.css?v=2.8.7">
+  <link rel="stylesheet" href="styles.css?v=2.8.8">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -86,6 +86,11 @@
               <span class="dropdown-dot dot-2"></span>
               <span>Browse Media &amp; Files (NUC)</span>
               <span class="item-tag">Vault</span>
+            </a>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://audiobooks.digitalresolve.ca', 'Audiobook Server (Audiobookshelf)')" class="btn-action-item" title="Open Audiobook Server (audiobooks.digitalresolve.ca)">
+              <span class="dropdown-dot" style="background-color: #fbbf24; box-shadow: 0 0 8px #fbbf24;"></span>
+              <span>Audiobook Server (Audiobookshelf)</span>
+              <span class="item-tag online">Port 3333</span>
             </a>
             <a href="penny.html#camera-feed-card" class="btn-action-item" title="Penny's Cat Hub - Live Optical Stream &amp; Smart Feeder IoT">
               <span class="dropdown-dot" style="background-color: #f472b6; box-shadow: 0 0 8px #f472b6;"></span>
@@ -311,6 +316,9 @@
           <button type="button" onclick="launchProtectedService('https://files.digitalresolve.ca/files/', 'File Vault &amp; Explorer')" class="pill-btn pill-files" style="cursor: pointer;">
             <span>[FILES]</span> Browse Media &amp; Files
           </button>
+          <button type="button" onclick="launchProtectedService('https://audiobooks.digitalresolve.ca', 'Audiobook Server (Audiobookshelf)')" class="pill-btn pill-audiobooks" style="cursor: pointer;" title="Open Audiobookshelf Server behind SSO">
+            <span>[AUDIO]</span> Audiobook Server (Audiobookshelf)
+          </button>
         </div>
 
         <!-- Torrent Control Matrix -->
@@ -424,7 +432,7 @@
               <span>[LIB]</span> Audiobookshelf Digital Media Vault
             </div>
             <div style="font-size: 0.8rem; color: #8b949e;">
-              Port 13378 &bull; Intel NUC Storage Backend
+              Port 3333 &bull; Intel NUC Storage Backend
             </div>
           </div>
           <div style="padding: 16px 20px;">
@@ -435,7 +443,7 @@
                 <div style="font-size: 0.8rem; color: #94a3b8;">High-fidelity audiobooks and technical literature hosted on NUC storage with progress sync.</div>
               </div>
               <div style="display: flex; gap: 8px;">
-                <button type="button" onclick="launchProtectedService('https://stream.digitalresolve.ca', 'Audiobookshelf (stream.digitalresolve.ca)')" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; color: #c4b5fd !important; cursor: pointer;">Launch Audiobookshelf &nearr;</button>
+                <button type="button" onclick="launchProtectedService('https://audiobooks.digitalresolve.ca', 'Audiobook Server (Audiobookshelf)')" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; color: #fbbf24 !important; border-color: rgba(245, 158, 11, 0.4); cursor: pointer;">Launch Audiobookshelf &nearr;</button>
                 <button type="button" onclick="launchProtectedService('https://files.digitalresolve.ca/files/', 'Kavita Reader (files.digitalresolve.ca)')" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; cursor: pointer;">Kavita Reader &nearr;</button>
               </div>
             </div>
