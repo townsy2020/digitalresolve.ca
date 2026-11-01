@@ -1648,6 +1648,54 @@ button.dropdown-item:active,
   box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
 }
 
+.pill-sonarr {
+  background: rgba(14, 165, 233, 0.15);
+  color: #38bdf8 !important;
+  border: 1px solid rgba(14, 165, 233, 0.4);
+}
+
+.pill-sonarr:hover {
+  background: rgba(14, 165, 233, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(14, 165, 233, 0.35);
+}
+
+.pill-radarr {
+  background: rgba(249, 115, 22, 0.15);
+  color: #fb923c !important;
+  border: 1px solid rgba(249, 115, 22, 0.4);
+}
+
+.pill-radarr:hover {
+  background: rgba(249, 115, 22, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.35);
+}
+
+.pill-prowlarr {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171 !important;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.pill-prowlarr:hover {
+  background: rgba(239, 68, 68, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.35);
+}
+
+.pill-readarr {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399 !important;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.pill-readarr:hover {
+  background: rgba(16, 185, 129, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
+}
+
 .pill-outline {
   background: rgba(255, 255, 255, 0.05);
   color: #e2e8f0 !important;
@@ -2000,6 +2048,58 @@ button.dropdown-item:active,
   border-color: #f59e0b !important;
   color: #ffffff !important;
   box-shadow: 0 0 16px rgba(245, 158, 11, 0.4) !important;
+}
+
+.btn-control.btn-sonarr {
+  background: rgba(14, 165, 233, 0.14) !important;
+  border-color: rgba(14, 165, 233, 0.45) !important;
+  color: #38bdf8 !important;
+}
+
+.btn-control.btn-sonarr:hover {
+  background: rgba(14, 165, 233, 0.28) !important;
+  border-color: #38bdf8 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px rgba(14, 165, 233, 0.4) !important;
+}
+
+.btn-control.btn-radarr {
+  background: rgba(249, 115, 22, 0.14) !important;
+  border-color: rgba(249, 115, 22, 0.45) !important;
+  color: #fb923c !important;
+}
+
+.btn-control.btn-radarr:hover {
+  background: rgba(249, 115, 22, 0.28) !important;
+  border-color: #fb923c !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px rgba(249, 115, 22, 0.4) !important;
+}
+
+.btn-control.btn-prowlarr {
+  background: rgba(239, 68, 68, 0.14) !important;
+  border-color: rgba(239, 68, 68, 0.45) !important;
+  color: #f87171 !important;
+}
+
+.btn-control.btn-prowlarr:hover {
+  background: rgba(239, 68, 68, 0.28) !important;
+  border-color: #ef4444 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.4) !important;
+}
+
+.btn-control.btn-readarr {
+  background: rgba(16, 185, 129, 0.14) !important;
+  border-color: rgba(16, 185, 129, 0.45) !important;
+  color: #34d399 !important;
+}
+
+.btn-control.btn-readarr:hover {
+  background: rgba(16, 185, 129, 0.28) !important;
+  border-color: #10b981 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.4) !important;
 }
 
 /* Symmetrical Homelab Control Filter Tabs & Tags */

@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0">
   <title>Media Suite & Torrent Swarm - Homelab</title>
   <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.20 - Media Suite & Torrent Swarm - Homelab">
-  <link rel="stylesheet" href="styles.css?v=2.8.8">
+  <link rel="stylesheet" href="styles.css?v=2.8.9">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -112,6 +112,27 @@
               <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
               <span>+ Quick-Drop Magnet Link</span>
               <span class="item-tag">Inject</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://sonarr.digitalresolve.ca', 'Sonarr (TV Automation)')" class="btn-action-item" title="Open Sonarr TV Automation">
+              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+              <span>Sonarr (TV Automation)</span>
+              <span class="item-tag online">Port 8990</span>
+            </a>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://radarr.digitalresolve.ca', 'Radarr (Movie Automation)')" class="btn-action-item" title="Open Radarr Movie Automation">
+              <span class="dropdown-dot" style="background-color: #fb923c; box-shadow: 0 0 8px #fb923c;"></span>
+              <span>Radarr (Movie Automation)</span>
+              <span class="item-tag online">Port 7878</span>
+            </a>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://prowlarr.digitalresolve.ca', 'Prowlarr (Indexer Swarm)')" class="btn-action-item" title="Open Prowlarr Indexer Swarm">
+              <span class="dropdown-dot" style="background-color: #f87171; box-shadow: 0 0 8px #f87171;"></span>
+              <span>Prowlarr (Indexers)</span>
+              <span class="item-tag online">Port 9696</span>
+            </a>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://readarr.digitalresolve.ca', 'Readarr (Book Automation)')" class="btn-action-item" title="Open Readarr Book Automation">
+              <span class="dropdown-dot" style="background-color: #34d399; box-shadow: 0 0 8px #34d399;"></span>
+              <span>Readarr (Book Automation)</span>
+              <span class="item-tag online">Port 8787</span>
             </a>
             <div class="dropdown-divider"></div>
             <div class="disk-widget" id="nuc-disk-widget">
@@ -319,6 +340,18 @@
           <button type="button" onclick="launchProtectedService('https://audiobooks.digitalresolve.ca', 'Audiobook Server (Audiobookshelf)')" class="pill-btn pill-audiobooks" style="cursor: pointer;" title="Open Audiobookshelf Server behind SSO">
             <span>[AUDIO]</span> Audiobook Server (Audiobookshelf)
           </button>
+          <button type="button" onclick="launchProtectedService('https://sonarr.digitalresolve.ca', 'Sonarr (TV Automation)')" class="pill-btn pill-sonarr" style="cursor: pointer;" title="Open Sonarr TV Automation behind SSO">
+            <span>[TV]</span> Sonarr
+          </button>
+          <button type="button" onclick="launchProtectedService('https://radarr.digitalresolve.ca', 'Radarr (Movie Automation)')" class="pill-btn pill-radarr" style="cursor: pointer;" title="Open Radarr Movie Automation behind SSO">
+            <span>[MOV]</span> Radarr
+          </button>
+          <button type="button" onclick="launchProtectedService('https://prowlarr.digitalresolve.ca', 'Prowlarr (Indexer Swarm)')" class="pill-btn pill-prowlarr" style="cursor: pointer;" title="Open Prowlarr Indexer Swarm behind SSO">
+            <span>[IDX]</span> Prowlarr
+          </button>
+          <button type="button" onclick="launchProtectedService('https://readarr.digitalresolve.ca', 'Readarr (Book Automation)')" class="pill-btn pill-readarr" style="cursor: pointer;" title="Open Readarr Book Automation behind SSO">
+            <span>[BOK]</span> Readarr
+          </button>
         </div>
 
         <!-- Torrent Control Matrix -->
@@ -352,6 +385,45 @@
                 </button>
               </div>
             </div>
+        </div>
+
+        <!-- Servarr Media Automation Suite Card -->
+        <div class="control-matrix-card" style="margin-bottom: 24px;">
+          <div class="control-matrix-header">
+            <div class="control-matrix-title">
+              <span>[ARR]</span> Servarr Media Automation Suite
+            </div>
+            <div style="font-size: 0.8rem; color: #8b949e;">
+              Autonomous PVR Pipelines &bull; Reverse Proxy SSO &bull; Intel NUC Cluster
+            </div>
+          </div>
+          <div class="control-group">
+            <div class="control-group-header">
+              <span class="control-group-title">Automated Acquisition &amp; Indexer Management</span>
+            </div>
+            <div class="control-group-grid">
+              <button type="button" class="btn-control btn-sonarr" onclick="launchProtectedService('https://sonarr.digitalresolve.ca', 'Sonarr (TV Automation)')" title="Open Sonarr TV Series Automation behind SSO (Port 8990)">
+                <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+                <span>Sonarr (TV Automation)</span>
+                <span class="item-tag online" style="margin-left: auto; font-size: 0.68rem; padding: 2px 6px;">Port 8990</span>
+              </button>
+              <button type="button" class="btn-control btn-radarr" onclick="launchProtectedService('https://radarr.digitalresolve.ca', 'Radarr (Movie Automation)')" title="Open Radarr Movie Automation behind SSO (Port 7878)">
+                <span class="dropdown-dot" style="background-color: #fb923c; box-shadow: 0 0 8px #fb923c;"></span>
+                <span>Radarr (Movie Automation)</span>
+                <span class="item-tag online" style="margin-left: auto; font-size: 0.68rem; padding: 2px 6px;">Port 7878</span>
+              </button>
+              <button type="button" class="btn-control btn-prowlarr" onclick="launchProtectedService('https://prowlarr.digitalresolve.ca', 'Prowlarr (Indexer Swarm)')" title="Open Prowlarr Indexer Swarm behind SSO (Port 9696)">
+                <span class="dropdown-dot" style="background-color: #f87171; box-shadow: 0 0 8px #f87171;"></span>
+                <span>Prowlarr (Indexer Swarm)</span>
+                <span class="item-tag online" style="margin-left: auto; font-size: 0.68rem; padding: 2px 6px;">Port 9696</span>
+              </button>
+              <button type="button" class="btn-control btn-readarr" onclick="launchProtectedService('https://readarr.digitalresolve.ca', 'Readarr (Book Automation)')" title="Open Readarr Book &amp; Audio Automation behind SSO (Port 8787)">
+                <span class="dropdown-dot" style="background-color: #34d399; box-shadow: 0 0 8px #34d399;"></span>
+                <span>Readarr (Book Automation)</span>
+                <span class="item-tag online" style="margin-left: auto; font-size: 0.68rem; padding: 2px 6px;">Port 8787</span>
+              </button>
+            </div>
+          </div>
         </div>
         <div class="control-matrix-card" style="margin-bottom: 24px;">
           <div class="control-matrix-header">
