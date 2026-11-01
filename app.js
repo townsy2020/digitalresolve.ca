@@ -474,6 +474,9 @@
       if (data.cameras) {
         updateCamerasUI(data.cameras);
         }
+        if (data.climate && typeof updateClimateUI === 'function') {
+          updateClimateUI(data.climate);
+        }
       } catch (e) {
         console.warn('Hydration cache error:', e);
       }
@@ -846,11 +849,11 @@
       }
       const ambTemp = document.getElementById('iot-ambient-temp');
       if (ambTemp) {
-        ambTemp.innerHTML = `21.4&deg;C <span style="font-size: 0.9rem; color: #94a3b8;">/ 42% RH</span>`;
+        if (!window._hasLiveClimate) ambTemp.innerHTML = `26.7&deg;C <span style="font-size: 0.9rem; color: #94a3b8;">/ 25% RH (80.1&deg;F)</span>`;
       }
       const roomThermo = document.getElementById('iot-room-thermostat');
       if (roomThermo) {
-        roomThermo.innerHTML = '21.2&deg;C';
+        if (!window._hasLiveClimate) roomThermo.innerHTML = '80.1&deg;F (26.7&deg;C)';
       }
       const storageThroughput = document.getElementById('schematic-storage-throughput');
       if (storageThroughput) {
@@ -2731,6 +2734,9 @@
       if (data.cameras) {
         updateCamerasUI(data.cameras);
       }
+      if (data.climate) {
+        updateClimateUI(data.climate);
+      }
       return data;
     }
 
@@ -2749,6 +2755,57 @@
       }
     }
     window.updateCamerasUI = updateCamerasUI;
+
+    function updateClimateUI(climate) {
+      if (!climate) return;
+      window._hasLiveClimate = true;
+      window._latestClimate = climate;
+
+      const tempF = climate.tempF !== undefined && climate.tempF !== null ? Number(climate.tempF).toFixed(1) : null;
+      const tempC = climate.tempC !== undefined && climate.tempC !== null ? Number(climate.tempC).toFixed(1) : null;
+      const hum = climate.humidity !== undefined && climate.humidity !== null ? Math.round(climate.humidity) : null;
+      const isOnline = climate.online !== false;
+      const stateStr = climate.state ? (climate.state.charAt(0).toUpperCase() + climate.state.slice(1)) : 'Normal';
+
+      // 1. Ribbon Climate Indicator
+      const ribbonClim = document.getElementById('ribbon-climate');
+      if (ribbonClim && tempF !== null && hum !== null) {
+        ribbonClim.innerHTML = '<span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 6px #10b981;"></span> ' + tempF + '&deg;F &bull; ' + hum + '% RH';
+      }
+
+      // 2. NUC Fleet Node Card
+      const fleetClim = document.getElementById('fleet-climate-nuc');
+      if (fleetClim && tempF !== null && hum !== null) {
+        fleetClim.textContent = tempF + '\u00B0F (' + tempC + '\u00B0C) \u2022 ' + hum + '% RH \u2022 ' + stateStr;
+      }
+
+      // 3. IoT Ambient Temp & Thermals Card
+      const ambTemp = document.getElementById('iot-ambient-temp');
+      if (ambTemp && tempC !== null && hum !== null) {
+        ambTemp.innerHTML = tempC + '&deg;C <span style="font-size: 0.9rem; color: #94a3b8;">/ ' + hum + '% RH (' + tempF + '&deg;F)</span>';
+      }
+
+      const roomThermo = document.getElementById('iot-room-thermostat');
+      if (roomThermo && tempF !== null && tempC !== null) {
+        roomThermo.innerHTML = tempF + '&deg;F (' + tempC + '&deg;C)';
+      }
+
+      const thTag = document.getElementById('iot-thermal-tag');
+      if (thTag) {
+        thTag.textContent = isOnline ? 'Nominal \u2022 YoLink LoRa' : 'Offline';
+        if (isOnline) thTag.className = 'item-tag online';
+      }
+
+      // 4. YoLink Water Leak Sensor
+      const leakTag = document.getElementById('iot-leak-sensor-status');
+      if (leakTag && climate.leakSensor) {
+        const leakState = climate.leakSensor.state || 'normal';
+        const isLeakNormal = String(leakState).toLowerCase() === 'normal';
+        leakTag.textContent = isLeakNormal ? 'Normal (Dry)' : 'LEAK DETECTED';
+        leakTag.style.color = isLeakNormal ? '#34d399' : '#ef4444';
+      }
+    }
+    window.updateClimateUI = updateClimateUI;
 
     function fetchClusterStats() {
       const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
