@@ -868,7 +868,7 @@
       document.querySelectorAll('#schematic-tunnel-throughput').forEach(el => el.textContent = 'Tunnel OK');
       document.querySelectorAll('#ai-model-footprint').forEach(el => el.textContent = '2.0 GB');
       document.querySelectorAll('#nuc-hw-ram').forEach(el => el.textContent = '32 GB');
-      document.querySelectorAll('#spark-scale-range').forEach(el => el.textContent = '0 - 10 ms');
+      // Dynamic scale range managed by renderSparklineFrame
       document.querySelectorAll('#schematic-nuc-throughput').forEach(el => {
         if (!el.textContent || el.textContent.includes('--')) el.textContent = `${window.LAST_NUC_LATENCY || 0.2} ms`;
       });
@@ -1183,7 +1183,7 @@
         }
         const rStorage = document.getElementById('ribbon-storage');
         if (rStorage && disk) {
-          rStorage.textContent = `${disk.freeGB} GB Free (${disk.usedPercent}%)`;
+          rStorage.textContent = `${disk.freeGB} GB Free (${disk.usedPercent}% used)`;
         }
         if (typeof updateHealthRadarUI === 'function') {
           updateHealthRadarUI({ nucOnline: isOnline, nucLatency: latencyMs, nucDisk: disk });
@@ -1343,7 +1343,7 @@
           if (sDeskSub) sDeskSub.innerHTML = `<span>Total ${totalGB.toLocaleString()} GB (${usedPercent}% Used &bull; ${usedGB} GB)</span>`;
 
           const rDeskStorage = document.getElementById('ribbon-desktop-storage');
-          if (rDeskStorage) rDeskStorage.textContent = `${(freeGB / 1000).toFixed(2)} TB Free (${usedPercent}%)`;
+          if (rDeskStorage) rDeskStorage.textContent = `${(freeGB / 1000).toFixed(2)} TB Free (${usedPercent}% used)`;
 
           const dynamicBaselineCpu = Math.floor(18 + Math.sin(Date.now() / 15000) * 8);
           const effectiveVitals = vitals || {
@@ -3782,14 +3782,38 @@
 
       // Tick markers and Y-axis scale labels (10 ms, 5 ms, 0 ms)
       const yZero = h - 14;  // 0 ms baseline (66px)
-      const yTen  = 14;      // 10 ms top (14px)
-      const yFive = (yZero + yTen) / 2; // 5 ms middle (40px)
+      const nucLatVal = (window.LAST_NUC_LATENCY !== undefined && window.LAST_NUC_LATENCY !== null)
+        ? Number(window.LAST_NUC_LATENCY)
+        : 0.22;
+      const bellLatVal = (window.ISP_LATEST && window.ISP_LATEST.pingAvgMs !== undefined)
+        ? Number(window.ISP_LATEST.pingAvgMs)
+        : 4.5;
+      const edgeLatVal = (window.ISP_LATEST && window.ISP_LATEST.googleDnsMs !== undefined)
+        ? Number(window.ISP_LATEST.googleDnsMs)
+        : 1.1;
+
+      let maxObserved = Math.max(nucLatVal, bellLatVal, edgeLatVal);
+      if (window.ISP_HISTORY_PINGS && window.ISP_HISTORY_PINGS.length > 0) {
+        maxObserved = Math.max(maxObserved, ...window.ISP_HISTORY_PINGS);
+      }
+      let scaleMax = 20;
+      if (maxObserved > 18) {
+        scaleMax = Math.ceil((maxObserved + 2) / 10) * 10;
+      }
+
+      const yTop  = 14;      // scaleMax top (14px)
+      const yMid  = (yZero + yTop) / 2; // middle tick (40px)
 
       const yTicks = [
-        { label: '10 ms', y: yTen },
-        { label: '5 ms',  y: yFive },
+        { label: `${scaleMax} ms`, y: yTop },
+        { label: `${Math.round(scaleMax / 2)} ms`, y: yMid },
         { label: '0 ms',  y: yZero }
       ];
+
+      const scaleStr = `0 - ${scaleMax} ms`;
+      document.querySelectorAll('#spark-scale-range').forEach(el => {
+        if (el.textContent !== scaleStr) el.textContent = scaleStr;
+      });
 
       ctx.font = '10px "JetBrains Mono", Consolas, monospace';
       ctx.fillStyle = '#94a3b8';
@@ -3820,8 +3844,8 @@
       sparklinePhase += 0.032;
 
       const toY = (valMs) => {
-        const clamped = Math.max(0, Math.min(10, valMs));
-        return yZero - (clamped / 10) * (yZero - yTen);
+        const clamped = Math.max(0, Math.min(scaleMax, valMs));
+        return yZero - (clamped / scaleMax) * (yZero - yTop);
       };
 
       const histBell = (window.ISP_HISTORY_PINGS && window.ISP_HISTORY_PINGS.length > 0) ? window.ISP_HISTORY_PINGS : null;

@@ -297,10 +297,20 @@
   <main id="main-content" style="padding-top: 30px;">
     <section class="fleet-section">
       <div class="container">
-        <div class="section-header">
+        <div class="section-header" style="margin-bottom: 24px;">
           <span class="section-tag" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3);">Media Hub</span>
           <h2>Media Suite &amp; Torrent Swarm</h2>
           <p>qBittorrent automated torrent ingestion, Jellyfin media streaming, and Audiobookshelf digital library.</p>
+        </div>
+
+        <!-- Command Launch Pills -->
+        <div class="command-pills" style="justify-content: center; margin-bottom: 30px;">
+          <button type="button" onclick="launchProtectedService('https://stream.digitalresolve.ca', 'Watch Library (HD / 4K)')" class="pill-btn pill-stream" style="cursor: pointer;">
+            <span>[PLAY]</span> Open Watch Library (HD / 4K)
+          </button>
+          <button type="button" onclick="launchProtectedService('https://files.digitalresolve.ca/files/', 'File Vault &amp; Explorer')" class="pill-btn pill-files" style="cursor: pointer;">
+            <span>[FILES]</span> Browse Media &amp; Files
+          </button>
         </div>
 
         <!-- Torrent Control Matrix -->
