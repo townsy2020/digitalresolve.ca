@@ -1328,7 +1328,7 @@
 
           const fStorage = document.getElementById('fleet-storage-desktop');
           const fBar = document.getElementById('fleet-bar-desktop');
-          if (fStorage) fStorage.innerHTML = `${freeGB.toLocaleString()} GB Free (${usedPercent}% used) &bull; C: ${cFree}G | D: ${dFree}T`;
+          const freePct = Math.round(100 - usedPercent); if (fStorage) fStorage.innerHTML = `${freeGB.toLocaleString()} GB Free (${freePct}% free) &bull; C: ${cFree}G | D: ${dFree}T`;
           if (fBar) fBar.style.width = `${usedPercent}%`;
           
           const dTag = document.getElementById('desktop-disk-tag');
@@ -1338,15 +1338,15 @@
           if (dTag) dTag.innerHTML = `C: ${cFree}G &bull; D: ${dFree}T`;
           if (dVal) dVal.textContent = `${freeGB.toLocaleString()} GB Free`;
           if (dBar) dBar.style.width = `${usedPercent}%`;
-          if (dSub) dSub.innerHTML = `${usedGB} GB used of ${totalGB.toLocaleString()} GB (${usedPercent}%) &bull; C: ${cFree}G | D: ${dFree}T`;
+          if (dSub) dSub.innerHTML = `${usedGB} GB used of ${totalGB.toLocaleString()} GB (${usedPercent}% used &bull; ${freePct}% free) &bull; C: ${cFree}G | D: ${dFree}T`;
           
           const sDeskFree = document.getElementById('stat-desktop-disk-free');
           const sDeskSub = document.getElementById('stat-desktop-disk-sub');
           if (sDeskFree) sDeskFree.innerHTML = `${freeGB.toLocaleString()} GB <span style="font-size: 0.9rem; color: #8b949e;">Free</span>`;
-          if (sDeskSub) sDeskSub.innerHTML = `<span>Total ${totalGB.toLocaleString()} GB (${usedPercent}% Used &bull; ${usedGB} GB)</span>`;
+          if (sDeskSub) sDeskSub.innerHTML = `<span>Total ${totalGB.toLocaleString()} GB (${freePct}% Free &bull; ${usedPercent}% Used &bull; ${usedGB} GB)</span>`;
 
           const rDeskStorage = document.getElementById('ribbon-desktop-storage');
-          if (rDeskStorage) rDeskStorage.textContent = `${(freeGB / 1000).toFixed(2)} TB Free (${usedPercent}% used)`;
+          if (rDeskStorage) rDeskStorage.textContent = `${(freeGB / 1000).toFixed(2)} TB Free (${freePct}% free \u2022 C: ${cFree}G | D: ${dFree}T)`;
 
           const dynamicBaselineCpu = Math.floor(18 + Math.sin(Date.now() / 15000) * 8);
           const effectiveVitals = vitals || {
