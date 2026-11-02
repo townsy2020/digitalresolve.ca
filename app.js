@@ -5077,7 +5077,10 @@
       const isDeskLocal = (hostname === 'desktop' || hostname === 'cory-desktop') || ((hostname === 'localhost' || hostname === '127.0.0.1') && !isNucLocal) || (isFileProtocol && localStorage.getItem('dr_is_nuc') !== 'true') || localStorage.getItem('dr_is_desktop') === 'true' || window.location.port === '8080';
       const deskHost = isDeskLocal ? 'localhost' : '192.168.2.62';
 
-      if (/^(?:https?:)?(?:\/\/)?(?:www\.)?(?:stream|jellyfin)\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
+      if (/^(?:https?:)?(?:\/\/)?(?:www\.)?stream\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
+        return `http://${nucHost}:8088`;
+      }
+      if (/^(?:https?:)?(?:\/\/)?(?:www\.)?jellyfin\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
         return 'https://lan.digitalresolve.ca:8920';
       }
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?audiobooks\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
