@@ -5051,7 +5051,8 @@
       }
 
       const hostname = (typeof window !== 'undefined' && window.location && window.location.hostname) ? window.location.hostname.toLowerCase() : '';
-      const isDirectHost = (hostname === 'localhost' || hostname === '127.0.0.1' || /^192\.168\./.test(hostname));
+      const isFileProtocol = (typeof window !== 'undefined' && window.location && window.location.protocol === 'file:');
+      const isDirectHost = isFileProtocol || (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === 'nuc' || /^192\.168\./.test(hostname));
 
       let isHomeNet = (typeof window !== 'undefined' && (window.dr_is_home_network === true || window.isHomeNetwork === true)) || localStorage.getItem('dr_is_home_network') === 'true';
 
@@ -5060,7 +5061,7 @@
         if (raw) {
           const cache = JSON.parse(raw);
           if (cache && cache.isHomeNetwork) isHomeNet = true;
-          if (cache && cache.nuc && cache.nuc.latencyMs !== null && cache.nuc.latencyMs < 10) isHomeNet = true;
+          if (cache && cache.nuc && cache.nuc.latencyMs !== null && cache.nuc.latencyMs < 35) isHomeNet = true;
         }
       } catch (e) {}
 
@@ -5069,20 +5070,20 @@
         return url;
       }
 
-      const isNucLocal = (hostname === 'localhost' || hostname === '127.0.0.1') && (window.location.port === '8088' || window.location.port === '3333' || window.location.port === '8085');
+      const isNucLocal = (hostname === 'nuc') || ((hostname === 'localhost' || hostname === '127.0.0.1') && (window.location.port === '8088' || window.location.port === '3333' || window.location.port === '8085' || localStorage.getItem('dr_is_nuc') === 'true'));
       const nucHost = isNucLocal ? 'localhost' : '192.168.2.35';
 
       if (url.includes('stream.digitalresolve.ca')) {
-        return url.replace('https://stream.digitalresolve.ca', `http://${nucHost}:8088`);
+        return url.replace(/^https?:\/\/stream\.digitalresolve\.ca/, `http://${nucHost}:8088`);
       }
       if (url.includes('audiobooks.digitalresolve.ca')) {
-        return url.replace('https://audiobooks.digitalresolve.ca', `http://${nucHost}:3333`);
+        return url.replace(/^https?:\/\/audiobooks\.digitalresolve\.ca/, `http://${nucHost}:3333`);
       }
       if (url.includes('files.digitalresolve.ca/files/')) {
-        return url.replace('https://files.digitalresolve.ca/files/', `http://${nucHost}:8085/files/`);
+        return url.replace(/^https?:\/\/files\.digitalresolve\.ca\/files\//, `http://${nucHost}:8085/files/`);
       }
       if (url.includes('files.digitalresolve.ca')) {
-        return url.replace('https://files.digitalresolve.ca', `http://${nucHost}:8085`);
+        return url.replace(/^https?:\/\/files\.digitalresolve\.ca/, `http://${nucHost}:8085`);
       }
 
       return url;
