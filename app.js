@@ -5070,8 +5070,11 @@
         return url;
       }
 
-      const isNucLocal = (hostname === 'nuc') || ((hostname === 'localhost' || hostname === '127.0.0.1') && (window.location.port === '8088' || window.location.port === '3333' || window.location.port === '8085' || localStorage.getItem('dr_is_nuc') === 'true'));
+      const isNucLocal = (hostname === 'nuc' || hostname === '192.168.2.35') || ((hostname === 'localhost' || hostname === '127.0.0.1') && (window.location.port === '8088' || window.location.port === '3333' || window.location.port === '8085' || window.location.port === '8990' || window.location.port === '7878' || window.location.port === '9696' || window.location.port === '8787' || window.location.port === '8081' || localStorage.getItem('dr_is_nuc') === 'true'));
       const nucHost = isNucLocal ? 'localhost' : '192.168.2.35';
+
+      const isDeskLocal = (hostname === 'desktop' || hostname === 'cory-desktop' || hostname === '192.168.2.62') || ((hostname === 'localhost' || hostname === '127.0.0.1') && !isNucLocal) || (isFileProtocol && localStorage.getItem('dr_is_nuc') !== 'true') || localStorage.getItem('dr_is_desktop') === 'true' || window.location.port === '8080';
+      const deskHost = isDeskLocal ? 'localhost' : '192.168.2.62';
 
       if (url.includes('stream.digitalresolve.ca')) {
         return url.replace(/^https?:\/\/stream\.digitalresolve\.ca/, `http://${nucHost}:8088`);
@@ -5084,6 +5087,24 @@
       }
       if (url.includes('files.digitalresolve.ca')) {
         return url.replace(/^https?:\/\/files\.digitalresolve\.ca/, `http://${nucHost}:8085`);
+      }
+      if (url.includes('sonarr.digitalresolve.ca')) {
+        return url.replace(/^https?:\/\/sonarr\.digitalresolve\.ca/, `http://${nucHost}:8990`);
+      }
+      if (url.includes('radarr.digitalresolve.ca')) {
+        return url.replace(/^https?:\/\/radarr\.digitalresolve\.ca/, `http://${nucHost}:7878`);
+      }
+      if (url.includes('prowlarr.digitalresolve.ca')) {
+        return url.replace(/^https?:\/\/prowlarr\.digitalresolve\.ca/, `http://${nucHost}:9696`);
+      }
+      if (url.includes('readarr.digitalresolve.ca')) {
+        return url.replace(/^https?:\/\/readarr\.digitalresolve\.ca/, `http://${nucHost}:8787`);
+      }
+      if (url.includes('torrents2.digitalresolve.ca')) {
+        return url.replace(/^https?:\/\/torrents2\.digitalresolve\.ca/, `http://${nucHost}:8081`);
+      }
+      if (url.includes('torrents.digitalresolve.ca')) {
+        return url.replace(/^https?:\/\/torrents\.digitalresolve\.ca/, `http://${deskHost}:8080`);
       }
 
       return url;
