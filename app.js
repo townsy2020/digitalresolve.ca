@@ -5044,10 +5044,6 @@
     // ==========================================
     function resolveMediaUrl(url) {
       if (!url || typeof url !== 'string') return url;
-      // Mobile browsers must always use secure HTTPS domain to avoid ERR_TOO_MANY_RETRIES
-      if (typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        return url;
-      }
 
       const routeSetting = localStorage.getItem('dr_media_route') || 'auto';
       if (routeSetting === 'wan') {
@@ -5070,7 +5066,7 @@
       } catch (e) {}
 
       // Keep secure HTTPS domains (stream.digitalresolve.ca) on public web & mobile to prevent ERR_TOO_MANY_RETRIES
-      const shouldUseLan = (routeSetting === 'lan') || (routeSetting === 'auto' && isDirectHost);
+      const shouldUseLan = (routeSetting === 'lan') || (routeSetting === 'auto' && (isDirectHost || isHomeNet));
       if (!shouldUseLan) {
         return url;
       }
@@ -5081,8 +5077,8 @@
       const isDeskLocal = (hostname === 'desktop' || hostname === 'cory-desktop') || ((hostname === 'localhost' || hostname === '127.0.0.1') && !isNucLocal) || (isFileProtocol && localStorage.getItem('dr_is_nuc') !== 'true') || localStorage.getItem('dr_is_desktop') === 'true' || window.location.port === '8080';
       const deskHost = isDeskLocal ? 'localhost' : '192.168.2.62';
 
-      if (/^(?:https?:)?(?:\/\/)?(?:www\.)?stream\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?stream\.digitalresolve\.ca(?::\d+)?/i, `http://${nucHost}:8088`);
+      if (/^(?:https?:)?(?:\/\/)?(?:www\.)?(?:stream|jellyfin)\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
+        return 'https://lan.digitalresolve.ca:8920';
       }
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?audiobooks\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
         return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?audiobooks\.digitalresolve\.ca(?::\d+)?/i, `http://${nucHost}:3333`);
