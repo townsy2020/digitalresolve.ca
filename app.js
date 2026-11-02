@@ -5078,7 +5078,7 @@
       const deskHost = isDeskLocal ? 'localhost' : '192.168.2.62';
 
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?stream\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-        return `http://${nucHost}:8088`;
+        return 'https://lan.digitalresolve.ca:8443';
       }
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?jellyfin\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
         return 'https://lan.digitalresolve.ca:8920';
