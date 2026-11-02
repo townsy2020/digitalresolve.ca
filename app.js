@@ -5065,7 +5065,8 @@
         }
       } catch (e) {}
 
-      const shouldUseLan = (routeSetting === 'lan') || (routeSetting === 'auto' && (isDirectHost || isHomeNet));
+      // Keep secure HTTPS domains (stream.digitalresolve.ca) on public web & mobile to prevent ERR_TOO_MANY_RETRIES
+      const shouldUseLan = (routeSetting === 'lan') || (routeSetting === 'auto' && isDirectHost);
       if (!shouldUseLan) {
         return url;
       }
