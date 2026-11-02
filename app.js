@@ -5070,41 +5070,41 @@
         return url;
       }
 
-      const isNucLocal = (hostname === 'nuc' || hostname === '192.168.2.35') || ((hostname === 'localhost' || hostname === '127.0.0.1') && (window.location.port === '8088' || window.location.port === '3333' || window.location.port === '8085' || window.location.port === '8990' || window.location.port === '7878' || window.location.port === '9696' || window.location.port === '8787' || window.location.port === '8081' || localStorage.getItem('dr_is_nuc') === 'true'));
+      const isNucLocal = (hostname === 'nuc') || ((hostname === 'localhost' || hostname === '127.0.0.1') && (window.location.port === '8088' || window.location.port === '3333' || window.location.port === '8085' || window.location.port === '8990' || window.location.port === '7878' || window.location.port === '9696' || window.location.port === '8787' || window.location.port === '8081' || localStorage.getItem('dr_is_nuc') === 'true'));
       const nucHost = isNucLocal ? 'localhost' : '192.168.2.35';
 
-      const isDeskLocal = (hostname === 'desktop' || hostname === 'cory-desktop' || hostname === '192.168.2.62') || ((hostname === 'localhost' || hostname === '127.0.0.1') && !isNucLocal) || (isFileProtocol && localStorage.getItem('dr_is_nuc') !== 'true') || localStorage.getItem('dr_is_desktop') === 'true' || window.location.port === '8080';
+      const isDeskLocal = (hostname === 'desktop' || hostname === 'cory-desktop') || ((hostname === 'localhost' || hostname === '127.0.0.1') && !isNucLocal) || (isFileProtocol && localStorage.getItem('dr_is_nuc') !== 'true') || localStorage.getItem('dr_is_desktop') === 'true' || window.location.port === '8080';
       const deskHost = isDeskLocal ? 'localhost' : '192.168.2.62';
 
-      if (url.includes('stream.digitalresolve.ca')) {
-        return url.replace(/^https?:\/\/stream\.digitalresolve\.ca/, `http://${nucHost}:8088`);
+      if (/^(?:https?:)?(?:\/\/)?(?:www\.)?stream\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
+        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?stream\.digitalresolve\.ca(?::\d+)?/i, `http://${nucHost}:8088`);
       }
-      if (url.includes('audiobooks.digitalresolve.ca')) {
-        return url.replace(/^https?:\/\/audiobooks\.digitalresolve\.ca/, `http://${nucHost}:3333`);
+      if (/^(?:https?:)?(?:\/\/)?(?:www\.)?audiobooks\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
+        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?audiobooks\.digitalresolve\.ca(?::\d+)?/i, `http://${nucHost}:3333`);
       }
-      if (url.includes('files.digitalresolve.ca/files/')) {
-        return url.replace(/^https?:\/\/files\.digitalresolve\.ca\/files\//, `http://${nucHost}:8085/files/`);
+      if (/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?\/files(?=[\/?#]|$)/i.test(url)) {
+        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?\/files/i, `http://${nucHost}:8085/files`);
       }
-      if (url.includes('files.digitalresolve.ca')) {
-        return url.replace(/^https?:\/\/files\.digitalresolve\.ca/, `http://${nucHost}:8085`);
+      if (/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
+        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?/i, `http://${nucHost}:8085`);
       }
-      if (url.includes('sonarr.digitalresolve.ca')) {
-        return url.replace(/^https?:\/\/sonarr\.digitalresolve\.ca/, `http://${nucHost}:8990`);
+      if (/^(?:https?:)?(?:\/\/)?(?:www\.)?sonarr\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
+        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?sonarr\.digitalresolve\.ca(?::\d+)?/i, `http://${nucHost}:8990`);
       }
-      if (url.includes('radarr.digitalresolve.ca')) {
-        return url.replace(/^https?:\/\/radarr\.digitalresolve\.ca/, `http://${nucHost}:7878`);
+      if (/^(?:https?:)?(?:\/\/)?(?:www\.)?radarr\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
+        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?radarr\.digitalresolve\.ca(?::\d+)?/i, `http://${nucHost}:7878`);
       }
-      if (url.includes('prowlarr.digitalresolve.ca')) {
-        return url.replace(/^https?:\/\/prowlarr\.digitalresolve\.ca/, `http://${nucHost}:9696`);
+      if (/^(?:https?:)?(?:\/\/)?(?:www\.)?prowlarr\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
+        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?prowlarr\.digitalresolve\.ca(?::\d+)?/i, `http://${nucHost}:9696`);
       }
-      if (url.includes('readarr.digitalresolve.ca')) {
-        return url.replace(/^https?:\/\/readarr\.digitalresolve\.ca/, `http://${nucHost}:8787`);
+      if (/^(?:https?:)?(?:\/\/)?(?:www\.)?readarr\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
+        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?readarr\.digitalresolve\.ca(?::\d+)?/i, `http://${nucHost}:8787`);
       }
-      if (url.includes('torrents2.digitalresolve.ca')) {
-        return url.replace(/^https?:\/\/torrents2\.digitalresolve\.ca/, `http://${nucHost}:8081`);
+      if (/^(?:https?:)?(?:\/\/)?(?:www\.)?torrents2\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
+        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?torrents2\.digitalresolve\.ca(?::\d+)?/i, `http://${nucHost}:8081`);
       }
-      if (url.includes('torrents.digitalresolve.ca')) {
-        return url.replace(/^https?:\/\/torrents\.digitalresolve\.ca/, `http://${deskHost}:8080`);
+      if (/^(?:https?:)?(?:\/\/)?(?:www\.)?torrents\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
+        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?torrents\.digitalresolve\.ca(?::\d+)?/i, `http://${deskHost}:8080`);
       }
 
       return url;
