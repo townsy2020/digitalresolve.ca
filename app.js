@@ -1595,6 +1595,7 @@
       setInterval(() => { if (!document.hidden) fetchClusterStats(); }, 4000);
       updateSSOGateUI(); try { updateMaintenanceVisualStates(); } catch(e) {}
       try { updateCodebaseMetrics(); } catch(e) {}
+      try { updateMediaRoutePillUI(); } catch(e) {}
       if (isSSOAuthenticated()) {
         loadLog('agy');
       }
@@ -1972,6 +1973,7 @@
       // 8. Instantly force UI updates across all gates and header buttons
       updateSSOGateUI(); try { updateMaintenanceVisualStates(); } catch(e) {}
       try { updateCodebaseMetrics(); } catch(e) {}
+      try { updateMediaRoutePillUI(); } catch(e) {}
       try { fetchISPHistory(); } catch(e) {}
 
       // 10. If explicit full Microsoft IdP logout was requested with Shift key
@@ -2854,6 +2856,7 @@
       if (!isSSOAuthenticated()) {
         updateSSOGateUI(); try { updateMaintenanceVisualStates(); } catch(e) {}
       try { updateCodebaseMetrics(); } catch(e) {}
+      try { updateMediaRoutePillUI(); } catch(e) {}
         return;
       }
 
@@ -4105,6 +4108,7 @@
       }
       updateSSOGateUI(); try { updateMaintenanceVisualStates(); } catch(e) {}
       try { updateCodebaseMetrics(); } catch(e) {}
+      try { updateMediaRoutePillUI(); } catch(e) {}
       fetchAgySessionInfo();
       refreshAgyConsole();
       startConsoleAutoPoll();
@@ -4169,6 +4173,7 @@
       if (!isSSOAuthenticated()) {
         updateSSOGateUI(); try { updateMaintenanceVisualStates(); } catch(e) {}
       try { updateCodebaseMetrics(); } catch(e) {}
+      try { updateMediaRoutePillUI(); } catch(e) {}
         return;
       }
       const screen = document.getElementById('agy-console-screen');
@@ -5034,14 +5039,106 @@
     window.closeSpeedtestSSOModal = closeSpeedtestSSOModal;
     window.closeGlobalSSOModal = closeSpeedtestSSOModal;
 
+    // ==========================================
+    // LOCAL LAN & MEDIA ROUTING ENGINE
+    // ==========================================
+    function resolveMediaUrl(url) {
+      if (!url || typeof url !== 'string') return url;
+
+      const routeSetting = localStorage.getItem('dr_media_route') || 'auto';
+      if (routeSetting === 'wan') {
+        return url;
+      }
+
+      const hostname = (typeof window !== 'undefined' && window.location && window.location.hostname) ? window.location.hostname.toLowerCase() : '';
+      const isDirectHost = (hostname === 'localhost' || hostname === '127.0.0.1' || /^192\.168\./.test(hostname));
+
+      let isHomeNet = (typeof window !== 'undefined' && (window.dr_is_home_network === true || window.isHomeNetwork === true)) || localStorage.getItem('dr_is_home_network') === 'true';
+
+      try {
+        const raw = localStorage.getItem('dr_telemetry_cache');
+        if (raw) {
+          const cache = JSON.parse(raw);
+          if (cache && cache.isHomeNetwork) isHomeNet = true;
+          if (cache && cache.nuc && cache.nuc.latencyMs !== null && cache.nuc.latencyMs < 10) isHomeNet = true;
+        }
+      } catch (e) {}
+
+      const shouldUseLan = (routeSetting === 'lan') || (routeSetting === 'auto' && (isDirectHost || isHomeNet));
+      if (!shouldUseLan) {
+        return url;
+      }
+
+      const isNucLocal = (hostname === 'localhost' || hostname === '127.0.0.1') && (window.location.port === '8088' || window.location.port === '3333' || window.location.port === '8085');
+      const nucHost = isNucLocal ? 'localhost' : '192.168.2.35';
+
+      if (url.includes('stream.digitalresolve.ca')) {
+        return url.replace('https://stream.digitalresolve.ca', `http://${nucHost}:8088`);
+      }
+      if (url.includes('audiobooks.digitalresolve.ca')) {
+        return url.replace('https://audiobooks.digitalresolve.ca', `http://${nucHost}:3333`);
+      }
+      if (url.includes('files.digitalresolve.ca/files/')) {
+        return url.replace('https://files.digitalresolve.ca/files/', `http://${nucHost}:8085/files/`);
+      }
+      if (url.includes('files.digitalresolve.ca')) {
+        return url.replace('https://files.digitalresolve.ca', `http://${nucHost}:8085`);
+      }
+
+      return url;
+    }
+    window.resolveMediaUrl = resolveMediaUrl;
+
+    function getMediaRouteMode() {
+      return localStorage.getItem('dr_media_route') || 'auto';
+    }
+
+    function updateMediaRoutePillUI() {
+      const btn = document.getElementById('btn-route-mode');
+      const txt = document.getElementById('route-mode-text');
+      if (!btn && !txt) return;
+      const mode = getMediaRouteMode();
+      let label = '⚡ Route: Auto (LAN Priority)';
+      let title = 'Routes directly to NUC on local network to bypass Cloudflare';
+      if (mode === 'lan') {
+        label = '● Route: Direct LAN (192.168.2.35)';
+        title = 'Forced Direct Gigabit LAN routing (bypasses Cloudflare Tunnels)';
+      } else if (mode === 'wan') {
+        label = '🌐 Route: Cloudflare Edge (WAN)';
+        title = 'Forced Cloudflare Zero Trust Tunnel routing';
+      }
+      if (txt) txt.textContent = label;
+      else if (btn) btn.textContent = label;
+      if (btn) btn.title = title;
+    }
+
+    function cycleMediaRouteMode() {
+      const current = getMediaRouteMode();
+      let next = 'auto';
+      if (current === 'auto') next = 'lan';
+      else if (current === 'lan') next = 'wan';
+      else next = 'auto';
+      localStorage.setItem('dr_media_route', next);
+      updateMediaRoutePillUI();
+      const desc = next === 'lan' ? 'Direct LAN (192.168.2.35)' : (next === 'wan' ? 'Cloudflare Tunnel (WAN)' : 'Auto (LAN Priority)');
+      if (typeof showToast === 'function') {
+        showToast('info', 'Media Routing Updated', `Route mode set to ${desc}`);
+      }
+    }
+    window.getMediaRouteMode = getMediaRouteMode;
+    window.updateMediaRoutePillUI = updateMediaRoutePillUI;
+    window.cycleMediaRouteMode = cycleMediaRouteMode;
+    try { updateMediaRoutePillUI(); } catch(e) {}
+
     function launchProtectedService(url, serviceName = 'Protected Homelab Service') {
+      const finalUrl = resolveMediaUrl(url);
       if (!isSSOAuthenticated()) {
         openGlobalSSOModal(serviceName, () => {
-          window.open(url, '_blank', 'noopener,noreferrer');
+          window.open(finalUrl, '_blank', 'noopener,noreferrer');
         });
         return;
       }
-      window.open(url, '_blank', 'noopener,noreferrer');
+      window.open(finalUrl, '_blank', 'noopener,noreferrer');
     }
     window.launchProtectedService = launchProtectedService;
 
