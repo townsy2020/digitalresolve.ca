@@ -5044,6 +5044,10 @@
     // ==========================================
     function resolveMediaUrl(url) {
       if (!url || typeof url !== 'string') return url;
+      // Mobile browsers must always use secure HTTPS domain to avoid ERR_TOO_MANY_RETRIES
+      if (typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        return url;
+      }
 
       const routeSetting = localStorage.getItem('dr_media_route') || 'auto';
       if (routeSetting === 'wan') {
