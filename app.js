@@ -5155,10 +5155,9 @@
 
     function launchProtectedService(url, serviceName = 'Protected Homelab Service') {
       const finalUrl = resolveMediaUrl(url);
-      if (!isSSOAuthenticated()) {
-        openGlobalSSOModal(serviceName, () => {
-          window.open(finalUrl, '_blank', 'noopener,noreferrer');
-        });
+      const isMobile = (typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+      if (isMobile) {
+        window.location.href = finalUrl;
         return;
       }
       window.open(finalUrl, '_blank', 'noopener,noreferrer');
