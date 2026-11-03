@@ -5078,34 +5078,34 @@
       const deskHost = isDeskLocal ? 'localhost' : '192.168.2.62';
 
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?stream\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-        return 'https://lan.digitalresolve.ca:8443';
+        return 'https://stream-lan.digitalresolve.ca';
       }
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?jellyfin\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-        return 'https://lan.digitalresolve.ca:8920';
+        return 'https://jellyfin-lan.digitalresolve.ca';
       }
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?audiobooks\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?audiobooks\.digitalresolve\.ca(?::\d+)?/i, `http://${nucHost}:3333`);
+        return 'https://audio-lan.digitalresolve.ca';
       }
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?\/files(?=[\/?#]|$)/i.test(url)) {
-        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?\/files/i, `http://${nucHost}:8085/files`);
+        return 'https://files-lan.digitalresolve.ca';
       }
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?/i, `http://${nucHost}:8085`);
+        return 'https://files-lan.digitalresolve.ca';
       }
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?sonarr\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?sonarr\.digitalresolve\.ca(?::\d+)?/i, `http://${nucHost}:8990`);
+        return 'https://sonarr-lan.digitalresolve.ca';
       }
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?radarr\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?radarr\.digitalresolve\.ca(?::\d+)?/i, `http://${nucHost}:7878`);
+        return 'https://radarr-lan.digitalresolve.ca';
       }
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?prowlarr\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?prowlarr\.digitalresolve\.ca(?::\d+)?/i, `http://${nucHost}:9696`);
+        return 'https://prowlarr-lan.digitalresolve.ca';
       }
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?readarr\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?readarr\.digitalresolve\.ca(?::\d+)?/i, `http://${nucHost}:8787`);
+        return 'https://readarr-lan.digitalresolve.ca';
       }
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?torrents2\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?torrents2\.digitalresolve\.ca(?::\d+)?/i, `http://${nucHost}:8081`);
+        return 'https://torrents-lan.digitalresolve.ca';
       }
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?torrents\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
         return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?torrents\.digitalresolve\.ca(?::\d+)?/i, `http://${deskHost}:8080`);

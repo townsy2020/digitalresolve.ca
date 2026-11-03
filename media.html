@@ -82,6 +82,11 @@
               <span>Watch Library (Stream 4K/HD)</span>
               <span class="item-tag online">Live</span>
             </a>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://jellyfin.digitalresolve.ca', 'Jellyfin Media Server (jellyfin.digitalresolve.ca)')" class="btn-action-item" title="Open Jellyfin Media Server">
+              <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 8px #a855f7;"></span>
+              <span>Jellyfin Media Server</span>
+              <span class="item-tag online">Port 8920</span>
+            </a>
             <a href="javascript:void(0)" onclick="launchProtectedService('https://files.digitalresolve.ca/files/', 'Media &amp; File Vault (files.digitalresolve.ca)')" class="btn-action-item" title="Open File Vault (files.digitalresolve.ca)">
               <span class="dropdown-dot dot-2"></span>
               <span>Browse Media &amp; Files (NUC)</span>
@@ -337,11 +342,17 @@
           <button type="button" onclick="launchProtectedService('https://stream.digitalresolve.ca', 'Watch Library (HD / 4K)')" class="pill-btn pill-stream" style="cursor: pointer;">
             <span>[PLAY]</span> Open Watch Library (HD / 4K)
           </button>
+          <button type="button" onclick="launchProtectedService('https://jellyfin.digitalresolve.ca', 'Jellyfin Media Server')" class="pill-btn pill-jellyfin" style="cursor: pointer;" title="Open Jellyfin 4K/HD Streaming Server">
+            <span>[JELLY]</span> Jellyfin Media Server
+          </button>
           <button type="button" onclick="launchProtectedService('https://files.digitalresolve.ca/files/', 'File Vault &amp; Explorer')" class="pill-btn pill-files" style="cursor: pointer;">
             <span>[FILES]</span> Browse Media &amp; Files
           </button>
           <button type="button" onclick="launchProtectedService('https://audiobooks.digitalresolve.ca', 'Audiobook Server (Audiobookshelf)')" class="pill-btn pill-audiobooks" style="cursor: pointer;" title="Open Audiobookshelf Server behind SSO">
             <span>[AUDIO]</span> Audiobook Server (Audiobookshelf)
+          </button>
+          <button type="button" onclick="launchProtectedService('https://torrents2.digitalresolve.ca', 'qBittorrent Swarm (NUC)')" class="pill-btn pill-torrents" style="cursor: pointer;" title="Open qBittorrent Swarm Manager">
+            <span>[TOR]</span> qBittorrent Swarm
           </button>
           <button type="button" onclick="launchProtectedService('https://sonarr.digitalresolve.ca', 'Sonarr (TV Automation)')" class="pill-btn pill-sonarr" style="cursor: pointer;" title="Open Sonarr TV Automation behind SSO">
             <span>[TV]</span> Sonarr
@@ -1433,6 +1444,6 @@
       </div>
     </div>
   </div>
-  <script src="app.js?v=2.8.39"></script>
+  <script src="app.js?v=2.8.40"></script>
 </body>
 </html>
