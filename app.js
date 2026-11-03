@@ -1466,7 +1466,7 @@
       if (typeof fetchClusterStats === 'function') fetchClusterStats();
 
       // Ensure all modal overlays are strictly hidden on load
-      ['magnet-modal-overlay', 'agy-console-modal-overlay', 'changelog-modal-overlay', 'health-modal-overlay', 'chaos-modal-overlay', 'disaster-modal-overlay', 'speedtest-sso-modal-overlay', 'cloudflare-stats-modal-overlay', 'adguard-modal-overlay'].forEach(id => {
+      ['magnet-modal-overlay', 'agy-console-modal-overlay', 'changelog-modal-overlay', 'health-modal-overlay', 'chaos-modal-overlay', 'disaster-modal-overlay', 'speedtest-sso-modal-overlay', 'cloudflare-stats-modal-overlay', 'adguard-modal-overlay', 'tailscale-modal-overlay'].forEach(id => {
         const el = document.getElementById(id);
         if (el) { el.classList.remove('active'); el.style.display = 'none'; }
       });
@@ -5633,6 +5633,284 @@
     window.copyAdguardDeployCommand = copyAdguardDeployCommand;
 
     // ========================================================
+    // Tailscale Mesh VPN Client Modal & Platform Auto-Detection
+    // ========================================================
+    function copySnippetText(text, btn) {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+          if (btn) {
+            const orig = btn.innerHTML;
+            btn.innerHTML = 'Copied!';
+            setTimeout(() => { btn.innerHTML = orig; }, 2000);
+          }
+          if (typeof showToast === 'function') showToast('success', 'Copied to Clipboard', text);
+        }).catch(() => {
+          prompt('Copy command:', text);
+        });
+      } else {
+        prompt('Copy command:', text);
+      }
+    }
+    window.copySnippetText = copySnippetText;
+
+    function detectClientOS() {
+      const ua = navigator.userAgent || '';
+      const platform = navigator.platform || '';
+      if (/iPad|iPhone|iPod/.test(ua) || (platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
+        return 'ios';
+      }
+      if (/Android/.test(ua)) {
+        return 'android';
+      }
+      if (/Macintosh|MacIntel|MacPPC|Mac68K/.test(ua) || (typeof platform === 'string' && platform.startsWith('Mac'))) {
+        return 'macos';
+      }
+      if (/Win32|Win64|Windows|WinCE/.test(ua) || (typeof platform === 'string' && platform.startsWith('Win'))) {
+        return 'windows';
+      }
+      if (/Linux/.test(ua) || (typeof platform === 'string' && platform.startsWith('Linux'))) {
+        return 'linux';
+      }
+      return 'windows';
+    }
+    window.detectClientOS = detectClientOS;
+
+    function selectTailscaleTab(platform) {
+      const tabs = document.querySelectorAll('#ts-platform-tabs .tailscale-tab-btn');
+      tabs.forEach(t => {
+        if (t.getAttribute('data-platform') === platform) {
+          t.classList.add('active');
+        } else {
+          t.classList.remove('active');
+        }
+      });
+      const panels = document.querySelectorAll('#tailscale-modal-overlay .tailscale-panel');
+      panels.forEach(p => {
+        if (p.id === 'ts-panel-' + platform) {
+          p.classList.add('active');
+        } else {
+          p.classList.remove('active');
+        }
+      });
+    }
+    window.selectTailscaleTab = selectTailscaleTab;
+
+    function ensureTailscaleModalDOM() {
+      if (document.getElementById('tailscale-modal-overlay')) return;
+      const wrap = document.createElement('div');
+      wrap.innerHTML = `
+  <div id="tailscale-modal-overlay" class="health-modal-overlay" style="display: none;" onclick="if(event.target===this)closeTailscaleModal()">
+    <div class="health-modal-window" role="dialog" aria-modal="true" aria-label="Tailscale Mesh VPN Client" style="max-width: 680px; border-color: rgba(6, 182, 212, 0.4); box-shadow: 0 20px 45px rgba(0, 0, 0, 0.7), 0 0 30px rgba(6, 182, 212, 0.2);">
+      <div class="health-modal-header" style="border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 14px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.3rem;">⚡</span>
+          <div>
+            <h3 style="margin: 0; font-size: 1.05rem; color: #f8fafc; font-weight: 700;">Tailscale Mesh VPN Client</h3>
+            <span style="font-size: 0.75rem; color: #94a3b8;">Zero-Config WireGuard Mesh &bull; Direct Secure LAN Routing</span>
+          </div>
+        </div>
+        <button type="button" class="btn btn-secondary" onclick="closeTailscaleModal()" style="font-size: 0.85rem; padding: 4px 10px; cursor: pointer;">&times;</button>
+      </div>
+
+      <div class="health-modal-body" style="padding: 18px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; max-height: calc(85vh - 120px);">
+        <!-- Detected Client OS Banner -->
+        <div id="ts-detected-banner" style="background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.3); border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span class="pulse-dot" style="background: #06b6d4; box-shadow: 0 0 8px #06b6d4; width: 10px; height: 10px;"></span>
+            <div>
+              <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8;">Detected Platform</span>
+              <div id="ts-detected-os-label" style="font-size: 0.95rem; font-weight: 700; color: #22d3ee;">Auto-detecting...</div>
+            </div>
+          </div>
+          <a id="ts-primary-download-btn" href="https://tailscale.com/download" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="font-size: 0.82rem; padding: 7px 16px; background: linear-gradient(135deg, #06b6d4, #0284c7); border-color: #06b6d4; color: #fff !important; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+            <span>Download Tailscale</span> &darr;
+          </a>
+        </div>
+
+        <!-- Platform Switcher Tabs -->
+        <div>
+          <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 6px; font-weight: 600;">Choose Client Platform:</div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;" id="ts-platform-tabs">
+            <button type="button" class="tailscale-tab-btn" data-platform="windows" onclick="selectTailscaleTab('windows')">🪟 Windows</button>
+            <button type="button" class="tailscale-tab-btn" data-platform="macos" onclick="selectTailscaleTab('macos')">🍎 macOS</button>
+            <button type="button" class="tailscale-tab-btn" data-platform="ios" onclick="selectTailscaleTab('ios')">📱 iOS / iPadOS</button>
+            <button type="button" class="tailscale-tab-btn" data-platform="android" onclick="selectTailscaleTab('android')">🤖 Android</button>
+            <button type="button" class="tailscale-tab-btn" data-platform="linux" onclick="selectTailscaleTab('linux')">🐧 Linux</button>
+          </div>
+        </div>
+
+        <!-- Windows Panel -->
+        <div id="ts-panel-windows" class="tailscale-panel" style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+            <div style="font-weight: 700; color: #f8fafc; font-size: 0.9rem;">Windows 10 / 11 (x64 &amp; ARM64)</div>
+            <a href="https://pkgs.tailscale.com/stable/tailscale-setup-latest.exe" class="btn btn-primary" style="font-size: 0.78rem; padding: 6px 14px; background: linear-gradient(135deg, #06b6d4, #0284c7); border-color: #06b6d4; color: #fff !important; text-decoration: none;">Download .EXE (Direct)</a>
+          </div>
+          <p style="font-size: 0.8rem; color: #94a3b8; margin: 0 0 10px 0; line-height: 1.4;">Official MSI/EXE installer. Provides automatic system tray agent, DNS split tunnel, and unattended background connection.</p>
+          <div style="background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 6px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+            <code style="font-size: 0.78rem; color: #38bdf8;">winget install Tailscale.Tailscale</code>
+            <button type="button" class="btn btn-secondary" onclick="copySnippetText('winget install Tailscale.Tailscale', this)" style="font-size: 0.72rem; padding: 3px 8px; cursor: pointer;">Copy</button>
+          </div>
+        </div>
+
+        <!-- macOS Panel -->
+        <div id="ts-panel-macos" class="tailscale-panel" style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+            <div style="font-weight: 700; color: #f8fafc; font-size: 0.9rem;">macOS (Apple Silicon &amp; Intel)</div>
+            <div style="display: flex; gap: 6px;">
+              <a href="https://apps.apple.com/app/tailscale/id1475387142" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="font-size: 0.78rem; padding: 6px 12px; background: linear-gradient(135deg, #06b6d4, #0284c7); border-color: #06b6d4; color: #fff !important; text-decoration: none;">App Store</a>
+              <a href="https://pkgs.tailscale.com/stable/Tailscale-latest-macos.pkg" class="btn btn-secondary" style="font-size: 0.78rem; padding: 6px 12px; text-decoration: none;">Standalone .PKG</a>
+            </div>
+          </div>
+          <p style="font-size: 0.8rem; color: #94a3b8; margin: 0 0 10px 0; line-height: 1.4;">Universal binary for macOS 12 Monterey or newer. Integrated menu bar app with automatic WireGuard tunnels.</p>
+          <div style="background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 6px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+            <code style="font-size: 0.78rem; color: #38bdf8;">brew install --cask tailscale</code>
+            <button type="button" class="btn btn-secondary" onclick="copySnippetText('brew install --cask tailscale', this)" style="font-size: 0.72rem; padding: 3px 8px; cursor: pointer;">Copy</button>
+          </div>
+        </div>
+
+        <!-- iOS Panel -->
+        <div id="ts-panel-ios" class="tailscale-panel" style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+            <div style="font-weight: 700; color: #f8fafc; font-size: 0.9rem;">iOS &amp; iPadOS</div>
+            <a href="https://apps.apple.com/app/tailscale/id1470499037" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="font-size: 0.78rem; padding: 6px 14px; background: linear-gradient(135deg, #06b6d4, #0284c7); border-color: #06b6d4; color: #fff !important; text-decoration: none;">Open in App Store &rarr;</a>
+          </div>
+          <p style="font-size: 0.8rem; color: #94a3b8; margin: 0; line-height: 1.4;">Native iOS VPN extension with VPN-on-Demand, negligible battery draw, and direct encrypted connections to your home server.</p>
+        </div>
+
+        <!-- Android Panel -->
+        <div id="ts-panel-android" class="tailscale-panel" style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+            <div style="font-weight: 700; color: #f8fafc; font-size: 0.9rem;">Android &amp; Android TV / Fire OS</div>
+            <div style="display: flex; gap: 6px;">
+              <a href="https://play.google.com/store/apps/details?id=com.tailscale.ipn" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="font-size: 0.78rem; padding: 6px 12px; background: linear-gradient(135deg, #06b6d4, #0284c7); border-color: #06b6d4; color: #fff !important; text-decoration: none;">Google Play</a>
+              <a href="https://pkgs.tailscale.com/stable/tailscale-latest-arm64.apk" class="btn btn-secondary" style="font-size: 0.78rem; padding: 6px 12px; text-decoration: none;">Direct APK</a>
+            </div>
+          </div>
+          <p style="font-size: 0.8rem; color: #94a3b8; margin: 0; line-height: 1.4;">Compatible with phones, tablets, and TV boxes. Sideloadable direct APK or Google Play install.</p>
+        </div>
+
+        <!-- Linux Panel -->
+        <div id="ts-panel-linux" class="tailscale-panel" style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 14px;">
+          <div style="font-weight: 700; color: #f8fafc; font-size: 0.9rem; margin-bottom: 6px;">Linux (Ubuntu, Debian, Arch, Fedora, Raspberry Pi OS)</div>
+          <p style="font-size: 0.8rem; color: #94a3b8; margin: 0 0 10px 0; line-height: 1.4;">Run the official 1-line installation script to add the Tailscale repository and install daemon:</p>
+          <div style="background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 6px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px;">
+            <code style="font-size: 0.78rem; color: #38bdf8;">curl -fsSL https://tailscale.com/install.sh | sh</code>
+            <button type="button" class="btn btn-secondary" onclick="copySnippetText('curl -fsSL https://tailscale.com/install.sh | sh', this)" style="font-size: 0.72rem; padding: 3px 8px; cursor: pointer;">Copy</button>
+          </div>
+          <div style="background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 6px; padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+            <code style="font-size: 0.78rem; color: #34d399;">sudo tailscale up</code>
+            <button type="button" class="btn btn-secondary" onclick="copySnippetText('sudo tailscale up', this)" style="font-size: 0.72rem; padding: 3px 8px; cursor: pointer;">Copy</button>
+          </div>
+        </div>
+
+        <!-- Microsoft SSO Step-by-Step Instructions -->
+        <div style="background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 8px; padding: 14px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+            <svg width="18" height="18" viewBox="0 0 21 21"><path d="M0 0h9.9v9.9H0z" fill="#f25022"/><path d="M11.1 0H21v9.9h-9.9z" fill="#7fba00"/><path d="M0 11.1h9.9V21H0z" fill="#00a4ef"/><path d="M11.1 11.1H21V21h-9.9z" fill="#ffb900"/></svg>
+            <span style="font-weight: 700; color: #f8fafc; font-size: 0.88rem;">Microsoft SSO Authentication Instructions</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.8rem; color: #cbd5e1; line-height: 1.4;">
+            <div style="display: flex; gap: 8px; align-items: flex-start;">
+              <span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border-radius: 50%; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem; flex-shrink: 0;">1</span>
+              <span>Launch the Tailscale app on your device and click <strong>"Log in with Microsoft"</strong>.</span>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: flex-start;">
+              <span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border-radius: 50%; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem; flex-shrink: 0;">2</span>
+              <span>Enter your organization Microsoft account: <strong style="color: #38bdf8;">cory.townsend@digitalresolve.ca</strong></span>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: flex-start;">
+              <span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border-radius: 50%; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem; flex-shrink: 0;">3</span>
+              <span>Once approved, you are on the <strong>digitalresolve.ca tailnet</strong>. All services are instantly available without port numbers!</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Direct LAN Services Card -->
+        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; padding: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="color: #34d399; font-weight: 700; font-size: 0.88rem;">🔒 Direct Zero-Port LAN URLs (HTTPS)</span>
+            </div>
+            <span class="item-tag online" style="font-size: 0.68rem;">WireGuard Encrypted</span>
+          </div>
+          <p style="font-size: 0.78rem; color: #94a3b8; margin: 0 0 10px 0;">When connected to Tailscale, these HTTPS endpoints bypass Cloudflare proxies completely with direct gigabit throughput:</p>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+            <a href="https://stream-lan.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="item-tag" style="background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); text-decoration: none; padding: 4px 8px; font-size: 0.74rem;">stream-lan</a>
+            <a href="https://jellyfin-lan.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="item-tag" style="background: rgba(168, 85, 247, 0.12); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); text-decoration: none; padding: 4px 8px; font-size: 0.74rem;">jellyfin-lan</a>
+            <a href="https://files-lan.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="item-tag" style="background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); text-decoration: none; padding: 4px 8px; font-size: 0.74rem;">files-lan</a>
+            <a href="https://audio-lan.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="item-tag" style="background: rgba(251, 191, 36, 0.12); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); text-decoration: none; padding: 4px 8px; font-size: 0.74rem;">audio-lan</a>
+            <a href="https://torrents-lan.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="item-tag" style="background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); text-decoration: none; padding: 4px 8px; font-size: 0.74rem;">torrents-lan</a>
+            <a href="https://sonarr-lan.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="item-tag" style="background: rgba(56, 189, 248, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); text-decoration: none; padding: 4px 8px; font-size: 0.74rem;">sonarr-lan</a>
+            <a href="https://radarr-lan.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="item-tag" style="background: rgba(251, 146, 60, 0.12); color: #fb923c; border: 1px solid rgba(251, 146, 60, 0.3); text-decoration: none; padding: 4px 8px; font-size: 0.74rem;">radarr-lan</a>
+            <a href="https://prowlarr-lan.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="item-tag" style="background: rgba(248, 113, 113, 0.12); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.3); text-decoration: none; padding: 4px 8px; font-size: 0.74rem;">prowlarr-lan</a>
+            <a href="https://readarr-lan.digitalresolve.ca" target="_blank" rel="noopener noreferrer" class="item-tag" style="background: rgba(52, 211, 153, 0.12); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); text-decoration: none; padding: 4px 8px; font-size: 0.74rem;">readarr-lan</a>
+          </div>
+          <div style="margin-top: 10px; font-size: 0.74rem; color: #64748b; display: flex; gap: 12px; flex-wrap: wrap;">
+            <span>Subnet Route: <code style="color: #94a3b8;">192.168.2.0/24</code></span>
+            <span>NUC Tailscale IP: <code style="color: #94a3b8;">100.68.136.76</code></span>
+            <span>Exit Node: <strong style="color: #34d399;">Enabled</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <div style="border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <button type="button" class="btn btn-secondary" onclick="closeTailscaleModal()" style="font-size: 0.8rem; padding: 6px 14px;">Close</button>
+        <div style="display: flex; gap: 8px;">
+          <a href="https://login.tailscale.com/admin" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; text-decoration: none; color: #94a3b8 !important;">Tailscale Admin &rarr;</a>
+          <a href="http://100.68.136.76:5252" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; text-decoration: none; color: #22d3ee !important; border-color: rgba(6, 182, 212, 0.4);">NUC Web Client &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </div>`;
+      document.body.appendChild(wrap.firstElementChild);
+    }
+    window.ensureTailscaleModalDOM = ensureTailscaleModalDOM;
+
+    function openTailscaleModal() {
+      ensureTailscaleModalDOM();
+      const modal = document.getElementById('tailscale-modal-overlay');
+      if (modal) {
+        const os = detectClientOS();
+        const osLabels = {
+          windows: 'Windows 10 / 11',
+          macos: 'Apple macOS',
+          ios: 'iOS / iPadOS',
+          android: 'Android',
+          linux: 'Linux'
+        };
+        const osDownloads = {
+          windows: 'https://pkgs.tailscale.com/stable/tailscale-setup-latest.exe',
+          macos: 'https://apps.apple.com/app/tailscale/id1475387142',
+          ios: 'https://apps.apple.com/app/tailscale/id1470499037',
+          android: 'https://play.google.com/store/apps/details?id=com.tailscale.ipn',
+          linux: 'https://tailscale.com/download/linux'
+        };
+        const labelEl = document.getElementById('ts-detected-os-label');
+        if (labelEl) labelEl.textContent = (osLabels[os] || 'Your Device') + ' (Detected)';
+        const btnEl = document.getElementById('ts-primary-download-btn');
+        if (btnEl) {
+          btnEl.href = osDownloads[os] || 'https://tailscale.com/download';
+          btnEl.innerHTML = `<span>Download for ${osLabels[os] || 'Device'}</span> &darr;`;
+        }
+        selectTailscaleTab(os);
+        modal.style.display = 'flex';
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+    window.openTailscaleModal = openTailscaleModal;
+
+    function closeTailscaleModal() {
+      const modal = document.getElementById('tailscale-modal-overlay');
+      if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    }
+    window.closeTailscaleModal = closeTailscaleModal;
+
+    // ========================================================
     // Smart Feeder Telemetry, Dynamic Hopper & Optical Watchdog
     // ========================================================
     function updateFeederUI(state) {
@@ -5884,6 +6162,7 @@
         closeMagnetModal();
         closeAdGuardConfigModal();
         closeCloudflareStatsModal();
+        if (typeof closeTailscaleModal === 'function') closeTailscaleModal();
         document.body.style.overflow = '';
         document.documentElement.style.overflow = '';
       }
