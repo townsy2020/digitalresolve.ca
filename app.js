@@ -5050,6 +5050,12 @@
         return url;
       }
 
+      // Mobile browsers default to secure HTTPS WAN domain to prevent ERR_TOO_MANY_RETRIES unless forced to LAN
+      const isMobile = (typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+      if (isMobile && routeSetting !== 'lan') {
+        return url;
+      }
+
       const hostname = (typeof window !== 'undefined' && window.location && window.location.hostname) ? window.location.hostname.toLowerCase() : '';
       const isFileProtocol = (typeof window !== 'undefined' && window.location && window.location.protocol === 'file:');
       const isDirectHost = isFileProtocol || (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === 'nuc' || /^192\.168\./.test(hostname));
