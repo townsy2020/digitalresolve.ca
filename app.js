@@ -5066,7 +5066,7 @@
       } catch (e) {}
 
       // Keep secure HTTPS domains (stream.digitalresolve.ca) on public web & mobile to prevent ERR_TOO_MANY_RETRIES
-      const shouldUseLan = (routeSetting === 'lan') || (routeSetting === 'auto' && (isDirectHost || isHomeNet));
+      const shouldUseLan = (routeSetting === 'lan') || (routeSetting === 'tailscale') || (routeSetting === 'auto' && (isDirectHost || isHomeNet));
       if (!shouldUseLan) {
         return url;
       }
@@ -5126,7 +5126,10 @@
       const mode = getMediaRouteMode();
       let label = '⚡ Route: Auto (LAN Priority)';
       let title = 'Routes directly to NUC on local network to bypass Cloudflare';
-      if (mode === 'lan') {
+      if (mode === 'tailscale') {
+        label = '⚡ Route: Tailscale Mesh (100.68.136.76)';
+        title = 'Routes over encrypted WireGuard mesh directly to NUC 100.68.136.76';
+      } else if (mode === 'lan') {
         label = '● Route: Direct LAN (192.168.2.35)';
         title = 'Forced Direct Gigabit LAN routing (bypasses Cloudflare Tunnels)';
       } else if (mode === 'wan') {
@@ -5141,12 +5144,13 @@
     function cycleMediaRouteMode() {
       const current = getMediaRouteMode();
       let next = 'auto';
-      if (current === 'auto') next = 'lan';
+      if (current === 'auto') next = 'tailscale';
+      else if (current === 'tailscale') next = 'lan';
       else if (current === 'lan') next = 'wan';
       else next = 'auto';
       localStorage.setItem('dr_media_route', next);
       updateMediaRoutePillUI();
-      const desc = next === 'lan' ? 'Direct LAN (192.168.2.35)' : (next === 'wan' ? 'Cloudflare Tunnel (WAN)' : 'Auto (LAN Priority)');
+      const desc = next === 'tailscale' ? 'Tailscale Mesh (100.68.136.76)' : (next === 'lan' ? 'Direct LAN (192.168.2.35)' : (next === 'wan' ? 'Cloudflare Tunnel (WAN)' : 'Auto (LAN Priority)'));
       if (typeof showToast === 'function') {
         showToast('info', 'Media Routing Updated', `Route mode set to ${desc}`);
       }
@@ -5851,7 +5855,7 @@
           </div>
           <div style="margin-top: 10px; font-size: 0.74rem; color: #64748b; display: flex; gap: 12px; flex-wrap: wrap;">
             <span>Subnet Route: <code style="color: #94a3b8;">192.168.2.0/24</code></span>
-            <span>NUC Tailscale IP: <code style="color: #94a3b8;">100.68.136.76</code></span>
+            <span>NUC Tailscale IP: <code style="color: #22d3ee; font-weight: 700;">100.68.136.76</code> <button type="button" class="btn btn-secondary" onclick="copySnippetText('100.68.136.76', this)" style="font-size: 0.68rem; padding: 2px 7px; margin-left: 4px; cursor: pointer;">Copy</button></span>
             <span>Exit Node: <strong style="color: #34d399;">Enabled</strong></span>
           </div>
         </div>
