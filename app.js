@@ -5157,6 +5157,10 @@
     try { updateMediaRoutePillUI(); } catch(e) {}
 
     function launchProtectedService(url, serviceName = 'Protected Homelab Service') {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal(serviceName, () => launchProtectedService(url, serviceName));
+        return;
+      }
       const finalUrl = resolveMediaUrl(url);
       const isMobile = (typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
       if (isMobile) {
