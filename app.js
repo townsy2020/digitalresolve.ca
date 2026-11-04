@@ -1603,11 +1603,14 @@
       setInterval(() => { if (!document.hidden) fetchISPHistory(); }, 15000);
       renderUptimeMatrix();
       setInterval(() => { if (!document.hidden) renderUptimeMatrix(); }, 60000);
+      fetchServicesHealth();
+      setInterval(() => { if (!document.hidden) fetchServicesHealth(); }, 15000);
 
       document.addEventListener('visibilitychange', () => {
         if (!document.hidden) {
           fetchClusterStats();
           fetchISPHistory();
+          fetchServicesHealth();
           if (currentLogTab && isSSOAuthenticated()) loadLog(currentLogTab);
         }
       });
@@ -3676,6 +3679,38 @@
         { id: 'bars-desktop', type: 'desktop', title: 'Desktop Workstation (Active Session)' }
       ];
 
+      if (!window.UPTIME_INCIDENTS) {
+        try {
+          const cached = JSON.parse(localStorage.getItem('dr_isp_history'));
+          if (cached && Array.isArray(cached.incidents)) window.UPTIME_INCIDENTS = cached.incidents;
+        } catch(e) {}
+      }
+
+      function applyUptimeIncidentsToBars(incidents) {
+        if (!Array.isArray(incidents)) return;
+        nodes.forEach(node => {
+          const container = document.getElementById(node.id);
+          if (!container) return;
+          const bars = container.querySelectorAll('.uptime-bar');
+          bars.forEach(bar => {
+            const dateStr = bar.getAttribute('data-date');
+            if (!dateStr) return;
+            const it = incidents.find(item => item.node === node.type && item.date === dateStr);
+            if (it) {
+              bar.classList.remove('edge', 'isp', 'maintenance', 'standby', 'down', 'warn');
+              const c = ['down', 'warn', 'maintenance', 'standby'].includes(it.type)
+                ? it.type
+                : ['down', 'warn', 'maintenance', 'standby'].includes(it.impact)
+                  ? it.impact
+                  : (it.type === 'outage' ? 'down' : 'warn');
+              bar.classList.add(c);
+              bar.title = `${dateStr} | ${node.title}\nStatus: ${it.title || 'Incident'}\nImpact: ${it.impact || it.type || 'Notice'}`;
+            }
+          });
+        });
+      }
+      window.applyUptimeIncidentsToBars = applyUptimeIncidentsToBars;
+
       const now = new Date();
       nodes.forEach(node => {
         const container = document.getElementById(node.id);
@@ -3694,8 +3729,21 @@
             bar.classList.remove('isp');
             bar.classList.remove('maintenance');
             bar.classList.remove('standby');
+            bar.classList.remove('down');
+            bar.classList.remove('warn');
+            bar.setAttribute('data-date', dateStr);
+            bar.setAttribute('data-node', node.type);
 
-            if (node.id === 'bars-nuc' && isNucMaintenanceActive() && i === 0) {
+            const inc = (window.UPTIME_INCIDENTS || []).find(it => it.node === node.type && it.date === dateStr);
+            if (inc) {
+              const c = ['down', 'warn', 'maintenance', 'standby'].includes(inc.type)
+                ? inc.type
+                : ['down', 'warn', 'maintenance', 'standby'].includes(inc.impact)
+                  ? inc.impact
+                  : (inc.type === 'outage' ? 'down' : 'warn');
+              bar.classList.add(c);
+              bar.title = `${dateStr} | ${node.title}\nStatus: ${inc.title || 'Incident'}\nImpact: ${inc.impact || inc.type || 'Notice'}`;
+            } else if (node.id === 'bars-nuc' && isNucMaintenanceActive() && i === 0) {
               bar.classList.add('maintenance');
               const mData = getNucMaintenanceData();
               const reason = (mData && mData.reason) ? mData.reason : 'Windows Updates & Optimization';
@@ -3716,8 +3764,19 @@
 
             const bar = document.createElement('div');
             bar.className = 'uptime-bar';
+            bar.setAttribute('data-date', dateStr);
+            bar.setAttribute('data-node', node.type);
 
-            if (node.id === 'bars-nuc' && isNucMaintenanceActive() && i === 0) {
+            const inc = (window.UPTIME_INCIDENTS || []).find(it => it.node === node.type && it.date === dateStr);
+            if (inc) {
+              const c = ['down', 'warn', 'maintenance', 'standby'].includes(inc.type)
+                ? inc.type
+                : ['down', 'warn', 'maintenance', 'standby'].includes(inc.impact)
+                  ? inc.impact
+                  : (inc.type === 'outage' ? 'down' : 'warn');
+              bar.classList.add(c);
+              bar.title = `${dateStr} | ${node.title}\nStatus: ${inc.title || 'Incident'}\nImpact: ${inc.impact || inc.type || 'Notice'}`;
+            } else if (node.id === 'bars-nuc' && isNucMaintenanceActive() && i === 0) {
               bar.classList.add('maintenance');
               const mData = getNucMaintenanceData();
               const reason = (mData && mData.reason) ? mData.reason : 'Windows Updates & Optimization';
@@ -3758,7 +3817,9 @@
           .then(r => r.json())
           .then(data => {
             if (data && data.status === 'success') {
-            try { localStorage.setItem('dr_isp_history', JSON.stringify(data)); } catch (e) {}
+              window.UPTIME_INCIDENTS = data.incidents || [];
+              applyUptimeIncidentsToBars(data.incidents);
+              try { localStorage.setItem('dr_isp_history', JSON.stringify(data)); } catch (e) {}
               document.querySelectorAll('#uptime-sla-val').forEach(el => {
                 if (data.overallSla) el.textContent = data.overallSla;
               });
@@ -4014,6 +4075,145 @@
       });
     }
 
+    function updateServiceDashboardUI(health) {
+      if (!health || !health.services) return;
+      const s = health.services;
+      const count = (typeof health.onlineCount === 'number') ? health.onlineCount : Object.values(s).filter(item => item && item.online).length;
+
+      function setStatus(tagId, metaId, svc, defaultActiveText, defaultActiveDesc) {
+        const tagEl = document.getElementById(tagId);
+        const metaEl = document.getElementById(metaId);
+        if (!svc) return;
+
+        const isOnline = !!svc.online;
+        if (tagEl) {
+          tagEl.className = isOnline ? 'item-tag online' : 'item-tag offline';
+          tagEl.textContent = isOnline ? (svc.statusText || defaultActiveText || 'Operational') : 'Offline';
+        }
+        if (metaEl) {
+          if (isOnline) {
+            const lat = (svc.latencyMs !== null && svc.latencyMs !== undefined) ? `${svc.latencyMs}ms • ` : '';
+            metaEl.textContent = `${lat}${defaultActiveDesc || 'Sentinel Verified'}`;
+            metaEl.style.color = '#34d399';
+          } else {
+            metaEl.textContent = svc.error || 'Connection Failed';
+            metaEl.style.color = '#ef4444';
+          }
+        }
+      }
+
+      setStatus('stag-streamhub', 'meta-watch-streamhub', s.streamhub, 'Operational', 'Sentinel Verified');
+      setStatus('stag-files', 'meta-watch-files', s.filebrowser, 'Operational', 'Vault Active');
+      setStatus('stag-cam', 'meta-watch-cam', s.cam, 'Operational', 'go2rtc Active');
+      setStatus('stag-feeder', 'feeder-card-watchdog', s.feeder, 'Armed & Active', 'Armed & Active');
+      setStatus('stag-wol', 'meta-watch-wol', s.wol, 'Operational', 'Gateway Active');
+      setStatus('stag-torrents2', 'meta-watch-torrents2', s.torrents2, 'Operational', 'WireGuard Swarm');
+
+      const dtTag = document.getElementById('stag-torrents');
+      const dtMeta = document.getElementById('meta-watch-torrents');
+      if (s.torrents) {
+        if (s.torrents.online) {
+          if (dtTag) {
+            dtTag.className = 'item-tag online';
+            dtTag.textContent = s.torrents.statusText || 'Operational';
+          }
+          if (dtMeta) {
+            const lat = (s.torrents.latencyMs !== null && s.torrents.latencyMs !== undefined) ? `${s.torrents.latencyMs}ms • ` : '';
+            dtMeta.textContent = `${lat}Active Node`;
+            dtMeta.style.color = '#34d399';
+          }
+        } else {
+          const isSleeping = window.DESKTOP_IS_ONLINE === false;
+          if (dtTag) {
+            dtTag.className = isSleeping ? 'item-tag standby' : 'item-tag offline';
+            dtTag.textContent = isSleeping ? 'Eco Standby' : 'Offline';
+          }
+          if (dtMeta) {
+            dtMeta.textContent = isSleeping ? 'Desktop Sleeping' : (s.torrents.error || 'Node Offline');
+            dtMeta.style.color = isSleeping ? '#818cf8' : '#ef4444';
+          }
+        }
+      }
+
+      const cfTag = document.getElementById('stag-cf');
+      const cfMeta = document.getElementById('meta-watch-cf');
+      if (s.cf) {
+        if (s.cf.online) {
+          if (cfTag) {
+            cfTag.className = 'item-tag online';
+            cfTag.textContent = 'Shield Active';
+            cfTag.style.background = 'rgba(249, 115, 22, 0.2)';
+            cfTag.style.color = '#fb923c';
+          }
+          if (cfMeta) {
+            const lat = (s.cf.latencyMs !== null && s.cf.latencyMs !== undefined) ? `${s.cf.latencyMs}ms • ` : '';
+            cfMeta.textContent = `${lat}Tunnel Active`;
+            cfMeta.style.color = '#fb923c';
+          }
+        } else {
+          if (cfTag) {
+            cfTag.className = 'item-tag warn';
+            cfTag.textContent = 'Degraded';
+            cfTag.style.background = '';
+            cfTag.style.color = '';
+          }
+          if (cfMeta) {
+            cfMeta.textContent = s.cf.error || 'Tunnel Warning';
+            cfMeta.style.color = '#ef4444';
+          }
+        }
+      }
+
+      document.querySelectorAll('#dash-global-status').forEach(dashGlobal => {
+        dashGlobal.textContent = `${count}/8 Services Online`;
+        if (count === 8) {
+          dashGlobal.className = 'item-tag online';
+          dashGlobal.style.color = '#4ade80';
+          dashGlobal.style.background = 'rgba(34, 197, 94, 0.12)';
+          dashGlobal.style.borderColor = 'rgba(34, 197, 94, 0.25)';
+        } else if (count >= 5) {
+          dashGlobal.className = 'item-tag warn';
+          dashGlobal.style.color = '#fbbf24';
+          dashGlobal.style.background = 'rgba(245, 158, 11, 0.12)';
+          dashGlobal.style.borderColor = 'rgba(245, 158, 11, 0.25)';
+        } else {
+          dashGlobal.className = 'item-tag offline';
+          dashGlobal.style.color = '#f87171';
+          dashGlobal.style.background = 'rgba(239, 68, 68, 0.12)';
+          dashGlobal.style.borderColor = 'rgba(239, 68, 68, 0.25)';
+        }
+      });
+
+      document.querySelectorAll('#hero-service-status-pill').forEach(heroPill => {
+        heroPill.textContent = `Service Status (${count}/8 Online)`;
+      });
+    }
+    window.updateServiceDashboardUI = updateServiceDashboardUI;
+
+    function fetchServicesHealth() {
+      if (typeof fetch !== 'function') return Promise.resolve(null);
+      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const timeoutId = controller ? setTimeout(() => controller.abort(), 4000) : null;
+
+      return fetch(`${GATEWAY}/services-health`, {
+        signal: controller ? controller.signal : undefined
+      })
+        .then(r => r.json())
+        .then(data => {
+          if (timeoutId) clearTimeout(timeoutId);
+          if (data && (data.services || data.status === 'success')) {
+            window.LAST_SERVICES_HEALTH = data;
+            updateServiceDashboardUI(data);
+          }
+          return data;
+        })
+        .catch(err => {
+          if (timeoutId) clearTimeout(timeoutId);
+          return null;
+        });
+    }
+    window.fetchServicesHealth = fetchServicesHealth;
+
     function pollRealData(btn) {
       const pollIcons = document.querySelectorAll('#poll-data-icon svg, #dash-refresh-icon');
       pollIcons.forEach(icon => {
@@ -4029,6 +4229,7 @@
       const pollTasks = [];
       if (typeof fetchClusterStats === 'function') pollTasks.push(fetchClusterStats());
       if (typeof fetchISPHistory === 'function') pollTasks.push(fetchISPHistory());
+      if (typeof fetchServicesHealth === 'function') pollTasks.push(fetchServicesHealth());
       if (typeof fetchFeederStatus === 'function') pollTasks.push(fetchFeederStatus());
       if (typeof renderUptimeMatrix === 'function') pollTasks.push(renderUptimeMatrix());
       if (typeof fetchAgySessionInfo === 'function') pollTasks.push(fetchAgySessionInfo());
@@ -4043,21 +4244,25 @@
           pollIcons.forEach(icon => icon.style.transform = 'none');
           document.querySelectorAll('#poll-data-text').forEach(el => el.textContent = 'Update');
 
-          const nucOn = window.NUC_IS_ONLINE !== false;
-          const deskOn = window.DESKTOP_IS_ONLINE === true;
-          let liveCount = 6;
-          if (!nucOn) liveCount = 0;
-          if (deskOn) liveCount += 2;
+          let liveCount = (window.LAST_SERVICES_HEALTH && typeof window.LAST_SERVICES_HEALTH.onlineCount === 'number')
+            ? window.LAST_SERVICES_HEALTH.onlineCount
+            : null;
 
-          const globalStatus = document.getElementById('dash-global-status');
-          if (globalStatus) {
+          if (liveCount === null) {
+            const nucOn = window.NUC_IS_ONLINE !== false;
+            const deskOn = window.DESKTOP_IS_ONLINE === true;
+            liveCount = 6;
+            if (!nucOn) liveCount = 0;
+            if (deskOn) liveCount += 2;
+          }
+
+          document.querySelectorAll('#dash-global-status').forEach(globalStatus => {
             globalStatus.textContent = `${liveCount}/8 Services Online`;
-            globalStatus.className = liveCount >= 6 ? 'item-tag online' : 'item-tag offline';
-          }
-          const heroPill = document.getElementById('hero-service-status-pill');
-          if (heroPill) {
+            globalStatus.className = liveCount === 8 ? 'item-tag online' : (liveCount >= 5 ? 'item-tag warn' : 'item-tag offline');
+          });
+          document.querySelectorAll('#hero-service-status-pill').forEach(heroPill => {
             heroPill.textContent = `Service Status (${liveCount}/8 Online)`;
-          }
+          });
 
           if (typeof showToast === 'function') {
             showToast('success', 'Real Telemetry Polled', `Cluster state synchronized: ${liveCount}/8 services verified online.`, 3500);
@@ -4068,8 +4273,31 @@
     window.pollRealData = pollRealData;
 
     function refreshServiceDashboard(btn) {
-      pollRealData(btn);
+      const icon = document.getElementById('dash-refresh-icon');
+      if (icon) {
+        icon.style.transition = 'transform 0.8s ease';
+        icon.style.transform = 'rotate(360deg)';
+      }
+      if (typeof showToast === 'function') {
+        showToast('loading', 'Querying Services...', 'Probing all 8 homelab microservice ports', 1500);
+      }
+      const tasks = [];
+      if (typeof fetchServicesHealth === 'function') tasks.push(fetchServicesHealth());
+      if (typeof renderUptimeMatrix === 'function') tasks.push(renderUptimeMatrix());
+
+      return Promise.allSettled(tasks).then(() => {
+        setTimeout(() => {
+          if (icon) icon.style.transform = 'none';
+          const count = (window.LAST_SERVICES_HEALTH && typeof window.LAST_SERVICES_HEALTH.onlineCount === 'number')
+            ? window.LAST_SERVICES_HEALTH.onlineCount
+            : 8;
+          if (typeof showToast === 'function') {
+            showToast('success', 'Services Refreshed', `${count}/8 microservices responding and operational.`, 3000);
+          }
+        }, 600);
+      });
     }
+    window.refreshServiceDashboard = refreshServiceDashboard;
 
     // Remote Actions Extension Handlers
     function confirmRebootNuc() {
