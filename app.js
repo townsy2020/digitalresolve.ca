@@ -480,6 +480,13 @@
       } catch (e) {
         console.warn('Hydration cache error:', e);
       }
+      try {
+        const rawClust = localStorage.getItem('dr_cluster_stats');
+        const cData = rawClust ? JSON.parse(rawClust) : null;
+        if (cData && cData.climate && typeof updateClimateUI === 'function' && !window._hasLiveClimate) {
+          updateClimateUI(cData.climate);
+        }
+      } catch (e) {}
     }
     window.hydrateTelemetryFromCache = hydrateTelemetryFromCache;
 
@@ -849,11 +856,11 @@
       }
       const ambTemp = document.getElementById('iot-ambient-temp');
       if (ambTemp) {
-        if (!window._hasLiveClimate) ambTemp.innerHTML = `26.7&deg;C <span style="font-size: 0.9rem; color: #94a3b8;">/ 25% RH (80.1&deg;F)</span>`;
+        if (!window._hasLiveClimate) ambTemp.innerHTML = `23.3&deg;C <span style="font-size: 0.9rem; color: #94a3b8;">/ 43% RH (73.9&deg;F)</span>`;
       }
       const roomThermo = document.getElementById('iot-room-thermostat');
       if (roomThermo) {
-        if (!window._hasLiveClimate) roomThermo.innerHTML = '80.1&deg;F (26.7&deg;C)';
+        if (!window._hasLiveClimate) roomThermo.innerHTML = '73.9&deg;F (23.3&deg;C)';
       }
       const storageThroughput = document.getElementById('schematic-storage-throughput');
       if (storageThroughput) {
@@ -1464,6 +1471,7 @@
       if (typeof fetchISPHistory === 'function') fetchISPHistory();
       if (typeof fetchFeederStatus === 'function') fetchFeederStatus();
       if (typeof fetchClusterStats === 'function') fetchClusterStats();
+      if (typeof fetchClimateData === 'function') fetchClimateData();
 
       // Ensure all modal overlays are strictly hidden on load
       ['magnet-modal-overlay', 'agy-console-modal-overlay', 'changelog-modal-overlay', 'health-modal-overlay', 'chaos-modal-overlay', 'disaster-modal-overlay', 'speedtest-sso-modal-overlay', 'cloudflare-stats-modal-overlay', 'adguard-modal-overlay', 'tailscale-modal-overlay'].forEach(id => {
@@ -1593,6 +1601,7 @@
       // Start live stats & terminal stream with Page Visibility throttling
       fetchClusterStats();
       setInterval(() => { if (!document.hidden) fetchClusterStats(); }, 4000);
+      setInterval(() => { if (!document.hidden && typeof fetchClimateData === 'function') fetchClimateData(); }, 10000);
       updateSSOGateUI(); try { updateMaintenanceVisualStates(); } catch(e) {}
       try { updateCodebaseMetrics(); } catch(e) {}
       try { updateMediaRoutePillUI(); } catch(e) {}
@@ -1609,6 +1618,7 @@
       document.addEventListener('visibilitychange', () => {
         if (!document.hidden) {
           fetchClusterStats();
+          if (typeof fetchClimateData === 'function') fetchClimateData();
           fetchISPHistory();
           fetchServicesHealth();
           if (currentLogTab && isSSOAuthenticated()) loadLog(currentLogTab);
@@ -2812,6 +2822,19 @@
     }
     window.updateClimateUI = updateClimateUI;
 
+    function fetchClimateData() {
+      return fetch(`${GATEWAY}/climate`, { cache: 'no-store' })
+        .then(r => r.ok ? r.json() : null)
+        .then(d => {
+          if (d && d.climate && typeof updateClimateUI === 'function') {
+            updateClimateUI(d.climate);
+          }
+          return d;
+        })
+        .catch(() => null);
+    }
+    window.fetchClimateData = fetchClimateData;
+
     function fetchClusterStats() {
       const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
       const timeoutId = controller ? setTimeout(() => controller.abort(), 6000) : null;
@@ -2828,6 +2851,7 @@
         })
         .catch(() => {
           if (timeoutId) clearTimeout(timeoutId);
+          if (typeof fetchClimateData === 'function') fetchClimateData();
           // Failover Method 1: Alternate endpoint or direct LAN
           const isHttps = typeof window !== 'undefined' && window.location && window.location.protocol === 'https:';
           const altStatsUrl = isHttps ? `${GATEWAY}/status?target=all` : `http://192.168.2.35:8082/stats`;
