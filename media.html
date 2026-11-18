@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -77,7 +77,7 @@
               <span>NUC 24/7 Services Suite</span>
               <span class="item-tag online">Active</span>
             </a>
-            <a href="javascript:void(0)" onclick="launchProtectedService('https://stream.digitalresolve.ca', 'Watch Library &amp; StreamHub (stream.digitalresolve.ca)')" class="btn-action-item" title="Open Watch Library (stream.digitalresolve.ca)">
+            <a href="https://stream.digitalresolve.ca" data-route-base="https://stream.digitalresolve.ca" target="_blank" rel="noopener noreferrer" onclick="if(typeof resolveMediaUrl==='function')this.href=resolveMediaUrl('https://stream.digitalresolve.ca');" class="btn-action-item" title="Open Watch Library (stream.digitalresolve.ca)">
               <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
               <span>Watch Library (Stream 4K/HD)</span>
               <span class="item-tag online">Live</span>
@@ -348,9 +348,9 @@
           <button type="button" id="btn-route-mode" onclick="cycleMediaRouteMode()" class="pill-btn pill-route" style="cursor: pointer;" title="Routes directly to NUC on local network to bypass Cloudflare">
             <span id="route-mode-text">⚡ Route: Auto (LAN Priority)</span>
           </button>
-          <button type="button" onclick="launchProtectedService('https://stream.digitalresolve.ca', 'Watch Library (HD / 4K)')" class="pill-btn pill-stream" style="cursor: pointer;">
+          <a href="https://stream.digitalresolve.ca" data-route-base="https://stream.digitalresolve.ca" target="_blank" rel="noopener noreferrer" onclick="if(typeof resolveMediaUrl==='function')this.href=resolveMediaUrl('https://stream.digitalresolve.ca');" class="pill-btn pill-stream" style="cursor: pointer; text-decoration: none;" title="Open Watch Library (HD / 4K)">
             <span>[PLAY]</span> Open Watch Library (HD / 4K)
-          </button>
+          </a>
           <button type="button" onclick="launchProtectedService('https://jellyfin.digitalresolve.ca', 'Jellyfin Media Server')" class="pill-btn pill-jellyfin" style="cursor: pointer;" title="Open Jellyfin 4K/HD Streaming Server">
             <span>[JELLY]</span> Jellyfin Media Server
           </button>
@@ -1453,6 +1453,6 @@
       </div>
     </div>
   </div>
-  <script src="app.js?v=2.8.46"></script>
+  <script src="app.js?v=2.8.47"></script>
 </body>
 </html>

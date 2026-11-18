@@ -5302,32 +5302,9 @@
         return url;
       }
 
-      // Mobile browsers default to secure HTTPS WAN domain to prevent ERR_TOO_MANY_RETRIES unless forced to LAN
-      const isMobile = (typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
-      if (isMobile && routeSetting !== 'lan') {
-        return url;
-      }
-
       const hostname = (typeof window !== 'undefined' && window.location && window.location.hostname) ? window.location.hostname.toLowerCase() : '';
       const isFileProtocol = (typeof window !== 'undefined' && window.location && window.location.protocol === 'file:');
       const isDirectHost = isFileProtocol || (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === 'nuc' || /^192\.168\./.test(hostname));
-
-      let isHomeNet = (typeof window !== 'undefined' && (window.dr_is_home_network === true || window.isHomeNetwork === true)) || localStorage.getItem('dr_is_home_network') === 'true';
-
-      try {
-        const raw = localStorage.getItem('dr_telemetry_cache');
-        if (raw) {
-          const cache = JSON.parse(raw);
-          if (cache && cache.isHomeNetwork) isHomeNet = true;
-          if (cache && cache.nuc && cache.nuc.latencyMs !== null && cache.nuc.latencyMs < 35) isHomeNet = true;
-        }
-      } catch (e) {}
-
-      // Keep secure HTTPS domains (stream.digitalresolve.ca) on public web & mobile to prevent ERR_TOO_MANY_RETRIES
-      const shouldUseLan = (routeSetting === 'lan') || (routeSetting === 'tailscale') || (routeSetting === 'auto' && (isDirectHost || isHomeNet));
-      if (!shouldUseLan) {
-        return url;
-      }
 
       const isNucLocal = (hostname === 'nuc') || ((hostname === 'localhost' || hostname === '127.0.0.1') && (window.location.port === '8088' || window.location.port === '3333' || window.location.port === '8085' || window.location.port === '8990' || window.location.port === '7878' || window.location.port === '9696' || window.location.port === '8787' || window.location.port === '8081' || localStorage.getItem('dr_is_nuc') === 'true'));
       const nucHost = isNucLocal ? 'localhost' : '192.168.2.35';
@@ -5335,35 +5312,91 @@
       const isDeskLocal = (hostname === 'desktop' || hostname === 'cory-desktop') || ((hostname === 'localhost' || hostname === '127.0.0.1') && !isNucLocal) || (isFileProtocol && localStorage.getItem('dr_is_nuc') !== 'true') || localStorage.getItem('dr_is_desktop') === 'true' || window.location.port === '8080';
       const deskHost = isDeskLocal ? 'localhost' : '192.168.2.62';
 
+      if (routeSetting === 'tailscale') {
+        if (/^(?:https?:)?(?:\/\/)?(?:www\.)?stream\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
+          return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?stream\.digitalresolve\.ca(?::\d+)?/i, 'http://100.68.136.76:8088');
+        }
+        if (/^(?:https?:)?(?:\/\/)?(?:www\.)?jellyfin\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
+          return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?jellyfin\.digitalresolve\.ca(?::\d+)?/i, 'http://100.68.136.76:8096');
+        }
+        if (/^(?:https?:)?(?:\/\/)?(?:www\.)?audiobooks\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
+          return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?audiobooks\.digitalresolve\.ca(?::\d+)?/i, 'http://100.68.136.76:13378');
+        }
+        if (/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?\/files(?=[\/?#]|$)/i.test(url)) {
+          return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?\/files/i, 'http://100.68.136.76:8085');
+        }
+        if (/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
+          return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?/i, 'http://100.68.136.76:8085');
+        }
+        if (/^(?:https?:)?(?:\/\/)?(?:www\.)?sonarr\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
+          return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?sonarr\.digitalresolve\.ca(?::\d+)?/i, 'http://100.68.136.76:8989');
+        }
+        if (/^(?:https?:)?(?:\/\/)?(?:www\.)?radarr\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
+          return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?radarr\.digitalresolve\.ca(?::\d+)?/i, 'http://100.68.136.76:7878');
+        }
+        if (/^(?:https?:)?(?:\/\/)?(?:www\.)?prowlarr\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
+          return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?prowlarr\.digitalresolve\.ca(?::\d+)?/i, 'http://100.68.136.76:9696');
+        }
+        if (/^(?:https?:)?(?:\/\/)?(?:www\.)?readarr\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
+          return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?readarr\.digitalresolve\.ca(?::\d+)?/i, 'http://100.68.136.76:8787');
+        }
+        if (/^(?:https?:)?(?:\/\/)?(?:www\.)?torrents2\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
+          return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?torrents2\.digitalresolve\.ca(?::\d+)?/i, 'http://100.68.136.76:8081');
+        }
+        if (/^(?:https?:)?(?:\/\/)?(?:www\.)?torrents\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
+          return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?torrents\.digitalresolve\.ca(?::\d+)?/i, `http://${deskHost}:8080`);
+        }
+        return url;
+      }
+
+      let isHomeNet = (typeof window !== 'undefined' && (window.dr_is_home_network === true || window.isHomeNetwork === true));
+      const homeNetKnownFalse = (typeof window !== 'undefined' && window.dr_is_home_network === false);
+      if (!isHomeNet && !homeNetKnownFalse) {
+        if (localStorage.getItem('dr_is_home_network') === 'true') isHomeNet = true;
+        try {
+          const raw = localStorage.getItem('dr_telemetry_cache');
+          if (raw) {
+            const cache = JSON.parse(raw);
+            if (cache && cache.isHomeNetwork) isHomeNet = true;
+            if (cache && cache.nuc && cache.nuc.latencyMs !== null && cache.nuc.latencyMs < 35) isHomeNet = true;
+          }
+        } catch (e) {}
+      }
+
+      const shouldUseLan = (routeSetting === 'lan') || (routeSetting === 'auto' && (isDirectHost || isHomeNet));
+      if (!shouldUseLan) {
+        return url;
+      }
+
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?stream\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-        return 'https://stream-lan.digitalresolve.ca';
+        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?stream\.digitalresolve\.ca(?::\d+)?/i, 'https://stream-lan.digitalresolve.ca');
       }
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?jellyfin\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-        return 'https://jellyfin-lan.digitalresolve.ca';
+        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?jellyfin\.digitalresolve\.ca(?::\d+)?/i, 'https://jellyfin-lan.digitalresolve.ca');
       }
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?audiobooks\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-        return 'https://audio-lan.digitalresolve.ca';
+        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?audiobooks\.digitalresolve\.ca(?::\d+)?/i, 'https://audio-lan.digitalresolve.ca');
       }
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?\/files(?=[\/?#]|$)/i.test(url)) {
-        return 'https://files-lan.digitalresolve.ca';
+        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?\/files/i, 'https://files-lan.digitalresolve.ca');
       }
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-        return 'https://files-lan.digitalresolve.ca';
+        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?/i, 'https://files-lan.digitalresolve.ca');
       }
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?sonarr\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-        return 'https://sonarr-lan.digitalresolve.ca';
+        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?sonarr\.digitalresolve\.ca(?::\d+)?/i, 'https://sonarr-lan.digitalresolve.ca');
       }
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?radarr\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-        return 'https://radarr-lan.digitalresolve.ca';
+        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?radarr\.digitalresolve\.ca(?::\d+)?/i, 'https://radarr-lan.digitalresolve.ca');
       }
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?prowlarr\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-        return 'https://prowlarr-lan.digitalresolve.ca';
+        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?prowlarr\.digitalresolve\.ca(?::\d+)?/i, 'https://prowlarr-lan.digitalresolve.ca');
       }
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?readarr\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-        return 'https://readarr-lan.digitalresolve.ca';
+        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?readarr\.digitalresolve\.ca(?::\d+)?/i, 'https://readarr-lan.digitalresolve.ca');
       }
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?torrents2\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-        return 'https://torrents-lan.digitalresolve.ca';
+        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?torrents2\.digitalresolve\.ca(?::\d+)?/i, 'https://torrents-lan.digitalresolve.ca');
       }
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?torrents\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
         return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?torrents\.digitalresolve\.ca(?::\d+)?/i, `http://${deskHost}:8080`);
@@ -5396,7 +5429,47 @@
       }
       if (txt) txt.textContent = label;
       else if (btn) btn.textContent = label;
-      if (btn) btn.title = title;
+      if (btn) {
+        btn.title = title;
+        btn.setAttribute('data-route-mode', mode);
+      }
+    }
+
+    function syncMediaRouteLinks() {
+      if (typeof document === 'undefined') return;
+      const links = document.querySelectorAll('a[data-route-base]');
+      links.forEach((a) => {
+        const base = a.getAttribute('data-route-base');
+        if (base) a.href = resolveMediaUrl(base);
+      });
+    }
+
+    function probeHomeLanRoute() {
+      if (typeof fetch !== 'function') return;
+      const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+      const timer = ctrl ? setTimeout(() => ctrl.abort(), 1500) : null;
+      fetch('https://stream-lan.digitalresolve.ca/api/route-info', {
+        method: 'GET',
+        mode: 'cors',
+        cache: 'no-store',
+        signal: ctrl ? ctrl.signal : undefined
+      })
+        .then((r) => (r && r.ok ? r.json() : null))
+        .then((data) => {
+          if (timer) clearTimeout(timer);
+          const onHomeLan = Boolean(data && data.isDirectLan === true);
+          window.dr_is_home_network = onHomeLan;
+          try { localStorage.setItem('dr_is_home_network', onHomeLan ? 'true' : 'false'); } catch (e) {}
+          syncMediaRouteLinks();
+          updateMediaRoutePillUI();
+        })
+        .catch(() => {
+          if (timer) clearTimeout(timer);
+          window.dr_is_home_network = false;
+          try { localStorage.setItem('dr_is_home_network', 'false'); } catch (e) {}
+          syncMediaRouteLinks();
+          updateMediaRoutePillUI();
+        });
     }
 
     function cycleMediaRouteMode() {
@@ -5406,8 +5479,9 @@
       else if (current === 'tailscale') next = 'lan';
       else if (current === 'lan') next = 'wan';
       else next = 'auto';
-      localStorage.setItem('dr_media_route', next);
+      try { localStorage.setItem('dr_media_route', next); } catch (e) {}
       updateMediaRoutePillUI();
+      syncMediaRouteLinks();
       const desc = next === 'tailscale' ? 'Tailscale Mesh (100.68.136.76)' : (next === 'lan' ? 'Direct LAN (192.168.2.35)' : (next === 'wan' ? 'Cloudflare Tunnel (WAN)' : 'Auto (LAN Priority)'));
       if (typeof showToast === 'function') {
         showToast('info', 'Media Routing Updated', `Route mode set to ${desc}`);
@@ -5415,11 +5489,16 @@
     }
     window.getMediaRouteMode = getMediaRouteMode;
     window.updateMediaRoutePillUI = updateMediaRoutePillUI;
+    window.syncMediaRouteLinks = syncMediaRouteLinks;
+    window.probeHomeLanRoute = probeHomeLanRoute;
     window.cycleMediaRouteMode = cycleMediaRouteMode;
     try { updateMediaRoutePillUI(); } catch(e) {}
+    try { syncMediaRouteLinks(); } catch(e) {}
+    try { probeHomeLanRoute(); } catch(e) {}
 
     function launchProtectedService(url, serviceName = 'Protected Homelab Service') {
-      if (!isSSOAuthenticated()) {
+      const isMediaStream = /stream(?:-lan)?\.digitalresolve\.ca/i.test(url);
+      if (!isMediaStream && !isSSOAuthenticated()) {
         openGlobalSSOModal(serviceName, () => launchProtectedService(url, serviceName));
         return;
       }
