@@ -5444,8 +5444,13 @@
       });
     }
 
-    function probeHomeLanRoute() {
+    let __drWakeRetryTimer = null;
+    function probeHomeLanRoute(allowWakeRetry) {
       if (typeof fetch !== 'function') return;
+      if (__drWakeRetryTimer) {
+        clearTimeout(__drWakeRetryTimer);
+        __drWakeRetryTimer = null;
+      }
       const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
       const timer = ctrl ? setTimeout(() => ctrl.abort(), 1500) : null;
       fetch('https://stream-lan.digitalresolve.ca/api/route-info', {
@@ -5469,6 +5474,12 @@
           try { localStorage.setItem('dr_is_home_network', 'false'); } catch (e) {}
           syncMediaRouteLinks();
           updateMediaRoutePillUI();
+          if (allowWakeRetry) {
+            __drWakeRetryTimer = setTimeout(() => {
+              __drWakeRetryTimer = null;
+              try { probeHomeLanRoute(false); } catch (e) {}
+            }, 2000);
+          }
         });
     }
 
@@ -5495,6 +5506,23 @@
     try { updateMediaRoutePillUI(); } catch(e) {}
     try { syncMediaRouteLinks(); } catch(e) {}
     try { probeHomeLanRoute(); } catch(e) {}
+    (function bindMediaRouteNetworkListeners() {
+      if (typeof window === 'undefined' || window.__drMediaRouteListenersBound) return;
+      window.__drMediaRouteListenersBound = true;
+      let lastRouteProbeAt = 0;
+      const reprobeRoute = (allowWakeRetry = false) => {
+        const now = Date.now();
+        if (now - lastRouteProbeAt < 5000) return;
+        lastRouteProbeAt = now;
+        try { probeHomeLanRoute(allowWakeRetry); } catch (e) {}
+      };
+      window.addEventListener('online', () => reprobeRoute(true));
+      if (typeof document !== 'undefined') {
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') reprobeRoute(true);
+        });
+      }
+    })();
 
     function launchProtectedService(url, serviceName = 'Protected Homelab Service') {
       const isMediaStream = /stream(?:-lan)?\.digitalresolve\.ca/i.test(url);
