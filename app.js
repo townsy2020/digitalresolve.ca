@@ -11,6 +11,7 @@
     }
     const GATEWAY = 'https://wake.digitalresolve.ca';
     var currentLogTab = 'agy';
+    const _fetchSig = (ms = 8000) => (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(ms) : undefined;
 
     // Back to top smooth scrolling controller
     function scrollToTop(e) {
@@ -161,8 +162,8 @@
 
       // Asynchronously count exact live lines via parallel cache-busted fetch
       Promise.all([
-        fetch('styles.css?_t=' + Date.now()).then(r => r.ok ? r.text() : null).catch(() => null),
-        fetch('app.js?_t=' + Date.now()).then(r => r.ok ? r.text() : null).catch(() => null)
+        fetch('styles.css?_t=' + Date.now(), { signal: _fetchSig(6000) }).then(r => r.ok ? r.text() : null).catch(() => null),
+        fetch('app.js?_t=' + Date.now(), { signal: _fetchSig(6000) }).then(r => r.ok ? r.text() : null).catch(() => null)
       ]).then(([cssSrc, jsSrc]) => {
         const cLines = cssSrc ? cssSrc.split(/\r?\n/).length : baseCssLines;
         const jLines = jsSrc ? jsSrc.split(/\r?\n/).length : baseJsLines;
@@ -613,7 +614,7 @@
         if (typeof sendControl === 'function') {
           sendControl('reboot', target);
         } else {
-          fetch(`${GATEWAY}/reboot?target=${target}`)
+          fetch(`${GATEWAY}/reboot?target=${target}`, { signal: _fetchSig(8000) })
             .then(r => r.json())
             .then(() => showToast('info', 'Reboot Dispatched', `Reboot signal sent to ${targetName}.`))
             .catch(() => showToast('error', 'Reboot Error', `Could not reach ${GATEWAY}`));
@@ -637,7 +638,7 @@
       const dev = devices[target] || devices.both;
       showToast('loading', `Transmitting Magic Packet...`, `Target: ${dev.name}`, 0);
 
-      fetch(`${GATEWAY}/wake?target=${target}`)
+      fetch(`${GATEWAY}/wake?target=${target}`, { signal: _fetchSig(8000) })
         .then(r => r.json())
         .then(() => {
           showToast('loading', `Magic Packet Broadcasted`, `Waiting for ${dev.name} to boot...`, 0);
@@ -651,7 +652,7 @@
           const maxAttempts = 12;
           pollInterval = setInterval(() => {
             attempts++;
-            fetch(`${GATEWAY}/status?target=${target}`)
+            fetch(`${GATEWAY}/status?target=${target}`, { signal: _fetchSig(5000) })
               .then(r => r.json())
               .then(data => {
                 if (data.online) {
@@ -681,7 +682,7 @@
       const dev = devices[target] || devices.nuc;
       showToast('loading', `Entering Sleep Mode...`, `Dispatching suspend signal to ${dev.name}`, 0);
 
-      fetch(`${GATEWAY}/sleep?target=${target}`)
+      fetch(`${GATEWAY}/sleep?target=${target}`, { signal: _fetchSig(8000) })
         .then(r => r.json())
         .then(() => {
           showToast('loading', `Sleep Signal Dispatched`, `Waiting for ${dev.name} to enter standby...`, 0);
@@ -690,7 +691,7 @@
           const maxAttempts = 10;
           pollInterval = setInterval(() => {
             attempts++;
-            fetch(`${GATEWAY}/status?target=${target}`)
+            fetch(`${GATEWAY}/status?target=${target}`, { signal: _fetchSig(5000) })
               .then(r => r.json())
               .then(data => {
                 if (!data.online) {
@@ -1631,7 +1632,8 @@
         if (currentLogTab && isSSOAuthenticated()) {
           const ssoEmail = localStorage.getItem('dr_sso_email') || 'cory.townsend@digitalresolve.ca';
           fetch(`${GATEWAY}/api/logs?name=${encodeURIComponent(currentLogTab)}`, {
-            headers: { 'X-SSO-Email': ssoEmail }
+            headers: { 'X-SSO-Email': ssoEmail },
+            signal: _fetchSig(8000)
           })
             .then(r => r.json())
             .then(data => {
@@ -2061,7 +2063,8 @@
       fetch(`${GATEWAY}/api/agy/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-SSO-Email': ssoEmail, 'X-Admin-Pin': '7788' },
-        body: JSON.stringify({ prompt: promptText, ssoEmail: ssoEmail, email: ssoEmail, conversationId: cid, pin: '7788' })
+        body: JSON.stringify({ prompt: promptText, ssoEmail: ssoEmail, email: ssoEmail, conversationId: cid, pin: '7788' }),
+        signal: _fetchSig(15000)
       })
       .then(r => r.json())
       .then(data => {
@@ -2164,7 +2167,7 @@
     }
 
     function fetchAgySessionInfo(callback) {
-      return fetch(`${GATEWAY}/api/agy/session`)
+      return fetch(`${GATEWAY}/api/agy/session`, { signal: _fetchSig(6000) })
         .then(r => r.json())
         .then(data => {
           if (data && data.conversationId) {
@@ -2202,7 +2205,8 @@
       fetch(`${GATEWAY}/api/agy/launch`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-SSO-Email': ssoEmail },
-        body: JSON.stringify({ target: 'desktop', action: 'resume', ssoEmail: ssoEmail, workspace: window.AGY_WORKSPACE || 'C:\\Users\\CoryTownsend\\Projects\\website' })
+        body: JSON.stringify({ target: 'desktop', action: 'resume', ssoEmail: ssoEmail, workspace: window.AGY_WORKSPACE || 'C:\\Users\\CoryTownsend\\Projects\\website' }),
+        signal: _fetchSig(12000)
       })
       .then(r => r.json())
       .then(data => {
@@ -2247,7 +2251,8 @@
       fetch(`${GATEWAY}/api/agy/launch`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-SSO-Email': ssoEmail },
-        body: JSON.stringify({ target: target, action: 'new-session', ssoEmail: ssoEmail })
+        body: JSON.stringify({ target: target, action: 'new-session', ssoEmail: ssoEmail }),
+        signal: _fetchSig(12000)
       })
       .then(r => r.json())
       .then(data => {
@@ -2318,7 +2323,8 @@
       showToast('loading', `Executing [${targetLabel}]...`, isSpeed ? 'Probing Bell Gigabit connection & jitter...' : `Action: ${action.toUpperCase()}`, 0);
       
       fetch(`${GATEWAY}/api/control?action=${encodeURIComponent(action)}&target=${encodeURIComponent(target)}`, {
-        headers: { 'X-SSO-Email': ssoEmail }
+        headers: { 'X-SSO-Email': ssoEmail },
+        signal: _fetchSig(10000)
       })
         .then(r => r.json())
         .then(data => {
@@ -2823,7 +2829,7 @@
     window.updateClimateUI = updateClimateUI;
 
     function fetchClimateData() {
-      return fetch(`${GATEWAY}/climate`, { cache: 'no-store' })
+      return fetch(`${GATEWAY}/climate`, { cache: 'no-store', signal: _fetchSig(5000) })
         .then(r => r.ok ? r.json() : null)
         .then(d => {
           if (d && d.climate && typeof updateClimateUI === 'function') {
@@ -2855,7 +2861,7 @@
           // Failover Method 1: Alternate endpoint or direct LAN
           const isHttps = typeof window !== 'undefined' && window.location && window.location.protocol === 'https:';
           const altStatsUrl = isHttps ? `${GATEWAY}/status?target=all` : `http://192.168.2.35:8082/stats`;
-          return fetch(altStatsUrl, { cache: 'no-store' })
+          return fetch(altStatsUrl, { cache: 'no-store', signal: _fetchSig(5000) })
             .then(r => r.json())
             .then(altData => {
               return applyClusterStatsPayload(altData);
@@ -2892,7 +2898,8 @@
 
       const ssoEmail = localStorage.getItem('dr_sso_email') || 'cory.townsend@digitalresolve.ca';
       fetch(`${GATEWAY}/api/logs?name=${encodeURIComponent(name)}`, {
-        headers: { 'X-SSO-Email': ssoEmail }
+        headers: { 'X-SSO-Email': ssoEmail },
+        signal: _fetchSig(8000)
       })
         .then(r => r.json())
         .then(data => {
@@ -2914,7 +2921,7 @@
     function fetchISPHistory() {
       const ssoEmail = isSSOAuthenticated() ? (localStorage.getItem('dr_sso_email') || 'cory.townsend@digitalresolve.ca') : '';
       const fetchHeaders = ssoEmail ? { 'X-SSO-Email': ssoEmail } : {};
-      return fetch(`${GATEWAY}/api/isp-health`, { headers: fetchHeaders })
+      return fetch(`${GATEWAY}/api/isp-health`, { headers: fetchHeaders, signal: _fetchSig(6000) })
         .then(r => r.json())
         .then(data => {
           if (data && data.status === 'success') {
@@ -3041,7 +3048,7 @@
         })
         .catch(() => {
           // Fallback 1: Fetch static snapshot isp-health.json from apex repository
-          return fetch('isp-health.json')
+          return fetch('isp-health.json', { signal: _fetchSig(5000) })
             .then(r => r.json())
             .then(sData => {
               if (sData && sData.status === 'success') {
@@ -3182,7 +3189,8 @@
       fetch(`${GATEWAY}/add`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: val, target: target })
+        body: JSON.stringify({ url: val, target: target }),
+        signal: _fetchSig(8000)
       })
       .then(r => r.json())
       .then(data => {
@@ -3240,7 +3248,8 @@
       fetch(`${GATEWAY}/add`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: val, target: target })
+        body: JSON.stringify({ url: val, target: target }),
+        signal: _fetchSig(8000)
       })
       .then(r => r.json())
       .then(data => {
@@ -3837,7 +3846,7 @@
 
       // Dynamic SLA and uptime metrics from gateway
       if (typeof fetch === 'function') {
-        return fetch(`${GATEWAY}/uptime`)
+        return fetch(`${GATEWAY}/uptime`, { signal: _fetchSig(5000) })
           .then(r => r.json())
           .then(data => {
             if (data && data.status === 'success') {
@@ -4434,7 +4443,8 @@
 
       const ssoEmail = localStorage.getItem('dr_sso_email') || 'cory.townsend@digitalresolve.ca';
       fetch(`${GATEWAY}/api/logs?name=agy`, {
-        headers: { 'X-SSO-Email': ssoEmail }
+        headers: { 'X-SSO-Email': ssoEmail },
+        signal: _fetchSig(8000)
       })
         .then(r => r.json())
         .then(data => {
@@ -4546,7 +4556,8 @@
       fetch(`${GATEWAY}/api/agy/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-SSO-Email': ssoEmail, 'X-Admin-Pin': '7788' },
-        body: JSON.stringify({ prompt: text, ssoEmail: ssoEmail, email: ssoEmail, conversationId: cid, pin: '7788' })
+        body: JSON.stringify({ prompt: text, ssoEmail: ssoEmail, email: ssoEmail, conversationId: cid, pin: '7788' }),
+        signal: _fetchSig(15000)
       })
       .then(r => r.json())
       .then(data => {
@@ -4580,7 +4591,7 @@
     // Dynamic System Release Changelog Ingestion Engine (Non-Hardcoded)
     function fetchAndRenderChangelog() {
       const container = document.querySelector('.changelog-body');
-      return fetch('changelog.json?_v=' + Date.now())
+      return fetch('changelog.json?_v=' + Date.now(), { signal: _fetchSig(5000) })
         .then(r => r.json())
         .then(data => {
           if (!data || !Array.isArray(data.releases) || data.releases.length === 0) return;
@@ -6451,12 +6462,14 @@
         return;
       }
       const ssoEmail = localStorage.getItem('dr_sso_email') || 'cory.townsend@digitalresolve.ca';
-      fetch(`${GATEWAY}/api/feeder/refill?email=${encodeURIComponent(ssoEmail)}`)
+      fetch(`${GATEWAY}/api/feeder/refill?email=${encodeURIComponent(ssoEmail)}`, { signal: _fetchSig(10000) })
         .then(r => r.ok ? r.json() : null)
         .then(data => {
           if (data && data.status === 'success') {
-            try { localStorage.setItem('dr_isp_history', JSON.stringify(data)); } catch (e) {}
-            if (data.feeder) updateFeederUI(data.feeder);
+            if (data.feeder) {
+              try { localStorage.setItem('dr_feeder_cache', JSON.stringify(data.feeder)); } catch (e) {}
+              updateFeederUI(data.feeder);
+            }
             showToast('success', "Hopper Refilled", "Kibble hopper reset to 100% (1,500g / ~18.7 days).");
           }
         })
@@ -6493,7 +6506,7 @@
 
       const ssoEmail = localStorage.getItem('dr_sso_email') || 'cory.townsend@digitalresolve.ca';
       const endpoint = `${GATEWAY}/api/feeder/dispense?portion=${encodeURIComponent(portionLabel)}&email=${encodeURIComponent(ssoEmail)}`;
-      fetch(endpoint)
+      fetch(endpoint, { signal: _fetchSig(10000) })
         .then(r => {
           if (!r.ok) throw new Error(`HTTP ${r.status}`);
           return r.json();
