@@ -5383,16 +5383,16 @@
           return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?jellyfin\.digitalresolve\.ca(?::\d+)?/i, 'http://100.68.136.76:8096');
         }
         if (/^(?:https?:)?(?:\/\/)?(?:www\.)?audiobooks\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-          return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?audiobooks\.digitalresolve\.ca(?::\d+)?/i, 'http://100.68.136.76:13378');
+          return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?audiobooks\.digitalresolve\.ca(?::\d+)?/i, 'http://100.68.136.76:3333');
         }
         if (/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?\/files(?=[\/?#]|$)/i.test(url)) {
-          return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?\/files/i, 'http://100.68.136.76:8085');
+          return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?\/files/i, 'https://files-lan.digitalresolve.ca');
         }
         if (/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-          return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?/i, 'http://100.68.136.76:8085');
+          return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?/i, 'https://files-lan.digitalresolve.ca');
         }
         if (/^(?:https?:)?(?:\/\/)?(?:www\.)?sonarr\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-          return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?sonarr\.digitalresolve\.ca(?::\d+)?/i, 'http://100.68.136.76:8989');
+          return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?sonarr\.digitalresolve\.ca(?::\d+)?/i, 'http://100.68.136.76:8990');
         }
         if (/^(?:https?:)?(?:\/\/)?(?:www\.)?radarr\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
           return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?radarr\.digitalresolve\.ca(?::\d+)?/i, 'http://100.68.136.76:7878');
@@ -5404,7 +5404,7 @@
           return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?readarr\.digitalresolve\.ca(?::\d+)?/i, 'http://100.68.136.76:8787');
         }
         if (/^(?:https?:)?(?:\/\/)?(?:www\.)?torrents2\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-          return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?torrents2\.digitalresolve\.ca(?::\d+)?/i, 'http://100.68.136.76:8081');
+          return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?torrents2\.digitalresolve\.ca(?::\d+)?/i, 'https://torrents-lan.digitalresolve.ca');
         }
         if (/^(?:https?:)?(?:\/\/)?(?:www\.)?torrents\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
           return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?torrents\.digitalresolve\.ca(?::\d+)?/i, `http://${deskHost}:8080`);
