@@ -415,6 +415,7 @@
     let sourceBuffer = null;
     let bufferQueue = [];
     let streamConnected = false;
+    let currentObjectUrl = null;
 
     function cleanupStream() {
       if (reconnectTimeout) {
@@ -436,6 +437,10 @@
           try { ms.endOfStream(); } catch (e) {}
         }
         ms = null;
+      }
+      if (currentObjectUrl) {
+        try { URL.revokeObjectURL(currentObjectUrl); } catch (e) {}
+        currentObjectUrl = null;
       }
       streamConnected = false;
     }
@@ -491,11 +496,20 @@
     }
 
     function startMSE(wsUrl, endpoints, idx) {
+      if (currentObjectUrl) {
+        try { URL.revokeObjectURL(currentObjectUrl); } catch (e) {}
+        currentObjectUrl = null;
+      }
       ms = new MediaSource();
-      video.src = URL.createObjectURL(ms);
+      currentObjectUrl = URL.createObjectURL(ms);
+      video.src = currentObjectUrl;
       video.srcObject = null;
 
       ms.addEventListener('sourceopen', () => {
+        if (currentObjectUrl) {
+          try { URL.revokeObjectURL(currentObjectUrl); } catch (e) {}
+          currentObjectUrl = null;
+        }
         try {
           ws = new WebSocket(wsUrl);
           ws.binaryType = 'arraybuffer';
@@ -677,9 +691,9 @@
         try {
           const msg = JSON.parse(ev.data);
           if (msg.type === 'webrtc/candidate') {
-            pc.addIceCandidate({ candidate: msg.value, sdpMid: '0' });
+            pc.addIceCandidate({ candidate: msg.value, sdpMid: '0' }).catch(() => {});
           } else if (msg.type === 'webrtc/answer') {
-            pc.setRemoteDescription({ type: 'answer', sdp: msg.value });
+            pc.setRemoteDescription({ type: 'answer', sdp: msg.value }).catch(() => {});
           }
         } catch (e) {
           console.warn('WS parse error:', e);
@@ -796,6 +810,13 @@
       requestAnimationFrame(detectFrame);
     }
 
+    // Optical Feeder Food Level Red Beacon Detector state (module scope)
+    const hopperBeaconBadge = document.getElementById('hopper-beacon-badge');
+    const hopperBeaconText = document.getElementById('hopper-beacon-text');
+    let redBlinkSamples = [];
+    let isFeederFoodLow = false;
+    let lastHopperWebhookNotify = 0;
+
     // 5. Process Detections with Temporal Persistence Tracker
     function processDetections(predictions) {
       ctx.clearRect(0, 0, container.clientWidth, container.clientHeight);
@@ -884,14 +905,8 @@
         personBadge.style.display = 'none';
       }
 
-          // Optical Feeder Food Level Red Beacon Detector
+    // Optical Feeder Food Level Red Beacon Detector
     // Detects periodic red LED pulse / blink frequency on feeder chassis
-    const hopperBeaconBadge = document.getElementById('hopper-beacon-badge');
-    const hopperBeaconText = document.getElementById('hopper-beacon-text');
-    let redBlinkSamples = [];
-    let isFeederFoodLow = false;
-    let lastHopperWebhookNotify = 0;
-
     function detectFeederRedBlink(videoEl) {
       if (!videoEl || videoEl.videoWidth === 0) return;
       try {

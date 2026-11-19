@@ -467,6 +467,8 @@
       }
     }
 
+    let currentObjectUrl = null;
+
     function cleanupStream() {
       if (reconnectTimeout) {
         clearTimeout(reconnectTimeout);
@@ -487,6 +489,10 @@
           try { ms.endOfStream(); } catch (e) {}
         }
         ms = null;
+      }
+      if (currentObjectUrl) {
+        try { URL.revokeObjectURL(currentObjectUrl); } catch (e) {}
+        currentObjectUrl = null;
       }
       try {
         video.removeAttribute('src');
@@ -579,11 +585,20 @@
     }
 
     function startMSE(wsUrl, endpoints, idx) {
+      if (currentObjectUrl) {
+        try { URL.revokeObjectURL(currentObjectUrl); } catch (e) {}
+        currentObjectUrl = null;
+      }
       ms = new MediaSource();
-      video.src = URL.createObjectURL(ms);
+      currentObjectUrl = URL.createObjectURL(ms);
+      video.src = currentObjectUrl;
       video.srcObject = null;
 
       ms.addEventListener('sourceopen', () => {
+        if (currentObjectUrl) {
+          try { URL.revokeObjectURL(currentObjectUrl); } catch (e) {}
+          currentObjectUrl = null;
+        }
         try {
           ws = new WebSocket(wsUrl);
           ws.binaryType = 'arraybuffer';
@@ -827,11 +842,14 @@
 
     // Active Camera Ping Telemetry
     async function pollStatus() {
-      const endpoints = [
-        'http://192.168.2.35:8082/api/cam/status',
-        'http://192.168.2.35:8089/api/cam/status',
-        '/api/cam/status'
-      ];
+      const isHttps = (window.location.protocol === 'https:');
+      const endpoints = isHttps
+        ? ['/api/cam/status']
+        : [
+            'http://192.168.2.35:8082/api/cam/status',
+            'http://192.168.2.35:8089/api/cam/status',
+            '/api/cam/status'
+          ];
       for (const ep of endpoints) {
         try {
           const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
@@ -841,7 +859,7 @@
           if (res.ok) {
             const data = await res.json();
             const list = Array.isArray(data) ? data : (data.cameras && data.cameras.value ? data.cameras.value : (data.cameras || []));
-            const c = list.find(item => item.id === activeCam.id) || list[isCam2 ? 1 : 0];
+            const c = list.find(item => item.id === activeCam.id) || list[activeCam.id === 'cam2' ? 1 : 0];
             if (c) {
               valState.textContent = c.online ? 'ONLINE' : 'UNREACHABLE';
               valState.style.color = c.online ? '#10b981' : '#f87171';
