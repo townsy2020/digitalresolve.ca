@@ -650,22 +650,36 @@
 
           let attempts = 0;
           const maxAttempts = 12;
+          let settled = false;
           pollInterval = setInterval(() => {
+            if (settled || attempts >= maxAttempts) {
+              clearInterval(pollInterval);
+              return;
+            }
             attempts++;
             fetch(`${GATEWAY}/status?target=${target}`, { signal: _fetchSig(5000) })
               .then(r => r.json())
               .then(data => {
+                if (settled) return;
                 if (data.online) {
+                  settled = true;
                   clearInterval(pollInterval);
                   const diskSub = (data.disk && data.disk.drive) ? ` | D: ${data.disk.freeGB} GB free` : '';
                   showToast('success', `${dev.name} is Awake & Online!`, `${data.latencyMs} ms latency${diskSub}`, 6000);
                   updateStatusUI(target, true, data.latencyMs, data.disk);
                 } else if (attempts >= maxAttempts) {
+                  settled = true;
                   clearInterval(pollInterval);
                   showToast('error', `${dev.name} Not Responding`, 'Machine may still be booting POST.', 6000);
                 }
               })
-              .catch(() => {});
+              .catch(() => {
+                if (!settled && attempts >= maxAttempts) {
+                  settled = true;
+                  clearInterval(pollInterval);
+                  showToast('error', `${dev.name} Not Responding`, 'Machine may still be booting POST.', 6000);
+                }
+              });
           }, 3000);
         })
         .catch(() => {
@@ -6572,7 +6586,7 @@
     // Auto-fetch feeder status on page load
     setTimeout(fetchFeederStatus, 1200);
     setTimeout(() => { if (typeof auditAndAttachCheckButtons === 'function') auditAndAttachCheckButtons(); }, 1600);
-    setInterval(() => { if (typeof auditAndAttachCheckButtons === 'function') auditAndAttachCheckButtons(); }, 5000);
+    setInterval(() => { if (document.hidden) return; if (typeof auditAndAttachCheckButtons === 'function') auditAndAttachCheckButtons(); }, 5000);
 
     // Global Escape Key Handler to dismiss all modals & restore scroll
     document.addEventListener('keydown', (e) => {
