@@ -844,11 +844,10 @@
     async function pollStatus() {
       const isHttps = (window.location.protocol === 'https:');
       const endpoints = isHttps
-        ? ['/api/cam/status']
+        ? ['https://wake.digitalresolve.ca/api/cam/status']
         : [
             'http://192.168.2.35:8082/api/cam/status',
-            'http://192.168.2.35:8089/api/cam/status',
-            '/api/cam/status'
+            'https://wake.digitalresolve.ca/api/cam/status'
           ];
       for (const ep of endpoints) {
         try {
