@@ -940,7 +940,7 @@
           // Notify gateway if confirmed
           if (now - lastHopperWebhookNotify > 60000) {
             lastHopperWebhookNotify = now;
-            fetch('https://wake.digitalresolve.ca/api/feeder/beacon-alert?state=low&optical=true', { method: 'POST', mode: 'no-cors' }).catch(() => {});
+            fetch('https://wake.digitalresolve.ca/api/feeder/beacon-alert?state=low&optical=true', { method: 'POST', mode: 'no-cors', signal: AbortSignal.timeout(5000) }).catch(() => {});
           }
         } else {
           if (redBlinkSamples.length > 10 && transitions === 0 && !hasRedPulse) {

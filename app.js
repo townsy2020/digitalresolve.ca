@@ -3037,8 +3037,8 @@
 
             const stPing = document.getElementById('st-val-ping');
             if (stPing && pingAvg) stPing.innerHTML = `${pingAvg} <span style="font-size: 0.85rem; color: #94a3b8;">ms</span>`;
-            const downMbps = (latest && latest.downloadMbps !== undefined) ? latest.downloadMbps : ((latest && latest.downMbps !== undefined) ? latest.downMbps : Math.max(850, Math.min(960, parseFloat((945.5 - ((parseFloat(jitter) || 0) * 2.5)).toFixed(1)))));
-            const upMbps = (latest && latest.uploadMbps !== undefined) ? latest.uploadMbps : ((latest && latest.upMbps !== undefined) ? latest.upMbps : Math.max(800, Math.min(940, parseFloat((890.0 - ((parseFloat(jitter) || 0) * 2.2)).toFixed(1)))));
+            const downMbps = (latest && latest.downloadMbps != null) ? latest.downloadMbps : ((latest && latest.downMbps != null) ? latest.downMbps : Math.max(850, Math.min(960, parseFloat((945.5 - ((parseFloat(jitter) || 0) * 2.5)).toFixed(1)))));
+            const upMbps = (latest && latest.uploadMbps != null) ? latest.uploadMbps : ((latest && latest.upMbps != null) ? latest.upMbps : Math.max(800, Math.min(940, parseFloat((890.0 - ((parseFloat(jitter) || 0) * 2.2)).toFixed(1)))));
             const stDown = document.getElementById('st-val-down');
             if (stDown) stDown.innerHTML = `${downMbps} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
             const stUp = document.getElementById('st-val-up');
@@ -3086,8 +3086,8 @@
                   if (jVal) jVal.innerHTML = `&plusmn; ${sLat.jitterMs || 0.71} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>`;
                   if (pTag) pTag.textContent = `${sLat.pingAvgMs || 3.6} ms`;
                   const sJitter = parseFloat(sLat.jitterMs) || 0.71;
-                  const sDown = (sLat.downloadMbps !== undefined) ? sLat.downloadMbps : ((sLat.downMbps !== undefined) ? sLat.downMbps : Math.max(850, Math.min(960, parseFloat((945.5 - (sJitter * 2.5)).toFixed(1)))));
-                  const sUp = (sLat.uploadMbps !== undefined) ? sLat.uploadMbps : ((sLat.upMbps !== undefined) ? sLat.upMbps : Math.max(800, Math.min(940, parseFloat((890.0 - (sJitter * 2.2)).toFixed(1)))));
+                  const sDown = (sLat.downloadMbps != null) ? sLat.downloadMbps : ((sLat.downMbps != null) ? sLat.downMbps : Math.max(850, Math.min(960, parseFloat((945.5 - (sJitter * 2.5)).toFixed(1)))));
+                  const sUp = (sLat.uploadMbps != null) ? sLat.uploadMbps : ((sLat.upMbps != null) ? sLat.upMbps : Math.max(800, Math.min(940, parseFloat((890.0 - (sJitter * 2.2)).toFixed(1)))));
                   const stPing = document.getElementById('st-val-ping');
                   const stDown = document.getElementById('st-val-down');
                   const stUp = document.getElementById('st-val-up');
@@ -3152,8 +3152,8 @@
                 const cGdns = (cLat && cLat.googleDnsMs !== undefined) ? cLat.googleDnsMs : 4.0;
                 const cJitter = (cLat && cLat.jitterMs !== undefined) ? cLat.jitterMs : 0.71;
                 const cJitterNum = parseFloat(cJitter) || 0.71;
-                const cDown = (cLat && cLat.downloadMbps !== undefined) ? cLat.downloadMbps : ((cLat && cLat.downMbps !== undefined) ? cLat.downMbps : Math.max(850, Math.min(960, parseFloat((945.5 - (cJitterNum * 2.5)).toFixed(1)))));
-                const cUp = (cLat && cLat.uploadMbps !== undefined) ? cLat.uploadMbps : ((cLat && cLat.upMbps !== undefined) ? cLat.upMbps : Math.max(800, Math.min(940, parseFloat((890.0 - (cJitterNum * 2.2)).toFixed(1)))));
+                const cDown = (cLat && cLat.downloadMbps != null) ? cLat.downloadMbps : ((cLat && cLat.downMbps != null) ? cLat.downMbps : Math.max(850, Math.min(960, parseFloat((945.5 - (cJitterNum * 2.5)).toFixed(1)))));
+                const cUp = (cLat && cLat.uploadMbps != null) ? cLat.uploadMbps : ((cLat && cLat.upMbps != null) ? cLat.upMbps : Math.max(800, Math.min(940, parseFloat((890.0 - (cJitterNum * 2.2)).toFixed(1)))));
 
                 const pingVal = document.getElementById('isp-ping-val');
                 const pingSub = document.getElementById('isp-ping-sub');
