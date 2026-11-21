@@ -3502,6 +3502,10 @@
     window.selectMaintDuration = selectMaintDuration;
 
     function openMaintenanceModal() {
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal('NUC Maintenance Window Control', openMaintenanceModal);
+        return;
+      }
       updateMaintenanceModalUI();
       const modal = document.getElementById('maintenance-modal-overlay');
       if (modal) modal.style.display = 'flex';
@@ -3606,9 +3610,6 @@
 
       try {
         localStorage.setItem('dr_nuc_maintenance', JSON.stringify(data));
-        localStorage.setItem('dr_sso_authenticated', 'true');
-        localStorage.setItem('dr_sso_user', 'Cory Townsend');
-        localStorage.setItem('dr_sso_email', 'cory.townsend@digitalresolve.ca');
       } catch(e) {}
 
       updateMaintenanceVisualStates();
@@ -3766,7 +3767,7 @@
 
       if (!window.UPTIME_INCIDENTS) {
         try {
-          const cached = JSON.parse(localStorage.getItem('dr_isp_history'));
+          const cached = JSON.parse(localStorage.getItem('dr_uptime_cache'));
           if (cached && Array.isArray(cached.incidents)) window.UPTIME_INCIDENTS = cached.incidents;
         } catch(e) {}
       }
@@ -3904,7 +3905,7 @@
             if (data && data.status === 'success') {
               window.UPTIME_INCIDENTS = data.incidents || [];
               applyUptimeIncidentsToBars(data.incidents);
-              try { localStorage.setItem('dr_isp_history', JSON.stringify(data)); } catch (e) {}
+              try { localStorage.setItem('dr_uptime_cache', JSON.stringify(data)); } catch (e) {}
               document.querySelectorAll('#uptime-sla-val').forEach(el => {
                 if (data.overallSla) el.textContent = data.overallSla;
               });
@@ -4664,7 +4665,7 @@
               if (Array.isArray(rel.changes)) {
                 listItems = rel.changes.map(ch => {
                   const boldPrefix = ch.label ? ('<strong>' + escapeHtml(ch.label) + ':</strong> ') : '';
-                  return '<li>' + boldPrefix + ch.text + '</li>';
+                  return '<li>' + boldPrefix + escapeHtml(ch.text) + '</li>';
                 }).join('');
               }
               html += '<div class=\"changelog-entry\">' +
@@ -6035,7 +6036,28 @@
     }
     window.closeCloudflareStatsModal = closeCloudflareStatsModal;
 
+    function ensureAdGuardModalDOM() {
+      if (document.getElementById('adguard-modal-overlay')) return;
+      const html = `
+        <div id="adguard-modal-overlay" class="modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(2,6,23,0.78); backdrop-filter:blur(6px); z-index:10005; align-items:center; justify-content:center; padding:16px;" onclick="if(event.target===this) closeAdGuardConfigModal()">
+          <div class="modal-content" style="max-width:560px; width:100%; background:#0f172a; border:1px solid rgba(56,189,248,0.3); border-radius:14px; padding:24px; color:#e2e8f0; box-shadow:0 20px 50px rgba(0,0,0,0.6);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+              <h3 style="margin:0; font-size:1.1rem; color:#38bdf8;">AdGuard Home — NUC DNS Sinkhole</h3>
+              <button type="button" onclick="closeAdGuardConfigModal()" style="background:none; border:none; color:#94a3b8; font-size:1.4rem; cursor:pointer; line-height:1;">&times;</button>
+            </div>
+            <p style="font-size:0.86rem; color:#94a3b8; margin:0 0 14px;">Deploy or update AdGuard Home on NUC (<code style="color:#38bdf8;">192.168.2.35:3000</code>) via elevated PowerShell:</p>
+            <pre style="background:#020617; border:1px solid rgba(148,163,184,0.2); border-radius:8px; padding:12px; font-size:0.76rem; color:#a5f3fc; overflow-x:auto; margin:0 0 16px;">powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/townsy2020/digitalresolve.ca/main/deploy/adguard/deploy.ps1 | iex"</pre>
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+              <button type="button" id="btn-copy-modal-cmd" class="btn btn-primary" onclick="copyAdguardDeployCommand()" style="padding:8px 14px; font-size:0.82rem;">Copy Install Command</button>
+              <button type="button" class="btn btn-secondary" onclick="closeAdGuardConfigModal()" style="padding:8px 14px; font-size:0.82rem;">Close</button>
+            </div>
+          </div>
+        </div>`;
+      document.body.insertAdjacentHTML('beforeend', html);
+    }
+
     function openAdGuardConfigModal() {
+      ensureAdGuardModalDOM();
       const modal = document.getElementById('adguard-modal-overlay');
       if (modal) {
         modal.style.display = 'flex';
