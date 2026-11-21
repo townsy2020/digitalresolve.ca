@@ -360,9 +360,9 @@
       const text = document.getElementById('toast-message');
       const sub = document.getElementById('toast-subtext');
       if (toast && text) {
-        dot.className = `toast-dot ${statusType}`;
+        if (dot) dot.className = `toast-dot ${statusType}`;
         text.textContent = msg;
-        sub.textContent = subtext;
+        if (sub) sub.textContent = subtext;
         toast.classList.add('show');
         clearTimeout(window.toastTimer);
         if (duration > 0) {
@@ -5668,7 +5668,8 @@
         }, 120);
 
         function finishDownload() {
-          if (downEl) downEl.innerHTML = `${gaugeNum.textContent} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
+          const downReading = gaugeNum ? gaugeNum.textContent : currentDown;
+          if (downEl) downEl.innerHTML = `${downReading} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
           if (stageText) stageText.textContent = `Stage 3/3: Transmitting 1.0 Gbps Uplink stream to ${realCarrier} Fiber Gateway...`;
           playChaosTone(880, 1320, 'sine', 0.25);
 
@@ -5691,11 +5692,14 @@
         }
 
         function finalizeBenchmark() {
-          if (upEl) upEl.innerHTML = `${gaugeNum.textContent} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
+          const upReading = gaugeNum ? gaugeNum.textContent : '0';
+          if (upEl) upEl.innerHTML = `${upReading} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
           if (btn) { btn.disabled = false; btn.innerHTML = 'Run Gigabit Speedtest'; }
-          if (stageText) stageText.textContent = `Benchmark Saved: ${downEl.textContent.trim()} Down  -  ${upEl.textContent.trim()} Up  -  ${testPing} ms  -  Grade ${realGrade} (${realCarrier})`;
+          const downSummary = downEl ? downEl.textContent.trim() : '--';
+          const upSummary = upEl ? upEl.textContent.trim() : '--';
+          if (stageText) stageText.textContent = `Benchmark Saved: ${downSummary} Down  -  ${upSummary} Up  -  ${testPing} ms  -  Grade ${realGrade} (${realCarrier})`;
           playChaosTone(523, 1046, 'triangle', 0.35);
-          showToast('success', `${realCarrier} Gigabit Telemetry Complete`, `${downEl.textContent.trim()} Down  -  ${upEl.textContent.trim()} Up  -  Packet Loss: ${realLoss}%`);
+          showToast('success', `${realCarrier} Gigabit Telemetry Complete`, `${downSummary} Down  -  ${upSummary} Up  -  Packet Loss: ${realLoss}%`);
           isSpeedtesting = false;
         }
       }, 800);
@@ -5723,19 +5727,23 @@
       playChaosTone(659, 880, 'sine', 0.1);
 
       if (feed) {
+        if (window._edgeAiTyper) clearInterval(window._edgeAiTyper);
         feed.innerHTML = `<span style="color: #a855f7;">dr-ollama [Llama-3.2-3B]&gt;</span> `;
+        const textNode = document.createTextNode('');
+        feed.appendChild(textNode);
         let i = 0;
         const startTime = Date.now();
-        const typer = setInterval(() => {
-          feed.innerHTML += response.charAt(i);
+        window._edgeAiTyper = setInterval(() => {
+          textNode.nodeValue += response.charAt(i);
           i++;
           if (i >= response.length) {
-            clearInterval(typer);
+            clearInterval(window._edgeAiTyper);
+            window._edgeAiTyper = null;
             const durationSec = Math.max(0.1, (Date.now() - startTime) / 1000);
             const tokenEstimate = Math.max(1, Math.round(response.length / 4));
             const speed = (tokenEstimate / durationSec).toFixed(1);
             if (stats) stats.textContent = `Complete (${tokenEstimate} tokens • ${speed} tok/s)`;
-            feed.innerHTML += `<br><span style="color: #34d399; font-size: 0.72rem;">Verified On-Premise Execution</span>`;
+            feed.insertAdjacentHTML('beforeend', `<br><span style="color: #34d399; font-size: 0.72rem;">Verified On-Premise Execution</span>`);
             document.querySelectorAll('.ai-kpi-speed').forEach(el => el.innerHTML = `${speed} <span style="font-size: 0.85rem; color: #94a3b8;">tok/s</span>`);
             document.querySelectorAll('.ai-kpi-speed-short').forEach(el => el.textContent = speed);
           }
@@ -5816,14 +5824,19 @@
 
       const resp = generateClusterAiResponse(text);
       if (feed) {
-        feed.innerHTML = `<span style="color: #60a5fa;">user&gt;</span> ${text}<br><span style="color: #a855f7;">dr-ollama&gt;</span> `;
+        if (window._edgeAiTyper) clearInterval(window._edgeAiTyper);
+        const safeText = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        feed.innerHTML = `<span style="color: #60a5fa;">user&gt;</span> ${safeText}<br><span style="color: #a855f7;">dr-ollama&gt;</span> `;
+        const textNode = document.createTextNode('');
+        feed.appendChild(textNode);
         let i = 0;
         const startTime = Date.now();
-        const typer = setInterval(() => {
-          feed.innerHTML += resp.charAt(i);
+        window._edgeAiTyper = setInterval(() => {
+          textNode.nodeValue += resp.charAt(i);
           i++;
           if (i >= resp.length) {
-            clearInterval(typer);
+            clearInterval(window._edgeAiTyper);
+            window._edgeAiTyper = null;
             const durationSec = Math.max(0.1, (Date.now() - startTime) / 1000);
             const tokenEstimate = Math.max(1, Math.round(resp.length / 4));
             const speed = (tokenEstimate / durationSec).toFixed(1);
