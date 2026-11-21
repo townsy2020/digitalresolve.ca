@@ -1788,7 +1788,7 @@
         if (modalScreen) modalScreen.style.display = 'block';
         if (modalChips) modalChips.style.display = 'flex';
         if (modalInput) modalInput.style.display = 'flex';
-        if (modalTitle) modalTitle.innerHTML = 'Antigravity (AGY) Live Terminal | <span class="mono" style="color: #60a5fa;">' + (window.AGY_SESSION_NAME || ('webdev (' + (window.AGY_SESSION_ID || '53c2a1ff').substring(0,8) + ')')) + '</span>';
+        if (modalTitle) modalTitle.innerHTML = 'Antigravity (AGY) Live Terminal | <span class="mono" style="color: #60a5fa;">' + escapeHtml(window.AGY_SESSION_NAME || ('webdev (' + (window.AGY_SESSION_ID || '53c2a1ff').substring(0,8) + ')')) + '</span>';
         const isDeskOnline = window.DESKTOP_IS_ONLINE !== undefined ? window.DESKTOP_IS_ONLINE : true;
         if (modalPulse) { modalPulse.style.background = isDeskOnline ? '#10b981' : '#6366f1'; modalPulse.style.boxShadow = isDeskOnline ? '0 0 8px #10b981' : '0 0 8px #6366f1'; }
         if (modalStatus) { modalStatus.textContent = isDeskOnline ? 'ONLINE (Desktop :8082)' : 'STANDBY (Desktop Sleeping • WoL Ready)'; modalStatus.className = `item-tag ${isDeskOnline ? 'online' : 'offline'}`; }
@@ -1805,7 +1805,7 @@
         const ispIpSub = document.getElementById('isp-ip-sub');
         const tierBellIp = document.getElementById('tier-bell-ip-text');
         const resolvedIp = window.CURRENT_EXTERNAL_IP || '184.148.161.160';
-        if (ispIpSub) ispIpSub.innerHTML = 'IPv4: <span id="isp-ip-text" style="color: #60a5fa; font-family: monospace; font-style: normal;">' + resolvedIp + '</span>';
+        if (ispIpSub) ispIpSub.innerHTML = 'IPv4: <span id="isp-ip-text" style="color: #60a5fa; font-family: monospace; font-style: normal;">' + escapeHtml(resolvedIp) + '</span>';
         if (tierBellIp) {
           tierBellIp.textContent = resolvedIp;
           tierBellIp.style.color = '#cbd5e1';
@@ -2144,7 +2144,7 @@
 
       const modalTitle = document.getElementById('agy-modal-title-text');
       if (modalTitle) {
-        modalTitle.innerHTML = `Antigravity (AGY) Live Terminal | <span class="mono" style="color: #60a5fa;">${sName}</span>`;
+        modalTitle.innerHTML = `Antigravity (AGY) Live Terminal | <span class="mono" style="color: #60a5fa;">${escapeHtml(sName)}</span>`;
       }
 
       const metaName = document.getElementById('agy-meta-name');
@@ -2171,7 +2171,7 @@
       if (headerBtn) {
         headerBtn.title = `Open Interactive Terminal for Active Session ${sName}`;
         const dotColor = isOnline ? '#10b981' : '#6366f1';
-        headerBtn.innerHTML = `<span class="dropdown-dot" style="background-color: ${dotColor}; box-shadow: 0 0 8px ${dotColor};"></span> ${isOnline ? 'Open Live Console' : 'Console Standby'}: ${sName} &rarr;`;
+        headerBtn.innerHTML = `<span class="dropdown-dot" style="background-color: ${dotColor}; box-shadow: 0 0 8px ${dotColor};"></span> ${isOnline ? 'Open Live Console' : 'Console Standby'}: ${escapeHtml(sName)} &rarr;`;
       }
 
       // Dynamically update card titles & session headers across all pages
@@ -6587,7 +6587,7 @@
       if (logEl) {
         const item = document.createElement('div');
         item.style.cssText = 'display: flex; justify-content: space-between; padding: 4px 0; border-top: 1px solid rgba(255,255,255,0.06); color: #cbd5e1;';
-        item.innerHTML = `<span>${portionLabel} (Hardware Bridge Dispense)</span><span class="mono" style="color: #34d399;">${nowStr}</span>`;
+        item.innerHTML = `<span>${escapeHtml(portionLabel)} (Hardware Bridge Dispense)</span><span class="mono" style="color: #34d399;">${escapeHtml(nowStr)}</span>`;
         logEl.prepend(item);
       }
 
