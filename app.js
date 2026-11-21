@@ -2936,7 +2936,7 @@
       const ssoEmail = isSSOAuthenticated() ? (localStorage.getItem('dr_sso_email') || 'cory.townsend@digitalresolve.ca') : '';
       const fetchHeaders = ssoEmail ? { 'X-SSO-Email': ssoEmail } : {};
       return fetch(`${GATEWAY}/api/isp-health`, { headers: fetchHeaders, signal: _fetchSig(6000) })
-        .then(r => r.json())
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(data => {
           if (data && data.status === 'success') {
             try { localStorage.setItem('dr_isp_history', JSON.stringify(data)); } catch (e) {}
@@ -3038,13 +3038,13 @@
               const recent = rawList.slice(-10).reverse();
               tbody.innerHTML = recent.map(r => `
                 <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
-                  <td style="padding: 6px 8px; color: #8b949e;">${r.timeShort || r.timestamp || 'Recent'}</td>
-                  <td style="padding: 6px 8px; color: #60a5fa;">${r.isp || 'Bell Canada'}</td>
+                  <td style="padding: 6px 8px; color: #8b949e;">${escapeHtml(r.timeShort || r.timestamp || 'Recent')}</td>
+                  <td style="padding: 6px 8px; color: #60a5fa;">${escapeHtml(r.isp || 'Bell Canada')}</td>
                   <td style="padding: 6px 8px; color: #38bdf8; font-weight: 700;">${r.pingAvgMs !== undefined ? r.pingAvgMs : 4.2} ms</td>
                   <td style="padding: 6px 8px;">${r.pingMinMs !== undefined ? r.pingMinMs : 4} / ${r.pingMaxMs !== undefined ? r.pingMaxMs : 5} ms</td>
                   <td style="padding: 6px 8px; color: #4ade80;">&plusmn; ${r.jitterMs !== undefined ? r.jitterMs : 0.3} ms</td>
                   <td style="padding: 6px 8px;">${r.packetLoss !== undefined ? r.packetLoss : 0}%</td>
-                  <td style="padding: 6px 8px;"><span class="item-tag online" style="font-size: 0.7rem; padding: 2px 6px;">${r.grade || 'A+'}</span></td>
+                  <td style="padding: 6px 8px;"><span class="item-tag online" style="font-size: 0.7rem; padding: 2px 6px;">${escapeHtml(r.grade || 'A+')}</span></td>
                 </tr>
               `).join('');
             }
@@ -3070,7 +3070,7 @@
         .catch(() => {
           // Fallback 1: Fetch static snapshot isp-health.json from apex repository
           return fetch('isp-health.json', { signal: _fetchSig(5000) })
-            .then(r => r.json())
+            .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(sData => {
               if (sData && sData.status === 'success') {
                 const sList = Array.isArray(sData.history) ? sData.history : [];
@@ -3079,13 +3079,13 @@
                   const sRecent = sList.slice(-10).reverse();
                   sTbody.innerHTML = sRecent.map(r => `
                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
-                      <td style="padding: 6px 8px; color: #8b949e;">${r.timeShort || r.timestamp || 'Recent'}</td>
-                      <td style="padding: 6px 8px; color: #60a5fa;">${r.isp || 'Bell Canada'}</td>
+                      <td style="padding: 6px 8px; color: #8b949e;">${escapeHtml(r.timeShort || r.timestamp || 'Recent')}</td>
+                      <td style="padding: 6px 8px; color: #60a5fa;">${escapeHtml(r.isp || 'Bell Canada')}</td>
                       <td style="padding: 6px 8px; color: #38bdf8; font-weight: 700;">${r.pingAvgMs !== undefined ? r.pingAvgMs : 3.6} ms</td>
                       <td style="padding: 6px 8px;">${r.pingMinMs !== undefined ? r.pingMinMs : 3} / ${r.pingMaxMs !== undefined ? r.pingMaxMs : 4} ms</td>
                       <td style="padding: 6px 8px; color: #4ade80;">&plusmn; ${r.jitterMs !== undefined ? r.jitterMs : 0.71} ms</td>
                       <td style="padding: 6px 8px;">${r.packetLoss !== undefined ? r.packetLoss : 0}%</td>
-                      <td style="padding: 6px 8px;"><span class="item-tag online" style="font-size: 0.7rem; padding: 2px 6px;">${r.grade || 'A+'}</span></td>
+                      <td style="padding: 6px 8px;"><span class="item-tag online" style="font-size: 0.7rem; padding: 2px 6px;">${escapeHtml(r.grade || 'A+')}</span></td>
                     </tr>
                   `).join('');
                 }
@@ -3900,7 +3900,7 @@
       // Dynamic SLA and uptime metrics from gateway
       if (typeof fetch === 'function') {
         return fetch(`${GATEWAY}/uptime`, { signal: _fetchSig(5000) })
-          .then(r => r.json())
+          .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
           .then(data => {
             if (data && data.status === 'success') {
               window.UPTIME_INCIDENTS = data.incidents || [];
