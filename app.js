@@ -78,12 +78,17 @@
     }
     window.scrollToSection = scrollToSection;
 
+    const safeNum = (v, fb = 0) => (v !== null && v !== undefined && v !== '' && Number.isFinite(Number(v))) ? Number(v) : fb;
+
     // Universal Safe Metric Formatter & Null-to-Check Architecture
     function safeMetric(val, unit = '', target = 'nuc') {
       if (val !== null && val !== undefined && !Number.isNaN(val) && val !== 'NaN') {
-        return `${val}${unit ? ' ' + unit : ''}`;
+        const vEsc = escapeHtml(String(val));
+        const uEsc = unit ? ' ' + escapeHtml(String(unit)) : '';
+        return `${vEsc}${uEsc}`;
       }
-      return `<button type="button" class="btn-check-inline" onclick="universalCheck('${target}', this); event.stopPropagation();" title="Telemetry unavailable. Click to check now."><span class="check-icon">&#8635;</span> Check</button>`;
+      const safeTarget = ['nuc', 'desktop', 'both'].includes(target) ? target : 'nuc';
+      return `<button type="button" class="btn-check-inline" onclick="universalCheck('${safeTarget}', this); event.stopPropagation();" title="Telemetry unavailable. Click to check now."><span class="check-icon">&#8635;</span> Check</button>`;
     }
     window.safeMetric = safeMetric;
 
@@ -158,16 +163,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.52';
+          const activeVer = match ? match[0] : 'v2.8.55';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 15223;
+      const baseHtmlLines = 15346;
       const baseCssLines = 6345;
-      const baseJsLines = 6752;
+      const baseJsLines = 6759;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
@@ -1172,16 +1177,17 @@
         const fLatNuc = document.getElementById('fleet-latency-nuc');
         if (fLatNuc) { fLatNuc.textContent = `192.168.2.35 • ${latencyMs !== null ? latencyMs : 14} ms (8.8.8.8)`; }
 
+        const latS = safeNum(latencyMs, null);
         const mStream = document.getElementById('meta-watch-streamhub');
-        if (mStream) mStream.innerHTML = isOnline ? `${latencyMs !== null ? latencyMs : 0.8} ms &bull; Sentinel Armed (3m)` : 'Unreachable &bull; Offline';
+        if (mStream) mStream.innerHTML = isOnline ? `${latS !== null ? latS : 0.8} ms &bull; Sentinel Armed (3m)` : 'Unreachable &bull; Offline';
         const mFiles = document.getElementById('meta-watch-files');
-        if (mFiles) mFiles.innerHTML = isOnline ? `${latencyMs !== null ? latencyMs : 0.9} ms &bull; Auto-Mount Active` : 'Unreachable &bull; Offline';
+        if (mFiles) mFiles.innerHTML = isOnline ? `${latS !== null ? latS : 0.9} ms &bull; Auto-Mount Active` : 'Unreachable &bull; Offline';
         const mCam = document.getElementById('meta-watch-cam');
         if (mCam) mCam.innerHTML = isOnline ? '&lt;50ms Low-Latency WebRTC' : 'Unreachable &bull; Offline';
         const mWol = document.getElementById('meta-watch-wol');
-        if (mWol) mWol.innerHTML = isOnline ? `${latencyMs ? latencyMs + ' ms' : '< 1 ms'} &bull; Fast-Path` : 'Unreachable &bull; Offline';
+        if (mWol) mWol.innerHTML = isOnline ? `${latS ? latS + ' ms' : '< 1 ms'} &bull; Fast-Path` : 'Unreachable &bull; Offline';
         const mTorrents2 = document.getElementById('meta-watch-torrents2');
-        if (mTorrents2) mTorrents2.innerHTML = isOnline ? `${latencyMs !== null ? latencyMs : 0.8} ms &bull; Swarm Active` : 'Unreachable &bull; Offline';
+        if (mTorrents2) mTorrents2.innerHTML = isOnline ? `${latS !== null ? latS : 0.8} ms &bull; Swarm Active` : 'Unreachable &bull; Offline';
         const mCf = document.getElementById('meta-watch-cf');
         if (mCf) mCf.innerHTML = isOnline ? '1.1 ms &bull; Global Anycast Resilient' : 'Standby &bull; Ingress Suspended';
         if (vitals) {
@@ -1197,9 +1203,9 @@
         const fCpuNuc = document.getElementById('fleet-cpu-nuc');
         const sCpu = document.getElementById('stat-cpu-val');
         if (isOnline) {
-          const cLoad = (vitals && vitals.cpuLoad !== undefined) ? vitals.cpuLoad : 5;
+          const cLoad = (vitals && vitals.cpuLoad !== undefined) ? safeNum(vitals.cpuLoad, 5) : 5;
           if (fCpuNuc) fCpuNuc.textContent = `Intel Core i5 \u2022 ${cLoad}% Load (4C / 8T)`;
-          if (sCpu && vitals && vitals.cpuLoad !== undefined) sCpu.innerHTML = `${vitals.cpuLoad}% <span style="font-size: 0.9rem; color: #8b949e;">CPU</span>`;
+          if (sCpu && vitals && vitals.cpuLoad !== undefined) sCpu.innerHTML = `${cLoad}% <span style="font-size: 0.9rem; color: #8b949e;">CPU</span>`;
         }
         if (!isOnline) {
           const sHw = document.getElementById('stat-hw-tag');
@@ -1216,7 +1222,7 @@
 
         const rNuc = document.getElementById('ribbon-nuc');
         if (rNuc) {
-          rNuc.innerHTML = `<span class="dropdown-dot dot-2"></span> ${latencyMs !== null ? latencyMs + ' ms' : '0 ms'} | ${isOnline ? 'Online' : 'Offline'}`;
+          rNuc.innerHTML = `<span class="dropdown-dot dot-2"></span> ${latS !== null ? latS + ' ms' : '0 ms'} | ${isOnline ? 'Online' : 'Offline'}`;
         }
         const rStorage = document.getElementById('ribbon-storage');
         if (rStorage && disk) {
@@ -1313,10 +1319,11 @@
           stagTorrents.className = `item-tag ${isOnline ? 'online' : 'offline'}`;
           stagTorrents.textContent = isOnline ? 'Operational' : 'Standby';
         }
+        const dLatS = safeNum(latencyMs, null);
         const metaTorrents = document.getElementById('meta-watch-torrents');
         if (metaTorrents) {
           metaTorrents.style.color = isOnline ? '#34d399' : '#94a3b8';
-          metaTorrents.innerHTML = isOnline ? `${latencyMs ? latencyMs + ' ms' : '< 1 ms'} &bull; Interactive Node Active` : 'Standby &bull; Sleeping (WoL Ready)';
+          metaTorrents.innerHTML = isOnline ? `${dLatS ? dLatS + ' ms' : '< 1 ms'} &bull; Interactive Node Active` : 'Standby &bull; Sleeping (WoL Ready)';
         }
         const stDesk = document.getElementById('status-tag-desktop');
         if (stDesk) { stDesk.textContent = isOnline ? 'Active' : 'Standby'; stDesk.className = 'item-tag ' + (isOnline ? 'online' : 'offline'); }
@@ -1353,12 +1360,12 @@
             dFreeGB: 5376,
             dTotalGB: 5589
           };
-          const totalGB = (effectiveDisk.totalGB !== undefined && effectiveDisk.totalGB !== null) ? effectiveDisk.totalGB : 6054;
-          const usedPercent = (effectiveDisk.usedPercent !== undefined && effectiveDisk.usedPercent !== null) ? effectiveDisk.usedPercent : 5.0;
-          const usedGB = (effectiveDisk.usedGB !== undefined && effectiveDisk.usedGB !== null) ? effectiveDisk.usedGB : 303;
-          const freeGB = (effectiveDisk.freeGB !== undefined && effectiveDisk.freeGB !== null) ? effectiveDisk.freeGB : 5751;
-          const cFree = effectiveDisk.cFreeGB ? Math.round(effectiveDisk.cFreeGB) : 375;
-          const dFree = effectiveDisk.dFreeGB ? (effectiveDisk.dFreeGB / 1000).toFixed(1) : '5.4';
+          const totalGB = safeNum(effectiveDisk.totalGB, 6054);
+          const usedPercent = safeNum(effectiveDisk.usedPercent, 5.0);
+          const usedGB = safeNum(effectiveDisk.usedGB, 303);
+          const freeGB = safeNum(effectiveDisk.freeGB, 5751);
+          const cFree = (effectiveDisk.cFreeGB !== undefined && effectiveDisk.cFreeGB !== null) ? Math.round(safeNum(effectiveDisk.cFreeGB, 375)) : 375;
+          const dFree = (effectiveDisk.dFreeGB !== undefined && effectiveDisk.dFreeGB !== null) ? (safeNum(effectiveDisk.dFreeGB, 5400) / 1000).toFixed(1) : '5.4';
 
           const fStorage = document.getElementById('fleet-storage-desktop');
           const fBar = document.getElementById('fleet-bar-desktop');
@@ -1382,22 +1389,25 @@
           const rDeskStorage = document.getElementById('ribbon-desktop-storage');
           if (rDeskStorage) rDeskStorage.textContent = `${(freeGB / 1000).toFixed(2)} TB Free (${freePct}% free \u2022 C: ${cFree}G | D: ${dFree}T)`;
 
-          const dynamicBaselineCpu = Math.floor(18 + Math.sin(Date.now() / 15000) * 8);
-          const effectiveVitals = vitals || {
-            ramUsedGB: 11.0,
-            ramTotalGB: 31.9,
-            ramPercent: 34,
-            cpuLoad: dynamicBaselineCpu
-          };
           const fVitals = document.getElementById('fleet-vitals-desktop');
           const fCpu = document.getElementById('fleet-cpu-desktop');
-          if (fVitals) fVitals.textContent = `${effectiveVitals.ramUsedGB} GB / ${effectiveVitals.ramTotalGB} GB (${effectiveVitals.ramPercent}%) | Active`;
-          if (fCpu && effectiveVitals.cpuLoad !== undefined) fCpu.textContent = `AMD Ryzen 7 | ${effectiveVitals.cpuLoad}% Load (8C / 16T)`;
-
           const sDeskCpu = document.getElementById('stat-desktop-cpu-val');
           const sDeskRam = document.getElementById('stat-desktop-ram-sub');
-          if (sDeskCpu && effectiveVitals.cpuLoad !== undefined) sDeskCpu.innerHTML = `${effectiveVitals.cpuLoad}% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>`;
-          if (sDeskRam) sDeskRam.textContent = `Memory: ${effectiveVitals.ramUsedGB} GB / ${effectiveVitals.ramTotalGB} GB (${effectiveVitals.ramPercent}%) | Active Session`;
+          if (vitals) {
+            const rUsed = safeNum(vitals.ramUsedGB, '--');
+            const rTot = safeNum(vitals.ramTotalGB, '--');
+            const rPct = safeNum(vitals.ramPercent, '--');
+            const cLd = vitals.cpuLoad !== undefined ? safeNum(vitals.cpuLoad, null) : null;
+            if (fVitals) fVitals.textContent = `${rUsed} GB / ${rTot} GB (${rPct}%) | Active`;
+            if (fCpu && cLd !== null) fCpu.textContent = `AMD Ryzen 7 | ${cLd}% Load (8C / 16T)`;
+            if (sDeskCpu && cLd !== null) sDeskCpu.innerHTML = `${cLd}% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>`;
+            if (sDeskRam) sDeskRam.textContent = `Memory: ${rUsed} GB / ${rTot} GB (${rPct}%) | Active Session`;
+          } else {
+            if (fVitals) fVitals.textContent = 'Awaiting Vitals | Online';
+            if (fCpu) fCpu.textContent = 'AMD Ryzen 7 | Online (8C / 16T)';
+            if (sDeskCpu) sDeskCpu.innerHTML = `-- <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>`;
+            if (sDeskRam) sDeskRam.textContent = 'Memory: Awaiting Vitals | Active Session';
+          }
         }
         if (!isOnline) {
           const fVitals = document.getElementById('fleet-vitals-desktop');
@@ -1748,8 +1758,8 @@
         return true;
       } catch (err) {
         const status = err && err.status;
-        const isTransient = (err && err.name === 'AbortError') || [502, 503, 504, 530].includes(status);
-        const isAuthFailure = !isTransient && (status === 401 || status === 403 || (err && err.name === 'TypeError'));
+        const isTransient = (err && (err.name === 'AbortError' || err.name === 'TimeoutError' || err.name === 'TypeError')) || [502, 503, 504, 530].includes(status);
+        const isAuthFailure = !isTransient && (status === 401 || status === 403);
         let syncAttempted = false;
         try { syncAttempted = Boolean(sessionStorage.getItem('dr_sso_sync_attempted')); } catch(e) {}
         if (autoRedirect && isAuthFailure && window.location.hostname === 'digitalresolve.ca' && !syncAttempted) {
@@ -2825,50 +2835,60 @@
 
         const cpuVal = document.getElementById('stat-cpu-val');
         const ramSub = document.getElementById('stat-ram-sub');
-        if (cpuVal && nuc.cpuLoad !== undefined) cpuVal.innerHTML = `${nuc.cpuLoad}% <span style="font-size: 0.9rem; color: #8b949e;">CPU</span>`;
+        const nucCpu = safeNum(nuc.cpuLoad, null);
+        if (cpuVal && nucCpu !== null) cpuVal.innerHTML = `${nucCpu}% <span style="font-size: 0.9rem; color: #8b949e;">CPU</span>`;
         if (ramSub && nuc.vitals) {
-          ramSub.textContent = `Memory: ${nuc.vitals.ramUsedGB} GB / ${nuc.vitals.ramTotalGB} GB (${nuc.vitals.ramPercent}%) | ${nuc.vitals.uptime} up`;
+          ramSub.textContent = `Memory: ${safeNum(nuc.vitals.ramUsedGB, 0)} GB / ${safeNum(nuc.vitals.ramTotalGB, 0)} GB (${safeNum(nuc.vitals.ramPercent, 0)}%) | ${nuc.vitals.uptime || '--'} up`;
         }
 
         if (nuc.disk) {
+          const ndFree = safeNum(nuc.disk.freeGB, 0);
+          const ndTot = safeNum(nuc.disk.totalGB, 0);
+          const ndPct = safeNum(nuc.disk.usedPercent, 0);
+          const ndUsed = safeNum(nuc.disk.usedGB, 0);
           const dFree = document.getElementById('stat-disk-free');
-          if (dFree) dFree.innerHTML = `${nuc.disk.freeGB} GB <span style="font-size: 0.9rem; color: #8b949e;">Free</span>`;
+          if (dFree) dFree.innerHTML = `${ndFree} GB <span style="font-size: 0.9rem; color: #8b949e;">Free</span>`;
           const statDiskSub = document.getElementById('stat-disk-sub');
           if (statDiskSub) {
-            statDiskSub.innerHTML = `<span>Total ${nuc.disk.totalGB} GB (${nuc.disk.usedPercent}% Used &bull; ${nuc.disk.usedGB} GB)</span>`;
+            statDiskSub.innerHTML = `<span>Total ${ndTot} GB (${ndPct}% Used &bull; ${ndUsed} GB)</span>`;
           }
         }
 
         if (nuc.storage && nuc.storage.totalGB) {
           const st = nuc.storage;
-          const moviesPct = ((st.moviesGB / st.totalGB) * 100).toFixed(1);
-          const tvPct = ((st.tvSeriesGB / st.totalGB) * 100).toFixed(1);
-          const mixesPct = ((st.mixesGB / st.totalGB) * 100).toFixed(1);
-          const freePct = ((st.freeGB / st.totalGB) * 100).toFixed(1);
+          const stTot = safeNum(st.totalGB, 1);
+          const stMov = safeNum(st.moviesGB, 0);
+          const stTv = safeNum(st.tvSeriesGB, 0);
+          const stMix = safeNum(st.mixesGB, 0);
+          const stFree = safeNum(st.freeGB, 0);
+          const moviesPct = ((stMov / stTot) * 100).toFixed(1);
+          const tvPct = ((stTv / stTot) * 100).toFixed(1);
+          const mixesPct = ((stMix / stTot) * 100).toFixed(1);
+          const freePct = ((stFree / stTot) * 100).toFixed(1);
 
           document.querySelectorAll('.seg-movies').forEach(el => {
             el.style.width = `${moviesPct}%`;
-            el.title = `Movies: ${st.moviesGB} GB`;
+            el.title = `Movies: ${stMov} GB`;
           });
           document.querySelectorAll('.seg-tv').forEach(el => {
             el.style.width = `${tvPct}%`;
-            el.title = `TV Series: ${st.tvSeriesGB} GB`;
+            el.title = `TV Series: ${stTv} GB`;
           });
           document.querySelectorAll('.seg-mixes').forEach(el => {
             el.style.width = `${mixesPct}%`;
-            el.title = `Media Mixes: ${Math.round(st.mixesGB)} GB`;
+            el.title = `Media Mixes: ${Math.round(stMix)} GB`;
           });
           document.querySelectorAll('.seg-free').forEach(el => {
             el.style.width = `${freePct}%`;
-            el.title = `Free Space: ${st.freeGB} GB (${freePct}%)`;
+            el.title = `Free Space: ${stFree} GB (${freePct}%)`;
           });
 
           const moviesLeg = document.getElementById('stat-nuc-movies-legend');
-          if (moviesLeg) moviesLeg.innerHTML = `<span class="legend-dot seg-movies"></span> Movies (${st.moviesGB} GB)`;
+          if (moviesLeg) moviesLeg.innerHTML = `<span class="legend-dot seg-movies"></span> Movies (${stMov} GB)`;
           const tvLeg = document.getElementById('stat-nuc-tv-legend');
-          if (tvLeg) tvLeg.innerHTML = `<span class="legend-dot seg-tv"></span> Series (${st.tvSeriesGB} GB)`;
+          if (tvLeg) tvLeg.innerHTML = `<span class="legend-dot seg-tv"></span> Series (${stTv} GB)`;
           const mixesLeg = document.getElementById('stat-nuc-mixes-legend');
-          if (mixesLeg) mixesLeg.innerHTML = `<span class="legend-dot seg-mixes"></span> Mixes (${Math.round(st.mixesGB)} GB)`;
+          if (mixesLeg) mixesLeg.innerHTML = `<span class="legend-dot seg-mixes"></span> Mixes (${Math.round(stMix)} GB)`;
         }
       }
       if (data.cloudflare) {
@@ -2876,11 +2896,12 @@
       }
       if (data.desktop) {
         updateStatusUI('desktop', data.desktop.online, data.desktop.latencyMs, data.desktop.disk, data.desktop.torrent, data.desktop.vitals);
-        if (data.desktop.cpuLoad !== undefined && data.desktop.online) {
+        const deskCpu = safeNum(data.desktop.cpuLoad, null);
+        if (deskCpu !== null && data.desktop.online) {
           const sDeskCpu = document.getElementById('stat-desktop-cpu-val');
-          if (sDeskCpu) sDeskCpu.innerHTML = `${data.desktop.cpuLoad}% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>`;
+          if (sDeskCpu) sDeskCpu.innerHTML = `${deskCpu}% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>`;
           const fCpu = document.getElementById('fleet-cpu-desktop');
-          if (fCpu) fCpu.textContent = `AMD Ryzen 7 | ${data.desktop.cpuLoad}% Load (8C / 16T)`;
+          if (fCpu) fCpu.textContent = `AMD Ryzen 7 | ${deskCpu}% Load (8C / 16T)`;
         }
       }
       if (data.tokens) {
@@ -3704,77 +3725,79 @@
     window.activateMaintenanceWithUpdate = activateMaintenanceWithUpdate;
 
     function activateMaintenanceMode(durationMinutes = 30, reason = 'Windows Updates & Optimization', autoRunUpdate = false) {
-      const expiresAt = durationMinutes > 0 ? (Date.now() + durationMinutes * 60000) : null;
-      const data = {
-        active: true,
-        durationMinutes: durationMinutes,
-        expiresAt: expiresAt,
-        reason: reason,
-        activatedAt: Date.now()
-      };
-
-      try {
-        localStorage.setItem('dr_nuc_maintenance', JSON.stringify(data));
-      } catch(e) {}
-
-      updateMaintenanceVisualStates();
-      updateMaintenanceModalUI();
-      closeMaintenanceModal();
-
-      playChaosTone(523, 1046, 'triangle', 0.25);
-      showToast('success', 'NUC Maintenance Window Engaged', `SLA Shield Active for ${durationMinutes > 0 ? durationMinutes + 'm' : 'Manual Duration'}. Outage metrics 100% exempt.`);
-
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3500);
-        fetch(`${GATEWAY}/api/control?action=maintenance&target=nuc&enable=true&duration=${durationMinutes}`, {
-          method: 'POST',
-          headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }),
-          body: JSON.stringify({ enable: true, duration: durationMinutes, reason: reason }),
-          signal: controller.signal
-        }).catch(() => {}).finally(() => clearTimeout(timeoutId));
-      } catch(e) {}
-
-      const pauseChk = document.getElementById('maint-chk-pause');
-      if (pauseChk && pauseChk.checked) {
-        sendControl('pause-all', 'nuc');
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal('Maintenance Mode Control', () => activateMaintenanceMode(durationMinutes, reason, autoRunUpdate));
+        return;
       }
-
-      if (autoRunUpdate) {
-        setTimeout(() => {
-          sendControl('run-update-computer', 'nuc');
-        }, 1200);
-      }
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
+      fetch(`${GATEWAY}/api/control?action=maintenance&target=nuc&enable=true&duration=${durationMinutes}`, {
+        method: 'POST',
+        headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ enable: true, duration: durationMinutes, reason: reason }),
+        signal: controller.signal
+      })
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(() => {
+          const expiresAt = durationMinutes > 0 ? (Date.now() + durationMinutes * 60000) : null;
+          const data = {
+            active: true,
+            durationMinutes: durationMinutes,
+            expiresAt: expiresAt,
+            reason: reason,
+            activatedAt: Date.now()
+          };
+          try { localStorage.setItem('dr_nuc_maintenance', JSON.stringify(data)); } catch(e) {}
+          updateMaintenanceVisualStates();
+          updateMaintenanceModalUI();
+          closeMaintenanceModal();
+          playChaosTone(523, 1046, 'triangle', 0.25);
+          showToast('success', 'NUC Maintenance Window Engaged', `SLA Shield Active for ${durationMinutes > 0 ? durationMinutes + 'm' : 'Manual Duration'}. Outage metrics 100% exempt.`);
+          const pauseChk = document.getElementById('maint-chk-pause');
+          if (pauseChk && pauseChk.checked) {
+            sendControl('pause-all', 'nuc');
+          }
+          if (autoRunUpdate) {
+            setTimeout(() => { sendControl('run-update-computer', 'nuc'); }, 1200);
+          }
+        })
+        .catch(err => {
+          showToast('error', 'Maintenance Mode Failed', `Gateway rejected or failed request (${err && err.message ? err.message : 'unreachable'}).`);
+        })
+        .finally(() => clearTimeout(timeoutId));
     }
     window.activateMaintenanceMode = activateMaintenanceMode;
 
     function deactivateMaintenanceMode() {
-      try {
-        localStorage.removeItem('dr_nuc_maintenance');
-      } catch(e) {}
-
-      updateMaintenanceVisualStates();
-      updateMaintenanceModalUI();
-      closeMaintenanceModal();
-
-      playChaosTone(880, 440, 'sine', 0.2);
-      showToast('info', 'Maintenance Window Concluded', 'NUC Server restored to continuous 24/7 monitoring.');
-
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3500);
-        fetch(`${GATEWAY}/api/control?action=maintenance&target=nuc&enable=false`, {
-          method: 'POST',
-          headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }),
-          body: JSON.stringify({ enable: false }),
-          signal: controller.signal
-        }).catch(() => {}).finally(() => clearTimeout(timeoutId));
-      } catch(e) {}
-
-      const resumeChk = document.getElementById('maint-chk-resume');
-      if (resumeChk && resumeChk.checked) {
-        sendControl('resume-all', 'nuc');
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal('Maintenance Mode Control', () => deactivateMaintenanceMode());
+        return;
       }
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
+      fetch(`${GATEWAY}/api/control?action=maintenance&target=nuc&enable=false`, {
+        method: 'POST',
+        headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ enable: false }),
+        signal: controller.signal
+      })
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(() => {
+          try { localStorage.removeItem('dr_nuc_maintenance'); } catch(e) {}
+          updateMaintenanceVisualStates();
+          updateMaintenanceModalUI();
+          closeMaintenanceModal();
+          playChaosTone(880, 440, 'sine', 0.2);
+          showToast('info', 'Maintenance Window Concluded', 'NUC Server restored to continuous 24/7 monitoring.');
+          const resumeChk = document.getElementById('maint-chk-resume');
+          if (resumeChk && resumeChk.checked) {
+            sendControl('resume-all', 'nuc');
+          }
+        })
+        .catch(err => {
+          showToast('error', 'Disable Maintenance Failed', `Gateway rejected or failed request (${err && err.message ? err.message : 'unreachable'}).`);
+        })
+        .finally(() => clearTimeout(timeoutId));
     }
     window.deactivateMaintenanceMode = deactivateMaintenanceMode;
 
@@ -4017,8 +4040,9 @@
               document.querySelectorAll('#uptime-hours-val').forEach(el => {
                 if (data.monitoredHours) el.innerHTML = `${Number(data.monitoredHours).toLocaleString()} <span style="font-size: 0.9rem; color: #8b949e;">Hours</span>`;
               });
+              const outCnt = safeNum(data.outages, null);
               document.querySelectorAll('#uptime-outages-val').forEach(el => {
-                if (data.outages !== undefined) el.innerHTML = `${data.outages} <span style="font-size: 0.9rem; color: #8b949e;">Incidents</span>`;
+                if (outCnt !== null) el.innerHTML = `${outCnt} <span style="font-size: 0.9rem; color: #8b949e;">Incidents</span>`;
               });
               document.querySelectorAll('.nav-sla-tag').forEach(tag => {
                 if (data.overallSla) tag.textContent = data.overallSla;
@@ -4730,15 +4754,7 @@
       });
     }
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        if (typeof closeAgyConsole === 'function') closeAgyConsole();
-        if (typeof closeChangelogModal === 'function') closeChangelogModal(); if (typeof closeMaintenanceModal === 'function') closeMaintenanceModal();
-        if (typeof closeMagnetModal === 'function') closeMagnetModal();
-        document.body.style.overflow = '';
-        document.querySelectorAll('.dropdown.is-open').forEach(dd => dd.classList.remove('is-open'));
-      }
-    });
+
       function escapeHtml(str) {
       if (!str) return '';
       return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -5489,12 +5505,7 @@
         if (/^(?:https?:)?(?:\/\/)?(?:www\.)?audiobooks\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
           return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?audiobooks\.digitalresolve\.ca(?::\d+)?/i, 'http://100.68.136.76:3333');
         }
-        if (/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?\/files(?=[\/?#]|$)/i.test(url)) {
-          return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?\/files/i, 'https://files-lan.digitalresolve.ca');
-        }
-        if (/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-          return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?/i, 'https://files-lan.digitalresolve.ca');
-        }
+
         if (/^(?:https?:)?(?:\/\/)?(?:www\.)?sonarr\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
           return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?sonarr\.digitalresolve\.ca(?::\d+)?/i, 'http://100.68.136.76:8990');
         }
@@ -5543,12 +5554,7 @@
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?audiobooks\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
         return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?audiobooks\.digitalresolve\.ca(?::\d+)?/i, 'https://audio-lan.digitalresolve.ca');
       }
-      if (/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?\/files(?=[\/?#]|$)/i.test(url)) {
-        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?\/files/i, 'https://files-lan.digitalresolve.ca');
-      }
-      if (/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-        return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?files\.digitalresolve\.ca(?::\d+)?/i, 'https://files-lan.digitalresolve.ca');
-      }
+
       if (/^(?:https?:)?(?:\/\/)?(?:www\.)?sonarr\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
         return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?sonarr\.digitalresolve\.ca(?::\d+)?/i, 'https://sonarr-lan.digitalresolve.ca');
       }
@@ -6746,6 +6752,7 @@
         closeAdGuardConfigModal();
         closeCloudflareStatsModal();
         if (typeof closeTailscaleModal === 'function') closeTailscaleModal();
+        document.querySelectorAll('.dropdown.is-open').forEach(dd => dd.classList.remove('is-open'));
         document.body.style.overflow = '';
         document.documentElement.style.overflow = '';
       }

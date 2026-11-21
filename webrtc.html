@@ -518,18 +518,19 @@
       const isHttps = (window.location.protocol === 'https:');
       const isDirectGo2rtc = (window.location.port === '8089' || hostname === 'cam.digitalresolve.ca');
 
+      const addEndpoint = (u) => { if (!endpoints.includes(u)) endpoints.push(u); };
       if (isDirectGo2rtc) {
         const proto = isHttps ? 'wss:' : 'ws:';
-        endpoints.push(`${proto}//${host}/api/ws?src=${encodeURIComponent(stream)}`);
+        addEndpoint(`${proto}//${host}/api/ws?src=${encodeURIComponent(stream)}`);
       }
 
       if (isHttps) {
         // Under HTTPS, mixed-content security forbids ws:// to LAN IP.
-        endpoints.push(`wss://cam.digitalresolve.ca/api/ws?src=${encodeURIComponent(stream)}`);
+        addEndpoint(`wss://cam.digitalresolve.ca/api/ws?src=${encodeURIComponent(stream)}`);
       } else {
         // Under HTTP or local file: LAN direct NUC port 8089 is ultra-low-latency primary
-        endpoints.push(`ws://192.168.2.35:8089/api/ws?src=${encodeURIComponent(stream)}`);
-        endpoints.push(`wss://cam.digitalresolve.ca/api/ws?src=${encodeURIComponent(stream)}`);
+        addEndpoint(`ws://192.168.2.35:8089/api/ws?src=${encodeURIComponent(stream)}`);
+        addEndpoint(`wss://cam.digitalresolve.ca/api/ws?src=${encodeURIComponent(stream)}`);
       }
       return endpoints;
     }
@@ -602,9 +603,11 @@
           try { URL.revokeObjectURL(currentObjectUrl); } catch (e) {}
           currentObjectUrl = null;
         }
+        let sock;
         try {
-          ws = new WebSocket(wsUrl);
-          ws.binaryType = 'arraybuffer';
+          sock = new WebSocket(wsUrl);
+          sock.binaryType = 'arraybuffer';
+          ws = sock;
         } catch (err) {
           return connectEndpoint(endpoints, idx + 1);
         }
@@ -612,15 +615,17 @@
         let hasOpened = false;
         let handled = false;
         const connTimeout = setTimeout(() => {
-          if (!hasOpened && ws && ws.readyState !== WebSocket.OPEN) {
+          if (ws !== sock) return;
+          if (!hasOpened && sock.readyState !== WebSocket.OPEN) {
             if (handled) return;
             handled = true;
-            try { ws.close(); } catch (e) {}
+            try { sock.close(); } catch (e) {}
             startWebRTC(wsUrl, endpoints, idx);
           }
         }, 4000);
 
-        ws.addEventListener('open', () => {
+        sock.addEventListener('open', () => {
+          if (ws !== sock) return;
           hasOpened = true;
           clearTimeout(connTimeout);
 
@@ -630,10 +635,11 @@
             'mp4a.40.2', 'opus'
           ].filter(c => MediaSource.isTypeSupported(`video/mp4; codecs="${c}"`)).join();
 
-          ws.send(JSON.stringify({ type: 'mse', value: supportedCodecs || 'avc1.42001F' }));
+          sock.send(JSON.stringify({ type: 'mse', value: supportedCodecs || 'avc1.42001F' }));
         });
 
-        ws.addEventListener('message', ev => {
+        sock.addEventListener('message', ev => {
+          if (ws !== sock) return;
           if (typeof ev.data === 'string') {
             try {
               const msg = JSON.parse(ev.data);
@@ -682,6 +688,9 @@
                 }
               } else if (msg.type === 'error') {
                 console.warn('go2rtc MSE error:', msg.value);
+                if (handled) return;
+                handled = true;
+                clearTimeout(connTimeout);
                 startWebRTC(wsUrl, endpoints, idx);
               }
             } catch (e) {
@@ -704,8 +713,8 @@
           }
         });
 
-        ws.addEventListener('error', () => {
-          if (streamConnected || handled) return;
+        sock.addEventListener('error', () => {
+          if (ws !== sock || streamConnected || handled) return;
           handled = true;
           clearTimeout(connTimeout);
           if (!hasOpened) {
@@ -715,7 +724,8 @@
           }
         });
 
-        ws.addEventListener('close', () => {
+        sock.addEventListener('close', () => {
+          if (ws !== sock) return;
           if (!streamConnected) {
             if (handled) return;
             handled = true;
@@ -724,6 +734,7 @@
           } else {
             if (handled) return;
             handled = true;
+            if (reconnectTimeout) clearTimeout(reconnectTimeout);
             reconnectTimeout = setTimeout(initStream, 4000);
           }
         });
@@ -770,46 +781,52 @@
             video.play().catch(er => console.warn('Autoplay error:', er));
           });
         } else if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
+          if (reconnectTimeout) clearTimeout(reconnectTimeout);
           reconnectTimeout = setTimeout(initStream, 4000);
         }
       });
 
       let hasOpened = false;
       let handled = false;
+      let sock;
       try {
-        ws = new WebSocket(wsUrl);
+        sock = new WebSocket(wsUrl);
+        ws = sock;
       } catch (err) {
         return connectEndpoint(endpoints, idx + 1);
       }
 
       const timeout = setTimeout(() => {
-        if (!hasOpened && ws && ws.readyState !== WebSocket.OPEN) {
+        if (ws !== sock) return;
+        if (!hasOpened && sock.readyState !== WebSocket.OPEN) {
           if (handled) return;
           handled = true;
-          try { ws.close(); } catch (e) {}
+          try { sock.close(); } catch (e) {}
           connectEndpoint(endpoints, idx + 1);
         }
       }, 3000);
 
-      ws.addEventListener('open', () => {
+      sock.addEventListener('open', () => {
+        if (ws !== sock) return;
         hasOpened = true;
         clearTimeout(timeout);
 
         pc.addEventListener('icecandidate', ev => {
-          if (!ev.candidate || ws.readyState !== WebSocket.OPEN) return;
-          ws.send(JSON.stringify({ type: 'webrtc/candidate', value: ev.candidate.candidate }));
+          if (!ev.candidate || sock.readyState !== WebSocket.OPEN || ws !== sock) return;
+          sock.send(JSON.stringify({ type: 'webrtc/candidate', value: ev.candidate.candidate }));
         });
 
         pc.createOffer().then(offer => pc.setLocalDescription(offer)).then(() => {
-          if (ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({ type: 'webrtc/offer', value: pc.localDescription.sdp }));
+          if (sock.readyState === WebSocket.OPEN && ws === sock) {
+            sock.send(JSON.stringify({ type: 'webrtc/offer', value: pc.localDescription.sdp }));
           }
         }).catch(err => {
           console.warn('Offer creation failed:', err);
         });
       });
 
-      ws.addEventListener('message', ev => {
+      sock.addEventListener('message', ev => {
+        if (ws !== sock) return;
         try {
           const msg = JSON.parse(ev.data);
           if (msg.type === 'webrtc/candidate') {
@@ -820,15 +837,15 @@
         } catch (e) {}
       });
 
-      ws.addEventListener('error', () => {
-        if (handled || hasOpened) return;
+      sock.addEventListener('error', () => {
+        if (ws !== sock || handled || hasOpened) return;
         handled = true;
         clearTimeout(timeout);
         connectEndpoint(endpoints, idx + 1);
       });
 
-      ws.addEventListener('close', () => {
-        if (handled) return;
+      sock.addEventListener('close', () => {
+        if (ws !== sock || handled) return;
         if (pc.connectionState !== 'connected' && !streamConnected) {
           handled = true;
           clearTimeout(timeout);

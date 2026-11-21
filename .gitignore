@@ -1,5 +1,6 @@
 .agents/
 *.ps1
+!/deploy/adguard/deploy.ps1
 *.tmp
 __probe.html
 __harness.html

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
 echo "=============================================="
 echo "  Deploying AdGuard Home for Digital Resolve  "
@@ -15,8 +15,6 @@ if [ -f "$SCRIPT_DIR/conf/AdGuardHome.yaml" ]; then
 fi
 
 cat << 'EOF' > "$INSTALL_DIR/docker-compose.yml"
-version: '3.8'
-
 services:
   adguardhome:
     image: adguard/adguardhome:latest

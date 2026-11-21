@@ -7,8 +7,8 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Digital Resolve - Homelab Operations Deck</title>
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.54 - Digital Resolve - Homelab Operations Deck">
-  <link rel="stylesheet" href="styles.css?v=2.8.54">
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.55 - Digital Resolve - Homelab Operations Deck">
+  <link rel="stylesheet" href="styles.css?v=2.8.55">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -254,9 +254,9 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.54</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.55</span>)</span>
             </button>
-            <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO()" title="Sign out and refresh deck behind Microsoft 365 SSO">
+            <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO(true, event)" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
               <span>Sign Out (M365)</span>
               <span class="item-tag">Sign Out</span>
@@ -311,7 +311,7 @@
               <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 6px #10b981;"></span>
               <span id="top-sso-user-name">Cory Townsend</span>
             </div>
-            <button type="button" class="btn-sso-logout" id="top-sso-logout-btn" onclick="lockSSO()" title="Sign out of Microsoft 365 Admin Session">
+            <button type="button" class="btn-sso-logout" id="top-sso-logout-btn" onclick="lockSSO(true, event)" title="Sign out of Microsoft 365 Admin Session">
               <span>Sign Out (M365)</span>
             </button>
           </div>
@@ -1855,7 +1855,7 @@
                 <button type="button" class="terminal-tab" id="tab-report" onclick="loadLog('report')" title="View Comprehensive Daily Homelab Morning Briefing">Briefing</button>
                 <button type="button" class="terminal-tab" onclick="startNewAgySession('desktop')" style="border-color: rgba(59, 130, 246, 0.4); color: #93c5fd; background: rgba(59, 130, 246, 0.1);" title="Launch New AGY Session on Desktop: agy --dangerously-skip-permissions">Desktop</button>
                 <button type="button" class="terminal-tab" onclick="startNewAgySession('nuc')" style="border-color: rgba(167, 139, 250, 0.4); color: #c4b5fd; background: rgba(167, 139, 250, 0.1);" title="Launch New AGY Session on NUC: agy --dangerously-skip-permissions">NUC</button>
-                <button type="button" class="terminal-tab" id="tab-lock-btn" onclick="lockSSO()" title="Lock Session" style="border-color: rgba(239, 68, 68, 0.4); color: #fca5a5; display: none; align-items: center; gap: 6px; padding: 5px 12px; white-space: nowrap;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; flex-shrink: 0;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg><span>Lock</span></button>
+                <button type="button" class="terminal-tab" id="tab-lock-btn" onclick="lockSSO(true, event)" title="Lock Session" style="border-color: rgba(239, 68, 68, 0.4); color: #fca5a5; display: none; align-items: center; gap: 6px; padding: 5px 12px; white-space: nowrap;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; flex-shrink: 0;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg><span>Lock</span></button>
               </div>
               <div id="terminal-header-sso-badge" style="display: inline-flex; align-items: center; gap: 8px;">
                 <span class="sso-badge-tag">Zero Trust Edge</span>
@@ -1927,7 +1927,7 @@
               </div>
               <div style="display: flex; align-items: center; gap: 12px;">
                 <span id="ai-infer-stats" style="font-size: 0.74rem; color: #94a3b8; font-family: monospace;">Intel Core i5 &bull; Local Compute</span>
-                <button type="button" class="btn btn-secondary" id="edge-ai-lock-btn" onclick="lockSSO()" style="display: none; font-size: 0.74rem; padding: 4px 10px; color: #f87171 !important; border-color: rgba(239, 68, 68, 0.4); align-items: center; gap: 5px;" title="Lock Session"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; flex-shrink: 0;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg><span>Lock</span></button>
+                <button type="button" class="btn btn-secondary" id="edge-ai-lock-btn" onclick="lockSSO(true, event)" style="display: none; font-size: 0.74rem; padding: 4px 10px; color: #f87171 !important; border-color: rgba(239, 68, 68, 0.4); align-items: center; gap: 5px;" title="Lock Session"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; flex-shrink: 0;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg><span>Lock</span></button>
               </div>
             </div>
 
@@ -2609,12 +2609,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.54</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.55</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 28,321 Lines of Code (HTML: 15,223 lines | CSS: 6,345 lines | JS: 6,752 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 28,451 Lines of Code (HTML: 15,346 lines | CSS: 6,345 lines | JS: 6,759 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">28,321</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">28,451</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -3209,10 +3209,23 @@
       </div>
 
             <div class="changelog-body">
-                        <!-- Version v2.8.54 (Current) -->
+                                <!-- Version v2.8.55 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.54 | Current</span>
+            <span class="ver-tag current">v2.8.55 | Current</span>
+            <span class="ver-date">November 21, 2026</span>
+          </div>
+          <h4 class="ver-title">Files SSO Routing Fix, Telemetry XSS/Fallback Cleanup, WS Race Guards &amp; Escape Dedup</h4>
+          <ul class="ver-list">
+            <li><strong>Cross-Device File Browser SSO &amp; Auth Session Fixes:</strong> Removed the broken <code>files.digitalresolve.ca</code> LAN/Tailscale rewrite so FileBrowser authenticates cleanly through Cloudflare Access M365 SSO on every device, wired <code>lockSSO(true, event)</code> onto header and dock lock buttons, and fixed offline/<code>TimeoutError</code> SSO redirect loops.</li>
+            <li><strong>Telemetry Sanitization, Real Vitals &amp; Maintenance Verification:</strong> Extended finite-number and HTML escaping across remaining dashboard and <code>safeMetric</code> sinks, replaced synthetic Desktop CPU/RAM fallbacks with awaiting-vitals states, gated maintenance toggles on verified gateway responses, and deduplicated global Escape modal listeners.</li>
+            <li><strong>WebSocket Fallback Race Hardening &amp; Deploy Script Tracking:</strong> Bound per-socket instances in <code>ai.html</code> and <code>webrtc.html</code> MSE/WebRTC pipelines with timeout/error handled guards, added legacy <code>AbortSignal.timeout</code> fallback guards, and updated <code>.gitignore</code> and AdGuard deploy scripts.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.54 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.54</span>
             <span class="ver-date">November 21, 2026</span>
           </div>
           <h4 class="ver-title">Cache-Bust Asset Sync, Full ISP XSS Sanitization, WS Race Guards &amp; A11y Headings</h4>
@@ -3466,6 +3479,6 @@
       </div>
     </div>
   </div>
-  <script src="app.js?v=2.8.54"></script>
+  <script src="app.js?v=2.8.55"></script>
 </body>
 </html>

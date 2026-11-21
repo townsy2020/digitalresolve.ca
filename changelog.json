@@ -1,290 +1,309 @@
 {
-  "updatedAt": "2026-11-21T22:25:00Z",
-  "currentVersion": "v2.8.54",
-  "releases": [
-    {
-      "version": "v2.8.54",
-      "date": "November 21, 2026",
-      "title": "Cache-Bust Asset Sync, Full ISP XSS Sanitization, WS Race Guards & A11y Headings",
-      "changes": [
-        {
-          "label": "Asset Cache-Busting & Complete XSS Sanitization",
-          "text": "Bumped styles.css and app.js cache-busting query strings to v2.8.54 across all 7 main pages, extended finite-number validation to all ISP history/baseline DOM paths and disk subtitles, and tightened gateway fetch origin prefix matching."
-        },
-        {
-          "label": "WebSocket Fallback Race Fix & Firefox Shift-Logout",
-          "text": "Hoisted per-socket handled guards above WebSocket connect timeouts on ai.html and webrtc.html to stop duplicate fallback handoffs, and passed explicit click events into lockSSO() for cross-browser Shift+Sign Out support."
-        },
-        {
-          "label": "Semantic Heading Hierarchy & Deploy Script Cleanup",
-          "text": "Added screen-reader section headings to eliminate h1-to-h3 level skips across all subpages and removed the stale missing GitHub fallback URL from deploy/adguard/deploy.ps1."
-        }
-      ]
-    },
-    {
-      "version": "v2.8.53",
-      "date": "November 21, 2026",
-      "title": "CSRF/SSO Hardening, Modal/Route/XSS Fixes & Mobile Layout Cleanup",
-      "changes": [
-        {
-          "label": "CSRF & Dual-App SSO Sign-Out Hardening",
-          "text": "Converted state-changing gateway actions (power, wake, sleep, feeder dispense/refill) to POST with X-Requested-With headers, avoided transient 5xx/AbortError SSO redirect loops, and cleared wake.digitalresolve.ca Access sessions during sign-out."
-        },
-        {
-          "label": "Accurate Telemetry & XSS Sanitization",
-          "text": "Removed synthetic online/kibble fallback telemetry on fetch errors, escaped ISP history strings and WebRTC status text safely, fixed duplicate WebSocket error/close fallback races, and corrected AI Ops navigation routing."
-        },
-        {
-          "label": "Modal, DOM, Mobile Nav & SEO Alignment",
-          "text": "Fixed maintenance modal scroll lock and .active class visibility, closed unclosed uptime legend wrappers, fixed desktop-width mobile-layout nav drawer collapsing, and synchronized per-page canonical URLs and exact codebase LOC counts."
-        }
-      ]
-    },
-    {
-      "version": "v2.8.52",
-      "date": "November 21, 2026",
-      "title": "Unified Microsoft 365 Entra ID Zero Trust SSO, Cryptographic JWT Gateway Verification & LOC Sync",
-      "changes": [
-        {
-          "label": "Unified Microsoft 365 Entra ID SSO",
-          "text": "Placed digitalresolve.ca, wake.digitalresolve.ca, torrents, torrents2, and files behind Cloudflare Access Microsoft 365 Entra ID SSO (30-day session), eliminating manual gateway key prompts and letting qBittorrent/service links launch straight through real M365 SSO while preserving Home Network Bypass on StreamHub, Jellyfin, and CatCam."
-        },
-        {
-          "label": "Cryptographic RS256 Gateway Auth & CSRF Lockdown",
-          "text": "Upgraded wol-listener.ps1 on Desktop and NUC to cryptographically validate Cf-Access-Jwt-Assertion signatures via Cloudflare Access JWKS, added /api/sso/login handshake, enforced $isNuc target guards, and closed localhost CSRF / target-cache DoS vectors."
-        },
-        {
-          "label": "Changelog, LOC Accuracy & Public Telemetry Scrub",
-          "text": "Synchronized footer/menu version badges and exact codebase Lines of Code counters across all pages, removed legacy hardcoded WAN/VPN IP literals, and updated ai.html low-kibble beacon requests to send SSO credentials."
-        }
-      ]
-    },
-    {
-      "version": "v2.8.51",
-      "date": "November 21, 2026",
-      "title": "Secrets Vault Migration, Rotated Service Keys, HTML/CSS/a11y Hardening & StorAHCI Upgrade",
-      "changes": [
-        {
-          "label": "ACL-Hardened Secrets Vault & Key Rotations",
-          "text": "Consolidated Desktop and NUC service tokens into ACL-restricted secrets.json, rotated Jellyfin, Prowlarr (synced across Radarr, Sonarr, Readarr, and RSS feeds), and Audiobookshelf API keys, and split Ntfy inbound command listening to a private topic."
-        },
-        {
-          "label": "HTML5 Semantic Structure & Subresource Integrity",
-          "text": "Fixed balanced DOM landmarks across all 7 main pages, added responsive 100dvh modals, :focus-visible rings, prefers-reduced-motion support, and SHA-384 SRI hashes on ai.html ML scripts."
-        },
-        {
-          "label": "Desktop SATA Storage Migration",
-          "text": "Migrated AMD SATA controllers from legacy StoreMI rcbottom/rcraid drivers to native Windows storahci with verified D: health and Defender/polling optimizations."
-        }
-      ]
-    },
-    {
-      "version": "v2.8.22",
-      "date": "October 30, 2026",
-      "title": "Global 8.8.8.8 Ping Telemetry, AI Token Quota Harmonization, Resilient ISP Health Diagnostics & Edge Ingress Alignment",
-      "changes": [
-        {
-          "label": "Global 8.8.8.8 Ping Telemetry",
-          "text": "Replaced local loopback and LAN latencies across NUC Server and Desktop Node with dual-path WAN ping targeting 8.8.8.8 Google DNS, backed by ICMP echo and resilient TCP port 53 fallbacks."
-        },
-        {
-          "label": "AI Token Telemetry Harmonization",
-          "text": "Eliminated confusing Flash/Pro labeling of raw input/output tokens in favor of accurate Prompt (Input), Completion (Output), and Context Cache Reused telemetry (103.4M cumulative tokens processed, 95.6% cache efficiency). Dynamically partitioned active AGY session metrics from lifetime cluster consumption."
-        },
-        {
-          "label": "Subdomain Routing & Edge Ingress Alignment",
-          "text": "Restructured Cloudflare Subdomain Routing matrix to display genuine cache hit rates and edge latencies across all 7 ingress routes (e.g., 94.6% Hit • 12ms, Dynamic Edge • 14ms, WebRTC • <50ms) while properly migrating M365 Entra ID SSO auth designations to the target column."
-        },
-        {
-          "label": "Resilient ISP Diagnostic Stream & CORS Fix",
-          "text": "Expanded gateway HTTP CORS headers to permit <code>X-SSO-Email</code> preflight requests and incorporated local storage telemetry caching, resolving diagnostic stream loading blocks."
-        },
-        {
-          "label": "Dynamic Workstation Compute Telemetry",
-          "text": "Eliminated stuck 4% CPU placeholder across workstation compute cards in favor of live performance counter streaming from the Desktop agent."
-        }
-      ]
-    },
-    {
-      "version": "v2.8.21",
-      "date": "October 30, 2026",
-      "title": "Dynamic Antigravity Session Synchronization, Live Console Stream & Responsive Navigation",
-      "changes": [
-        {
-          "label": "Dynamic AGY Session Tracking",
-          "text": "Autonomous detection and real-time switching to whichever active Antigravity session is currently working on the website via <code>history.jsonl</code> and multi-node active-session publishing, eliminating hardcoded session IDs."
-        },
-        {
-          "label": "Live Console & Terminal Streaming",
-          "text": "Instant terminal transcript streaming from the NUC gateway via <code>/api/logs?name=agy</code> and remote prompt queueing via <code>/api/agy/send</code>."
-        },
-        {
-          "label": "Desktop Navigation Architecture",
-          "text": "Restored unified horizontal desktop navigation flexbar and eliminated layout-breaking vertical cascading overrides and legacy UTF-8 BOM prefixes across all HTML templates."
-        },
-        {
-          "label": "Automated Dynamic Codebase Metrics",
-          "text": "Live line-of-code calculation dynamically evaluating active stylesheet and JavaScript scale."
-        },
-        {
-          "label": "Dynamic Changelog Engine",
-          "text": "Centralized, non-hardcoded release telemetry powered by dynamic JSON ingestion across all pages and modals."
-        }
-      ]
-    },
-    {
-      "version": "v2.8.20",
-      "date": "October 29, 2026",
-      "title": "Streamlined Nodes Navigation, Sleek Button Pills & Unified Control Styling",
-      "changes": [
-        {
-          "label": "Streamlined Nodes Navigation",
-          "text": "Renamed primary category navigation button from <em>FLEET NODES</em> to <code>NODES</code> across all headers and page titles."
-        },
-        {
-          "label": "Sleek Button Pills & Styling Consistency",
-          "text": "Replaced plain radio controls with sleek, interactive button pills (<code>Desktop Node (192.168.2.62)</code> and <code>NUC Server (192.168.2.35)</code>) with cyan/emerald glowing borders and dedicated typography hierarchy for <code>WoL</code>, <code>Sleep</code>, <code>Reboot</code>, and <code>Broadcast WoL</code>."
-        }
-      ]
-    },
-    {
-      "version": "v2.8.19",
-      "date": "October 29, 2026",
-      "title": "Instant WebRTC Stream Play, Symmetrical Hardware Telemetry & Remote Power Operations",
-      "changes": [
-        {
-          "label": "Instant WebRTC Streaming",
-          "text": "Hardware-accelerated optical WebRTC feed from Penny's Cat Hub (<code>cam.digitalresolve.ca</code>) with sub-50ms glass-to-glass latency and automated reconnect loop."
-        },
-        {
-          "label": "Symmetrical Node Telemetry",
-          "text": "Synchronized dual-node hardware metrics, CPU/memory vitals, disk arrays, and network transport matrix between NUC server and Desktop workstation."
-        }
-      ]
-    },
-    {
-      "version": "v2.8.7",
-      "date": "October 28, 2026",
-      "title": "Unified Homelab Service Dashboard Button Styles & Cache-Busted Pipeline",
-      "changes": [
-        {
-          "label": "Strict Button Hierarchy & Consistency",
-          "text": "Standardized all dashboard filter tabs and card action buttons under the shared <code>.btn-schematic-chip</code> class, guaranteeing uniform padding, typography, hover glow, and active click states."
-        },
-        {
-          "label": "Cache-Busted Distribution",
-          "text": "Bumped stylesheet distribution ensuring instant viewport synchronization across Cloudflare Edge and client browsers."
-        },
-        {
-          "label": "Pure ASCII Guarantees",
-          "text": "Replaced dynamic refresh indicators with pure ASCII inline SVG vectors to permanently prevent character decoding artifacts."
-        }
-      ]
-    },
-    {
-      "version": "v2.8.6",
-      "date": "October 28, 2026",
-      "title": "M365 Dedicated SSO Authentication Symmetrical Refresh & Connected Pet Feeder IoT Bridge",
-      "changes": [
-        {
-          "label": "M365 Sign In Multi-Layer Synchronization",
-          "text": "Restored top navigation <code>[ Sign In with M365 ]</code> authentication engine with symmetrical cookie synchronization, global scope variable resolution, and automatic cache-busting reload."
-        },
-        {
-          "label": "Penny's Smart Feeder IoT Bridge",
-          "text": "Fully connected and armed Penny's Smart Feeder IoT (<code>192.168.2.22</code>) with active hardware bridge via NUC backend endpoint (<code>/api/feeder/dispense</code>), live multi-portion motor actuation, and real-time telemetry logging."
-        }
-      ]
-    },
-    {
-      "version": "v2.8.5",
-      "date": "October 28, 2026",
-      "title": "Dynamic 2-Decimal Precision Telemetry & Non-Hardcoded Quota Ingestion",
-      "changes": [
-        {
-          "label": "Dynamic Real-Time Precision",
-          "text": "Replaced static allocation percentages with live mathematical calculations computed to 2 decimal places ingested directly from live session transcripts."
-        },
-        {
-          "label": "Symmetrical Ingestion & UI Binding",
-          "text": "Synchronized frontend telemetry controllers and NUC webhook listener with live float precision, eliminating hardcoded model estimates across all dashboard decks."
-        }
-      ]
-    },
-    {
-      "version": "v2.8.4",
-      "date": "October 28, 2026",
-      "title": "Accurate Gemini Usage & Multi-Tier Model Allocation",
-      "changes": [
-        {
-          "label": "Accurate Gemini Telemetry",
-          "text": "Updated token allocation across header tags, status ribbon, and AGY console modal to reflect multi-tier model usage."
-        },
-        {
-          "label": "Dynamic Model Allocation Meter",
-          "text": "Updated progress bar and telemetry badges with segmented visualization."
-        }
-      ]
-    },
-    {
-      "version": "v2.8.3",
-      "date": "October 28, 2026",
-      "title": "NUC Scheduled Maintenance Mode & Zero-Penalty SLA Shield",
-      "changes": [
-        {
-          "label": "NUC Server Maintenance Window Engine",
-          "text": "Introduced dedicated scheduled maintenance mode controller in the Control Matrix and SLA Telemetry ribbon to protect 90-Day SLA metrics during Windows Updates, driver installs, and reboots."
-        },
-        {
-          "label": "Zero-Penalty SLA Protection",
-          "text": "Planned maintenance windows are mathematically exempt from unplanned outage incidents, preserving 99.985% Grade A+ uptime compliance."
-        }
-      ]
-    },
-    {
-      "version": "v2.8.2",
-      "date": "October 28, 2026",
-      "title": "Topology Circuit Flows, Heartbeat Sparkline & Dynamic Codebase Metrics",
-      "changes": [
-        {
-          "label": "Hardware Topology Schematic Packet Flows",
-          "text": "Restored and enhanced animated glowing SVG packet streams with hardware-accelerated <code>stroke-dashoffset</code> keyframes across Firefox, Chrome, and Edge."
-        },
-        {
-          "label": "Dynamic Heartbeat Oscilloscope",
-          "text": "Activated dynamic multi-tier waveform rendering on the 24-Hour SLA Latency Sparkline canvas with tab-visibility management."
-        }
-      ]
-    },
-    {
-      "version": "v2.8.1",
-      "date": "October 28, 2026",
-      "title": "Live Token Telemetry, Zero-PIN Security & Dynamic Codebase Metrics",
-      "changes": [
-        {
-          "label": "Dynamic AI Token Telemetry",
-          "text": "Real-time regex ingestion of active Antigravity session transcripts (Gemini Flash: 100%, Context Cache Reused)."
-        },
-        {
-          "label": "Zero-PIN Security Deprecation",
-          "text": "Completely eradicated PIN credentials across client and server in favor of strict Microsoft 365 Entra ID SSO & MFA."
-        }
-      ]
-    },
-    {
-      "version": "v2.8.0",
-      "date": "October 27, 2026",
-      "title": "Consolidated Compute & AI Console, Clean UI & Top SSO",
-      "changes": [
-        {
-          "label": "Consolidated Compute & Operations",
-          "text": "Grouped the Live Interactive Terminal and Ollama 24/7 Local Inference Playground together in a unified operations hub."
-        },
-        {
-          "label": "Cloudflare Zero Trust Edge Lockdown",
-          "text": "Enforced strict Microsoft 365 identity challenges on 100% of subdomain requests."
-        }
-      ]
-    }
-  ]
+    "updatedAt":  "2026-11-21T23:46:17Z",
+    "currentVersion":  "v2.8.55",
+    "releases":  [
+                     {
+                         "version":  "v2.8.55",
+                         "date":  "November 21, 2026",
+                         "title":  "Files SSO Routing Fix, Telemetry XSS/Fallback Cleanup, WS Race Guards \u0026 Escape Dedup",
+                         "changes":  [
+                                         {
+                                             "label":  "Cross-Device File Browser SSO \u0026 Auth Session Fixes",
+                                             "text":  "Removed the broken files.digitalresolve.ca LAN/Tailscale rewrite so FileBrowser authenticates cleanly through Cloudflare Access M365 SSO on every device, wired Shift+Sign Out click arguments onto header and dock lock buttons, and fixed offline/TimeoutError SSO redirect loops."
+                                         },
+                                         {
+                                             "label":  "Telemetry Sanitization, Real Vitals \u0026 Maintenance Verification",
+                                             "text":  "Extended finite-number and HTML escaping across remaining dashboard and safeMetric innerHTML sinks, replaced synthetic Math.sin Desktop CPU/RAM fallbacks with real awaiting-vitals states, gated maintenance toggles on verified gateway responses, and deduplicated global Escape modal listeners."
+                                         },
+                                         {
+                                             "label":  "WebSocket Fallback Race Hardening \u0026 Deploy Script Tracking",
+                                             "text":  "Bound per-socket instances in ai.html and webrtc.html MSE/WebRTC pipelines with timeout/error handled guards, added legacy AbortSignal.timeout fallback guards, and updated .gitignore and AdGuard deploy scripts."
+                                         }
+                                     ]
+                     },
+                     {
+                         "version":  "v2.8.54",
+                         "date":  "November 21, 2026",
+                         "title":  "Cache-Bust Asset Sync, Full ISP XSS Sanitization, WS Race Guards \u0026 A11y Headings",
+                         "changes":  [
+                                         {
+                                             "label":  "Asset Cache-Busting \u0026 Complete XSS Sanitization",
+                                             "text":  "Bumped styles.css and app.js cache-busting query strings to v2.8.54 across all 7 main pages, extended finite-number validation to all ISP history/baseline DOM paths and disk subtitles, and tightened gateway fetch origin prefix matching."
+                                         },
+                                         {
+                                             "label":  "WebSocket Fallback Race Fix \u0026 Firefox Shift-Logout",
+                                             "text":  "Hoisted per-socket handled guards above WebSocket connect timeouts on ai.html and webrtc.html to stop duplicate fallback handoffs, and passed explicit click events into lockSSO() for cross-browser Shift+Sign Out support."
+                                         },
+                                         {
+                                             "label":  "Semantic Heading Hierarchy \u0026 Deploy Script Cleanup",
+                                             "text":  "Added screen-reader section headings to eliminate h1-to-h3 level skips across all subpages and removed the stale missing GitHub fallback URL from deploy/adguard/deploy.ps1."
+                                         }
+                                     ]
+                     },
+                     {
+                         "version":  "v2.8.53",
+                         "date":  "November 21, 2026",
+                         "title":  "CSRF/SSO Hardening, Modal/Route/XSS Fixes \u0026 Mobile Layout Cleanup",
+                         "changes":  [
+                                         {
+                                             "label":  "CSRF \u0026 Dual-App SSO Sign-Out Hardening",
+                                             "text":  "Converted state-changing gateway actions (power, wake, sleep, feeder dispense/refill) to POST with X-Requested-With headers, avoided transient 5xx/AbortError SSO redirect loops, and cleared wake.digitalresolve.ca Access sessions during sign-out."
+                                         },
+                                         {
+                                             "label":  "Accurate Telemetry \u0026 XSS Sanitization",
+                                             "text":  "Removed synthetic online/kibble fallback telemetry on fetch errors, escaped ISP history strings and WebRTC status text safely, fixed duplicate WebSocket error/close fallback races, and corrected AI Ops navigation routing."
+                                         },
+                                         {
+                                             "label":  "Modal, DOM, Mobile Nav \u0026 SEO Alignment",
+                                             "text":  "Fixed maintenance modal scroll lock and .active class visibility, closed unclosed uptime legend wrappers, fixed desktop-width mobile-layout nav drawer collapsing, and synchronized per-page canonical URLs and exact codebase LOC counts."
+                                         }
+                                     ]
+                     },
+                     {
+                         "version":  "v2.8.52",
+                         "date":  "November 21, 2026",
+                         "title":  "Unified Microsoft 365 Entra ID Zero Trust SSO, Cryptographic JWT Gateway Verification \u0026 LOC Sync",
+                         "changes":  [
+                                         {
+                                             "label":  "Unified Microsoft 365 Entra ID SSO",
+                                             "text":  "Placed digitalresolve.ca, wake.digitalresolve.ca, torrents, torrents2, and files behind Cloudflare Access Microsoft 365 Entra ID SSO (30-day session), eliminating manual gateway key prompts and letting qBittorrent/service links launch straight through real M365 SSO while preserving Home Network Bypass on StreamHub, Jellyfin, and CatCam."
+                                         },
+                                         {
+                                             "label":  "Cryptographic RS256 Gateway Auth \u0026 CSRF Lockdown",
+                                             "text":  "Upgraded wol-listener.ps1 on Desktop and NUC to cryptographically validate Cf-Access-Jwt-Assertion signatures via Cloudflare Access JWKS, added /api/sso/login handshake, enforced $isNuc target guards, and closed localhost CSRF / target-cache DoS vectors."
+                                         },
+                                         {
+                                             "label":  "Changelog, LOC Accuracy \u0026 Public Telemetry Scrub",
+                                             "text":  "Synchronized footer/menu version badges and exact codebase Lines of Code counters across all pages, removed legacy hardcoded WAN/VPN IP literals, and updated ai.html low-kibble beacon requests to send SSO credentials."
+                                         }
+                                     ]
+                     },
+                     {
+                         "version":  "v2.8.51",
+                         "date":  "November 21, 2026",
+                         "title":  "Secrets Vault Migration, Rotated Service Keys, HTML/CSS/a11y Hardening \u0026 StorAHCI Upgrade",
+                         "changes":  [
+                                         {
+                                             "label":  "ACL-Hardened Secrets Vault \u0026 Key Rotations",
+                                             "text":  "Consolidated Desktop and NUC service tokens into ACL-restricted secrets.json, rotated Jellyfin, Prowlarr (synced across Radarr, Sonarr, Readarr, and RSS feeds), and Audiobookshelf API keys, and split Ntfy inbound command listening to a private topic."
+                                         },
+                                         {
+                                             "label":  "HTML5 Semantic Structure \u0026 Subresource Integrity",
+                                             "text":  "Fixed balanced DOM landmarks across all 7 main pages, added responsive 100dvh modals, :focus-visible rings, prefers-reduced-motion support, and SHA-384 SRI hashes on ai.html ML scripts."
+                                         },
+                                         {
+                                             "label":  "Desktop SATA Storage Migration",
+                                             "text":  "Migrated AMD SATA controllers from legacy StoreMI rcbottom/rcraid drivers to native Windows storahci with verified D: health and Defender/polling optimizations."
+                                         }
+                                     ]
+                     },
+                     {
+                         "version":  "v2.8.22",
+                         "date":  "October 30, 2026",
+                         "title":  "Global 8.8.8.8 Ping Telemetry, AI Token Quota Harmonization, Resilient ISP Health Diagnostics \u0026 Edge Ingress Alignment",
+                         "changes":  [
+                                         {
+                                             "label":  "Global 8.8.8.8 Ping Telemetry",
+                                             "text":  "Replaced local loopback and LAN latencies across NUC Server and Desktop Node with dual-path WAN ping targeting 8.8.8.8 Google DNS, backed by ICMP echo and resilient TCP port 53 fallbacks."
+                                         },
+                                         {
+                                             "label":  "AI Token Telemetry Harmonization",
+                                             "text":  "Eliminated confusing Flash/Pro labeling of raw input/output tokens in favor of accurate Prompt (Input), Completion (Output), and Context Cache Reused telemetry (103.4M cumulative tokens processed, 95.6% cache efficiency). Dynamically partitioned active AGY session metrics from lifetime cluster consumption."
+                                         },
+                                         {
+                                             "label":  "Subdomain Routing \u0026 Edge Ingress Alignment",
+                                             "text":  "Restructured Cloudflare Subdomain Routing matrix to display genuine cache hit rates and edge latencies across all 7 ingress routes (e.g., 94.6% Hit • 12ms, Dynamic Edge • 14ms, WebRTC • \u003c50ms) while properly migrating M365 Entra ID SSO auth designations to the target column."
+                                         },
+                                         {
+                                             "label":  "Resilient ISP Diagnostic Stream \u0026 CORS Fix",
+                                             "text":  "Expanded gateway HTTP CORS headers to permit \u003ccode\u003eX-SSO-Email\u003c/code\u003e preflight requests and incorporated local storage telemetry caching, resolving diagnostic stream loading blocks."
+                                         },
+                                         {
+                                             "label":  "Dynamic Workstation Compute Telemetry",
+                                             "text":  "Eliminated stuck 4% CPU placeholder across workstation compute cards in favor of live performance counter streaming from the Desktop agent."
+                                         }
+                                     ]
+                     },
+                     {
+                         "version":  "v2.8.21",
+                         "date":  "October 30, 2026",
+                         "title":  "Dynamic Antigravity Session Synchronization, Live Console Stream \u0026 Responsive Navigation",
+                         "changes":  [
+                                         {
+                                             "label":  "Dynamic AGY Session Tracking",
+                                             "text":  "Autonomous detection and real-time switching to whichever active Antigravity session is currently working on the website via \u003ccode\u003ehistory.jsonl\u003c/code\u003e and multi-node active-session publishing, eliminating hardcoded session IDs."
+                                         },
+                                         {
+                                             "label":  "Live Console \u0026 Terminal Streaming",
+                                             "text":  "Instant terminal transcript streaming from the NUC gateway via \u003ccode\u003e/api/logs?name=agy\u003c/code\u003e and remote prompt queueing via \u003ccode\u003e/api/agy/send\u003c/code\u003e."
+                                         },
+                                         {
+                                             "label":  "Desktop Navigation Architecture",
+                                             "text":  "Restored unified horizontal desktop navigation flexbar and eliminated layout-breaking vertical cascading overrides and legacy UTF-8 BOM prefixes across all HTML templates."
+                                         },
+                                         {
+                                             "label":  "Automated Dynamic Codebase Metrics",
+                                             "text":  "Live line-of-code calculation dynamically evaluating active stylesheet and JavaScript scale."
+                                         },
+                                         {
+                                             "label":  "Dynamic Changelog Engine",
+                                             "text":  "Centralized, non-hardcoded release telemetry powered by dynamic JSON ingestion across all pages and modals."
+                                         }
+                                     ]
+                     },
+                     {
+                         "version":  "v2.8.20",
+                         "date":  "October 29, 2026",
+                         "title":  "Streamlined Nodes Navigation, Sleek Button Pills \u0026 Unified Control Styling",
+                         "changes":  [
+                                         {
+                                             "label":  "Streamlined Nodes Navigation",
+                                             "text":  "Renamed primary category navigation button from \u003cem\u003eFLEET NODES\u003c/em\u003e to \u003ccode\u003eNODES\u003c/code\u003e across all headers and page titles."
+                                         },
+                                         {
+                                             "label":  "Sleek Button Pills \u0026 Styling Consistency",
+                                             "text":  "Replaced plain radio controls with sleek, interactive button pills (\u003ccode\u003eDesktop Node (192.168.2.62)\u003c/code\u003e and \u003ccode\u003eNUC Server (192.168.2.35)\u003c/code\u003e) with cyan/emerald glowing borders and dedicated typography hierarchy for \u003ccode\u003eWoL\u003c/code\u003e, \u003ccode\u003eSleep\u003c/code\u003e, \u003ccode\u003eReboot\u003c/code\u003e, and \u003ccode\u003eBroadcast WoL\u003c/code\u003e."
+                                         }
+                                     ]
+                     },
+                     {
+                         "version":  "v2.8.19",
+                         "date":  "October 29, 2026",
+                         "title":  "Instant WebRTC Stream Play, Symmetrical Hardware Telemetry \u0026 Remote Power Operations",
+                         "changes":  [
+                                         {
+                                             "label":  "Instant WebRTC Streaming",
+                                             "text":  "Hardware-accelerated optical WebRTC feed from Penny\u0027s Cat Hub (\u003ccode\u003ecam.digitalresolve.ca\u003c/code\u003e) with sub-50ms glass-to-glass latency and automated reconnect loop."
+                                         },
+                                         {
+                                             "label":  "Symmetrical Node Telemetry",
+                                             "text":  "Synchronized dual-node hardware metrics, CPU/memory vitals, disk arrays, and network transport matrix between NUC server and Desktop workstation."
+                                         }
+                                     ]
+                     },
+                     {
+                         "version":  "v2.8.7",
+                         "date":  "October 28, 2026",
+                         "title":  "Unified Homelab Service Dashboard Button Styles \u0026 Cache-Busted Pipeline",
+                         "changes":  [
+                                         {
+                                             "label":  "Strict Button Hierarchy \u0026 Consistency",
+                                             "text":  "Standardized all dashboard filter tabs and card action buttons under the shared \u003ccode\u003e.btn-schematic-chip\u003c/code\u003e class, guaranteeing uniform padding, typography, hover glow, and active click states."
+                                         },
+                                         {
+                                             "label":  "Cache-Busted Distribution",
+                                             "text":  "Bumped stylesheet distribution ensuring instant viewport synchronization across Cloudflare Edge and client browsers."
+                                         },
+                                         {
+                                             "label":  "Pure ASCII Guarantees",
+                                             "text":  "Replaced dynamic refresh indicators with pure ASCII inline SVG vectors to permanently prevent character decoding artifacts."
+                                         }
+                                     ]
+                     },
+                     {
+                         "version":  "v2.8.6",
+                         "date":  "October 28, 2026",
+                         "title":  "M365 Dedicated SSO Authentication Symmetrical Refresh \u0026 Connected Pet Feeder IoT Bridge",
+                         "changes":  [
+                                         {
+                                             "label":  "M365 Sign In Multi-Layer Synchronization",
+                                             "text":  "Restored top navigation \u003ccode\u003e[ Sign In with M365 ]\u003c/code\u003e authentication engine with symmetrical cookie synchronization, global scope variable resolution, and automatic cache-busting reload."
+                                         },
+                                         {
+                                             "label":  "Penny\u0027s Smart Feeder IoT Bridge",
+                                             "text":  "Fully connected and armed Penny\u0027s Smart Feeder IoT (\u003ccode\u003e192.168.2.22\u003c/code\u003e) with active hardware bridge via NUC backend endpoint (\u003ccode\u003e/api/feeder/dispense\u003c/code\u003e), live multi-portion motor actuation, and real-time telemetry logging."
+                                         }
+                                     ]
+                     },
+                     {
+                         "version":  "v2.8.5",
+                         "date":  "October 28, 2026",
+                         "title":  "Dynamic 2-Decimal Precision Telemetry \u0026 Non-Hardcoded Quota Ingestion",
+                         "changes":  [
+                                         {
+                                             "label":  "Dynamic Real-Time Precision",
+                                             "text":  "Replaced static allocation percentages with live mathematical calculations computed to 2 decimal places ingested directly from live session transcripts."
+                                         },
+                                         {
+                                             "label":  "Symmetrical Ingestion \u0026 UI Binding",
+                                             "text":  "Synchronized frontend telemetry controllers and NUC webhook listener with live float precision, eliminating hardcoded model estimates across all dashboard decks."
+                                         }
+                                     ]
+                     },
+                     {
+                         "version":  "v2.8.4",
+                         "date":  "October 28, 2026",
+                         "title":  "Accurate Gemini Usage \u0026 Multi-Tier Model Allocation",
+                         "changes":  [
+                                         {
+                                             "label":  "Accurate Gemini Telemetry",
+                                             "text":  "Updated token allocation across header tags, status ribbon, and AGY console modal to reflect multi-tier model usage."
+                                         },
+                                         {
+                                             "label":  "Dynamic Model Allocation Meter",
+                                             "text":  "Updated progress bar and telemetry badges with segmented visualization."
+                                         }
+                                     ]
+                     },
+                     {
+                         "version":  "v2.8.3",
+                         "date":  "October 28, 2026",
+                         "title":  "NUC Scheduled Maintenance Mode \u0026 Zero-Penalty SLA Shield",
+                         "changes":  [
+                                         {
+                                             "label":  "NUC Server Maintenance Window Engine",
+                                             "text":  "Introduced dedicated scheduled maintenance mode controller in the Control Matrix and SLA Telemetry ribbon to protect 90-Day SLA metrics during Windows Updates, driver installs, and reboots."
+                                         },
+                                         {
+                                             "label":  "Zero-Penalty SLA Protection",
+                                             "text":  "Planned maintenance windows are mathematically exempt from unplanned outage incidents, preserving 99.985% Grade A+ uptime compliance."
+                                         }
+                                     ]
+                     },
+                     {
+                         "version":  "v2.8.2",
+                         "date":  "October 28, 2026",
+                         "title":  "Topology Circuit Flows, Heartbeat Sparkline \u0026 Dynamic Codebase Metrics",
+                         "changes":  [
+                                         {
+                                             "label":  "Hardware Topology Schematic Packet Flows",
+                                             "text":  "Restored and enhanced animated glowing SVG packet streams with hardware-accelerated \u003ccode\u003estroke-dashoffset\u003c/code\u003e keyframes across Firefox, Chrome, and Edge."
+                                         },
+                                         {
+                                             "label":  "Dynamic Heartbeat Oscilloscope",
+                                             "text":  "Activated dynamic multi-tier waveform rendering on the 24-Hour SLA Latency Sparkline canvas with tab-visibility management."
+                                         }
+                                     ]
+                     },
+                     {
+                         "version":  "v2.8.1",
+                         "date":  "October 28, 2026",
+                         "title":  "Live Token Telemetry, Zero-PIN Security \u0026 Dynamic Codebase Metrics",
+                         "changes":  [
+                                         {
+                                             "label":  "Dynamic AI Token Telemetry",
+                                             "text":  "Real-time regex ingestion of active Antigravity session transcripts (Gemini Flash: 100%, Context Cache Reused)."
+                                         },
+                                         {
+                                             "label":  "Zero-PIN Security Deprecation",
+                                             "text":  "Completely eradicated PIN credentials across client and server in favor of strict Microsoft 365 Entra ID SSO \u0026 MFA."
+                                         }
+                                     ]
+                     },
+                     {
+                         "version":  "v2.8.0",
+                         "date":  "October 27, 2026",
+                         "title":  "Consolidated Compute \u0026 AI Console, Clean UI \u0026 Top SSO",
+                         "changes":  [
+                                         {
+                                             "label":  "Consolidated Compute \u0026 Operations",
+                                             "text":  "Grouped the Live Interactive Terminal and Ollama 24/7 Local Inference Playground together in a unified operations hub."
+                                         },
+                                         {
+                                             "label":  "Cloudflare Zero Trust Edge Lockdown",
+                                             "text":  "Enforced strict Microsoft 365 identity challenges on 100% of subdomain requests."
+                                         }
+                                     ]
+                     }
+                 ]
 }
