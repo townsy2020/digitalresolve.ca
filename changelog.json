@@ -1,7 +1,26 @@
 {
-  "updatedAt": "2026-11-21T20:40:00Z",
-  "currentVersion": "v2.8.53",
+  "updatedAt": "2026-11-21T22:25:00Z",
+  "currentVersion": "v2.8.54",
   "releases": [
+    {
+      "version": "v2.8.54",
+      "date": "November 21, 2026",
+      "title": "Cache-Bust Asset Sync, Full ISP XSS Sanitization, WS Race Guards & A11y Headings",
+      "changes": [
+        {
+          "label": "Asset Cache-Busting & Complete XSS Sanitization",
+          "text": "Bumped styles.css and app.js cache-busting query strings to v2.8.54 across all 7 main pages, extended finite-number validation to all ISP history/baseline DOM paths and disk subtitles, and tightened gateway fetch origin prefix matching."
+        },
+        {
+          "label": "WebSocket Fallback Race Fix & Firefox Shift-Logout",
+          "text": "Hoisted per-socket handled guards above WebSocket connect timeouts on ai.html and webrtc.html to stop duplicate fallback handoffs, and passed explicit click events into lockSSO() for cross-browser Shift+Sign Out support."
+        },
+        {
+          "label": "Semantic Heading Hierarchy & Deploy Script Cleanup",
+          "text": "Added screen-reader section headings to eliminate h1-to-h3 level skips across all subpages and removed the stale missing GitHub fallback URL from deploy/adguard/deploy.ps1."
+        }
+      ]
+    },
     {
       "version": "v2.8.53",
       "date": "November 21, 2026",

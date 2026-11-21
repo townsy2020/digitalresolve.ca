@@ -14,7 +14,7 @@
     window.fetch = function(input, init) {
       try {
         const urlStr = (typeof input === 'string') ? input : (input && input.url ? input.url : '');
-        if (urlStr.startsWith(GATEWAY)) {
+        if (urlStr === GATEWAY || urlStr.startsWith(GATEWAY + '/')) {
           const merged = Object.assign({}, init || {}, { credentials: 'include' });
           return _origFetch(input, merged);
         }
@@ -165,9 +165,9 @@
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 15118;
-      const baseCssLines = 6333;
-      const baseJsLines = 6767;
+      const baseHtmlLines = 15223;
+      const baseCssLines = 6345;
+      const baseJsLines = 6752;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
@@ -1068,13 +1068,16 @@
             diskBar.classList.remove('warning');
           }
         }
-        const speedNote = (torrent && torrent.dlSpeed > 0) ? ` | DL: ${torrent.dlSpeedText}` : '';
+        const speedNote = (torrent && torrent.dlSpeed > 0 && torrent.dlSpeedText) ? ` | DL: ${String(torrent.dlSpeedText)}` : '';
+        const usedG = Number.isFinite(Number(disk.usedGB)) ? Number(disk.usedGB) : 0;
+        const totG = Number.isFinite(Number(disk.totalGB)) ? Number(disk.totalGB) : 0;
+        const pctG = Number.isFinite(Number(disk.usedPercent)) ? Number(disk.usedPercent) : 0;
         if (diskSub) {
-          diskSub.innerHTML = `${disk.usedGB} GB used of ${disk.totalGB} GB (${disk.usedPercent}%)${speedNote}`;
+          diskSub.textContent = `${usedG} GB used of ${totG} GB (${pctG}%)${speedNote}`;
         }
         const statDiskSub = document.getElementById('stat-disk-sub');
         if (statDiskSub) {
-          statDiskSub.innerHTML = `<span>Total ${disk.totalGB} GB (${disk.usedPercent}% Used &bull; ${disk.usedGB} GB)</span>`;
+          statDiskSub.innerHTML = `<span>Total ${totG} GB (${pctG}% Used &bull; ${usedG} GB)</span>`;
         }
       }
 
@@ -1786,7 +1789,7 @@
       const menuSsoBtn = document.getElementById('menu-sso-auth-btn');
       if (menuSsoBtn) {
         if (authed) {
-          menuSsoBtn.onclick = () => lockSSO();
+          menuSsoBtn.onclick = (e) => lockSSO(true, e);
           menuSsoBtn.title = 'Sign out and refresh deck behind Microsoft 365 SSO';
           menuSsoBtn.innerHTML = '<span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span><span>Sign Out (M365)</span><span class="item-tag">Sign Out</span>';
         } else {
@@ -1997,7 +2000,7 @@
     window.unlockSSO = unlockSSO;
     window.isSSOAuthenticated = isSSOAuthenticated;
 
-    async function lockSSO(fullIdpLogout = false) {
+    async function lockSSO(fullIdpLogout = false, evt = null) {
       showToast('info', 'Signing Out of Microsoft 365 SSO...', 'Clearing Cloudflare Access session and local caches...', 3000);
       _cfAccessVerified = false;
       _cfAccessEmail = '';
@@ -2026,7 +2029,8 @@
       if (typeof stopConsoleAutoPoll === 'function') stopConsoleAutoPoll();
       updateSSOGateUI();
       await fetch('https://wake.digitalresolve.ca/cdn-cgi/access/logout', { mode: 'no-cors', credentials: 'include' }).catch(() => {});
-      if (fullIdpLogout && window.event && window.event.shiftKey) {
+      const isShift = Boolean((evt && evt.shiftKey) || (typeof window !== 'undefined' && window.event && window.event.shiftKey));
+      if (fullIdpLogout && isShift) {
         window.location.href = 'https://login.microsoftonline.com/common/oauth2/v2.0/logout?post_logout_redirect_uri=' + encodeURIComponent('https://digitalresolve.ca/cdn-cgi/access/logout');
         return;
       }
@@ -3046,6 +3050,21 @@
 
     // ISP Diagnostics & History Poller
     function fetchISPHistory() {
+      const numField = (v, fb) => (v !== null && v !== undefined && v !== '' && Number.isFinite(Number(v))) ? Number(v) : fb;
+      const renderIspRows = (tbody, list, fb) => {
+        if (!tbody || !Array.isArray(list) || list.length === 0) return;
+        tbody.innerHTML = list.slice(-10).reverse().map(r => `
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
+                  <td style="padding: 6px 8px; color: #8b949e;">${escapeHtml(String(r.timeShort || r.timestamp || 'Recent'))}</td>
+                  <td style="padding: 6px 8px; color: #60a5fa;">${escapeHtml(String(r.isp || 'Bell Canada'))}</td>
+                  <td style="padding: 6px 8px; color: #38bdf8; font-weight: 700;">${numField(r.pingAvgMs, fb.avg)} ms</td>
+                  <td style="padding: 6px 8px;">${numField(r.pingMinMs, fb.min)} / ${numField(r.pingMaxMs, fb.max)} ms</td>
+                  <td style="padding: 6px 8px; color: #4ade80;">&plusmn; ${numField(r.jitterMs, fb.jitter)} ms</td>
+                  <td style="padding: 6px 8px;">${numField(r.packetLoss, 0)}%</td>
+                  <td style="padding: 6px 8px;"><span class="item-tag online" style="font-size: 0.7rem; padding: 2px 6px;">${escapeHtml(String(r.grade || 'A+'))}</span></td>
+                </tr>
+              `).join('');
+      };
       return fetch(`${GATEWAY}/api/isp-health`, { signal: _fetchSig(6000) })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(data => {
@@ -3076,15 +3095,15 @@
               updateHealthRadarUI({ isp: latest });
             }
 
-            const pingAvg = (latest && latest.pingAvgMs !== undefined) ? latest.pingAvgMs : 4.2;
-            const pingMin = (latest && latest.pingMinMs !== undefined) ? latest.pingMinMs : 4;
-            const pingMax = (latest && latest.pingMaxMs !== undefined) ? latest.pingMaxMs : 5;
-            const googleDns = (latest && latest.googleDnsMs !== undefined) ? latest.googleDnsMs : 4.5;
-            const jitter = (latest && latest.jitterMs !== undefined) ? latest.jitterMs : 0.3;
-            const loss = (latest && latest.packetLoss !== undefined) ? latest.packetLoss : 0;
-            const grade = (latest && latest.grade) ? latest.grade : 'A+';
-            const carrier = (latest && latest.isp) ? latest.isp : 'Bell Canada';
-            const extIp = (latest && latest.externalIp) ? latest.externalIp : 'n/a';
+            const pingAvg = latest ? numField(latest.pingAvgMs, 4.2) : 4.2;
+            const pingMin = latest ? numField(latest.pingMinMs, 4) : 4;
+            const pingMax = latest ? numField(latest.pingMaxMs, 5) : 5;
+            const googleDns = latest ? numField(latest.googleDnsMs, 4.5) : 4.5;
+            const jitter = latest ? numField(latest.jitterMs, 0.3) : 0.3;
+            const loss = latest ? numField(latest.packetLoss, 0) : 0;
+            const grade = (latest && latest.grade) ? String(latest.grade) : 'A+';
+            const carrier = (latest && latest.isp) ? String(latest.isp) : 'Bell Canada';
+            const extIp = (latest && latest.externalIp) ? String(latest.externalIp) : 'n/a';
 
             if (pingVal) pingVal.innerHTML = `${pingAvg} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>`;
             if (pingSub) pingSub.textContent = `Min: ${pingMin} ms | Max: ${pingMax} ms | Google: ${googleDns} ms`;
@@ -3096,7 +3115,7 @@
             }
             if (carrierVal) carrierVal.textContent = carrier;
             if (latest && latest.externalIp && latest.externalIp !== 'Protected (MFA Required)') {
-              window.CURRENT_EXTERNAL_IP = latest.externalIp;
+              window.CURRENT_EXTERNAL_IP = String(latest.externalIp);
             }
             const authed = isSSOAuthenticated();
             const safeIp = (window.CURRENT_EXTERNAL_IP || extIp);
@@ -3144,26 +3163,14 @@
               el.textContent = `${googleDns} ms`;
             });
 
-            const tbody = document.getElementById('isp-history-tbody');
-            if (tbody && rawList.length > 0) {
-              const recent = rawList.slice(-10).reverse();
-              tbody.innerHTML = recent.map(r => `
-                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
-                  <td style="padding: 6px 8px; color: #8b949e;">${escapeHtml(r.timeShort || r.timestamp || 'Recent')}</td>
-                  <td style="padding: 6px 8px; color: #60a5fa;">${escapeHtml(r.isp || 'Bell Canada')}</td>
-                  <td style="padding: 6px 8px; color: #38bdf8; font-weight: 700;">${r.pingAvgMs !== undefined ? r.pingAvgMs : 4.2} ms</td>
-                  <td style="padding: 6px 8px;">${r.pingMinMs !== undefined ? r.pingMinMs : 4} / ${r.pingMaxMs !== undefined ? r.pingMaxMs : 5} ms</td>
-                  <td style="padding: 6px 8px; color: #4ade80;">&plusmn; ${r.jitterMs !== undefined ? r.jitterMs : 0.3} ms</td>
-                  <td style="padding: 6px 8px;">${r.packetLoss !== undefined ? r.packetLoss : 0}%</td>
-                  <td style="padding: 6px 8px;"><span class="item-tag online" style="font-size: 0.7rem; padding: 2px 6px;">${escapeHtml(r.grade || 'A+')}</span></td>
-                </tr>
-              `).join('');
-            }
+            renderIspRows(document.getElementById('isp-history-tbody'), rawList, { avg: 4.2, min: 4, max: 5, jitter: 0.3 });
 
             const stPing = document.getElementById('st-val-ping');
-            if (stPing && pingAvg) stPing.innerHTML = `${pingAvg} <span style="font-size: 0.85rem; color: #94a3b8;">ms</span>`;
-            const downMbps = (latest && latest.downloadMbps != null) ? latest.downloadMbps : ((latest && latest.downMbps != null) ? latest.downMbps : Math.max(850, Math.min(960, parseFloat((945.5 - ((parseFloat(jitter) || 0) * 2.5)).toFixed(1)))));
-            const upMbps = (latest && latest.uploadMbps != null) ? latest.uploadMbps : ((latest && latest.upMbps != null) ? latest.upMbps : Math.max(800, Math.min(940, parseFloat((890.0 - ((parseFloat(jitter) || 0) * 2.2)).toFixed(1)))));
+            if (stPing) stPing.innerHTML = `${pingAvg} <span style="font-size: 0.85rem; color: #94a3b8;">ms</span>`;
+            const downFallback = Math.max(850, Math.min(960, parseFloat((945.5 - (jitter * 2.5)).toFixed(1))));
+            const upFallback = Math.max(800, Math.min(940, parseFloat((890.0 - (jitter * 2.2)).toFixed(1))));
+            const downMbps = latest ? numField(latest.downloadMbps != null ? latest.downloadMbps : latest.downMbps, downFallback) : downFallback;
+            const upMbps = latest ? numField(latest.uploadMbps != null ? latest.uploadMbps : latest.upMbps, upFallback) : upFallback;
             const stDown = document.getElementById('st-val-down');
             if (stDown) stDown.innerHTML = `${downMbps} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
             const stUp = document.getElementById('st-val-up');
@@ -3185,39 +3192,31 @@
             .then(sData => {
               if (sData && sData.status === 'success') {
                 const sList = Array.isArray(sData.history) ? sData.history : [];
-                const sTbody = document.getElementById('isp-history-tbody');
-                if (sTbody && sList.length > 0) {
-                  const sRecent = sList.slice(-10).reverse();
-                  sTbody.innerHTML = sRecent.map(r => `
-                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
-                      <td style="padding: 6px 8px; color: #8b949e;">${escapeHtml(r.timeShort || r.timestamp || 'Recent')}</td>
-                      <td style="padding: 6px 8px; color: #60a5fa;">${escapeHtml(r.isp || 'Bell Canada')}</td>
-                      <td style="padding: 6px 8px; color: #38bdf8; font-weight: 700;">${r.pingAvgMs !== undefined ? r.pingAvgMs : 3.6} ms</td>
-                      <td style="padding: 6px 8px;">${r.pingMinMs !== undefined ? r.pingMinMs : 3} / ${r.pingMaxMs !== undefined ? r.pingMaxMs : 4} ms</td>
-                      <td style="padding: 6px 8px; color: #4ade80;">&plusmn; ${r.jitterMs !== undefined ? r.jitterMs : 0.71} ms</td>
-                      <td style="padding: 6px 8px;">${r.packetLoss !== undefined ? r.packetLoss : 0}%</td>
-                      <td style="padding: 6px 8px;"><span class="item-tag online" style="font-size: 0.7rem; padding: 2px 6px;">${escapeHtml(r.grade || 'A+')}</span></td>
-                    </tr>
-                  `).join('');
-                }
+                renderIspRows(document.getElementById('isp-history-tbody'), sList, { avg: 3.6, min: 3, max: 4, jitter: 0.71 });
                 const sLat = (sData.latest && sData.latest.pingAvgMs !== undefined) ? sData.latest : (sList.length > 0 ? sList[sList.length - 1] : null);
                 if (sLat) {
                   const pVal = document.getElementById('isp-ping-val');
                   const pSub = document.getElementById('isp-ping-sub');
                   const jVal = document.getElementById('isp-jitter-val');
                   const pTag = document.getElementById('isp-ping-tag');
-                  if (pVal) pVal.innerHTML = `${sLat.pingAvgMs || 3.6} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>`;
-                  if (pSub) pSub.textContent = `Min: ${sLat.pingMinMs || 3} ms | Max: ${sLat.pingMaxMs || 4} ms | Google: ${sLat.googleDnsMs || 4} ms`;
-                  if (jVal) jVal.innerHTML = `&plusmn; ${sLat.jitterMs || 0.71} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>`;
-                  if (pTag) pTag.textContent = `${sLat.pingAvgMs || 3.6} ms`;
-                  const sJitter = parseFloat(sLat.jitterMs) || 0.71;
-                  const sDown = (sLat.downloadMbps != null) ? sLat.downloadMbps : ((sLat.downMbps != null) ? sLat.downMbps : Math.max(850, Math.min(960, parseFloat((945.5 - (sJitter * 2.5)).toFixed(1)))));
-                  const sUp = (sLat.uploadMbps != null) ? sLat.uploadMbps : ((sLat.upMbps != null) ? sLat.upMbps : Math.max(800, Math.min(940, parseFloat((890.0 - (sJitter * 2.2)).toFixed(1)))));
+                  const sPingAvg = numField(sLat.pingAvgMs, 3.6);
+                  const sPingMin = numField(sLat.pingMinMs, 3);
+                  const sPingMax = numField(sLat.pingMaxMs, 4);
+                  const sGdns = numField(sLat.googleDnsMs, 4);
+                  const sJitter = numField(sLat.jitterMs, 0.71);
+                  const sDownFb = Math.max(850, Math.min(960, parseFloat((945.5 - (sJitter * 2.5)).toFixed(1))));
+                  const sUpFb = Math.max(800, Math.min(940, parseFloat((890.0 - (sJitter * 2.2)).toFixed(1))));
+                  const sDown = numField(sLat.downloadMbps != null ? sLat.downloadMbps : sLat.downMbps, sDownFb);
+                  const sUp = numField(sLat.uploadMbps != null ? sLat.uploadMbps : sLat.upMbps, sUpFb);
+                  if (pVal) pVal.innerHTML = `${sPingAvg} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>`;
+                  if (pSub) pSub.textContent = `Min: ${sPingMin} ms | Max: ${sPingMax} ms | Google: ${sGdns} ms`;
+                  if (jVal) jVal.innerHTML = `&plusmn; ${sJitter} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>`;
+                  if (pTag) pTag.textContent = `${sPingAvg} ms`;
                   const stPing = document.getElementById('st-val-ping');
                   const stDown = document.getElementById('st-val-down');
                   const stUp = document.getElementById('st-val-up');
                   const gaugeNum = document.getElementById('gauge-live-num');
-                  if (stPing && sLat.pingAvgMs !== undefined) stPing.innerHTML = `${sLat.pingAvgMs} <span style="font-size: 0.85rem; color: #94a3b8;">ms</span>`;
+                  if (stPing && sLat.pingAvgMs !== undefined) stPing.innerHTML = `${sPingAvg} <span style="font-size: 0.85rem; color: #94a3b8;">ms</span>`;
                   if (stDown) stDown.innerHTML = `${sDown} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
                   if (stUp) stUp.innerHTML = `${sUp} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
                   if (gaugeNum) gaugeNum.textContent = `${sDown}`;
@@ -3254,32 +3253,18 @@
                   ];
                 }
 
-                const cTbody = document.getElementById('isp-history-tbody');
-                if (cTbody) {
-                  const cRecent = cList.slice(-10).reverse();
-                  const numField = (v, fb) => Number.isFinite(Number(v)) ? Number(v) : fb;
-                  cTbody.innerHTML = cRecent.map(r => `
-                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
-                      <td style="padding: 6px 8px; color: #8b949e;">${escapeHtml(String(r.timeShort || r.timestamp || 'Recent'))}</td>
-                      <td style="padding: 6px 8px; color: #60a5fa;">${escapeHtml(String(r.isp || 'Bell Canada'))}</td>
-                      <td style="padding: 6px 8px; color: #38bdf8; font-weight: 700;">${numField(r.pingAvgMs, 3.6)} ms</td>
-                      <td style="padding: 6px 8px;">${numField(r.pingMinMs, 3)} / ${numField(r.pingMaxMs, 4)} ms</td>
-                      <td style="padding: 6px 8px; color: #4ade80;">&plusmn; ${numField(r.jitterMs, 0.71)} ms</td>
-                      <td style="padding: 6px 8px;">${numField(r.packetLoss, 0)}%</td>
-                      <td style="padding: 6px 8px;"><span class="item-tag online" style="font-size: 0.7rem; padding: 2px 6px;">${escapeHtml(String(r.grade || 'A+'))}</span></td>
-                    </tr>
-                  `).join('');
-                }
+                renderIspRows(document.getElementById('isp-history-tbody'), cList, { avg: 3.6, min: 3, max: 4, jitter: 0.71 });
 
                 const cLat = cList.length > 0 ? cList[cList.length - 1] : null;
-                const cPing = (cLat && cLat.pingAvgMs !== undefined) ? cLat.pingAvgMs : 3.6;
-                const cMin = (cLat && cLat.pingMinMs !== undefined) ? cLat.pingMinMs : 3;
-                const cMax = (cLat && cLat.pingMaxMs !== undefined) ? cLat.pingMaxMs : 4;
-                const cGdns = (cLat && cLat.googleDnsMs !== undefined) ? cLat.googleDnsMs : 4.0;
-                const cJitter = (cLat && cLat.jitterMs !== undefined) ? cLat.jitterMs : 0.71;
-                const cJitterNum = parseFloat(cJitter) || 0.71;
-                const cDown = (cLat && cLat.downloadMbps != null) ? cLat.downloadMbps : ((cLat && cLat.downMbps != null) ? cLat.downMbps : Math.max(850, Math.min(960, parseFloat((945.5 - (cJitterNum * 2.5)).toFixed(1)))));
-                const cUp = (cLat && cLat.uploadMbps != null) ? cLat.uploadMbps : ((cLat && cLat.upMbps != null) ? cLat.upMbps : Math.max(800, Math.min(940, parseFloat((890.0 - (cJitterNum * 2.2)).toFixed(1)))));
+                const cPing = cLat ? numField(cLat.pingAvgMs, 3.6) : 3.6;
+                const cMin = cLat ? numField(cLat.pingMinMs, 3) : 3;
+                const cMax = cLat ? numField(cLat.pingMaxMs, 4) : 4;
+                const cGdns = cLat ? numField(cLat.googleDnsMs, 4.0) : 4.0;
+                const cJitter = cLat ? numField(cLat.jitterMs, 0.71) : 0.71;
+                const cDownFb = Math.max(850, Math.min(960, parseFloat((945.5 - (cJitter * 2.5)).toFixed(1))));
+                const cUpFb = Math.max(800, Math.min(940, parseFloat((890.0 - (cJitter * 2.2)).toFixed(1))));
+                const cDown = cLat ? numField(cLat.downloadMbps != null ? cLat.downloadMbps : cLat.downMbps, cDownFb) : cDownFb;
+                const cUp = cLat ? numField(cLat.uploadMbps != null ? cLat.uploadMbps : cLat.upMbps, cUpFb) : cUpFb;
 
                 const pingVal = document.getElementById('isp-ping-val');
                 const pingSub = document.getElementById('isp-ping-sub');

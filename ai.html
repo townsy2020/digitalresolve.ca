@@ -521,8 +521,11 @@
         }
 
         let hasOpened = false;
+        let handled = false;
         const connTimeout = setTimeout(() => {
           if (!hasOpened && ws && ws.readyState !== WebSocket.OPEN) {
+            if (handled) return;
+            handled = true;
             try { ws.close(); } catch (e) {}
             startWebRTC(wsUrl, endpoints, idx);
           }
@@ -604,7 +607,6 @@
           }
         });
 
-        let handled = false;
         ws.addEventListener('error', () => {
           if (streamConnected || handled) return;
           handled = true;
@@ -668,6 +670,7 @@
       });
 
       let hasOpened = false;
+      let handled = false;
       try {
         ws = new WebSocket(wsUrl);
       } catch (e) {
@@ -676,6 +679,8 @@
 
       const timeout = setTimeout(() => {
         if (!hasOpened && ws && ws.readyState !== WebSocket.OPEN) {
+          if (handled) return;
+          handled = true;
           try { ws.close(); } catch (e) {}
           connectEndpoint(endpoints, idx + 1);
         }
@@ -711,7 +716,6 @@
         }
       });
 
-      let handled = false;
       ws.addEventListener('close', () => {
         if (handled) return;
         handled = true;

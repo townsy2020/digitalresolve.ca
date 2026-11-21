@@ -7,8 +7,8 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Digital Resolve - Homelab Operations Deck</title>
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.53 - Digital Resolve - Homelab Operations Deck">
-  <link rel="stylesheet" href="styles.css?v=2.8.52">
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.54 - Digital Resolve - Homelab Operations Deck">
+  <link rel="stylesheet" href="styles.css?v=2.8.54">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -254,7 +254,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.53</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.54</span>)</span>
             </button>
             <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO()" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -2609,12 +2609,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.53</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.54</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 28,219 Lines of Code (HTML: 15,118 lines | CSS: 6,333 lines | JS: 6,767 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 28,321 Lines of Code (HTML: 15,223 lines | CSS: 6,345 lines | JS: 6,752 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">28,219</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">28,321</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -3209,10 +3209,23 @@
       </div>
 
             <div class="changelog-body">
-                <!-- Version v2.8.53 (Current) -->
+                        <!-- Version v2.8.54 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.53 | Current</span>
+            <span class="ver-tag current">v2.8.54 | Current</span>
+            <span class="ver-date">November 21, 2026</span>
+          </div>
+          <h4 class="ver-title">Cache-Bust Asset Sync, Full ISP XSS Sanitization, WS Race Guards &amp; A11y Headings</h4>
+          <ul class="ver-list">
+            <li><strong>Asset Cache-Busting &amp; Complete XSS Sanitization:</strong> Bumped <code>styles.css</code> and <code>app.js</code> cache-busting query strings to <code>v2.8.54</code> across all 7 main pages, extended finite-number validation to all ISP history/baseline DOM paths and disk subtitles, and tightened gateway fetch origin prefix matching.</li>
+            <li><strong>WebSocket Fallback Race Fix &amp; Firefox Shift-Logout:</strong> Hoisted per-socket <code>handled</code> guards above WebSocket connect timeouts on <code>ai.html</code> and <code>webrtc.html</code> to stop duplicate fallback handoffs, and passed explicit click events into <code>lockSSO()</code> for cross-browser Shift+Sign Out support.</li>
+            <li><strong>Semantic Heading Hierarchy &amp; Deploy Script Cleanup:</strong> Added screen-reader section headings to eliminate <code>h1</code>-to-<code>h3</code> level skips across all subpages and removed the stale missing GitHub fallback URL from <code>deploy/adguard/deploy.ps1</code>.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.53 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.53</span>
             <span class="ver-date">November 21, 2026</span>
           </div>
           <h4 class="ver-title">CSRF/SSO Hardening, Modal/Route/XSS Fixes &amp; Mobile Layout Cleanup</h4>
@@ -3453,6 +3466,6 @@
       </div>
     </div>
   </div>
-  <script src="app.js?v=2.8.52"></script>
+  <script src="app.js?v=2.8.54"></script>
 </body>
 </html>
