@@ -7,8 +7,8 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Services - Self-Hosted Homelab Portfolio</title>
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.20 - Services - Self-Hosted Homelab Portfolio">
-  <link rel="stylesheet" href="styles.css?v=2.8.48">
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.51 - Services - Self-Hosted Homelab Portfolio">
+  <link rel="stylesheet" href="styles.css?v=2.8.51">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -39,6 +39,7 @@
     })();
   </script>
 </head>
+<body>
   <header class="header" id="site-header">
     <div class="container nav-container">
       <a href="index.html#deck" class="logo" title="DigitalResolve Homelab Deck">
@@ -82,10 +83,20 @@
               <span>Watch Library (Stream 4K/HD)</span>
               <span class="item-tag online">Live</span>
             </a>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://jellyfin.digitalresolve.ca', 'Jellyfin Media Server (jellyfin.digitalresolve.ca)')" class="btn-action-item" title="Open Jellyfin Media Server">
+              <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 8px #a855f7;"></span>
+              <span>Jellyfin Media Server</span>
+              <span class="item-tag online">Port 8920</span>
+            </a>
             <a href="javascript:void(0)" onclick="launchProtectedService('https://files.digitalresolve.ca/files/', 'Media &amp; File Vault (files.digitalresolve.ca)')" class="btn-action-item" title="Open File Vault (files.digitalresolve.ca)">
               <span class="dropdown-dot dot-2"></span>
               <span>Browse Media &amp; Files (NUC)</span>
               <span class="item-tag">Vault</span>
+            </a>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://audiobooks.digitalresolve.ca', 'Audiobook Server (Audiobookshelf)')" class="btn-action-item" title="Open Audiobook Server (audiobooks.digitalresolve.ca)">
+              <span class="dropdown-dot" style="background-color: #fbbf24; box-shadow: 0 0 8px #fbbf24;"></span>
+              <span>Audiobook Server (Audiobookshelf)</span>
+              <span class="item-tag online">Port 3333</span>
             </a>
             <a href="javascript:void(0)" onclick="openTailscaleModal()" class="btn-action-item" title="Connect Tailscale Mesh VPN to access LAN services directly anywhere">
               <span class="dropdown-dot" style="background-color: #06b6d4; box-shadow: 0 0 8px #06b6d4;"></span>
@@ -113,6 +124,27 @@
               <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
               <span>+ Quick-Drop Magnet Link</span>
               <span class="item-tag">Inject</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://sonarr.digitalresolve.ca', 'Sonarr (TV Automation)')" class="btn-action-item" title="Open Sonarr TV Automation">
+              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+              <span>Sonarr (TV Automation)</span>
+              <span class="item-tag online">Port 8990</span>
+            </a>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://radarr.digitalresolve.ca', 'Radarr (Movie Automation)')" class="btn-action-item" title="Open Radarr Movie Automation">
+              <span class="dropdown-dot" style="background-color: #fb923c; box-shadow: 0 0 8px #fb923c;"></span>
+              <span>Radarr (Movie Automation)</span>
+              <span class="item-tag online">Port 7878</span>
+            </a>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://prowlarr.digitalresolve.ca', 'Prowlarr (Indexer Swarm)')" class="btn-action-item" title="Open Prowlarr Indexer Swarm">
+              <span class="dropdown-dot" style="background-color: #f87171; box-shadow: 0 0 8px #f87171;"></span>
+              <span>Prowlarr (Indexers)</span>
+              <span class="item-tag online">Port 9696</span>
+            </a>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://readarr.digitalresolve.ca', 'Readarr (Book Automation)')" class="btn-action-item" title="Open Readarr Book Automation">
+              <span class="dropdown-dot" style="background-color: #34d399; box-shadow: 0 0 8px #34d399;"></span>
+              <span>Readarr (Book Automation)</span>
+              <span class="item-tag online">Port 8787</span>
             </a>
             <div class="dropdown-divider"></div>
             <div class="disk-widget" id="nuc-disk-widget">
@@ -234,24 +266,24 @@
             <div style="padding: 8px 14px 6px; font-size: 0.78rem;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
                 <span style="color: #94a3b8; font-weight: 600;">Antigravity Quota:</span>
-                <span id="menu-token-val" class="mono" style="font-weight: 700; color: #38bdf8;">74.52% Weekly</span>
+                <span id="menu-token-val" class="mono" style="font-weight: 700; color: #38bdf8;">--% Weekly</span>
               </div>
               <!-- Weekly Limit Progress Bar -->
               <div style="font-size: 0.7rem; color: #cbd5e1; margin-bottom: 2px; display: flex; justify-content: space-between;">
                 <span>Gemini Weekly Limit</span>
-                <span style="color: #34d399; font-weight: 700;" id="menu-pct-flash">74.52% Remaining</span>
+                <span style="color: #34d399; font-weight: 700;" id="menu-pct-flash">--% Remaining</span>
               </div>
-              <div class="model-progress-bar" id="menu-progress-bar" title="Gemini Weekly: 74.52% Remaining - Refreshes in 103h 10m">
-                <div class="model-segment flash" id="menu-bar-flash" style="width: 74.52%; background: #38bdf8;"></div>
-                <div class="model-segment pro" id="menu-bar-pro" style="width: 25.48%; display: block; background: rgba(255,255,255,0.15);"></div>
+              <div class="model-progress-bar" id="menu-progress-bar" title="Gemini Weekly Limit">
+                <div class="model-segment flash" id="menu-bar-flash" style="width: 100%; background: #38bdf8;"></div>
+                <div class="model-segment pro" id="menu-bar-pro" style="width: 0%; display: block; background: rgba(255,255,255,0.15);"></div>
               </div>
               <!-- 5-Hour Limit Progress Bar -->
               <div style="font-size: 0.7rem; color: #cbd5e1; margin-top: 6px; margin-bottom: 2px; display: flex; justify-content: space-between;">
                 <span>5-Hour Rolling Limit</span>
-                <span style="color: #f59e0b; font-weight: 700;" id="menu-pct-5h">94.92% (3h 31m)</span>
+                <span style="color: #f59e0b; font-weight: 700;" id="menu-pct-5h">--% (--)</span>
               </div>
-              <div class="model-progress-bar" title="5-Hour Limit: 94.92% Remaining - Refreshes in 3h 31m">
-                <div class="model-segment" id="menu-bar-5h" style="width: 94.92%; background: #f59e0b;"></div>
+              <div class="model-progress-bar" id="menu-progress-bar-5h" title="5-Hour Rolling Limit">
+                <div class="model-segment" id="menu-bar-5h" style="width: 100%; background: #f59e0b;"></div>
               </div>
               <div style="margin-top: 6px; font-size: 0.68rem; color: #64748b; display: flex; justify-content: space-between;">
                 <span>Account: <span id="menu-account-user" style="color: #cbd5e1;">coryrobertleetownsend</span></span>
@@ -305,7 +337,7 @@
       <div class="container">
         <div class="section-header">
           <span class="section-tag" style="background: rgba(139, 92, 246, 0.15); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3);">Self-Hosted Matrix</span>
-          <h2>Self-Hosted Cloud Services</h2>
+          <h1>Self-Hosted Cloud Services</h1>
           <p>Zero-trust secured web applications running across the NUC server and Desktop workstation.</p>
         </div>
 
@@ -528,8 +560,6 @@
       </div>
     </section>
   </main>
-
-  </main>
   <footer class="footer">
     <div class="container footer-container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
       <p>&copy; 2026 Digital Resolve &bull; Homelab Operations Deck &bull; Cory Townsend</p>
@@ -540,7 +570,7 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.20</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.51</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
         <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 12,336 Lines of Code (HTML: 7,012 lines | CSS: 5,323 lines | CNAME)">
@@ -795,7 +825,7 @@
             Live 24-hour edge traffic telemetry, cache hit efficiency, WAF bot defense, and subdomain tunnel throughput.
           </div>
         </div>
-        <button type="button" class="btn btn-secondary" onclick="closeCloudflareStatsModal()" style="font-size: 0.8rem; padding: 4px 10px; cursor: pointer;">&times;</button>
+        <button type="button" class="btn btn-secondary" aria-label="Close Cloudflare statistics modal" onclick="closeCloudflareStatsModal()" style="font-size: 0.8rem; padding: 4px 10px; cursor: pointer;">&times;</button>
       </div>
 
       <div style="overflow-y: auto; flex: 1; padding-right: 4px; display: flex; flex-direction: column; gap: 16px;">
@@ -1119,9 +1149,9 @@
           This is a public, front-facing website. Any operation that interacts with on-premise hardware (Ollama LLM inference, Gigabit WAN tests, Wake-on-LAN, sleep standby, remote reboots, torrent injection, or IoT treat dispensers) is strictly restricted to authenticated <strong>Microsoft 365 Administrators</strong> (<code>cory.townsend@digitalresolve.ca</code>).
         </div>
         <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 4px;">
-          <button type="button" class="btn btn-primary" onclick="unlockSSO('m365'); closeSpeedtestSSOModal();" style="width: 100%; padding: 13px 20px; font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); cursor: pointer;">
-            <svg width="18" height="18" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;"><path d="M0 0h9.9v9.9H0z" fill="#f25022"/><path d="M11.1 0H21v9.9h-9.9z" fill="#7fba00"/><path d="M0 11.1h9.9V21H0z" fill="#00a4ef"/><path d="M11.1 11.1H21V21h-9.9z" fill="#ffb900"/></svg>
-            <span>Sign In with M365</span>
+          <input type="password" id="sso-admin-key-input" class="sso-pin-input" placeholder="Enter Gateway Admin Key..." autocomplete="current-password" aria-label="Gateway Admin Key" onkeydown="if(event.key==='Enter')verifySpeedtestSSO()">
+          <button type="button" class="btn btn-primary" onclick="verifySpeedtestSSO()" style="width: 100%; padding: 13px 20px; font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); cursor: pointer;">
+            <span>Unlock with Gateway Admin Key</span>
           </button>
           <button type="button" class="btn btn-secondary" onclick="closeSpeedtestSSOModal()" style="font-size: 0.82rem; cursor: pointer; padding: 8px 16px; border-color: rgba(255, 255, 255, 0.15); align-self: center;">Cancel</button>
         </div>
@@ -1277,7 +1307,7 @@
             <li><strong>Cloudflare Zero Trust Edge Lockdown:</strong> Enforced strict Microsoft 365 identity challenges on 100% of subdomain requests.</li>
           </ul>
         </div>
-      </div></div>
+      </div>
     </div>
   </div>
   <!-- NUC Server Scheduled Maintenance & SLA Protection Modal -->
@@ -1291,7 +1321,7 @@
             <div style="font-size: 0.76rem; color: #94a3b8; margin-top: 2px;">Protect 90-Day SLA &amp; Cluster Heartbeat (0 Outage Impact) during Windows Updates &amp; Reboots</div>
           </div>
         </div>
-        <button type="button" class="btn btn-secondary" onclick="closeMaintenanceModal()" style="font-size: 0.85rem; padding: 4px 10px; cursor: pointer;">&times;</button>
+        <button type="button" class="btn btn-secondary" aria-label="Close maintenance modal" onclick="closeMaintenanceModal()" style="font-size: 0.85rem; padding: 4px 10px; cursor: pointer;">&times;</button>
       </div>
 
       <div class="health-modal-body" style="padding: 18px 0; display: flex; flex-direction: column; gap: 16px; overflow-y: auto;">
@@ -1359,6 +1389,6 @@
       </div>
     </div>
   </div>
-  <script src="app.js?v=2.8.48"></script>
+  <script src="app.js?v=2.8.51"></script>
 </body>
 </html>

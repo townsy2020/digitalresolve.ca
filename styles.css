@@ -729,6 +729,7 @@ button.dropdown-item:active,
   margin-bottom: 8px;
 }
 
+.section-header h1,
 .section-header h2 {
   font-size: 2.2rem;
   font-weight: 700;
@@ -2744,8 +2745,10 @@ button.dropdown-item:active,
 .agy-console-window.fullscreen {
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   max-width: 100vw;
   max-height: 100vh;
+  max-height: 100dvh;
   border-radius: 0;
   border: none;
 }
@@ -4596,6 +4599,7 @@ html.mobile-layout .agy-inline-chips {
   inset: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   background: rgba(2, 6, 23, 0.94);
   z-index: 10005;
   display: none !important;
@@ -5376,6 +5380,7 @@ html.mobile-layout .agy-inline-chips {
   inset: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   background: rgba(2, 6, 23, 0.94);
   z-index: 10006;
   display: none !important;
@@ -6271,6 +6276,27 @@ html.mobile-layout .node-decks-grid {
 
 .tailscale-panel {
   display: none;
+}
+
+/* Explicit high-contrast keyboard focus indicator across inputs & selects */
+.magnet-input:focus-visible,
+.quick-drop-input:focus-visible,
+.ctrl-node-select:focus-visible,
+.agy-modal-input:focus-visible,
+.sso-pin-input:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 .tailscale-panel.active {

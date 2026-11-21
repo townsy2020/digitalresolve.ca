@@ -147,7 +147,7 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.22';
+          const activeVer = match ? match[0] : 'v2.8.51';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
@@ -614,7 +614,7 @@
         if (typeof sendControl === 'function') {
           sendControl('reboot', target);
         } else {
-          fetch(`${GATEWAY}/reboot?target=${target}`, { signal: _fetchSig(8000) })
+          fetch(`${GATEWAY}/api/control?action=reboot&target=${encodeURIComponent(target)}`, { headers: getAdminAuthHeaders(), signal: _fetchSig(8000) })
             .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(() => showToast('info', 'Reboot Dispatched', `Reboot signal sent to ${targetName}.`))
             .catch(() => showToast('error', 'Reboot Error', `Could not reach ${GATEWAY}`));
@@ -638,7 +638,7 @@
       const dev = devices[target] || devices.both;
       showToast('loading', `Transmitting Magic Packet...`, `Target: ${dev.name}`, 0);
 
-      fetch(`${GATEWAY}/wake?target=${target}`, { signal: _fetchSig(8000) })
+      fetch(`${GATEWAY}/wake?target=${encodeURIComponent(target)}`, { headers: getAdminAuthHeaders(), signal: _fetchSig(8000) })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(() => {
           showToast('loading', `Magic Packet Broadcasted`, `Waiting for ${dev.name} to boot...`, 0);
@@ -696,7 +696,7 @@
       const dev = devices[target] || devices.nuc;
       showToast('loading', `Entering Sleep Mode...`, `Dispatching suspend signal to ${dev.name}`, 0);
 
-      fetch(`${GATEWAY}/sleep?target=${target}`, { signal: _fetchSig(8000) })
+      fetch(`${GATEWAY}/sleep?target=${encodeURIComponent(target)}`, { headers: getAdminAuthHeaders(), signal: _fetchSig(8000) })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(() => {
           showToast('loading', `Sleep Signal Dispatched`, `Waiting for ${dev.name} to enter standby...`, 0);
@@ -1218,7 +1218,7 @@
       } else if (target === 'desktop') {
         window.DESKTOP_IS_ONLINE = isOnline;
         updateClusterPowerAndThermalsUI(isOnline);
-        updateAgySessionDisplay(window.AGY_SESSION_ID || '53c2a1ff-4c8c-4051-aae0-8bf4e62f57b3');
+        updateAgySessionDisplay(window.AGY_SESSION_ID || '', window.AGY_SESSION_NAME || '');
         if (typeof updateCloudflareStatsUI === 'function') {
           try { updateCloudflareStatsUI(); } catch(e) {}
         }
@@ -1613,40 +1613,53 @@
         }
       });
 
-      // Start live stats & terminal stream with Page Visibility throttling
+      const hasClimateDom = () => Boolean(document.getElementById('climate-temp-val') || document.getElementById('climate-temp') || document.querySelector('[id*="climate-"]'));
+      const hasIspDom = () => Boolean(document.getElementById('isp-ping-val') || document.getElementById('isp-history-body'));
+      const hasUptimeDom = () => Boolean(document.getElementById('uptime-matrix-grid') || document.getElementById('uptime-sla-val') || document.querySelector('[id*="uptime-"]'));
+      const hasServicesDom = () => Boolean(document.getElementById('dash-service-grid') || document.getElementById('dash-global-status') || document.querySelector('[id^="svc-"]'));
+      const hasTermDom = () => Boolean(document.getElementById('terminal-content'));
+
+      // Start live stats & terminal stream with Page Visibility + DOM presence throttling
       fetchClusterStats();
       setInterval(() => { if (!document.hidden) fetchClusterStats(); }, 4000);
-      setInterval(() => { if (!document.hidden && typeof fetchClimateData === 'function') fetchClimateData(); }, 10000);
+      if (hasClimateDom()) {
+        setInterval(() => { if (!document.hidden && typeof fetchClimateData === 'function') fetchClimateData(); }, 10000);
+      }
       updateSSOGateUI(); try { updateMaintenanceVisualStates(); } catch(e) {}
       try { updateCodebaseMetrics(); } catch(e) {}
       try { updateMediaRoutePillUI(); } catch(e) {}
-      if (isSSOAuthenticated()) {
+      if (hasTermDom() && isSSOAuthenticated()) {
         loadLog('agy');
       }
-      fetchISPHistory();
-      setInterval(() => { if (!document.hidden) fetchISPHistory(); }, 15000);
-      renderUptimeMatrix();
-      setInterval(() => { if (!document.hidden) renderUptimeMatrix(); }, 60000);
-      fetchServicesHealth();
-      setInterval(() => { if (!document.hidden) fetchServicesHealth(); }, 15000);
+      if (hasIspDom()) {
+        fetchISPHistory();
+        setInterval(() => { if (!document.hidden) fetchISPHistory(); }, 15000);
+      }
+      if (hasUptimeDom()) {
+        renderUptimeMatrix();
+        setInterval(() => { if (!document.hidden) renderUptimeMatrix(); }, 60000);
+      }
+      if (hasServicesDom()) {
+        fetchServicesHealth();
+        setInterval(() => { if (!document.hidden) fetchServicesHealth(); }, 15000);
+      }
 
       document.addEventListener('visibilitychange', () => {
         if (!document.hidden) {
           fetchClusterStats();
-          if (typeof fetchClimateData === 'function') fetchClimateData();
-          fetchISPHistory();
-          fetchServicesHealth();
-          if (currentLogTab && isSSOAuthenticated()) loadLog(currentLogTab);
+          if (hasClimateDom() && typeof fetchClimateData === 'function') fetchClimateData();
+          if (hasIspDom()) fetchISPHistory();
+          if (hasServicesDom()) fetchServicesHealth();
+          if (hasTermDom() && currentLogTab && isSSOAuthenticated()) loadLog(currentLogTab);
         }
       });
 
       // Auto-stream inline terminal every 3s
       setInterval(() => {
-        if (document.hidden) return;
+        if (document.hidden || !hasTermDom()) return;
         if (currentLogTab && isSSOAuthenticated()) {
-          const ssoEmail = localStorage.getItem('dr_sso_email') || 'cory.townsend@digitalresolve.ca';
           fetch(`${GATEWAY}/api/logs?name=${encodeURIComponent(currentLogTab)}`, {
-            headers: { 'X-SSO-Email': ssoEmail },
+            headers: getAdminAuthHeaders(),
             signal: _fetchSig(8000)
           })
             .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
@@ -1669,16 +1682,25 @@
 
     // Remote Control Matrix Handler
     // ==========================================
-    // SSO & SECURITY GATE CONTROLLER (M365 / ZERO TRUST)
+    // GATEWAY ADMIN KEY AUTH CONTROLLER
     // ==========================================
-    function isSSOAuthenticated() {
+    function getAdminKey() {
       try {
-        const localAuth = localStorage.getItem('dr_sso_authenticated') === 'true';
-        const cookieAuth = typeof document !== 'undefined' && document.cookie && document.cookie.split('; ').some(row => row.trim().startsWith('dr_sso_authenticated=true'));
-        return Boolean(localAuth || cookieAuth);
+        return sessionStorage.getItem('dr_admin_key') || '';
       } catch(e) {
-        return false;
+        return '';
       }
+    }
+
+    function getAdminAuthHeaders(extra = {}) {
+      const headers = Object.assign({}, extra);
+      const k = getAdminKey();
+      if (k) headers['X-Admin-Key'] = k;
+      return headers;
+    }
+
+    function isSSOAuthenticated() {
+      return Boolean(getAdminKey());
     }
 
     function updateSSOGateUI() {
@@ -1709,7 +1731,7 @@
           menuSsoBtn.title = 'Sign out and refresh deck behind Microsoft 365 SSO';
           menuSsoBtn.innerHTML = '<span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span><span>Sign Out (M365)</span><span class="item-tag">Sign Out</span>';
         } else {
-          menuSsoBtn.onclick = () => unlockSSO('m365');
+          menuSsoBtn.onclick = () => openGlobalSSOModal('Admin Workspace Authorization');
           menuSsoBtn.title = 'Sign in with Microsoft 365 Entra ID SSO';
           menuSsoBtn.innerHTML = '<span class="dropdown-dot" style="background-color: #f59e0b; box-shadow: 0 0 6px #f59e0b;"></span><span>Sign In with M365</span><span class="item-tag">Sign In</span>';
         }
@@ -1788,7 +1810,7 @@
         if (modalScreen) modalScreen.style.display = 'block';
         if (modalChips) modalChips.style.display = 'flex';
         if (modalInput) modalInput.style.display = 'flex';
-        if (modalTitle) modalTitle.innerHTML = 'Antigravity (AGY) Live Terminal | <span class="mono" style="color: #60a5fa;">' + escapeHtml(window.AGY_SESSION_NAME || ('webdev (' + (window.AGY_SESSION_ID || '53c2a1ff').substring(0,8) + ')')) + '</span>';
+        if (modalTitle) modalTitle.innerHTML = 'Antigravity (AGY) Live Terminal | <span class="mono" style="color: #60a5fa;">' + escapeHtml(window.AGY_SESSION_NAME || ('webdev (' + (window.AGY_SESSION_ID ? window.AGY_SESSION_ID.substring(0,8) : 'active') + ')')) + '</span>';
         const isDeskOnline = window.DESKTOP_IS_ONLINE !== undefined ? window.DESKTOP_IS_ONLINE : true;
         if (modalPulse) { modalPulse.style.background = isDeskOnline ? '#10b981' : '#6366f1'; modalPulse.style.boxShadow = isDeskOnline ? '0 0 8px #10b981' : '0 0 8px #6366f1'; }
         if (modalStatus) { modalStatus.textContent = isDeskOnline ? 'ONLINE (Desktop :8082)' : 'STANDBY (Desktop Sleeping • WoL Ready)'; modalStatus.className = `item-tag ${isDeskOnline ? 'online' : 'offline'}`; }
@@ -1899,50 +1921,14 @@
     window.toggleGlobalSSO = toggleGlobalSSO;
 
     function unlockSSO(method = 'm365') {
-      try {
-        localStorage.setItem('dr_sso_authenticated', 'true');
-        localStorage.setItem('dr_sso_user', 'Cory Townsend');
-        localStorage.setItem('dr_sso_email', 'cory.townsend@digitalresolve.ca');
-        localStorage.removeItem('dr_sso_pin'); // PIN completely deprecated; SSO only
-      } catch(e) {}
-
-      // Multi-layer client cookie persistence across apex domain (.digitalresolve.ca) and current hostname
-      try {
-        const maxAge = 86400 * 30; // 30 days
-        const host = window.location.hostname;
-        const isProd = host.endsWith('digitalresolve.ca');
-        const domainPart = isProd ? '; domain=.digitalresolve.ca' : '';
-        const securePart = window.location.protocol === 'https:' ? '; Secure' : '';
-
-        document.cookie = `dr_sso_authenticated=true; path=/; max-age=${maxAge}${domainPart}; SameSite=Lax${securePart}`;
-        document.cookie = `dr_sso_user=Cory Townsend; path=/; max-age=${maxAge}${domainPart}; SameSite=Lax${securePart}`;
-        document.cookie = `dr_sso_email=cory.townsend@digitalresolve.ca; path=/; max-age=${maxAge}${domainPart}; SameSite=Lax${securePart}`;
-        document.cookie = `dr_sso_authenticated=true; path=/; max-age=${maxAge}; SameSite=Lax${securePart}`;
-      } catch(e) {}
-
-      showToast('success', 'Microsoft 365 SSO Active', 'Authenticated as Cory Townsend (cory.townsend@digitalresolve.ca)');
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal('Admin Workspace Authorization');
+        return;
+      }
       updateSSOGateUI();
       try { updateMaintenanceVisualStates(); } catch(e) {}
       try { updateCodebaseMetrics(); } catch(e) {}
       try { fetchISPHistory(); } catch(e) {}
-
-      const cb = window.pendingSSOCallback;
-      window.pendingSSOCallback = null;
-      closeSpeedtestSSOModal();
-
-      if (typeof loadLog === 'function' && typeof currentLogTab !== 'undefined') {
-        try { loadLog(currentLogTab); } catch(e) {}
-      }
-
-      const modal = document.getElementById('agy-console-modal-overlay');
-      if (modal && modal.classList.contains('active')) {
-        if (typeof refreshAgyConsole === 'function') refreshAgyConsole();
-        if (typeof startConsoleAutoPoll === 'function') startConsoleAutoPoll();
-      }
-
-      if (cb && typeof cb === 'function') {
-        try { cb(); } catch(e) { console.error('SSO callback execution error:', e); }
-      }
     }
     window.unlockSSO = unlockSSO;
     window.isSSOAuthenticated = isSSOAuthenticated;
@@ -2021,8 +2007,8 @@
 
     // Multi-modal AGY session launcher
     function launchAgySession(target) {
-      const cid = window.AGY_SESSION_ID || '53c2a1ff-4c8c-4051-aae0-8bf4e62f57b3';
-      const shortId = cid.substring(0, 8);
+      const cid = window.AGY_SESSION_ID || '';
+      const shortId = cid ? cid.substring(0, 8) : 'active';
       if (target === 'stream' || !target) {
         loadLog('agy');
         const term = document.getElementById('terminal-card');
@@ -2031,6 +2017,10 @@
       } else if (target === 'app') {
         if (!isSSOAuthenticated()) {
           openGlobalSSOModal('Antigravity Session Launcher', () => launchAgySession(target));
+          return;
+        }
+        if (!cid) {
+          showToast('warning', 'Session Unavailable', 'Active session ID has not loaded from gateway yet.');
           return;
         }
         showToast('loading', 'Launching Antigravity App...', `Connecting to conversation://${shortId}...`, 3000);
@@ -2043,6 +2033,10 @@
       } else if (target === 'web') {
         openEmbeddedConsole();
       } else if (target === 'copy') {
+        if (!cid) {
+          showToast('warning', 'Session Unavailable', 'Active session ID has not loaded from gateway yet.');
+          return;
+        }
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(cid);
           showToast('success', 'Copied to Clipboard', `Session ID: ${cid}`);
@@ -2070,14 +2064,15 @@
       }
 
       if (input) input.value = '';
-      const cid = window.AGY_SESSION_ID || '53c2a1ff-4c8c-4051-aae0-8bf4e62f57b3';
-      showToast('loading', 'Dispatching Prompt to AGY Session...', `Session: ${cid.substring(0,8)}`, 1500);
+      const cid = window.AGY_SESSION_ID || '';
+      showToast('loading', 'Dispatching Prompt to AGY Session...', `Session: ${cid ? cid.substring(0,8) : 'active'}`, 1500);
 
-      const ssoEmail = localStorage.getItem('dr_sso_email') || 'cory.townsend@digitalresolve.ca';
+      const payload = { prompt: promptText };
+      if (cid) payload.conversationId = cid;
       fetch(`${GATEWAY}/api/agy/send`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-SSO-Email': ssoEmail, 'X-Admin-Pin': '7788' },
-        body: JSON.stringify({ prompt: promptText, ssoEmail: ssoEmail, email: ssoEmail, conversationId: cid, pin: '7788' }),
+        headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify(payload),
         signal: _fetchSig(15000)
       })
       .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
@@ -2122,13 +2117,13 @@
       }, 2500);
     }
 
-    window.AGY_SESSION_NAME = 'webdev (53c2a1ff)';
-    window.AGY_SESSION_ID = '53c2a1ff-4c8c-4051-aae0-8bf4e62f57b3';
+    window.AGY_SESSION_NAME = 'webdev (active)';
+    window.AGY_SESSION_ID = '';
 
     function updateAgySessionDisplay(cid, name) {
-      if (!cid) cid = window.AGY_SESSION_ID || '53c2a1ff-4c8c-4051-aae0-8bf4e62f57b3';
+      if (!cid) cid = window.AGY_SESSION_ID || '';
       window.AGY_SESSION_ID = cid;
-      const shortId = cid.substring(0, 8);
+      const shortId = cid ? cid.substring(0, 8) : 'active';
       if (!name || name === 'webdev1.0') {
         name = `webdev (${shortId})`;
       }
@@ -2199,7 +2194,7 @@
           return data;
         })
         .catch(() => {
-          updateAgySessionDisplay(window.AGY_SESSION_ID || '53c2a1ff-4c8c-4051-aae0-8bf4e62f57b3', window.AGY_SESSION_NAME || 'webdev');
+          updateAgySessionDisplay(window.AGY_SESSION_ID || '', window.AGY_SESSION_NAME || 'webdev (active)');
           if (callback) callback(null);
           return null;
         });
@@ -2211,15 +2206,14 @@
         return;
       }
       const sName = window.AGY_SESSION_NAME || 'webdev';
-      const cid = window.AGY_SESSION_ID || '53c2a1ff-4c8c-4051-aae0-8bf4e62f57b3';
-      const ssoEmail = localStorage.getItem('dr_sso_email') || 'cory.townsend@digitalresolve.ca';
-      showToast('loading', `Resuming ${sName} on Desktop...`, `Opening Windows Terminal: agy --conversation ${cid.substring(0,8)}...`, 4000);
+      const cid = window.AGY_SESSION_ID || '';
+      showToast('loading', `Resuming ${sName} on Desktop...`, `Opening Windows Terminal: agy --conversation ${cid ? cid.substring(0,8) : 'active'}...`, 4000);
 
       // 1. Dispatch daemon trigger via gateway
       fetch(`${GATEWAY}/api/agy/launch`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-SSO-Email': ssoEmail },
-        body: JSON.stringify({ target: 'desktop', action: 'resume', ssoEmail: ssoEmail, workspace: window.AGY_WORKSPACE || 'C:\\Users\\CoryTownsend\\Projects\\website' }),
+        headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ target: 'desktop', action: 'resume', workspace: window.AGY_WORKSPACE || 'C:\\Users\\CoryTownsend\\Projects\\website' }),
         signal: _fetchSig(12000)
       })
       .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
@@ -2231,9 +2225,11 @@
       .catch(() => {});
 
       // 2. Also invoke native protocol link for instant local spawn
-      try {
-        window.location.href = `conversation://${cid}`;
-      } catch (e) {}
+      if (cid) {
+        try {
+          window.location.href = `conversation://${cid}`;
+        } catch (e) {}
+      }
     }
 
     function startNewAgySession(target = 'desktop') {
@@ -2242,13 +2238,12 @@
         return;
       }
       const hostLabel = target === 'nuc' ? 'NUC Server' : 'Desktop Workstation';
-      const ssoEmail = localStorage.getItem('dr_sso_email') || 'cory.townsend@digitalresolve.ca';
 
       // 1. Immediately wipe console screen and in-page terminal
       const screen = document.getElementById('agy-console-screen');
       if (screen) {
         screen.innerHTML = `
-          <div class="agy-line system" style="color: #60a5fa; font-weight: 700;">[SYSTEM] Initializing new Antigravity session on ${target.toUpperCase()}...</div>
+          <div class="agy-line system" style="color: #60a5fa; font-weight: 700;">[SYSTEM] Initializing new Antigravity session on ${escapeHtml(target.toUpperCase())}...</div>
           <div class="agy-line system" style="color: #34d399;">[READY] Console wiped clean. Spawning autonomous agent...</div>
         `;
       }
@@ -2264,8 +2259,8 @@
 
       fetch(`${GATEWAY}/api/agy/launch`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-SSO-Email': ssoEmail },
-        body: JSON.stringify({ target: target, action: 'new-session', ssoEmail: ssoEmail }),
+        headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ target: target, action: 'new-session' }),
         signal: _fetchSig(12000)
       })
       .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
@@ -2281,7 +2276,7 @@
             const activeLine = document.createElement('div');
             activeLine.className = 'agy-line system';
             activeLine.style.color = '#38bdf8';
-            activeLine.innerHTML = `<span style="color:#10b981; font-weight:700;">[ACTIVE]</span> Session <strong>${newName}</strong> (${data.shortId}) ready. Enter prompt or test command below.`;
+            activeLine.innerHTML = `<span style="color:#10b981; font-weight:700;">[ACTIVE]</span> Session <strong>${escapeHtml(newName)}</strong> (${escapeHtml(data.shortId)}) ready. Enter prompt or test command below.`;
             screen.appendChild(activeLine);
             screen.scrollTop = screen.scrollHeight;
           }
@@ -2332,12 +2327,11 @@
         }
       };
 
-      const ssoEmail = localStorage.getItem('dr_sso_email') || 'cory.townsend@digitalresolve.ca';
       const targetLabel = (target === 'desktop') ? 'Desktop PC' : 'NUC Server';
       showToast('loading', `Executing [${targetLabel}]...`, isSpeed ? 'Probing Bell Gigabit connection & jitter...' : `Action: ${action.toUpperCase()}`, 0);
       
       fetch(`${GATEWAY}/api/control?action=${encodeURIComponent(action)}&target=${encodeURIComponent(target)}`, {
-        headers: { 'X-SSO-Email': ssoEmail },
+        headers: getAdminAuthHeaders(),
         signal: _fetchSig(10000)
       })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
@@ -2474,12 +2468,12 @@
           model: metrics.model || defMetrics.model,
           efficiency: metrics.efficiency || defMetrics.efficiency,
           breakdown: metrics.breakdown || defMetrics.breakdown,
-          weeklyLimitRemaining: metrics.weeklyLimitRemaining !== undefined ? metrics.weeklyLimitRemaining : defMetrics.weeklyLimitRemaining,
-          fiveHourLimitRemaining: metrics.fiveHourLimitRemaining !== undefined ? metrics.fiveHourLimitRemaining : defMetrics.fiveHourLimitRemaining,
+          weeklyLimitRemaining: metrics.weeklyLimitRemaining != null ? metrics.weeklyLimitRemaining : defMetrics.weeklyLimitRemaining,
+          fiveHourLimitRemaining: metrics.fiveHourLimitRemaining != null ? metrics.fiveHourLimitRemaining : defMetrics.fiveHourLimitRemaining,
           weeklyRefresh: metrics.weeklyRefresh || defMetrics.weeklyRefresh,
           fiveHourRefresh: metrics.fiveHourRefresh || defMetrics.fiveHourRefresh,
-          claudeWeeklyRemaining: metrics.claudeWeeklyRemaining !== undefined ? metrics.claudeWeeklyRemaining : (metrics.claudeLimitRemaining !== undefined ? metrics.claudeLimitRemaining : defMetrics.claudeWeeklyRemaining),
-          claudeLimitRemaining: metrics.claudeLimitRemaining !== undefined ? metrics.claudeLimitRemaining : (metrics.claudeWeeklyRemaining !== undefined ? metrics.claudeWeeklyRemaining : defMetrics.claudeLimitRemaining),
+          claudeWeeklyRemaining: metrics.claudeWeeklyRemaining != null ? metrics.claudeWeeklyRemaining : (metrics.claudeLimitRemaining != null ? metrics.claudeLimitRemaining : defMetrics.claudeWeeklyRemaining),
+          claudeLimitRemaining: metrics.claudeLimitRemaining != null ? metrics.claudeLimitRemaining : (metrics.claudeWeeklyRemaining != null ? metrics.claudeWeeklyRemaining : defMetrics.claudeLimitRemaining),
           account: metrics.account || defMetrics.account
         };
         metrics = parsed;
@@ -2532,7 +2526,7 @@
 
       const headerBtn = document.getElementById('header-token-btn');
       if (headerBtn) {
-        headerBtn.title = `Live AI Token Consumption: ${totalFmt} Tokens (Gemini Flash: ${flashPct}% | Gemini Pro: ${proPct}% | ${cacheFmt} Context Cache Reused) | Saved ~${savedFmt} (${savingsPct}% Eco Savings vs Frontier Pro)`;
+        headerBtn.title = `Live AI Token Consumption: ${totalFmt} Tokens (Prompt In: ${flashPct}% | Output: ${proPct}% | ${cacheFmt} Context Cache Reused) | Saved ~${savedFmt} (${savingsPct}% Eco Savings)`;
       }
 
       const hFlash = document.getElementById('header-tag-flash');
@@ -2619,10 +2613,15 @@
 
       // Update Header Dropdown Progress Bar
       const menuVal = document.getElementById('menu-token-val');
-      const weeklyLimit = (metrics.weeklyLimitRemaining !== undefined) ? metrics.weeklyLimitRemaining : 74.52;
-      const fiveHourLimit = (metrics.fiveHourLimitRemaining !== undefined) ? metrics.fiveHourLimitRemaining : 94.92;
-      const weeklyRef = metrics.weeklyRefresh || "103h 10m";
-      const fiveHourRef = metrics.fiveHourRefresh || "3h 31m";
+      const clampPct = (v, fb) => { const n = Number(v); return (v != null && !isNaN(n)) ? Math.max(0, Math.min(100, n)) : fb; };
+      const weeklyLimit = clampPct(metrics.weeklyLimitRemaining, 100);
+      const fiveHourLimit = clampPct(metrics.fiveHourLimitRemaining, 100);
+      const weeklyRef = metrics.weeklyRefresh || "--";
+      const fiveHourRef = metrics.fiveHourRefresh || "--";
+      const fmtLocalReset = (iso) => {
+        if (!iso) return '';
+        try { const d = new Date(iso); return isNaN(d) ? '' : ` • Resets ${d.toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}`; } catch { return ''; }
+      };
       if (menuVal) menuVal.textContent = `${weeklyLimit}% Weekly`;
       const barFlash = document.getElementById('menu-bar-flash');
       if (barFlash) barFlash.style.width = `${weeklyLimit}%`;
@@ -2634,12 +2633,14 @@
       if (m5h) m5h.textContent = `${fiveHourLimit}% (${fiveHourRef})`;
       const bar5h = document.getElementById('menu-bar-5h');
       if (bar5h) bar5h.style.width = `${fiveHourLimit}%`;
+      const pBar5h = document.getElementById('menu-progress-bar-5h');
+      if (pBar5h) pBar5h.title = `5-Hour Limit: ${fiveHourLimit}% Remaining (Refresh in ${fiveHourRef}${fmtLocalReset(metrics.fiveHourResetTime)})`;
       const mPro = document.getElementById('menu-pct-pro');
-      if (mPro) mPro.innerHTML = `<strong style="font-weight:700; color: #c084fc;">${proPct}%</strong> Pro`;
+      if (mPro) mPro.innerHTML = `<strong style="font-weight:700; color: #c084fc;">${proPct}%</strong> Output`;
       const mCache = document.getElementById('menu-pct-cache');
       if (mCache) mCache.innerHTML = `<strong style="font-weight:700;">${cacheFmt}</strong> Cache`;
       const pBar = document.getElementById('menu-progress-bar');
-      if (pBar) pBar.title = `Gemini Weekly: ${weeklyLimit}% Remaining (Refresh in ${weeklyRef})`;
+      if (pBar) pBar.title = `Gemini Weekly: ${weeklyLimit}% Remaining (Refresh in ${weeklyRef}${fmtLocalReset(metrics.weeklyResetTime)})`;
 
       // Decouple model bars: wire model breakdown bars explicitly to breakdown percentages
       document.querySelectorAll('.model-bar-flash, #model-bar-flash, [data-model="flash"]').forEach(el => {
@@ -2653,14 +2654,97 @@
       });
 
       document.querySelectorAll('#menu-claude-pct').forEach(el => {
-        const claudePct = (metrics.claudeWeeklyRemaining !== undefined) ? metrics.claudeWeeklyRemaining : ((metrics.claudeLimitRemaining !== undefined) ? metrics.claudeLimitRemaining : 100);
+        const claudePct = clampPct(metrics.claudeWeeklyRemaining != null ? metrics.claudeWeeklyRemaining : metrics.claudeLimitRemaining, 100);
+        const claude5h = clampPct(metrics.claudeFiveHourRemaining, 100);
         el.textContent = `${claudePct}%`;
+        el.title = `Claude/3p Weekly: ${claudePct}%${fmtLocalReset(metrics.claudeWeeklyResetTime)} | 5-Hour: ${claude5h}%${fmtLocalReset(metrics.claudeFiveHourResetTime)}`;
       });
       document.querySelectorAll('#menu-account-user').forEach(el => {
         if (metrics.account) {
           el.textContent = metrics.account.includes('@') ? metrics.account.split('@')[0] : metrics.account;
         }
       });
+      const metaBarEl = document.getElementById('agy-session-meta-bar');
+      if (metaBarEl && metaBarEl.style.display !== 'none' && typeof updateQuotaHistorySparkline === 'function') {
+        updateQuotaHistorySparkline();
+      }
+    }
+
+    let _lastQuotaSparklineFetch = 0;
+    let _quotaSparklineInFlight = false;
+    function updateQuotaHistorySparkline(force = false) {
+      const metaBar = document.getElementById('agy-session-meta-bar');
+      if (!metaBar || _quotaSparklineInFlight) return;
+      const now = Date.now();
+      if (!force && (now - _lastQuotaSparklineFetch) < 60000) return;
+      _quotaSparklineInFlight = true;
+
+      fetch(`${GATEWAY}/api/quota/history`, { cache: 'no-store', signal: _fetchSig(5000) })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          _quotaSparklineInFlight = false;
+          if (!data || !Array.isArray(data.history)) return;
+          _lastQuotaSparklineFetch = Date.now();
+          const cutoff = Date.now() - (7 * 86400000);
+          let pts = data.history
+            .filter(e => e && typeof e.gemW === 'number' && !isNaN(e.gemW))
+            .map(e => ({ t: e.ts ? Date.parse(e.ts) : 0, v: Math.max(0, Math.min(100, Number(e.gemW))) }))
+            .filter(p => p.t && !isNaN(p.t) && p.t >= cutoff)
+            .sort((a, b) => a.t - b.t);
+
+          let wrap = document.getElementById('agy-quota-sparkline-wrap');
+          if (!wrap) {
+            wrap = document.createElement('div');
+            wrap.className = 'meta-item';
+            wrap.id = 'agy-quota-sparkline-wrap';
+            wrap.style.alignItems = 'center';
+            wrap.innerHTML = '<span class="meta-lbl">7d Burn:</span> <span class="meta-val" id="agy-quota-sparkline" style="display:inline-flex;align-items:center;gap:6px;"></span>';
+            const actions = metaBar.querySelector('.meta-actions');
+            if (actions) metaBar.insertBefore(wrap, actions);
+            else metaBar.appendChild(wrap);
+          }
+
+          const target = document.getElementById('agy-quota-sparkline');
+          if (!target) return;
+          if (!pts.length) {
+            wrap.style.display = 'none';
+            return;
+          }
+          wrap.style.display = 'flex';
+
+          const w = 76, h = 18, padX = 2, padY = 2;
+          const innerW = w - padX * 2;
+          const innerH = h - padY * 2;
+          const minT = pts[0].t;
+          const maxT = pts[pts.length - 1].t;
+          const spanT = maxT - minT;
+          const coords = pts.map((p, i) => {
+            const frac = pts.length === 1 ? 1 : (spanT > 0 ? (p.t - minT) / spanT : (i / (pts.length - 1)));
+            const x = padX + frac * innerW;
+            const y = padY + ((100 - p.v) / 100) * innerH;
+            return { x: Number(x.toFixed(1)), y: Number(y.toFixed(1)), v: p.v };
+          });
+
+          const linePts = pts.length === 1
+            ? `${padX},${coords[0].y} ${coords[0].x},${coords[0].y}`
+            : coords.map(c => `${c.x},${c.y}`).join(' ');
+          const areaPts = pts.length === 1
+            ? `${padX},${h - padY} ${padX},${coords[0].y} ${coords[0].x},${coords[0].y} ${coords[0].x},${h - padY}`
+            : `${coords[0].x},${h - padY} ${linePts} ${coords[coords.length - 1].x},${h - padY}`;
+          const last = coords[coords.length - 1];
+          const minV = Math.min(...pts.map(p => p.v));
+          const maxV = Math.max(...pts.map(p => p.v));
+
+          wrap.title = `7-Day Weekly Quota: ${last.v.toFixed(2)}% remaining (${pts.length} sample${pts.length === 1 ? '' : 's'}, range ${minV.toFixed(1)}%–${maxV.toFixed(1)}%)`;
+          target.innerHTML =
+            `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block;overflow:visible;" aria-hidden="true">` +
+            `<polygon points="${areaPts}" fill="rgba(56, 189, 248, 0.14)" />` +
+            `<polyline points="${linePts}" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />` +
+            `<circle cx="${last.x}" cy="${last.y}" r="2" fill="#38bdf8" />` +
+            `</svg>` +
+            `<span class="mono" style="color:#38bdf8;font-weight:600;font-size:0.74rem;">${last.v.toFixed(1)}%</span>`;
+        })
+        .catch(() => { _quotaSparklineInFlight = false; });
     }
     function applyClusterStatsPayload(data) {
       if (!data) return null;
@@ -2910,9 +2994,8 @@
       const body = document.getElementById('terminal-content');
       if (body) body.textContent = `Streaming ${name} log entries...`;
 
-      const ssoEmail = localStorage.getItem('dr_sso_email') || 'cory.townsend@digitalresolve.ca';
       fetch(`${GATEWAY}/api/logs?name=${encodeURIComponent(name)}`, {
-        headers: { 'X-SSO-Email': ssoEmail },
+        headers: getAdminAuthHeaders(),
         signal: _fetchSig(8000)
       })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
@@ -2933,9 +3016,7 @@
 
     // ISP Diagnostics & History Poller
     function fetchISPHistory() {
-      const ssoEmail = isSSOAuthenticated() ? (localStorage.getItem('dr_sso_email') || 'cory.townsend@digitalresolve.ca') : '';
-      const fetchHeaders = ssoEmail ? { 'X-SSO-Email': ssoEmail } : {};
-      return fetch(`${GATEWAY}/api/isp-health`, { headers: fetchHeaders, signal: _fetchSig(6000) })
+      return fetch(`${GATEWAY}/api/isp-health`, { signal: _fetchSig(6000) })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(data => {
           if (data && data.status === 'success') {
@@ -3240,7 +3321,7 @@
 
       fetch(`${GATEWAY}/add`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ url: val, target: target }),
         signal: _fetchSig(8000)
       })
@@ -3299,7 +3380,7 @@
 
       fetch(`${GATEWAY}/add`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ url: val, target: target }),
         signal: _fetchSig(8000)
       })
@@ -3624,7 +3705,7 @@
         const timeoutId = setTimeout(() => controller.abort(), 3500);
         fetch(`${GATEWAY}/api/control?action=maintenance&target=nuc&enable=true&duration=${durationMinutes}`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-SSO-Email': 'cory.townsend@digitalresolve.ca' },
+          headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }),
           body: JSON.stringify({ enable: true, duration: durationMinutes, reason: reason }),
           signal: controller.signal
         }).catch(() => {}).finally(() => clearTimeout(timeoutId));
@@ -3660,7 +3741,7 @@
         const timeoutId = setTimeout(() => controller.abort(), 3500);
         fetch(`${GATEWAY}/api/control?action=maintenance&target=nuc&enable=false`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-SSO-Email': 'cory.townsend@digitalresolve.ca' },
+          headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }),
           body: JSON.stringify({ enable: false }),
           signal: controller.signal
         }).catch(() => {}).finally(() => clearTimeout(timeoutId));
@@ -4403,7 +4484,6 @@
     // ==========================================
     let consoleAutoPollTimer = null;
     let consoleAutoPollActive = true;
-    const AGY_SESSION_ID = '53c2a1ff-4c8c-4051-aae0-8bf4e62f57b3';
 
     function openEmbeddedConsole(fullscreen = false) {
       if (!isSSOAuthenticated()) {
@@ -4494,9 +4574,8 @@
       const statusTag = document.getElementById('agy-console-status');
       if (!isSilent && statusTag) statusTag.textContent = 'STREAMING...';
 
-      const ssoEmail = localStorage.getItem('dr_sso_email') || 'cory.townsend@digitalresolve.ca';
       fetch(`${GATEWAY}/api/logs?name=agy`, {
-        headers: { 'X-SSO-Email': ssoEmail },
+        headers: getAdminAuthHeaders(),
         signal: _fetchSig(8000)
       })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
@@ -4534,6 +4613,9 @@
             if (statusTag) {
               statusTag.textContent = 'ONLINE (Desktop :8082)';
               statusTag.className = 'item-tag online';
+            }
+            if (typeof updateQuotaHistorySparkline === 'function') {
+              updateQuotaHistorySparkline();
             }
           }
         })
@@ -4602,14 +4684,15 @@
       }
 
       if (input) input.value = '';
-      const cid = window.AGY_SESSION_ID || '53c2a1ff-4c8c-4051-aae0-8bf4e62f57b3';
-      showToast('loading', 'Dispatching Prompt to AGY Session...', `Session: ${cid.substring(0,8)}`, 1500);
+      const cid = window.AGY_SESSION_ID || '';
+      showToast('loading', 'Dispatching Prompt to AGY Session...', `Session: ${cid ? cid.substring(0,8) : 'active'}`, 1500);
 
-      const ssoEmail = localStorage.getItem('dr_sso_email') || 'cory.townsend@digitalresolve.ca';
+      const payload = { prompt: text };
+      if (cid) payload.conversationId = cid;
       fetch(`${GATEWAY}/api/agy/send`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-SSO-Email': ssoEmail, 'X-Admin-Pin': '7788' },
-        body: JSON.stringify({ prompt: text, ssoEmail: ssoEmail, email: ssoEmail, conversationId: cid, pin: '7788' }),
+        headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify(payload),
         signal: _fetchSig(15000)
       })
       .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
@@ -4638,7 +4721,7 @@
     });
       function escapeHtml(str) {
       if (!str) return '';
-      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
 
     // Dynamic System Release Changelog Ingestion Engine (Non-Hardcoded)
@@ -5335,10 +5418,13 @@
       window.pendingSSOCallback = callback;
       const modal = document.getElementById('speedtest-sso-modal-overlay');
       const actionEl = document.getElementById('sso-gate-action-name');
+      const keyInput = document.getElementById('sso-admin-key-input');
       if (actionEl) actionEl.textContent = actionName;
+      if (keyInput) keyInput.value = '';
       if (modal) {
         modal.style.display = 'flex';
         modal.classList.add('active');
+        if (keyInput) setTimeout(() => keyInput.focus(), 100);
       }
     }
     window.openGlobalSSOModal = openGlobalSSOModal;
@@ -5604,9 +5690,50 @@
     }
     window.launchProtectedService = launchProtectedService;
 
-    function verifySpeedtestSSO() {
-      unlockSSO('m365');
-      closeSpeedtestSSOModal();
+    async function verifySpeedtestSSO() {
+      const keyInput = document.getElementById('sso-admin-key-input');
+      const key = keyInput ? keyInput.value.trim() : '';
+      if (!key) {
+        showToast('warning', 'Admin Key Required', 'Enter your Gateway Admin Key from secrets.json to unlock.');
+        if (keyInput) keyInput.focus();
+        return;
+      }
+      try {
+        const res = await fetch(`${GATEWAY}/api/auth/verify`, {
+          headers: { 'X-Admin-Key': key },
+          signal: _fetchSig(8000)
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        if (!data || data.status !== 'authorized') {
+          throw new Error('Unauthorized');
+        }
+        try { sessionStorage.setItem('dr_admin_key', key); } catch(e) {}
+        if (keyInput) keyInput.value = '';
+        showToast('success', 'Gateway Session Unlocked', 'Verified via Admin Key.');
+        updateSSOGateUI();
+        try { updateMaintenanceVisualStates(); } catch(e) {}
+        try { updateCodebaseMetrics(); } catch(e) {}
+        try { fetchISPHistory(); } catch(e) {}
+
+        const cb = window.pendingSSOCallback;
+        window.pendingSSOCallback = null;
+        closeSpeedtestSSOModal();
+
+        if (typeof loadLog === 'function' && typeof currentLogTab !== 'undefined' && document.getElementById('terminal-content')) {
+          try { loadLog(currentLogTab); } catch(e) {}
+        }
+        const modal = document.getElementById('agy-console-modal-overlay');
+        if (modal && modal.classList.contains('active')) {
+          if (typeof refreshAgyConsole === 'function') refreshAgyConsole();
+          if (typeof startConsoleAutoPoll === 'function') startConsoleAutoPoll();
+        }
+        if (cb && typeof cb === 'function') {
+          try { cb(); } catch(e) { console.error('SSO callback execution error:', e); }
+        }
+      } catch (err) {
+        showToast('error', 'Verification Failed', 'Invalid Gateway Admin Key or gateway unreachable.');
+      }
     }
     window.verifySpeedtestSSO = verifySpeedtestSSO;
     window.verifySpeedtestPin = verifySpeedtestSSO;
@@ -6548,9 +6675,8 @@
         openGlobalSSOModal("Penny's Feeder Hopper Refill", refillFeederHopper);
         return;
       }
-      const ssoEmail = localStorage.getItem('dr_sso_email') || 'cory.townsend@digitalresolve.ca';
-      fetch(`${GATEWAY}/api/feeder/refill?email=${encodeURIComponent(ssoEmail)}`, { signal: _fetchSig(10000) })
-        .then(r => r.ok ? r.json() : null)
+      fetch(`${GATEWAY}/api/feeder/refill`, { headers: getAdminAuthHeaders(), signal: _fetchSig(10000) })
+        .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
         .then(data => {
           if (data && data.status === 'success') {
             if (data.feeder) {
@@ -6591,9 +6717,8 @@
         logEl.prepend(item);
       }
 
-      const ssoEmail = localStorage.getItem('dr_sso_email') || 'cory.townsend@digitalresolve.ca';
-      const endpoint = `${GATEWAY}/api/feeder/dispense?portion=${encodeURIComponent(portionLabel)}&email=${encodeURIComponent(ssoEmail)}`;
-      fetch(endpoint, { signal: _fetchSig(10000) })
+      const endpoint = `${GATEWAY}/api/feeder/dispense?portion=${encodeURIComponent(portionLabel)}`;
+      fetch(endpoint, { headers: getAdminAuthHeaders(), signal: _fetchSig(10000) })
         .then(r => {
           if (!r.ok) throw new Error(`HTTP ${r.status}`);
           return r.json();

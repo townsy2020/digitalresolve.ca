@@ -3,3 +3,4 @@
 *.tmp
 __probe.html
 __harness.html
+deploy/adguard/conf/AdGuardHome.yaml
