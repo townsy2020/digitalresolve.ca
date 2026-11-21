@@ -165,9 +165,9 @@
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 14999;
-      const baseCssLines = 6304;
-      const baseJsLines = 6738;
+      const baseHtmlLines = 15118;
+      const baseCssLines = 6333;
+      const baseJsLines = 6767;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
@@ -523,10 +523,8 @@
           }
         })
         .catch(() => {
-          const fallbackLat = target === 'nuc' ? 0.2 : 0.4;
-          const fallbackDisk = target === 'nuc' ? { freeGB: 489.2, totalGB: 1863, usedGB: 1373.8, usedPercent: 73.7 } : { freeGB: 5751, totalGB: 6054, usedGB: 303, usedPercent: 5.0 };
-          showToast('success', `${dev.name} Response Verified`, `${fallbackLat} ms latency (LAN direct)`, 4000);
-          updateStatusUI(target, true, fallbackLat, fallbackDisk);
+          showToast('error', `${dev.name} Unreachable`, `Could not reach ${GATEWAY} or verify node status.`, 5000);
+          updateStatusUI(target, false);
         });
     }
 
@@ -625,7 +623,7 @@
         if (typeof sendControl === 'function') {
           sendControl('reboot', target);
         } else {
-          fetch(`${GATEWAY}/api/control?action=reboot&target=${encodeURIComponent(target)}`, { headers: getAdminAuthHeaders(), signal: _fetchSig(8000) })
+          fetch(`${GATEWAY}/api/control?action=reboot&target=${encodeURIComponent(target)}`, { method: 'POST', credentials: 'include', headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }), body: '{}', signal: _fetchSig(8000) })
             .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(() => showToast('info', 'Reboot Dispatched', `Reboot signal sent to ${targetName}.`))
             .catch(() => showToast('error', 'Reboot Error', `Could not reach ${GATEWAY}`));
@@ -649,7 +647,7 @@
       const dev = devices[target] || devices.both;
       showToast('loading', `Transmitting Magic Packet...`, `Target: ${dev.name}`, 0);
 
-      fetch(`${GATEWAY}/wake?target=${encodeURIComponent(target)}`, { headers: getAdminAuthHeaders(), signal: _fetchSig(8000) })
+      fetch(`${GATEWAY}/wake?target=${encodeURIComponent(target)}`, { method: 'POST', credentials: 'include', headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }), body: '{}', signal: _fetchSig(8000) })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(() => {
           showToast('loading', `Magic Packet Broadcasted`, `Waiting for ${dev.name} to boot...`, 0);
@@ -707,7 +705,7 @@
       const dev = devices[target] || devices.nuc;
       showToast('loading', `Entering Sleep Mode...`, `Dispatching suspend signal to ${dev.name}`, 0);
 
-      fetch(`${GATEWAY}/sleep?target=${encodeURIComponent(target)}`, { headers: getAdminAuthHeaders(), signal: _fetchSig(8000) })
+      fetch(`${GATEWAY}/sleep?target=${encodeURIComponent(target)}`, { method: 'POST', credentials: 'include', headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }), body: '{}', signal: _fetchSig(8000) })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(() => {
           showToast('loading', `Sleep Signal Dispatched`, `Waiting for ${dev.name} to enter standby...`, 0);
@@ -1708,7 +1706,7 @@
     }
 
     function getAdminAuthHeaders(extra = {}) {
-      const headers = Object.assign({}, extra);
+      const headers = Object.assign({ 'X-Requested-With': 'XMLHttpRequest' }, extra);
       const k = getAdminKey();
       if (k) headers['X-Admin-Key'] = k;
       return headers;
@@ -1724,10 +1722,16 @@
           credentials: 'include',
           signal: _fetchSig(6000)
         });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
+        if (!res.ok) {
+          const httpErr = new Error('HTTP ' + res.status);
+          httpErr.status = res.status;
+          throw httpErr;
+        }
         const data = await res.json();
         if (!data || data.status !== 'authorized') {
-          throw new Error('Unauthorized');
+          const authErr = new Error('Unauthorized');
+          authErr.status = 401;
+          throw authErr;
         }
         _cfAccessVerified = true;
         _cfAccessEmail = data.email || 'cory.townsend@digitalresolve.ca';
@@ -1740,9 +1744,12 @@
         }
         return true;
       } catch (err) {
+        const status = err && err.status;
+        const isTransient = (err && err.name === 'AbortError') || [502, 503, 504, 530].includes(status);
+        const isAuthFailure = !isTransient && (status === 401 || status === 403 || (err && err.name === 'TypeError'));
         let syncAttempted = false;
         try { syncAttempted = Boolean(sessionStorage.getItem('dr_sso_sync_attempted')); } catch(e) {}
-        if (autoRedirect && window.location.hostname === 'digitalresolve.ca' && !syncAttempted) {
+        if (autoRedirect && isAuthFailure && window.location.hostname === 'digitalresolve.ca' && !syncAttempted) {
           try { sessionStorage.setItem('dr_sso_sync_attempted', '1'); } catch(e) {}
           window.location.href = GATEWAY + '/api/sso/login?return=' + encodeURIComponent(window.location.href);
           return false;
@@ -2018,6 +2025,7 @@
       window.pendingSSOCallback = null;
       if (typeof stopConsoleAutoPoll === 'function') stopConsoleAutoPoll();
       updateSSOGateUI();
+      await fetch('https://wake.digitalresolve.ca/cdn-cgi/access/logout', { mode: 'no-cors', credentials: 'include' }).catch(() => {});
       if (fullIdpLogout && window.event && window.event.shiftKey) {
         window.location.href = 'https://login.microsoftonline.com/common/oauth2/v2.0/logout?post_logout_redirect_uri=' + encodeURIComponent('https://digitalresolve.ca/cdn-cgi/access/logout');
         return;
@@ -2352,7 +2360,10 @@
       showToast('loading', `Executing [${targetLabel}]...`, isSpeed ? 'Probing Bell Gigabit connection & jitter...' : `Action: ${action.toUpperCase()}`, 0);
       
       fetch(`${GATEWAY}/api/control?action=${encodeURIComponent(action)}&target=${encodeURIComponent(target)}`, {
-        headers: getAdminAuthHeaders(),
+        method: 'POST',
+        credentials: 'include',
+        headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }),
+        body: '{}',
         signal: _fetchSig(10000)
       })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
@@ -3246,15 +3257,16 @@
                 const cTbody = document.getElementById('isp-history-tbody');
                 if (cTbody) {
                   const cRecent = cList.slice(-10).reverse();
+                  const numField = (v, fb) => Number.isFinite(Number(v)) ? Number(v) : fb;
                   cTbody.innerHTML = cRecent.map(r => `
                     <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
-                      <td style="padding: 6px 8px; color: #8b949e;">${r.timeShort || r.timestamp || 'Recent'}</td>
-                      <td style="padding: 6px 8px; color: #60a5fa;">${r.isp || 'Bell Canada'}</td>
-                      <td style="padding: 6px 8px; color: #38bdf8; font-weight: 700;">${r.pingAvgMs !== undefined ? r.pingAvgMs : 3.6} ms</td>
-                      <td style="padding: 6px 8px;">${r.pingMinMs !== undefined ? r.pingMinMs : 3} / ${r.pingMaxMs !== undefined ? r.pingMaxMs : 4} ms</td>
-                      <td style="padding: 6px 8px; color: #4ade80;">&plusmn; ${r.jitterMs !== undefined ? r.jitterMs : 0.71} ms</td>
-                      <td style="padding: 6px 8px;">${r.packetLoss !== undefined ? r.packetLoss : 0}%</td>
-                      <td style="padding: 6px 8px;"><span class="item-tag online" style="font-size: 0.7rem; padding: 2px 6px;">${r.grade || 'A+'}</span></td>
+                      <td style="padding: 6px 8px; color: #8b949e;">${escapeHtml(String(r.timeShort || r.timestamp || 'Recent'))}</td>
+                      <td style="padding: 6px 8px; color: #60a5fa;">${escapeHtml(String(r.isp || 'Bell Canada'))}</td>
+                      <td style="padding: 6px 8px; color: #38bdf8; font-weight: 700;">${numField(r.pingAvgMs, 3.6)} ms</td>
+                      <td style="padding: 6px 8px;">${numField(r.pingMinMs, 3)} / ${numField(r.pingMaxMs, 4)} ms</td>
+                      <td style="padding: 6px 8px; color: #4ade80;">&plusmn; ${numField(r.jitterMs, 0.71)} ms</td>
+                      <td style="padding: 6px 8px;">${numField(r.packetLoss, 0)}%</td>
+                      <td style="padding: 6px 8px;"><span class="item-tag online" style="font-size: 0.7rem; padding: 2px 6px;">${escapeHtml(String(r.grade || 'A+'))}</span></td>
                     </tr>
                   `).join('');
                 }
@@ -3608,14 +3620,22 @@
       }
       updateMaintenanceModalUI();
       const modal = document.getElementById('maintenance-modal-overlay');
-      if (modal) modal.style.display = 'flex';
+      if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
       playChaosTone(440, 880, 'sine', 0.1);
     }
     window.openMaintenanceModal = openMaintenanceModal;
 
     function closeMaintenanceModal() {
       const modal = document.getElementById('maintenance-modal-overlay');
-      if (modal) modal.style.display = 'none';
+      if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+      }
+      document.body.style.overflow = '';
       if (maintCountdownInterval) {
         clearInterval(maintCountdownInterval);
         maintCountdownInterval = null;
@@ -3668,7 +3688,7 @@
       } else {
         if (banner) { banner.style.background = 'rgba(16, 185, 129, 0.1)'; banner.style.borderColor = 'rgba(16, 185, 129, 0.3)'; }
         if (dot) { dot.style.background = '#10b981'; dot.style.boxShadow = '0 0 8px #10b981'; }
-        if (title) title.textContent = 'Normal 24/7 Operations &mdash; 90-Day SLA: 99.985%';
+        if (title) title.textContent = 'Normal 24/7 Operations \u2014 90-Day SLA: 99.985%';
         if (sub) sub.textContent = 'Planned maintenance windows are excluded from outage penalties.';
         if (tag) { tag.textContent = 'SLA Protected'; tag.className = 'item-tag online'; tag.style.background = ''; tag.style.color = ''; }
         if (actionBtn) {
@@ -5396,7 +5416,7 @@
         if (ops) {
           ops.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } else {
-          window.location.href = 'ai.html#ops-ai';
+          window.location.href = 'ops.html#ops-ai';
         }
         return;
       }
@@ -5520,7 +5540,6 @@
           if (raw) {
             const cache = JSON.parse(raw);
             if (cache && cache.isHomeNetwork) isHomeNet = true;
-            if (cache && cache.nuc && cache.nuc.latencyMs !== null && cache.nuc.latencyMs < 35) isHomeNet = true;
           }
         } catch (e) {}
       }
@@ -6592,36 +6611,46 @@
         })
         .catch(() => {
           const isHttps = typeof window !== 'undefined' && window.location && window.location.protocol === 'https:';
-          const defaultFeeder = {
-            fillPercent: 85,
-            hopperPercent: 85,
-            remainingGrams: 1275,
-            opticalWatchdog: 'Armed & Active',
-            bowlStatus: 'Kibble Present (Verified)',
-            estimatedDaysLeft: 16.0,
-            lastDispenseTime: new Date().toISOString(),
-            lastDispenseLabel: 'Dinner',
-            lastDispenseStatus: 'Verified'
-          };
-          const applyCachedOrDefault = () => {
+          const applyCachedOrOffline = () => {
             const cached = localStorage.getItem('dr_feeder_cache');
             if (cached) {
               try {
                 const parsed = JSON.parse(cached);
-                if (!parsed.lastDispenseTime) parsed.lastDispenseTime = defaultFeeder.lastDispenseTime;
-                updateFeederUI(parsed);
-                return;
+                if (parsed && typeof parsed === 'object') {
+                  updateFeederUI(parsed);
+                  return;
+                }
               } catch (e) {}
             }
-            updateFeederUI(defaultFeeder);
+            const setOfflineText = (id, text, color = '#94a3b8') => {
+              const el = document.getElementById(id);
+              if (el) { el.textContent = text; if (color) el.style.color = color; }
+            };
+            setOfflineText('feeder-watchdog-status', 'Telemetry Offline');
+            setOfflineText('feeder-nuc-watchdog', 'Telemetry Offline');
+            setOfflineText('feeder-card-watchdog', 'Telemetry Offline');
+            setOfflineText('feeder-dish-status', 'Telemetry Offline');
+            setOfflineText('feeder-hopper-pct', '--');
+            setOfflineText('feeder-nuc-hopper-pct', '--');
+            setOfflineText('feeder-hopper-sub', '(Telemetry Offline)');
+            setOfflineText('feeder-nuc-hopper-sub', '(Telemetry Offline)');
+            setOfflineText('feeder-card-kibble', 'Telemetry Offline');
+            setOfflineText('feeder-last-time', 'Offline');
+            const stagFeeder = document.getElementById('stag-feeder');
+            if (stagFeeder) {
+              stagFeeder.className = 'item-tag offline';
+              stagFeeder.textContent = 'Telemetry Offline';
+              stagFeeder.style.background = 'rgba(148, 163, 184, 0.15)';
+              stagFeeder.style.color = '#94a3b8';
+            }
           };
 
           if (isHttps) {
-            applyCachedOrDefault();
+            applyCachedOrOffline();
             return null;
           }
 
-          // Alternative Method: Try direct LAN gateway or hydrate verified active state
+          // Alternative Method: Try direct LAN gateway or surface cached/offline state
           return fetch('http://192.168.2.35:8082/api/feeder/status', { signal: (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(2000) : undefined })
             .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(d => {
@@ -6629,12 +6658,12 @@
                 updateFeederUI(d.feeder);
                 return d;
               } else {
-                applyCachedOrDefault();
+                applyCachedOrOffline();
                 return null;
               }
             })
             .catch(() => {
-              applyCachedOrDefault();
+              applyCachedOrOffline();
               return null;
             });
         });
@@ -6646,7 +6675,7 @@
         openGlobalSSOModal("Penny's Feeder Hopper Refill", refillFeederHopper);
         return;
       }
-      fetch(`${GATEWAY}/api/feeder/refill`, { headers: getAdminAuthHeaders(), signal: _fetchSig(10000) })
+      fetch(`${GATEWAY}/api/feeder/refill`, { method: 'POST', credentials: 'include', headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }), body: '{}', signal: _fetchSig(10000) })
         .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
         .then(data => {
           if (data && data.status === 'success') {
@@ -6689,7 +6718,7 @@
       }
 
       const endpoint = `${GATEWAY}/api/feeder/dispense?portion=${encodeURIComponent(portionLabel)}`;
-      fetch(endpoint, { headers: getAdminAuthHeaders(), signal: _fetchSig(10000) })
+      fetch(endpoint, { method: 'POST', credentials: 'include', headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }), body: '{}', signal: _fetchSig(10000) })
         .then(r => {
           if (!r.ok) throw new Error(`HTTP ${r.status}`);
           return r.json();

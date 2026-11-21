@@ -1,7 +1,26 @@
 {
-  "updatedAt": "2026-11-21T19:00:00Z",
-  "currentVersion": "v2.8.52",
+  "updatedAt": "2026-11-21T20:40:00Z",
+  "currentVersion": "v2.8.53",
   "releases": [
+    {
+      "version": "v2.8.53",
+      "date": "November 21, 2026",
+      "title": "CSRF/SSO Hardening, Modal/Route/XSS Fixes & Mobile Layout Cleanup",
+      "changes": [
+        {
+          "label": "CSRF & Dual-App SSO Sign-Out Hardening",
+          "text": "Converted state-changing gateway actions (power, wake, sleep, feeder dispense/refill) to POST with X-Requested-With headers, avoided transient 5xx/AbortError SSO redirect loops, and cleared wake.digitalresolve.ca Access sessions during sign-out."
+        },
+        {
+          "label": "Accurate Telemetry & XSS Sanitization",
+          "text": "Removed synthetic online/kibble fallback telemetry on fetch errors, escaped ISP history strings and WebRTC status text safely, fixed duplicate WebSocket error/close fallback races, and corrected AI Ops navigation routing."
+        },
+        {
+          "label": "Modal, DOM, Mobile Nav & SEO Alignment",
+          "text": "Fixed maintenance modal scroll lock and .active class visibility, closed unclosed uptime legend wrappers, fixed desktop-width mobile-layout nav drawer collapsing, and synchronized per-page canonical URLs and exact codebase LOC counts."
+        }
+      ]
+    },
     {
       "version": "v2.8.52",
       "date": "November 21, 2026",

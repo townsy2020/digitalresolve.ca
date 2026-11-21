@@ -7,14 +7,14 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Uptime & SLA Matrix - Homelab Operations</title>
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.51 - Uptime & SLA Matrix - Homelab Operations">
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.53 - Uptime & SLA Matrix - Homelab Operations">
   <link rel="stylesheet" href="styles.css?v=2.8.52">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
   <link rel="preconnect" href="https://cam.digitalresolve.ca">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="canonical" href="https://digitalresolve.ca/" />
+  <link rel="canonical" href="https://digitalresolve.ca/uptime.html" />
   <script>
     (function() {
       try {
@@ -254,7 +254,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.52</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.53</span>)</span>
             </button>
             <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO()" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -431,6 +431,7 @@
                 <span style="color: #cbd5e1;"><strong>Red:</strong> Service Outage</span>
               </div>
             </div>
+          </div>
           <div class="uptime-matrix" id="uptimeMatrix">
             <!-- Tier 1: NUC -->
             <div class="uptime-tier-row">
@@ -821,7 +822,6 @@
           </div>
         </div>
       </div>
-      </div>
     </section>
 
 
@@ -943,12 +943,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.52</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.53</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 28,042 Lines of Code (HTML: 14,999 lines | CSS: 6,304 lines | JS: 6,738 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 28,219 Lines of Code (HTML: 15,118 lines | CSS: 6,333 lines | JS: 6,767 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">28,042</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">28,219</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1543,10 +1543,23 @@
       </div>
 
             <div class="changelog-body">
-        <!-- Version v2.8.52 (Current) -->
+                <!-- Version v2.8.53 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.52 | Current</span>
+            <span class="ver-tag current">v2.8.53 | Current</span>
+            <span class="ver-date">November 21, 2026</span>
+          </div>
+          <h4 class="ver-title">CSRF/SSO Hardening, Modal/Route/XSS Fixes &amp; Mobile Layout Cleanup</h4>
+          <ul class="ver-list">
+            <li><strong>CSRF &amp; Dual-App SSO Sign-Out Hardening:</strong> Converted state-changing gateway actions (power, wake, sleep, feeder dispense/refill) to POST with <code>X-Requested-With</code> headers, avoided transient 5xx/AbortError SSO redirect loops, and cleared <code>wake.digitalresolve.ca</code> Access sessions during sign-out.</li>
+            <li><strong>Accurate Telemetry &amp; XSS Sanitization:</strong> Removed synthetic online/kibble fallback telemetry on fetch errors, escaped ISP history strings and WebRTC status text safely, fixed duplicate WebSocket error/close fallback races, and corrected AI Ops navigation routing.</li>
+            <li><strong>Modal, DOM, Mobile Nav &amp; SEO Alignment:</strong> Fixed maintenance modal scroll lock and <code>.active</code> visibility, closed unclosed uptime legend wrappers, scoped mobile-layout nav drawer collapsing, and synchronized per-page canonical URLs and exact codebase LOC counts.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.52 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.52</span>
             <span class="ver-date">November 21, 2026</span>
           </div>
           <h4 class="ver-title">Unified Microsoft 365 Entra ID Zero Trust SSO, Cryptographic JWT Gateway Verification &amp; LOC Sync</h4>

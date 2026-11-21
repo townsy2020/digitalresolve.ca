@@ -604,19 +604,27 @@
           }
         });
 
+        let handled = false;
         ws.addEventListener('error', () => {
+          if (streamConnected || handled) return;
+          handled = true;
+          clearTimeout(connTimeout);
           if (!hasOpened) {
-            clearTimeout(connTimeout);
             connectEndpoint(endpoints, idx + 1);
-          } else if (!streamConnected) {
+          } else {
             startWebRTC(wsUrl, endpoints, idx);
           }
         });
 
         ws.addEventListener('close', () => {
           if (!streamConnected) {
+            if (handled) return;
+            handled = true;
+            clearTimeout(connTimeout);
             startWebRTC(wsUrl, endpoints, idx);
           } else {
+            if (handled) return;
+            handled = true;
             scheduleReconnect();
           }
         });
@@ -703,7 +711,11 @@
         }
       });
 
+      let handled = false;
       ws.addEventListener('close', () => {
+        if (handled) return;
+        handled = true;
+        clearTimeout(timeout);
         if (!streamConnected) {
           connectEndpoint(endpoints, idx + 1);
         } else {
@@ -711,10 +723,10 @@
         }
       });
       ws.addEventListener('error', () => {
-        if (!hasOpened) {
-          clearTimeout(timeout);
-          connectEndpoint(endpoints, idx + 1);
-        }
+        if (handled || hasOpened) return;
+        handled = true;
+        clearTimeout(timeout);
+        connectEndpoint(endpoints, idx + 1);
       });
     }
 
