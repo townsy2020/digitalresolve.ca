@@ -165,7 +165,7 @@
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 14993;
+      const baseHtmlLines = 14999;
       const baseCssLines = 6304;
       const baseJsLines = 6738;
       const baseCnameLines = 1;
@@ -6138,13 +6138,13 @@
       if (document.getElementById('adguard-modal-overlay')) return;
       const html = `
         <div id="adguard-modal-overlay" class="modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(2,6,23,0.78); backdrop-filter:blur(6px); z-index:10005; align-items:center; justify-content:center; padding:16px;" onclick="if(event.target===this) closeAdGuardConfigModal()">
-          <div class="modal-content" style="max-width:560px; width:100%; background:#0f172a; border:1px solid rgba(56,189,248,0.3); border-radius:14px; padding:24px; color:#e2e8f0; box-shadow:0 20px 50px rgba(0,0,0,0.6);">
+          <div class="modal-content" role="dialog" aria-modal="true" aria-label="AdGuard Home Deployment" style="max-width:560px; width:100%; background:#0f172a; border:1px solid rgba(56,189,248,0.3); border-radius:14px; padding:24px; color:#e2e8f0; box-shadow:0 20px 50px rgba(0,0,0,0.6);">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
               <h3 style="margin:0; font-size:1.1rem; color:#38bdf8;">AdGuard Home — NUC DNS Sinkhole</h3>
-              <button type="button" onclick="closeAdGuardConfigModal()" style="background:none; border:none; color:#94a3b8; font-size:1.4rem; cursor:pointer; line-height:1;">&times;</button>
+              <button type="button" aria-label="Close dialog" onclick="closeAdGuardConfigModal()" style="background:none; border:none; color:#94a3b8; font-size:1.4rem; cursor:pointer; line-height:1;">&times;</button>
             </div>
-            <p style="font-size:0.86rem; color:#94a3b8; margin:0 0 14px;">Deploy or update AdGuard Home on NUC (<code style="color:#38bdf8;">192.168.2.35:3000</code>) via elevated PowerShell:</p>
-            <pre style="background:#020617; border:1px solid rgba(148,163,184,0.2); border-radius:8px; padding:12px; font-size:0.76rem; color:#a5f3fc; overflow-x:auto; margin:0 0 16px;">powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/townsy2020/digitalresolve.ca/main/deploy/adguard/deploy.ps1 | iex"</pre>
+            <p style="font-size:0.86rem; color:#94a3b8; margin:0 0 14px;">Deploy or update AdGuard Home on NUC (<code style="color:#38bdf8;">192.168.2.35:3000</code>) via Docker Compose:</p>
+            <pre style="background:#020617; border:1px solid rgba(148,163,184,0.2); border-radius:8px; padding:12px; font-size:0.76rem; color:#a5f3fc; overflow-x:auto; margin:0 0 16px;">git clone https://github.com/townsy2020/digitalresolve.ca.git &amp;&amp; cd digitalresolve.ca/deploy/adguard &amp;&amp; docker compose up -d</pre>
             <div style="display:flex; gap:10px; justify-content:flex-end;">
               <button type="button" id="btn-copy-modal-cmd" class="btn btn-primary" onclick="copyAdguardDeployCommand()" style="padding:8px 14px; font-size:0.82rem;">Copy Install Command</button>
               <button type="button" class="btn btn-secondary" onclick="closeAdGuardConfigModal()" style="padding:8px 14px; font-size:0.82rem;">Close</button>
@@ -6176,10 +6176,10 @@
     window.closeAdGuardConfigModal = closeAdGuardConfigModal;
 
     function copyAdguardDeployCommand() {
-      const cmd = 'powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/townsy2020/digitalresolve.ca/main/deploy/adguard/deploy.ps1 | iex"';
+      const cmd = 'git clone https://github.com/townsy2020/digitalresolve.ca.git && cd digitalresolve.ca/deploy/adguard && docker compose up -d';
       if (navigator.clipboard) {
         navigator.clipboard.writeText(cmd).then(() => {
-          showToast('success', 'Command Copied', 'AdGuard Windows install command copied. Run in elevated PowerShell on NUC.');
+          showToast('success', 'Command Copied', 'AdGuard Docker Compose command copied for NUC deployment.');
           const btn = document.getElementById('btn-copy-adguard');
           const modalBtn = document.getElementById('btn-copy-modal-cmd');
           if (btn) {
