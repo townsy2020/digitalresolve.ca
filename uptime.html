@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0">
   <title>Uptime & SLA Matrix - Homelab Operations</title>
   <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.51 - Uptime & SLA Matrix - Homelab Operations">
-  <link rel="stylesheet" href="styles.css?v=2.8.51">
+  <link rel="stylesheet" href="styles.css?v=2.8.52">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -254,7 +254,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.22</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.52</span>)</span>
             </button>
             <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO()" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -943,12 +943,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.51</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.52</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 12,336 Lines of Code (HTML: 7,012 lines | CSS: 5,323 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 28,036 Lines of Code (HTML: 14,993 lines | CSS: 6,304 lines | JS: 6,738 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">25,444</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">28,036</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1519,12 +1519,11 @@
       <div style="padding: 22px; display: flex; flex-direction: column; gap: 16px;">
         <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 14px; font-size: 0.8rem; color: #fde68a; line-height: 1.55;">
           <strong> Zero Trust Security Policy:</strong><br>
-          This is a public, front-facing website. Any operation that interacts with on-premise hardware (Ollama LLM inference, Gigabit WAN tests, Wake-on-LAN, sleep standby, remote reboots, torrent injection, or IoT treat dispensers) is strictly restricted to authenticated <strong>Microsoft 365 Administrators</strong> (<code>cory.townsend@digitalresolve.ca</code>).
+          All Digital Resolve operations are protected by <strong>Cloudflare Access and Microsoft 365 Entra ID SSO</strong> (<code>cory.townsend@digitalresolve.ca</code>, 30-day session). Sign in once with your Microsoft 365 account to unlock live hardware controls and telemetry.
         </div>
         <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 4px;">
-          <input type="password" id="sso-admin-key-input" class="sso-pin-input" placeholder="Enter Gateway Admin Key..." autocomplete="current-password" aria-label="Gateway Admin Key" onkeydown="if(event.key==='Enter')verifySpeedtestSSO()">
           <button type="button" class="btn btn-primary" onclick="verifySpeedtestSSO()" style="width: 100%; padding: 13px 20px; font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); cursor: pointer;">
-            <span>Unlock with Gateway Admin Key</span>
+            <span>Sign In with Microsoft 365 (Entra ID)</span>
           </button>
           <button type="button" class="btn btn-secondary" onclick="closeSpeedtestSSOModal()" style="font-size: 0.82rem; cursor: pointer; padding: 8px 16px; border-color: rgba(255, 255, 255, 0.15); align-self: center;">Cancel</button>
         </div>
@@ -1544,10 +1543,23 @@
       </div>
 
             <div class="changelog-body">
-        <!-- Version v2.8.22 (Current) -->
+        <!-- Version v2.8.52 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.22 | Current</span>
+            <span class="ver-tag current">v2.8.52 | Current</span>
+            <span class="ver-date">November 21, 2026</span>
+          </div>
+          <h4 class="ver-title">Unified Microsoft 365 Entra ID Zero Trust SSO, Cryptographic JWT Gateway Verification &amp; LOC Sync</h4>
+          <ul class="ver-list">
+            <li><strong>Unified Microsoft 365 Entra ID SSO:</strong> Placed <code>digitalresolve.ca</code>, <code>wake.digitalresolve.ca</code>, <code>torrents</code>, <code>torrents2</code>, and <code>files</code> behind Cloudflare Access M365 Entra ID SSO (30-day session), eliminating manual admin key prompts while preserving Home Network Bypass on StreamHub, Jellyfin, and CatCam.</li>
+            <li><strong>Cryptographic RS256 Gateway Auth:</strong> Upgraded <code>wol-listener.ps1</code> to verify signed <code>Cf-Access-Jwt-Assertion</code> tokens against Cloudflare Access JWKS and hardened CORS/CSRF controls.</li>
+            <li><strong>Release Log &amp; Metrics Synchronization:</strong> Updated footer/menu version badges and exact codebase Lines of Code counters across all pages.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.22 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.22</span>
             <span class="ver-date">October 30, 2026</span>
           </div>
           <h4 class="ver-title">Dynamic Antigravity Session Synchronization, Live Console Stream & Responsive Navigation</h4>
@@ -1762,6 +1774,6 @@
       </div>
     </div>
   </div>
-  <script src="app.js?v=2.8.51"></script>
+  <script src="app.js?v=2.8.52"></script>
 </body>
 </html>

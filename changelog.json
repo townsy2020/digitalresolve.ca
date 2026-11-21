@@ -1,7 +1,45 @@
 {
-  "updatedAt": "2026-10-30T07:30:00Z",
-  "currentVersion": "v2.8.22",
+  "updatedAt": "2026-11-21T19:00:00Z",
+  "currentVersion": "v2.8.52",
   "releases": [
+    {
+      "version": "v2.8.52",
+      "date": "November 21, 2026",
+      "title": "Unified Microsoft 365 Entra ID Zero Trust SSO, Cryptographic JWT Gateway Verification & LOC Sync",
+      "changes": [
+        {
+          "label": "Unified Microsoft 365 Entra ID SSO",
+          "text": "Placed digitalresolve.ca, wake.digitalresolve.ca, torrents, torrents2, and files behind Cloudflare Access Microsoft 365 Entra ID SSO (30-day session), eliminating manual gateway key prompts and letting qBittorrent/service links launch straight through real M365 SSO while preserving Home Network Bypass on StreamHub, Jellyfin, and CatCam."
+        },
+        {
+          "label": "Cryptographic RS256 Gateway Auth & CSRF Lockdown",
+          "text": "Upgraded wol-listener.ps1 on Desktop and NUC to cryptographically validate Cf-Access-Jwt-Assertion signatures via Cloudflare Access JWKS, added /api/sso/login handshake, enforced $isNuc target guards, and closed localhost CSRF / target-cache DoS vectors."
+        },
+        {
+          "label": "Changelog, LOC Accuracy & Public Telemetry Scrub",
+          "text": "Synchronized footer/menu version badges and exact codebase Lines of Code counters across all pages, removed legacy hardcoded WAN/VPN IP literals, and updated ai.html low-kibble beacon requests to send SSO credentials."
+        }
+      ]
+    },
+    {
+      "version": "v2.8.51",
+      "date": "November 21, 2026",
+      "title": "Secrets Vault Migration, Rotated Service Keys, HTML/CSS/a11y Hardening & StorAHCI Upgrade",
+      "changes": [
+        {
+          "label": "ACL-Hardened Secrets Vault & Key Rotations",
+          "text": "Consolidated Desktop and NUC service tokens into ACL-restricted secrets.json, rotated Jellyfin, Prowlarr (synced across Radarr, Sonarr, Readarr, and RSS feeds), and Audiobookshelf API keys, and split Ntfy inbound command listening to a private topic."
+        },
+        {
+          "label": "HTML5 Semantic Structure & Subresource Integrity",
+          "text": "Fixed balanced DOM landmarks across all 7 main pages, added responsive 100dvh modals, :focus-visible rings, prefers-reduced-motion support, and SHA-384 SRI hashes on ai.html ML scripts."
+        },
+        {
+          "label": "Desktop SATA Storage Migration",
+          "text": "Migrated AMD SATA controllers from legacy StoreMI rcbottom/rcraid drivers to native Windows storahci with verified D: health and Defender/polling optimizations."
+        }
+      ]
+    },
     {
       "version": "v2.8.22",
       "date": "October 30, 2026",

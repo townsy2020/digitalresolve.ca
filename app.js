@@ -10,6 +10,17 @@
       window.location.replace('https://digitalresolve.ca' + window.location.pathname + window.location.search + window.location.hash);
     }
     const GATEWAY = 'https://wake.digitalresolve.ca';
+    const _origFetch = window.fetch.bind(window);
+    window.fetch = function(input, init) {
+      try {
+        const urlStr = (typeof input === 'string') ? input : (input && input.url ? input.url : '');
+        if (urlStr.startsWith(GATEWAY)) {
+          const merged = Object.assign({}, init || {}, { credentials: 'include' });
+          return _origFetch(input, merged);
+        }
+      } catch(e) {}
+      return _origFetch(input, init);
+    };
     var currentLogTab = 'agy';
     const _fetchSig = (ms = 8000) => (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(ms) : undefined;
 
@@ -147,16 +158,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.51';
+          const activeVer = match ? match[0] : 'v2.8.52';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 13739;
-      const baseCssLines = 6076;
-      const baseJsLines = 5628;
+      const baseHtmlLines = 14993;
+      const baseCssLines = 6304;
+      const baseJsLines = 6738;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
@@ -165,8 +176,8 @@
         fetch('styles.css?_t=' + Date.now(), { signal: _fetchSig(6000) }).then(r => r.ok ? r.text() : null).catch(() => null),
         fetch('app.js?_t=' + Date.now(), { signal: _fetchSig(6000) }).then(r => r.ok ? r.text() : null).catch(() => null)
       ]).then(([cssSrc, jsSrc]) => {
-        const cLines = cssSrc ? cssSrc.split(/\r?\n/).length : baseCssLines;
-        const jLines = jsSrc ? jsSrc.split(/\r?\n/).length : baseJsLines;
+        const cLines = cssSrc ? cssSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : baseCssLines;
+        const jLines = jsSrc ? jsSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : baseJsLines;
         const total = baseHtmlLines + cLines + jLines + baseCnameLines;
         const totalFormatted = total.toLocaleString();
 
@@ -1628,6 +1639,7 @@
       updateSSOGateUI(); try { updateMaintenanceVisualStates(); } catch(e) {}
       try { updateCodebaseMetrics(); } catch(e) {}
       try { updateMediaRoutePillUI(); } catch(e) {}
+      try { syncCloudflareAccessSession(true); } catch(e) {}
       if (hasTermDom() && isSSOAuthenticated()) {
         loadLog('agy');
       }
@@ -1682,8 +1694,11 @@
 
     // Remote Control Matrix Handler
     // ==========================================
-    // GATEWAY ADMIN KEY AUTH CONTROLLER
+    // CLOUDFLARE ACCESS M365 ENTRA ID SSO CONTROLLER
     // ==========================================
+    let _cfAccessVerified = false;
+    let _cfAccessEmail = '';
+
     function getAdminKey() {
       try {
         return sessionStorage.getItem('dr_admin_key') || '';
@@ -1700,8 +1715,45 @@
     }
 
     function isSSOAuthenticated() {
-      return Boolean(getAdminKey());
+      return Boolean(_cfAccessVerified || getAdminKey());
     }
+
+    async function syncCloudflareAccessSession(autoRedirect = true) {
+      try {
+        const res = await fetch(`${GATEWAY}/api/auth/verify`, {
+          credentials: 'include',
+          signal: _fetchSig(6000)
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        if (!data || data.status !== 'authorized') {
+          throw new Error('Unauthorized');
+        }
+        _cfAccessVerified = true;
+        _cfAccessEmail = data.email || 'cory.townsend@digitalresolve.ca';
+        try { sessionStorage.removeItem('dr_sso_sync_attempted'); } catch(e) {}
+        updateSSOGateUI();
+        try { updateMaintenanceVisualStates(); } catch(e) {}
+        try { fetchISPHistory(); } catch(e) {}
+        if (typeof loadLog === 'function' && typeof currentLogTab !== 'undefined' && document.getElementById('terminal-content')) {
+          try { loadLog(currentLogTab); } catch(e) {}
+        }
+        return true;
+      } catch (err) {
+        let syncAttempted = false;
+        try { syncAttempted = Boolean(sessionStorage.getItem('dr_sso_sync_attempted')); } catch(e) {}
+        if (autoRedirect && window.location.hostname === 'digitalresolve.ca' && !syncAttempted) {
+          try { sessionStorage.setItem('dr_sso_sync_attempted', '1'); } catch(e) {}
+          window.location.href = GATEWAY + '/api/sso/login?return=' + encodeURIComponent(window.location.href);
+          return false;
+        }
+        _cfAccessVerified = false;
+        _cfAccessEmail = '';
+        updateSSOGateUI();
+        return false;
+      }
+    }
+    window.syncCloudflareAccessSession = syncCloudflareAccessSession;
 
     function updateSSOGateUI() {
       const authed = isSSOAuthenticated();
@@ -1715,7 +1767,7 @@
           topLoginBtn.style.display = 'none';
           topAuthedGroup.style.display = 'inline-flex';
           if (topUserName) {
-            topUserName.textContent = 'Cory Townsend';
+            topUserName.textContent = _cfAccessEmail || 'Cory Townsend';
           }
         } else {
           topLoginBtn.style.display = 'inline-flex';
@@ -1826,7 +1878,7 @@
         // External WAN IPv4 (Exposed only when MFA/SSO authenticated)
         const ispIpSub = document.getElementById('isp-ip-sub');
         const tierBellIp = document.getElementById('tier-bell-ip-text');
-        const resolvedIp = window.CURRENT_EXTERNAL_IP || '184.148.161.160';
+        const resolvedIp = window.CURRENT_EXTERNAL_IP || 'n/a';
         if (ispIpSub) ispIpSub.innerHTML = 'IPv4: <span id="isp-ip-text" style="color: #60a5fa; font-family: monospace; font-style: normal;">' + escapeHtml(resolvedIp) + '</span>';
         if (tierBellIp) {
           tierBellIp.textContent = resolvedIp;
@@ -1921,45 +1973,40 @@
     window.toggleGlobalSSO = toggleGlobalSSO;
 
     function unlockSSO(method = 'm365') {
-      if (!isSSOAuthenticated()) {
-        openGlobalSSOModal('Admin Workspace Authorization');
+      if (isSSOAuthenticated()) {
+        updateSSOGateUI();
+        try { updateMaintenanceVisualStates(); } catch(e) {}
+        try { updateCodebaseMetrics(); } catch(e) {}
+        try { fetchISPHistory(); } catch(e) {}
         return;
       }
-      updateSSOGateUI();
-      try { updateMaintenanceVisualStates(); } catch(e) {}
-      try { updateCodebaseMetrics(); } catch(e) {}
-      try { fetchISPHistory(); } catch(e) {}
+      if (window.location.hostname === 'digitalresolve.ca') {
+        try { sessionStorage.removeItem('dr_sso_sync_attempted'); } catch(e) {}
+        window.location.href = GATEWAY + '/api/sso/login?return=' + encodeURIComponent(window.location.href);
+        return;
+      }
+      openGlobalSSOModal('Microsoft 365 Entra ID SSO Authorization');
     }
     window.unlockSSO = unlockSSO;
     window.isSSOAuthenticated = isSSOAuthenticated;
 
     async function lockSSO(fullIdpLogout = false) {
-      // 1. Show immediate toast feedback
-      showToast('info', 'Signing Out & Clearing Cache...', 'Purging browser caches, credentials and resetting deck behind SSO...', 3000);
-
-      // 2. Explicitly clear all localStorage authentication keys
+      showToast('info', 'Signing Out of Microsoft 365 SSO...', 'Clearing Cloudflare Access session and local caches...', 3000);
+      _cfAccessVerified = false;
+      _cfAccessEmail = '';
       try {
         localStorage.removeItem('dr_sso_authenticated');
         localStorage.removeItem('dr_sso_pin');
         localStorage.removeItem('dr_sso_user');
         localStorage.removeItem('dr_sso_email');
-        localStorage.setItem('dr_sso_authenticated', 'false');
       } catch(e) {}
-
-      // 3. Clear all sessionStorage cache
-      try {
-        sessionStorage.clear();
-      } catch(e) {}
-
-      // 4. Purge CacheStorage API caches (Service Worker & HTTP caches)
+      try { sessionStorage.clear(); } catch(e) {}
       try {
         if ('caches' in window) {
           const cacheKeys = await caches.keys();
           await Promise.all(cacheKeys.map(k => caches.delete(k)));
         }
       } catch(e) {}
-
-      // 5. Unregister all Service Workers
       try {
         if ('serviceWorker' in navigator) {
           const registrations = await navigator.serviceWorker.getRegistrations();
@@ -1968,40 +2015,14 @@
           }
         }
       } catch(e) {}
-
-      // 6. Clear local deck auth cookies (preserve Cloudflare Access session so cameras stay online)
-      try {
-        const host = window.location.hostname;
-        const cookieList = ['dr_sso_authenticated', 'dr_sso_user', 'dr_sso'];
-        cookieList.forEach(name => {
-          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${host};`;
-          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.${host};`;
-          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.digitalresolve.ca;`;
-        });
-      } catch(e) {}
-
-      // 7. Terminate background pollers and reset memory states
       window.pendingSSOCallback = null;
       if (typeof stopConsoleAutoPoll === 'function') stopConsoleAutoPoll();
-
-      // 8. Instantly force UI updates across all gates and header buttons
-      updateSSOGateUI(); try { updateMaintenanceVisualStates(); } catch(e) {}
-      try { updateCodebaseMetrics(); } catch(e) {}
-      try { updateMediaRoutePillUI(); } catch(e) {}
-      try { fetchISPHistory(); } catch(e) {}
-
-      // 10. If explicit full Microsoft IdP logout was requested with Shift key
-      if (fullIdpLogout && (window.event && window.event.shiftKey)) {
-        window.location.href = 'https://login.microsoftonline.com/common/oauth2/v2.0/logout?post_logout_redirect_uri=' + encodeURIComponent(window.location.origin + window.location.pathname);
+      updateSSOGateUI();
+      if (fullIdpLogout && window.event && window.event.shiftKey) {
+        window.location.href = 'https://login.microsoftonline.com/common/oauth2/v2.0/logout?post_logout_redirect_uri=' + encodeURIComponent('https://digitalresolve.ca/cdn-cgi/access/logout');
         return;
       }
-
-      // 11. Automatically refresh page with cache-busting timestamp so everything is fresh and locked behind SSO
-      setTimeout(() => {
-        const cleanUrl = window.location.origin + window.location.pathname + '?_fresh=' + Date.now();
-        window.location.replace(cleanUrl);
-      }, 300);
+      window.location.href = 'https://digitalresolve.ca/cdn-cgi/access/logout';
     }
     window.lockSSO = lockSSO;
 
@@ -2986,8 +3007,6 @@
 
       if (!isSSOAuthenticated()) {
         updateSSOGateUI(); try { updateMaintenanceVisualStates(); } catch(e) {}
-      try { updateCodebaseMetrics(); } catch(e) {}
-      try { updateMediaRoutePillUI(); } catch(e) {}
         return;
       }
 
@@ -3054,7 +3073,7 @@
             const loss = (latest && latest.packetLoss !== undefined) ? latest.packetLoss : 0;
             const grade = (latest && latest.grade) ? latest.grade : 'A+';
             const carrier = (latest && latest.isp) ? latest.isp : 'Bell Canada';
-            const extIp = (latest && latest.externalIp) ? latest.externalIp : '184.148.161.160';
+            const extIp = (latest && latest.externalIp) ? latest.externalIp : 'n/a';
 
             if (pingVal) pingVal.innerHTML = `${pingAvg} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>`;
             if (pingSub) pingSub.textContent = `Min: ${pingMin} ms | Max: ${pingMax} ms | Google: ${googleDns} ms`;
@@ -3072,7 +3091,7 @@
             const safeIp = (window.CURRENT_EXTERNAL_IP || extIp);
             if (ipSub) {
               if (authed && extIp !== 'Protected (MFA Required)') {
-                ipSub.innerHTML = `IPv4: <span id="isp-ip-text" style="color: #60a5fa; font-family: monospace; font-style: normal;">${safeIp}</span>`;
+                ipSub.innerHTML = `IPv4: <span id="isp-ip-text" style="color: #60a5fa; font-family: monospace; font-style: normal;">${escapeHtml(safeIp)}</span>`;
               } else {
                 ipSub.innerHTML = 'IPv4: <span id="isp-ip-text" style="color: #94a3b8; font-style: italic;">Protected (MFA Required)</span>';
               }
@@ -4501,8 +4520,6 @@
         win.classList.add('fullscreen');
       }
       updateSSOGateUI(); try { updateMaintenanceVisualStates(); } catch(e) {}
-      try { updateCodebaseMetrics(); } catch(e) {}
-      try { updateMediaRoutePillUI(); } catch(e) {}
       fetchAgySessionInfo();
       refreshAgyConsole();
       startConsoleAutoPoll();
@@ -4566,8 +4583,6 @@
     function refreshAgyConsole(isSilent = false) {
       if (!isSSOAuthenticated()) {
         updateSSOGateUI(); try { updateMaintenanceVisualStates(); } catch(e) {}
-      try { updateCodebaseMetrics(); } catch(e) {}
-      try { updateMediaRoutePillUI(); } catch(e) {}
         return;
       }
       const screen = document.getElementById('agy-console-screen');
@@ -5418,13 +5433,10 @@
       window.pendingSSOCallback = callback;
       const modal = document.getElementById('speedtest-sso-modal-overlay');
       const actionEl = document.getElementById('sso-gate-action-name');
-      const keyInput = document.getElementById('sso-admin-key-input');
       if (actionEl) actionEl.textContent = actionName;
-      if (keyInput) keyInput.value = '';
       if (modal) {
         modal.style.display = 'flex';
         modal.classList.add('active');
-        if (keyInput) setTimeout(() => keyInput.focus(), 100);
       }
     }
     window.openGlobalSSOModal = openGlobalSSOModal;
@@ -5675,11 +5687,6 @@
     })();
 
     function launchProtectedService(url, serviceName = 'Protected Homelab Service') {
-      const isMediaStream = /stream(?:-lan)?\.digitalresolve\.ca/i.test(url);
-      if (!isMediaStream && !isSSOAuthenticated()) {
-        openGlobalSSOModal(serviceName, () => launchProtectedService(url, serviceName));
-        return;
-      }
       const finalUrl = resolveMediaUrl(url);
       const isMobile = (typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
       if (isMobile) {
@@ -5691,49 +5698,13 @@
     window.launchProtectedService = launchProtectedService;
 
     async function verifySpeedtestSSO() {
-      const keyInput = document.getElementById('sso-admin-key-input');
-      const key = keyInput ? keyInput.value.trim() : '';
-      if (!key) {
-        showToast('warning', 'Admin Key Required', 'Enter your Gateway Admin Key from secrets.json to unlock.');
-        if (keyInput) keyInput.focus();
+      closeSpeedtestSSOModal();
+      try { sessionStorage.removeItem('dr_sso_sync_attempted'); } catch(e) {}
+      if (window.location.hostname === 'digitalresolve.ca') {
+        window.location.href = GATEWAY + '/api/sso/login?return=' + encodeURIComponent(window.location.href);
         return;
       }
-      try {
-        const res = await fetch(`${GATEWAY}/api/auth/verify`, {
-          headers: { 'X-Admin-Key': key },
-          signal: _fetchSig(8000)
-        });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const data = await res.json();
-        if (!data || data.status !== 'authorized') {
-          throw new Error('Unauthorized');
-        }
-        try { sessionStorage.setItem('dr_admin_key', key); } catch(e) {}
-        if (keyInput) keyInput.value = '';
-        showToast('success', 'Gateway Session Unlocked', 'Verified via Admin Key.');
-        updateSSOGateUI();
-        try { updateMaintenanceVisualStates(); } catch(e) {}
-        try { updateCodebaseMetrics(); } catch(e) {}
-        try { fetchISPHistory(); } catch(e) {}
-
-        const cb = window.pendingSSOCallback;
-        window.pendingSSOCallback = null;
-        closeSpeedtestSSOModal();
-
-        if (typeof loadLog === 'function' && typeof currentLogTab !== 'undefined' && document.getElementById('terminal-content')) {
-          try { loadLog(currentLogTab); } catch(e) {}
-        }
-        const modal = document.getElementById('agy-console-modal-overlay');
-        if (modal && modal.classList.contains('active')) {
-          if (typeof refreshAgyConsole === 'function') refreshAgyConsole();
-          if (typeof startConsoleAutoPoll === 'function') startConsoleAutoPoll();
-        }
-        if (cb && typeof cb === 'function') {
-          try { cb(); } catch(e) { console.error('SSO callback execution error:', e); }
-        }
-      } catch (err) {
-        showToast('error', 'Verification Failed', 'Invalid Gateway Admin Key or gateway unreachable.');
-      }
+      await syncCloudflareAccessSession(false);
     }
     window.verifySpeedtestSSO = verifySpeedtestSSO;
     window.verifySpeedtestPin = verifySpeedtestSSO;
