@@ -392,7 +392,7 @@
           if (tid) clearTimeout(tid);
           if (target === 'desktop' && data.online && (!data.disk || !data.vitals)) {
             fetch(altUrl1, { signal: (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(3000) : undefined })
-              .then(r => r.json())
+              .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
               .then(stats => {
                 if (stats && stats.desktop) {
                   if (stats.desktop.disk) data.disk = stats.desktop.disk;
@@ -406,7 +406,7 @@
         .catch(err => {
           if (tid) clearTimeout(tid);
           return fetch(altUrl1, { signal: (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(4000) : undefined })
-            .then(r => r.json())
+            .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(stats => {
               if (stats && stats[target]) {
                 const nodeData = stats[target];
@@ -422,7 +422,7 @@
             })
             .catch(err2 => {
               return fetch(altUrl2, { signal: (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(3000) : undefined })
-                .then(r => r.json())
+                .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
                 .then(data2 => {
                   if (data2) {
                     if (data2.nodes && Array.isArray(data2.nodes)) {
@@ -1649,7 +1649,7 @@
             headers: { 'X-SSO-Email': ssoEmail },
             signal: _fetchSig(8000)
           })
-            .then(r => r.json())
+            .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(data => {
               const body = document.getElementById('terminal-content');
               if (body && data && data.lines) {
@@ -2080,7 +2080,7 @@
         body: JSON.stringify({ prompt: promptText, ssoEmail: ssoEmail, email: ssoEmail, conversationId: cid, pin: '7788' }),
         signal: _fetchSig(15000)
       })
-      .then(r => r.json())
+      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(data => {
         if (data.status === 'success') {
           showToast('success', 'Prompt Delivered', 'Instruction queued for autonomous agent execution.');
@@ -2182,7 +2182,7 @@
 
     function fetchAgySessionInfo(callback) {
       return fetch(`${GATEWAY}/api/agy/session`, { signal: _fetchSig(6000) })
-        .then(r => r.json())
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(data => {
           if (data && data.conversationId) {
             const prevCid = window.AGY_SESSION_ID;
@@ -2222,7 +2222,7 @@
         body: JSON.stringify({ target: 'desktop', action: 'resume', ssoEmail: ssoEmail, workspace: window.AGY_WORKSPACE || 'C:\\Users\\CoryTownsend\\Projects\\website' }),
         signal: _fetchSig(12000)
       })
-      .then(r => r.json())
+      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(data => {
         if (data.status === 'success') {
           showToast('success', 'Session Resumed on Desktop', data.message || `Antigravity ${sName} active in Windows Terminal.`);
@@ -2268,7 +2268,7 @@
         body: JSON.stringify({ target: target, action: 'new-session', ssoEmail: ssoEmail }),
         signal: _fetchSig(12000)
       })
-      .then(r => r.json())
+      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(data => {
         if (data.status === 'success') {
           const newCid = data.conversationId;
@@ -2340,7 +2340,7 @@
         headers: { 'X-SSO-Email': ssoEmail },
         signal: _fetchSig(10000)
       })
-        .then(r => r.json())
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(data => {
           if (data.status === 'success') {
             showToast('success', isSpeed ? 'Probe Initiated' : `Command Executed (${targetLabel})`, data.message || `Action ${action} succeeded.`);
@@ -2876,7 +2876,7 @@
           const isHttps = typeof window !== 'undefined' && window.location && window.location.protocol === 'https:';
           const altStatsUrl = isHttps ? `${GATEWAY}/status?target=all` : `http://192.168.2.35:8082/stats`;
           return fetch(altStatsUrl, { cache: 'no-store', signal: _fetchSig(5000) })
-            .then(r => r.json())
+            .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(altData => {
               return applyClusterStatsPayload(altData);
             })
@@ -2915,7 +2915,7 @@
         headers: { 'X-SSO-Email': ssoEmail },
         signal: _fetchSig(8000)
       })
-        .then(r => r.json())
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(data => {
           if (body && data.lines) {
             body.textContent = data.lines.join('\n');
@@ -4284,7 +4284,7 @@
       return fetch(`${GATEWAY}/services-health`, {
         signal: controller ? controller.signal : undefined
       })
-        .then(r => r.json())
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(data => {
           if (timeoutId) clearTimeout(timeoutId);
           if (data && (data.services || data.status === 'success')) {
@@ -4499,7 +4499,7 @@
         headers: { 'X-SSO-Email': ssoEmail },
         signal: _fetchSig(8000)
       })
-        .then(r => r.json())
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(data => {
           if (data && data.lines && screen) {
             const isNearBottom = screen.scrollHeight - screen.scrollTop - screen.clientHeight < 80;
@@ -4612,7 +4612,7 @@
         body: JSON.stringify({ prompt: text, ssoEmail: ssoEmail, email: ssoEmail, conversationId: cid, pin: '7788' }),
         signal: _fetchSig(15000)
       })
-      .then(r => r.json())
+      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(data => {
         if (data.status === 'success') {
           showToast('success', 'Prompt Delivered to AGY', 'Autonomous agent processing instruction...');
@@ -4645,7 +4645,7 @@
     function fetchAndRenderChangelog() {
       const container = document.querySelector('.changelog-body');
       return fetch('changelog.json?_v=' + Date.now(), { signal: _fetchSig(5000) })
-        .then(r => r.json())
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(data => {
           if (!data || !Array.isArray(data.releases) || data.releases.length === 0) return;
           const latestVer = data.releases[0].version;
@@ -6525,7 +6525,7 @@
 
           // Alternative Method: Try direct LAN gateway or hydrate verified active state
           return fetch('http://192.168.2.35:8082/api/feeder/status', { signal: (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(2000) : undefined })
-            .then(r => r.json())
+            .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(d => {
               if (d && d.feeder) {
                 updateFeederUI(d.feeder);
