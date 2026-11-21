@@ -615,7 +615,7 @@
           sendControl('reboot', target);
         } else {
           fetch(`${GATEWAY}/reboot?target=${target}`, { signal: _fetchSig(8000) })
-            .then(r => r.json())
+            .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(() => showToast('info', 'Reboot Dispatched', `Reboot signal sent to ${targetName}.`))
             .catch(() => showToast('error', 'Reboot Error', `Could not reach ${GATEWAY}`));
         }
@@ -639,7 +639,7 @@
       showToast('loading', `Transmitting Magic Packet...`, `Target: ${dev.name}`, 0);
 
       fetch(`${GATEWAY}/wake?target=${target}`, { signal: _fetchSig(8000) })
-        .then(r => r.json())
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(() => {
           showToast('loading', `Magic Packet Broadcasted`, `Waiting for ${dev.name} to boot...`, 0);
 
@@ -658,7 +658,7 @@
             }
             attempts++;
             fetch(`${GATEWAY}/status?target=${target}`, { signal: _fetchSig(5000) })
-              .then(r => r.json())
+              .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
               .then(data => {
                 if (settled) return;
                 if (data.online) {
@@ -697,7 +697,7 @@
       showToast('loading', `Entering Sleep Mode...`, `Dispatching suspend signal to ${dev.name}`, 0);
 
       fetch(`${GATEWAY}/sleep?target=${target}`, { signal: _fetchSig(8000) })
-        .then(r => r.json())
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(() => {
           showToast('loading', `Sleep Signal Dispatched`, `Waiting for ${dev.name} to enter standby...`, 0);
 
@@ -706,7 +706,7 @@
           pollInterval = setInterval(() => {
             attempts++;
             fetch(`${GATEWAY}/status?target=${target}`, { signal: _fetchSig(5000) })
-              .then(r => r.json())
+              .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
               .then(data => {
                 if (!data.online) {
                   clearInterval(pollInterval);
@@ -3244,7 +3244,7 @@
         body: JSON.stringify({ url: val, target: target }),
         signal: _fetchSig(8000)
       })
-      .then(r => r.json())
+      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(data => {
         if (input) input.value = '';
         showToast('success', 'Download Started!', data.message || `Torrent sent to ${target.toUpperCase()}`);
@@ -3303,7 +3303,7 @@
         body: JSON.stringify({ url: val, target: target }),
         signal: _fetchSig(8000)
       })
-      .then(r => r.json())
+      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(data => {
         closeMagnetModal();
         if (input) input.value = '';
