@@ -163,16 +163,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.68';
+          const activeVer = match ? match[0] : 'v2.8.69';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 16210;
+      const baseHtmlLines = 16308;
       const baseCssLines = 6516;
-      const baseJsLines = 6957;
+      const baseJsLines = 6950;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
@@ -399,7 +399,7 @@
       const altUrl1 = `${GATEWAY}/stats`;
       const altUrl2 = isHttps ? `${GATEWAY}/uptime` : `http://192.168.2.35:8082/status?target=${target}`;
 
-      return fetch(primaryUrl, ctrl ? { signal: ctrl.signal } : {})
+      return fetch(primaryUrl, ctrl ? { credentials: 'include', signal: ctrl.signal } : { credentials: 'include' })
         .then(r => {
           if (!r.ok) throw new Error('HTTP ' + r.status);
           return r.json();
@@ -407,7 +407,7 @@
         .then(data => {
           if (tid) clearTimeout(tid);
           if (target === 'desktop' && data.online && (!data.disk || !data.vitals)) {
-            fetch(altUrl1, { signal: (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(3000) : undefined })
+            fetch(altUrl1, { credentials: 'include', signal: (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(3000) : undefined })
               .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
               .then(stats => {
                 if (stats && stats.desktop) {
@@ -421,7 +421,7 @@
         })
         .catch(err => {
           if (tid) clearTimeout(tid);
-          return fetch(altUrl1, { signal: (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(4000) : undefined })
+          return fetch(altUrl1, { credentials: 'include', signal: (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(4000) : undefined })
             .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(stats => {
               if (stats && stats[target]) {
@@ -437,7 +437,7 @@
               throw err;
             })
             .catch(err2 => {
-              return fetch(altUrl2, { signal: (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(3000) : undefined })
+              return fetch(altUrl2, { credentials: 'include', signal: (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(3000) : undefined })
                 .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
                 .then(data2 => {
                   if (data2) {
@@ -1009,7 +1009,13 @@
         tag.className = `item-tag ${isOnline ? 'online' : 'offline'}`;
       }
       if (target === 'nuc') {
-        if (latencyMs !== null) window.LAST_NUC_LATENCY = latencyMs;
+        if (latencyMs !== null && Number.isFinite(Number(latencyMs))) {
+          window.LAST_NUC_LATENCY = Number(latencyMs);
+          document.querySelectorAll('#spark-leg-nuc').forEach(el => {
+            el.textContent = `${Number(latencyMs).toFixed(1)} ms`;
+          });
+          if (typeof initSparklineHeartbeat === 'function') initSparklineHeartbeat();
+        }
       } else if (lat) {
         lat.textContent = latencyMs !== null ? `${latencyMs} ms` : (isOnline ? 'Online' : 'Standby');
         lat.className = `item-tag ${isOnline ? 'online' : 'offline'}`;
@@ -2240,7 +2246,7 @@
     }
 
     function fetchAgySessionInfo(callback) {
-      return fetch(`${GATEWAY}/api/agy/session`, { signal: _fetchSig(6000) })
+      return fetch(`${GATEWAY}/api/agy/session`, { credentials: 'include', signal: _fetchSig(6000) })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(data => {
           if (data) {
@@ -2758,7 +2764,7 @@
       if (!force && (now - _lastQuotaSparklineFetch) < 60000) return;
       _quotaSparklineInFlight = true;
 
-      fetch(`${GATEWAY}/api/quota/history`, { cache: 'no-store', signal: _fetchSig(5000) })
+      fetch(`${GATEWAY}/api/quota/history`, { credentials: 'include', cache: 'no-store', signal: _fetchSig(5000) })
         .then(r => r.ok ? r.json() : null)
         .then(data => {
           _quotaSparklineInFlight = false;
@@ -3103,7 +3109,7 @@
     window.updateClimateUI = updateClimateUI;
 
     function fetchClimateData() {
-      return fetch(`${GATEWAY}/climate`, { cache: 'no-store', signal: _fetchSig(5000) })
+      return fetch(`${GATEWAY}/climate`, { credentials: 'include', cache: 'no-store', signal: _fetchSig(5000) })
         .then(r => r.ok ? r.json() : null)
         .then(d => {
           if (d && d.climate && typeof updateClimateUI === 'function') {
@@ -3120,7 +3126,7 @@
       const timeoutId = controller ? setTimeout(() => controller.abort(), 6000) : null;
       
       // Primary Route: Query ${GATEWAY}/stats with cache: no-store
-      return fetch(`${GATEWAY}/stats`, controller ? { signal: controller.signal, cache: 'no-store' } : { cache: 'no-store' })
+      return fetch(`${GATEWAY}/stats`, controller ? { credentials: 'include', signal: controller.signal, cache: 'no-store' } : { credentials: 'include', cache: 'no-store' })
         .then(r => {
           if (!r.ok) throw new Error('HTTP ' + r.status);
           return r.json();
@@ -3191,19 +3197,27 @@
     // ISP Diagnostics & History Poller
     function fetchISPHistory() {
       const numField = (v, fb) => (v !== null && v !== undefined && v !== '' && Number.isFinite(Number(v))) ? Number(v) : fb;
-      const renderIspRows = (tbody, list, fb) => {
+      const fmtVal = (v, suffix = '') => (v !== null && v !== undefined && Number.isFinite(Number(v))) ? `${Number(v)}${suffix}` : '--';
+      const renderIspRows = (tbody, list) => {
         if (!tbody || !Array.isArray(list) || list.length === 0) return;
-        tbody.innerHTML = list.slice(-10).reverse().map(r => `
+        tbody.innerHTML = list.slice(-10).reverse().map(r => {
+          const avg = numField(r && r.pingAvgMs, null);
+          const min = numField(r && r.pingMinMs, null);
+          const max = numField(r && r.pingMaxMs, null);
+          const jit = numField(r && r.jitterMs, null);
+          const loss = numField(r && r.packetLoss, 0);
+          return `
                 <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
-                  <td style="padding: 6px 8px; color: #8b949e;">${escapeHtml(String(r.timeShort || r.timestamp || 'Recent'))}</td>
-                  <td style="padding: 6px 8px; color: #60a5fa;">${escapeHtml(String(r.isp || 'Bell Canada'))}</td>
-                  <td style="padding: 6px 8px; color: #38bdf8; font-weight: 700;">${numField(r.pingAvgMs, fb.avg)} ms</td>
-                  <td style="padding: 6px 8px;">${numField(r.pingMinMs, fb.min)} / ${numField(r.pingMaxMs, fb.max)} ms</td>
-                  <td style="padding: 6px 8px; color: #4ade80;">&plusmn; ${numField(r.jitterMs, fb.jitter)} ms</td>
-                  <td style="padding: 6px 8px;">${numField(r.packetLoss, 0)}%</td>
-                  <td style="padding: 6px 8px;"><span class="item-tag online" style="font-size: 0.7rem; padding: 2px 6px;">${escapeHtml(String(r.grade || 'A+'))}</span></td>
+                  <td style="padding: 6px 8px; color: #8b949e;">${escapeHtml(String((r && (r.timeShort || r.timestamp)) || 'Recent'))}</td>
+                  <td style="padding: 6px 8px; color: #60a5fa;">${escapeHtml(String((r && r.isp) || 'Bell Canada'))}</td>
+                  <td style="padding: 6px 8px; color: #38bdf8; font-weight: 700;">${fmtVal(avg, ' ms')}</td>
+                  <td style="padding: 6px 8px;">${min !== null && max !== null ? `${min} / ${max} ms` : '--'}</td>
+                  <td style="padding: 6px 8px; color: #4ade80;">${jit !== null ? `&plusmn; ${jit} ms` : '--'}</td>
+                  <td style="padding: 6px 8px;">${loss !== null ? `${loss}%` : '--'}</td>
+                  <td style="padding: 6px 8px;"><span class="item-tag online" style="font-size: 0.7rem; padding: 2px 6px;">${escapeHtml(String((r && r.grade) || 'A+'))}</span></td>
                 </tr>
-              `).join('');
+              `;
+        }).join('');
       };
       const sortIspChrono = (list) => {
         if (!Array.isArray(list) || list.length <= 1) return Array.isArray(list) ? list : [];
@@ -3216,123 +3230,137 @@
           })
           .map(x => x.item);
       };
-      return fetch(`${GATEWAY}/api/isp-health`, { signal: _fetchSig(6000) })
+
+      const applyIspTelemetry = (rawListInput, explicitLatest, opts = {}) => {
+        const list = sortIspChrono(Array.isArray(rawListInput) ? rawListInput : []);
+        const latest = (explicitLatest && explicitLatest.pingAvgMs !== undefined)
+          ? explicitLatest
+          : (list.length > 0 ? list[list.length - 1] : null);
+
+        window.ISP_HISTORY_PINGS = list
+          .map(h => (h && h.pingAvgMs !== null && h.pingAvgMs !== undefined && Number.isFinite(Number(h.pingAvgMs))) ? Number(h.pingAvgMs) : null)
+          .filter(v => v !== null);
+        window.ISP_EDGE_PINGS = list
+          .map(h => (h && h.googleDnsMs !== null && h.googleDnsMs !== undefined && Number.isFinite(Number(h.googleDnsMs))) ? Number(h.googleDnsMs) : null);
+        window.ISP_LATEST = latest;
+
+        if (latest && typeof updateHealthRadarUI === 'function') {
+          updateHealthRadarUI({ isp: latest });
+        }
+
+        const pingAvg = latest ? numField(latest.pingAvgMs, null) : null;
+        const pingMin = latest ? numField(latest.pingMinMs, null) : null;
+        const pingMax = latest ? numField(latest.pingMaxMs, null) : null;
+        const googleDns = latest ? numField(latest.googleDnsMs, null) : null;
+        const jitter = latest ? numField(latest.jitterMs, null) : null;
+        const loss = latest ? numField(latest.packetLoss, null) : null;
+        const grade = (latest && latest.grade) ? String(latest.grade) : '--';
+        const carrier = (latest && latest.isp) ? String(latest.isp) : '--';
+        const extIp = (latest && latest.externalIp) ? String(latest.externalIp) : 'n/a';
+        const uptimeStr = (latest && latest.uptime) ? String(latest.uptime) : null;
+        const snapTag = opts.snapTag || '';
+
+        const pingVal = document.getElementById('isp-ping-val');
+        const pingSub = document.getElementById('isp-ping-sub');
+        const jitterVal = document.getElementById('isp-jitter-val');
+        const lossSub = document.getElementById('isp-loss-sub');
+        const gradeTag = document.getElementById('isp-grade-tag');
+        const carrierVal = document.getElementById('isp-carrier-val');
+        const ipSub = document.getElementById('isp-ip-sub');
+        const pingTag = document.getElementById('isp-ping-tag');
+        const uptimeVal = document.getElementById('isp-uptime-val');
+
+        if (pingVal) pingVal.innerHTML = pingAvg !== null ? `${pingAvg} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>` : `-- <span style="font-size: 0.9rem; color: #8b949e;">ms</span>`;
+        if (pingSub) pingSub.textContent = `Min: ${pingMin !== null ? pingMin : '--'} ms | Max: ${pingMax !== null ? pingMax : '--'} ms | Google: ${googleDns !== null ? googleDns : '--'} ms${snapTag}`;
+        if (jitterVal) jitterVal.innerHTML = jitter !== null ? `&plusmn; ${jitter} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>` : `-- <span style="font-size: 0.9rem; color: #8b949e;">ms</span>`;
+        if (lossSub) lossSub.textContent = `Packet Loss: ${loss !== null ? loss + '%' : '--'} | Fiber Optic`;
+        if (gradeTag) {
+          gradeTag.textContent = grade !== '--' ? `Grade: ${grade} (Ultra Stable)` : 'Grade: --';
+          gradeTag.className = grade === 'A+' ? 'item-tag online' : 'item-tag';
+        }
+        if (carrierVal) carrierVal.textContent = carrier;
+        if (uptimeVal && uptimeStr && (!uptimeVal.textContent || uptimeVal.textContent.trim() === '--')) {
+          uptimeVal.textContent = uptimeStr;
+        }
+        if (latest && latest.externalIp && latest.externalIp !== 'Protected (MFA Required)') {
+          window.CURRENT_EXTERNAL_IP = String(latest.externalIp);
+        }
+        const authed = isSSOAuthenticated();
+        const safeIp = (window.CURRENT_EXTERNAL_IP || extIp);
+        if (ipSub) {
+          if (authed && safeIp && safeIp !== 'Protected (MFA Required)' && safeIp !== 'n/a') {
+            ipSub.innerHTML = `IPv4: <span id="isp-ip-text" style="color: #60a5fa; font-family: monospace; font-style: normal;">${escapeHtml(safeIp)}</span>`;
+          } else {
+            ipSub.innerHTML = 'IPv4: <span id="isp-ip-text" style="color: #94a3b8; font-style: italic;">Protected (MFA Required)</span>';
+          }
+        }
+        const tierBellIp = document.getElementById('tier-bell-ip-text');
+        if (tierBellIp) {
+          if (authed && safeIp && safeIp !== 'Protected (MFA Required)' && safeIp !== 'n/a') {
+            tierBellIp.textContent = safeIp;
+            tierBellIp.style.color = '#cbd5e1';
+            tierBellIp.style.fontStyle = 'normal';
+            tierBellIp.style.fontFamily = 'monospace';
+          } else {
+            tierBellIp.textContent = 'Protected (MFA Required)';
+            tierBellIp.style.color = '#94a3b8';
+            tierBellIp.style.fontStyle = 'italic';
+            tierBellIp.style.fontFamily = 'inherit';
+          }
+        }
+        if (pingTag) pingTag.textContent = pingAvg !== null ? `${pingAvg} ms` : '-- ms';
+        document.querySelectorAll('#uptime-isp-jitter-status').forEach(el => {
+          el.textContent = jitter !== null ? `± ${jitter} ms Jitter` : '-- ms Jitter';
+        });
+        document.querySelectorAll('#isp-jitter-tag').forEach(el => {
+          el.textContent = jitter !== null ? (jitter < 1 ? '< 1 ms' : `± ${jitter} ms`) : '--';
+        });
+        document.querySelectorAll('#uptime-scale-bell-today').forEach(el => {
+          el.textContent = pingAvg !== null ? `Today (${pingAvg} ms ping)` : 'Today (-- ms ping)';
+        });
+        document.querySelectorAll('#st-sub-jitter').forEach(el => {
+          el.innerHTML = jitter !== null ? `&plusmn; ${jitter} ms Jitter &bull; Cloudflare YYZ` : `-- ms Jitter &bull; Cloudflare YYZ`;
+        });
+        document.querySelectorAll('#st-sub-bloat').forEach(el => {
+          el.textContent = jitter !== null ? `+${jitter} ms latency under full saturation` : '-- ms latency under full saturation';
+        });
+        document.querySelectorAll('#spark-leg-bell').forEach(el => {
+          el.textContent = pingAvg !== null ? `${pingAvg} ms` : '--';
+        });
+        document.querySelectorAll('#spark-leg-edge').forEach(el => {
+          el.textContent = googleDns !== null ? `${googleDns} ms` : '--';
+        });
+
+        renderIspRows(document.getElementById('isp-history-tbody'), list);
+
+        const stPing = document.getElementById('st-val-ping');
+        if (stPing) stPing.innerHTML = pingAvg !== null ? `${pingAvg} <span style="font-size: 0.85rem; color: #94a3b8;">ms</span>` : '--';
+        const downMbps = latest ? numField(latest.downloadMbps != null ? latest.downloadMbps : latest.downMbps, null) : null;
+        const upMbps = latest ? numField(latest.uploadMbps != null ? latest.uploadMbps : latest.upMbps, null) : null;
+        const stDown = document.getElementById('st-val-down');
+        if (stDown) stDown.innerHTML = downMbps !== null ? `${downMbps} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>` : '--';
+        const stUp = document.getElementById('st-val-up');
+        if (stUp) stUp.innerHTML = upMbps !== null ? `${upMbps} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>` : '--';
+        const gaugeNum = document.getElementById('gauge-live-num');
+        if (gaugeNum) gaugeNum.textContent = downMbps !== null ? `${downMbps}` : '--';
+        const gaugeNeedle = document.getElementById('speed-dial-needle');
+        if (gaugeNeedle) {
+          const angle = downMbps !== null ? (-45 + (Math.min(downMbps, 1000) / 1000) * 180) : -45;
+          gaugeNeedle.style.transform = `rotate(${angle}deg)`;
+        }
+
+        if (typeof initSparklineHeartbeat === 'function') initSparklineHeartbeat();
+      };
+
+      return fetch(`${GATEWAY}/api/isp-health`, { credentials: 'include', signal: _fetchSig(6000) })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(data => {
           if (data && data.status === 'success') {
             try { localStorage.setItem('dr_isp_history', JSON.stringify(data)); } catch (e) {}
-            const rawList = sortIspChrono(Array.isArray(data.history) 
-              ? data.history 
-              : (data.history && Array.isArray(data.history.value) ? data.history.value : []));
-            const latest = (data.latest && data.latest.pingAvgMs !== undefined) 
-              ? data.latest 
-              : (rawList.length > 0 ? rawList[rawList.length - 1] : null);
-
-            const pingVal = document.getElementById('isp-ping-val');
-            const pingSub = document.getElementById('isp-ping-sub');
-            const jitterVal = document.getElementById('isp-jitter-val');
-            const lossSub = document.getElementById('isp-loss-sub');
-            const gradeTag = document.getElementById('isp-grade-tag');
-            const carrierVal = document.getElementById('isp-carrier-val');
-            const ipSub = document.getElementById('isp-ip-sub');
-            const pingTag = document.getElementById('isp-ping-tag');
-
-            // Store real measured historical pings for live sparkline plotting
-            window.ISP_HISTORY_PINGS = rawList
-              .map(h => (h && typeof h.pingAvgMs === 'number' && isFinite(h.pingAvgMs)) ? h.pingAvgMs : null)
-              .filter(v => v !== null);
-            window.ISP_EDGE_PINGS = rawList.map(h => (h && typeof h.googleDnsMs === 'number' && isFinite(h.googleDnsMs)) ? h.googleDnsMs : null);
-            window.ISP_LATEST = latest;
-
-            if (latest && typeof updateHealthRadarUI === 'function') {
-              updateHealthRadarUI({ isp: latest });
-            }
-
-            const pingAvg = latest ? numField(latest.pingAvgMs, null) : null;
-            const pingMin = latest ? numField(latest.pingMinMs, null) : null;
-            const pingMax = latest ? numField(latest.pingMaxMs, null) : null;
-            const googleDns = latest ? numField(latest.googleDnsMs, null) : null;
-            const jitter = latest ? numField(latest.jitterMs, null) : null;
-            const loss = latest ? numField(latest.packetLoss, null) : null;
-            const grade = (latest && latest.grade) ? String(latest.grade) : '--';
-            const carrier = (latest && latest.isp) ? String(latest.isp) : '--';
-            const extIp = (latest && latest.externalIp) ? String(latest.externalIp) : 'n/a';
-
-            if (pingVal) pingVal.innerHTML = pingAvg !== null ? `${pingAvg} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>` : `-- <span style="font-size: 0.9rem; color: #8b949e;">ms</span>`;
-            if (pingSub) pingSub.textContent = `Min: ${pingMin !== null ? pingMin : '--'} ms | Max: ${pingMax !== null ? pingMax : '--'} ms | Google: ${googleDns !== null ? googleDns : '--'} ms`;
-            if (jitterVal) jitterVal.innerHTML = jitter !== null ? `&plusmn; ${jitter} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>` : `-- <span style="font-size: 0.9rem; color: #8b949e;">ms</span>`;
-            if (lossSub) lossSub.textContent = `Packet Loss: ${loss !== null ? loss + '%' : '--'} | Fiber Optic`;
-            if (gradeTag) {
-              gradeTag.textContent = grade !== '--' ? `Grade: ${grade} (Ultra Stable)` : 'Grade: --';
-              gradeTag.className = grade === 'A+' ? 'item-tag online' : 'item-tag';
-            }
-            if (carrierVal) carrierVal.textContent = carrier;
-            if (latest && latest.externalIp && latest.externalIp !== 'Protected (MFA Required)') {
-              window.CURRENT_EXTERNAL_IP = String(latest.externalIp);
-            }
-            const authed = isSSOAuthenticated();
-            const safeIp = (window.CURRENT_EXTERNAL_IP || extIp);
-            if (ipSub) {
-              if (authed && extIp !== 'Protected (MFA Required)') {
-                ipSub.innerHTML = `IPv4: <span id="isp-ip-text" style="color: #60a5fa; font-family: monospace; font-style: normal;">${escapeHtml(safeIp)}</span>`;
-              } else {
-                ipSub.innerHTML = 'IPv4: <span id="isp-ip-text" style="color: #94a3b8; font-style: italic;">Protected (MFA Required)</span>';
-              }
-            }
-            const tierBellIp = document.getElementById('tier-bell-ip-text');
-            if (tierBellIp) {
-              if (authed && extIp !== 'Protected (MFA Required)') {
-                tierBellIp.textContent = safeIp;
-                tierBellIp.style.color = '#cbd5e1';
-                tierBellIp.style.fontStyle = 'normal';
-                tierBellIp.style.fontFamily = 'monospace';
-              } else {
-                tierBellIp.textContent = 'Protected (MFA Required)';
-                tierBellIp.style.color = '#94a3b8';
-                tierBellIp.style.fontStyle = 'italic';
-                tierBellIp.style.fontFamily = 'inherit';
-              }
-            }
-            if (pingTag) pingTag.textContent = pingAvg !== null ? `${pingAvg} ms` : '-- ms';
-            document.querySelectorAll('#uptime-isp-jitter-status').forEach(el => {
-              el.textContent = jitter !== null ? `± ${jitter} ms Jitter` : '-- ms Jitter';
-            });
-            document.querySelectorAll('#isp-jitter-tag').forEach(el => {
-              el.textContent = jitter !== null ? (jitter < 1 ? '< 1 ms' : `± ${jitter} ms`) : '--';
-            });
-            document.querySelectorAll('#uptime-scale-bell-today').forEach(el => {
-              el.textContent = pingAvg !== null ? `Today (${pingAvg} ms ping)` : 'Today (-- ms ping)';
-            });
-            document.querySelectorAll('#st-sub-jitter').forEach(el => {
-              el.innerHTML = jitter !== null ? `&plusmn; ${jitter} ms Jitter &bull; Cloudflare YYZ` : `-- ms Jitter &bull; Cloudflare YYZ`;
-            });
-            document.querySelectorAll('#st-sub-bloat').forEach(el => {
-              el.textContent = jitter !== null ? `+${jitter} ms latency under full saturation` : '-- ms latency under full saturation';
-            });
-            document.querySelectorAll('#spark-leg-bell').forEach(el => {
-              el.textContent = `${pingAvg} ms`;
-            });
-            document.querySelectorAll('#spark-leg-edge').forEach(el => {
-              el.textContent = `${googleDns} ms`;
-            });
-
-            renderIspRows(document.getElementById('isp-history-tbody'), rawList, { avg: 4.2, min: 4, max: 5, jitter: 0.3 });
-
-            const stPing = document.getElementById('st-val-ping');
-            if (stPing) stPing.innerHTML = `${pingAvg} <span style="font-size: 0.85rem; color: #94a3b8;">ms</span>`;
-            const downMbps = latest ? numField(latest.downloadMbps != null ? latest.downloadMbps : latest.downMbps, null) : null;
-            const upMbps = latest ? numField(latest.uploadMbps != null ? latest.uploadMbps : latest.upMbps, null) : null;
-            const stDown = document.getElementById('st-val-down');
-            if (stDown) stDown.innerHTML = downMbps !== null ? `${downMbps} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>` : '--';
-            const stUp = document.getElementById('st-val-up');
-            if (stUp) stUp.innerHTML = upMbps !== null ? `${upMbps} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>` : '--';
-            const gaugeNum = document.getElementById('gauge-live-num');
-            if (gaugeNum) gaugeNum.textContent = downMbps !== null ? `${downMbps}` : '--';
-            const gaugeNeedle = document.getElementById('speed-dial-needle');
-            if (gaugeNeedle) {
-              const angle = downMbps !== null ? (-45 + (Math.min(downMbps, 1000) / 1000) * 180) : -45;
-              gaugeNeedle.style.transform = `rotate(${angle}deg)`;
-            }
+            const rawList = Array.isArray(data.history)
+              ? data.history
+              : (data.history && Array.isArray(data.history.value) ? data.history.value : []);
+            applyIspTelemetry(rawList, data.latest || null);
           }
           return data;
         })
@@ -3342,118 +3370,43 @@
             .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(sData => {
               if (sData && sData.status === 'success') {
-                const sList = sortIspChrono(Array.isArray(sData.history) ? sData.history : []);
-                renderIspRows(document.getElementById('isp-history-tbody'), sList, { avg: '--', min: '--', max: '--', jitter: '--' });
+                const sList = Array.isArray(sData.history) ? sData.history : [];
                 const sLat = (sData.latest && sData.latest.pingAvgMs !== undefined) ? sData.latest : (sList.length > 0 ? sList[sList.length - 1] : null);
-                if (sLat) {
-                  const snapTsRaw = sLat.timestamp || sData.timestamp || null;
-                  const snapTs = snapTsRaw ? Date.parse(snapTsRaw) : NaN;
-                  const isStaleSnap = !Number.isFinite(snapTs) || (Date.now() - snapTs) > (2 * 60 * 60 * 1000);
-                  const snapDateLabel = Number.isFinite(snapTs) ? new Date(snapTs).toISOString().slice(0, 10) : 'Unknown';
-                  const snapTag = isStaleSnap ? ` [Snapshot: ${snapDateLabel}]` : '';
-
-                  const pVal = document.getElementById('isp-ping-val');
-                  const pSub = document.getElementById('isp-ping-sub');
-                  const jVal = document.getElementById('isp-jitter-val');
-                  const pTag = document.getElementById('isp-ping-tag');
-                  const sPingAvg = numField(sLat.pingAvgMs, null);
-                  const sPingMin = numField(sLat.pingMinMs, '--');
-                  const sPingMax = numField(sLat.pingMaxMs, '--');
-                  const sGdns = numField(sLat.googleDnsMs, '--');
-                  const sJitter = numField(sLat.jitterMs, null);
-                  const sDown = numField(sLat.downloadMbps != null ? sLat.downloadMbps : sLat.downMbps, null);
-                  const sUp = numField(sLat.uploadMbps != null ? sLat.uploadMbps : sLat.upMbps, null);
-                  if (pVal) pVal.innerHTML = sPingAvg !== null ? `${sPingAvg} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>` : '--';
-                  if (pSub) pSub.textContent = `Min: ${sPingMin} ms | Max: ${sPingMax} ms | Google: ${sGdns} ms${snapTag}`;
-                  if (jVal) jVal.innerHTML = sJitter !== null ? `&plusmn; ${sJitter} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>` : '--';
-                  if (pTag) pTag.textContent = sPingAvg !== null ? `${sPingAvg} ms` : '--';
-                  const stPing = document.getElementById('st-val-ping');
-                  const stDown = document.getElementById('st-val-down');
-                  const stUp = document.getElementById('st-val-up');
-                  const gaugeNum = document.getElementById('gauge-live-num');
-                  if (stPing) stPing.innerHTML = sPingAvg !== null ? `${sPingAvg} <span style="font-size: 0.85rem; color: #94a3b8;">ms</span>` : '--';
-                  if (stDown) stDown.innerHTML = sDown !== null ? `${sDown} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>` : '--';
-                  if (stUp) stUp.innerHTML = sUp !== null ? `${sUp} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>` : '--';
-                  if (gaugeNum) gaugeNum.textContent = sDown !== null ? `${sDown}` : '--';
-                  const sGaugeNeedle = document.getElementById('speed-dial-needle');
-                  if (sGaugeNeedle) {
-                    const sAngle = sDown !== null ? (-45 + (Math.min(sDown, 1000) / 1000) * 180) : -45;
-                    sGaugeNeedle.style.transform = `rotate(${sAngle}deg)`;
-                  }
-                }
+                const snapTsRaw = (sLat && sLat.timestamp) || sData.timestamp || null;
+                const snapTs = snapTsRaw ? Date.parse(snapTsRaw) : NaN;
+                const isStaleSnap = !Number.isFinite(snapTs) || (Date.now() - snapTs) > (2 * 60 * 60 * 1000);
+                const snapDateLabel = Number.isFinite(snapTs) ? new Date(snapTs).toISOString().slice(0, 10) : 'Unknown';
+                const snapTag = isStaleSnap ? ` [Snapshot: ${snapDateLabel}]` : '';
+                applyIspTelemetry(sList, sLat, { snapTag });
                 return sData;
               }
               throw new Error('Static snapshot empty');
             })
             .catch(() => {
-              const applyBaseline = () => {
-                let cList = [];
-                try {
-                  const cachedRaw = localStorage.getItem('dr_isp_history');
-                  if (cachedRaw) {
-                    const cachedData = JSON.parse(cachedRaw);
-                    if (cachedData && cachedData.status === 'success') {
-                      cList = Array.isArray(cachedData.history) ? cachedData.history : [];
-                    }
+              let cList = [];
+              let cLat = null;
+              try {
+                const cachedRaw = localStorage.getItem('dr_isp_history');
+                if (cachedRaw) {
+                  const cachedData = JSON.parse(cachedRaw);
+                  if (cachedData && cachedData.status === 'success') {
+                    cList = Array.isArray(cachedData.history) ? cachedData.history : [];
+                    cLat = cachedData.latest || null;
                   }
-                } catch (e) {}
+                }
+              } catch (e) {}
 
+              if (cList && cList.length > 0) {
+                applyIspTelemetry(cList, cLat);
+              } else {
+                applyIspTelemetry([], null);
                 const tbody = document.getElementById('isp-history-tbody');
-                const pingVal = document.getElementById('isp-ping-val');
+                if (tbody) {
+                  tbody.innerHTML = '<tr><td colspan="7" style="padding: 12px 8px; text-align: center; color: #94a3b8;">Awaiting live ISP telemetry...</td></tr>';
+                }
                 const pingSub = document.getElementById('isp-ping-sub');
-                const jitterVal = document.getElementById('isp-jitter-val');
-                const uptimeVal = document.getElementById('isp-uptime-val');
-                const pingTag = document.getElementById('isp-ping-tag');
-                const stPing = document.getElementById('st-val-ping');
-                const stDown = document.getElementById('st-val-down');
-                const stUp = document.getElementById('st-val-up');
-                const gaugeNum = document.getElementById('gauge-live-num');
-                const cGaugeNeedle = document.getElementById('speed-dial-needle');
-
-                if (!cList || cList.length === 0) {
-                  if (tbody) {
-                    tbody.innerHTML = '<tr><td colspan="7" style="padding: 12px 8px; text-align: center; color: #94a3b8;">Awaiting live ISP telemetry...</td></tr>';
-                  }
-                  if (pingVal) pingVal.textContent = '--';
-                  if (pingSub) pingSub.textContent = 'Awaiting live ISP telemetry...';
-                  if (jitterVal) jitterVal.textContent = '--';
-                  if (uptimeVal) uptimeVal.textContent = '--';
-                  if (pingTag) pingTag.textContent = '--';
-                  if (stPing) stPing.textContent = '--';
-                  if (stDown) stDown.textContent = '--';
-                  if (stUp) stUp.textContent = '--';
-                  if (gaugeNum) gaugeNum.textContent = '--';
-                  if (cGaugeNeedle) cGaugeNeedle.style.transform = 'rotate(-45deg)';
-                  return;
-                }
-
-                cList = sortIspChrono(cList);
-                renderIspRows(tbody, cList, { avg: '--', min: '--', max: '--', jitter: '--' });
-
-                const cLat = cList[cList.length - 1];
-                const cPing = cLat ? numField(cLat.pingAvgMs, null) : null;
-                const cMin = cLat ? numField(cLat.pingMinMs, '--') : '--';
-                const cMax = cLat ? numField(cLat.pingMaxMs, '--') : '--';
-                const cGdns = cLat ? numField(cLat.googleDnsMs, '--') : '--';
-                const cJitter = cLat ? numField(cLat.jitterMs, null) : null;
-                const cDown = cLat ? numField(cLat.downloadMbps != null ? cLat.downloadMbps : cLat.downMbps, null) : null;
-                const cUp = cLat ? numField(cLat.uploadMbps != null ? cLat.uploadMbps : cLat.upMbps, null) : null;
-
-                if (pingVal) pingVal.innerHTML = cPing !== null ? `${cPing} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>` : '--';
-                if (pingSub) pingSub.textContent = `Min: ${cMin} ms | Max: ${cMax} ms | Google: ${cGdns} ms`;
-                if (jitterVal) jitterVal.innerHTML = cJitter !== null ? `&plusmn; ${cJitter} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>` : '--';
-                if (uptimeVal) uptimeVal.textContent = '--';
-                if (pingTag) pingTag.textContent = cPing !== null ? `${cPing} ms` : '--';
-                if (stPing) stPing.innerHTML = cPing !== null ? `${cPing} <span style="font-size: 0.85rem; color: #94a3b8;">ms</span>` : '--';
-                if (stDown) stDown.innerHTML = cDown !== null ? `${cDown} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>` : '--';
-                if (stUp) stUp.innerHTML = cUp !== null ? `${cUp} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>` : '--';
-                if (gaugeNum) gaugeNum.textContent = cDown !== null ? `${cDown}` : '--';
-                if (cGaugeNeedle) {
-                  const cAngle = cDown !== null ? (-45 + (Math.min(cDown, 1000) / 1000) * 180) : -45;
-                  cGaugeNeedle.style.transform = `rotate(${cAngle}deg)`;
-                }
-              };
-              applyBaseline();
+                if (pingSub) pingSub.textContent = 'Awaiting live ISP telemetry...';
+              }
               return null;
             });
         });
@@ -4038,38 +3991,66 @@
         { id: 'bars-desktop', type: 'desktop', title: 'Desktop Workstation (Active Session)' }
       ];
 
-      if (!window.UPTIME_INCIDENTS) {
-        try {
-          const cached = JSON.parse(localStorage.getItem('dr_uptime_cache'));
-          if (cached && Array.isArray(cached.incidents)) window.UPTIME_INCIDENTS = cached.incidents;
-        } catch(e) {}
+      let cachedUptime = null;
+      try {
+        cachedUptime = JSON.parse(localStorage.getItem('dr_uptime_cache'));
+      } catch(e) {}
+      if (!window.UPTIME_INCIDENTS && cachedUptime && Array.isArray(cachedUptime.incidents)) {
+        window.UPTIME_INCIDENTS = cachedUptime.incidents;
+      }
+      if (!window.UPTIME_DAILY_HISTORY && cachedUptime && cachedUptime.dailyHistory && typeof cachedUptime.dailyHistory === 'object') {
+        window.UPTIME_DAILY_HISTORY = cachedUptime.dailyHistory;
       }
 
-      function applyUptimeIncidentsToBars(incidents) {
-        if (!Array.isArray(incidents)) return;
-        nodes.forEach(node => {
-          const container = document.getElementById(node.id);
-          if (!container) return;
-          const bars = container.querySelectorAll('.uptime-bar');
-          bars.forEach(bar => {
-            const dateStr = bar.getAttribute('data-date');
-            if (!dateStr) return;
-            const it = incidents.find(item => item.node === node.type && item.date === dateStr);
-            if (it) {
-              bar.style.background = '';
-              bar.classList.remove('edge', 'isp', 'maintenance', 'standby', 'down', 'warn');
-              const c = ['down', 'warn', 'maintenance', 'standby'].includes(it.type)
-                ? it.type
-                : ['down', 'warn', 'maintenance', 'standby'].includes(it.impact)
-                  ? it.impact
-                  : (it.type === 'outage' ? 'down' : 'warn');
-              bar.classList.add(c);
-              bar.title = `${dateStr} | ${node.title}\nStatus: ${it.title || 'Incident'}\nImpact: ${it.impact || it.type || 'Notice'}`;
+      const applyUptimeMetrics = (data) => {
+        if (!data || data.status !== 'success') return;
+        document.querySelectorAll('#uptime-sla-val').forEach(el => {
+          el.textContent = data.overallSla || '--';
+        });
+        document.querySelectorAll('#uptime-hours-val').forEach(el => {
+          el.innerHTML = (data.monitoredHours !== undefined && data.monitoredHours !== null)
+            ? `${Number(data.monitoredHours).toLocaleString()} <span style="font-size: 0.9rem; color: #8b949e;">Hours</span>`
+            : '--';
+        });
+        const outCnt = safeNum(data.outages, null);
+        document.querySelectorAll('#uptime-outages-val').forEach(el => {
+          el.innerHTML = outCnt !== null
+            ? `${outCnt} <span style="font-size: 0.9rem; color: #8b949e;">Incidents</span>`
+            : '--';
+        });
+        document.querySelectorAll('#uptime-mttr-val').forEach(el => {
+          el.textContent = (data.mttr !== undefined && data.mttr !== null && data.mttr !== '') ? data.mttr : '--';
+        });
+        document.querySelectorAll('.nav-sla-tag').forEach(tag => {
+          tag.textContent = data.overallSla || '--';
+        });
+        const ispOverall = document.getElementById('isp-uptime-val');
+        if (ispOverall && data.overallSla) ispOverall.textContent = data.overallSla;
+
+        if (Array.isArray(data.nodes)) {
+          data.nodes.forEach(n => {
+            if (n.id === 'desktop') {
+              document.querySelectorAll('#uptime-desktop-sla-val').forEach(el => {
+                el.textContent = n.uptime ? `${n.uptime} SLA` : '--';
+              });
+            } else if (n.id === 'nuc') {
+              document.querySelectorAll('#uptime-nuc-sla-val').forEach(el => {
+                el.textContent = n.uptime ? `${n.uptime} Uptime` : '--';
+              });
+            } else if (n.id === 'isp') {
+              document.querySelectorAll('#uptime-isp-sla-val').forEach(el => {
+                el.textContent = n.uptime ? `${n.uptime} Uptime` : '--';
+              });
+              const ispValNode = document.getElementById('isp-uptime-val');
+              if (ispValNode && n.uptime) ispValNode.textContent = n.uptime;
+            } else if (n.id === 'edge') {
+              document.querySelectorAll('#uptime-edge-sla-val').forEach(el => {
+                el.textContent = n.uptime ? `${n.uptime} Uptime` : '--';
+              });
             }
           });
-        });
-      }
-      window.applyUptimeIncidentsToBars = applyUptimeIncidentsToBars;
+        }
+      };
 
       const now = new Date();
       const applyBarState = (bar, node, i, dateStr) => {
@@ -4103,10 +4084,44 @@
             bar.title = `${dateStr} | ${node.title}\nStatus: Operational (Live)`;
           }
         } else {
-          bar.style.background = 'rgba(148, 163, 184, 0.22)';
-          bar.title = `${dateStr} | ${node.title}\nStatus: No Recorded History`;
+          const dayRec = (window.UPTIME_DAILY_HISTORY && typeof window.UPTIME_DAILY_HISTORY === 'object')
+            ? window.UPTIME_DAILY_HISTORY[dateStr]
+            : null;
+          const dayState = dayRec ? dayRec[node.type] : null;
+          if (dayState === 'up') {
+            bar.title = `${dateStr} | ${node.title}\nStatus: Operational${dayRec.note ? ' (' + dayRec.note + ')' : ''}`;
+          } else if (['down', 'warn', 'maintenance', 'standby'].includes(dayState)) {
+            bar.classList.add(dayState);
+            const labelMap = { down: 'Offline / Outage', warn: 'Degraded / Warning', maintenance: 'Scheduled Maintenance', standby: 'Eco Standby / Sleeping' };
+            bar.title = `${dateStr} | ${node.title}\nStatus: ${labelMap[dayState] || dayState}${dayRec.note ? ' (' + dayRec.note + ')' : ''}`;
+          } else {
+            bar.style.background = 'rgba(148, 163, 184, 0.22)';
+            bar.title = `${dateStr} | ${node.title}\nStatus: No Recorded History`;
+          }
         }
       };
+
+      const applyUptimeHistoryToBars = (dailyHistory, incidents) => {
+        if (dailyHistory && typeof dailyHistory === 'object') {
+          window.UPTIME_DAILY_HISTORY = dailyHistory;
+        }
+        if (Array.isArray(incidents)) {
+          window.UPTIME_INCIDENTS = incidents;
+        }
+        nodes.forEach(node => {
+          const container = document.getElementById(node.id);
+          if (!container) return;
+          const bars = container.querySelectorAll('.uptime-bar');
+          if (!bars || bars.length !== 90) return;
+          for (let i = 89; i >= 0; i--) {
+            const bar = bars[89 - i];
+            const dateStr = bar.getAttribute('data-date');
+            if (dateStr) applyBarState(bar, node, i, dateStr);
+          }
+        });
+      };
+      window.applyUptimeIncidentsToBars = (incidents) => applyUptimeHistoryToBars(window.UPTIME_DAILY_HISTORY, incidents);
+      window.applyUptimeHistoryToBars = applyUptimeHistoryToBars;
 
       nodes.forEach(node => {
         const container = document.getElementById(node.id);
@@ -4137,6 +4152,8 @@
         }
       });
 
+      if (cachedUptime) applyUptimeMetrics(cachedUptime);
+
       const nucScale = document.getElementById('uptime-nuc-scale-today');
       if (nucScale) {
         nucScale.textContent = isNucMaintenanceActive() ? 'Today (Scheduled Maintenance)' : (window.NUC_IS_ONLINE === false ? 'Today (Offline)' : 'Today (Operational)');
@@ -4157,68 +4174,29 @@
 
       // Dynamic SLA and uptime metrics from gateway
       if (typeof fetch === 'function') {
-        return fetch(`${GATEWAY}/uptime`, { signal: _fetchSig(5000) })
+        return fetch(`${GATEWAY}/uptime`, { credentials: 'include', signal: _fetchSig(5000) })
           .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
           .then(data => {
             if (data && data.status === 'success') {
-              window.UPTIME_INCIDENTS = data.incidents || [];
-              applyUptimeIncidentsToBars(data.incidents);
               try { localStorage.setItem('dr_uptime_cache', JSON.stringify(data)); } catch (e) {}
-              document.querySelectorAll('#uptime-sla-val').forEach(el => {
-                el.textContent = data.overallSla || '--';
-              });
-              document.querySelectorAll('#uptime-hours-val').forEach(el => {
-                el.innerHTML = (data.monitoredHours !== undefined && data.monitoredHours !== null)
-                  ? `${Number(data.monitoredHours).toLocaleString()} <span style="font-size: 0.9rem; color: #8b949e;">Hours</span>`
-                  : '--';
-              });
-              const outCnt = safeNum(data.outages, null);
-              document.querySelectorAll('#uptime-outages-val').forEach(el => {
-                el.innerHTML = outCnt !== null
-                  ? `${outCnt} <span style="font-size: 0.9rem; color: #8b949e;">Incidents</span>`
-                  : '--';
-              });
-              document.querySelectorAll('#uptime-mttr-val').forEach(el => {
-                el.textContent = (data.mttr !== undefined && data.mttr !== null && data.mttr !== '') ? data.mttr : '--';
-              });
-              document.querySelectorAll('.nav-sla-tag').forEach(tag => {
-                tag.textContent = data.overallSla || '--';
-              });
-              const ispOverall = document.getElementById('isp-uptime-val');
-              if (ispOverall) ispOverall.textContent = data.overallSla || '--';
-
-              if (Array.isArray(data.nodes)) {
-                data.nodes.forEach(n => {
-                  if (n.id === 'desktop') {
-                    document.querySelectorAll('#uptime-desktop-sla-val').forEach(el => {
-                      el.textContent = n.uptime ? `${n.uptime} SLA` : '--';
-                    });
-                  } else if (n.id === 'nuc') {
-                    document.querySelectorAll('#uptime-nuc-sla-val').forEach(el => {
-                      el.textContent = n.uptime ? `${n.uptime} Uptime` : '--';
-                    });
-                  } else if (n.id === 'isp') {
-                    document.querySelectorAll('#uptime-isp-sla-val').forEach(el => {
-                      el.textContent = n.uptime ? `${n.uptime} Uptime` : '--';
-                    });
-                    const ispValNode = document.getElementById('isp-uptime-val');
-                    if (ispValNode) ispValNode.textContent = n.uptime || '--';
-                  } else if (n.id === 'edge') {
-                    document.querySelectorAll('#uptime-edge-sla-val').forEach(el => {
-                      el.textContent = n.uptime ? `${n.uptime} Uptime` : '--';
-                    });
-                  }
-                });
-              }
+              applyUptimeHistoryToBars(data.dailyHistory || window.UPTIME_DAILY_HISTORY || {}, data.incidents || []);
+              applyUptimeMetrics(data);
             }
             return data;
           })
-          .catch(() => null);
+          .catch(() => {
+            if (cachedUptime) {
+              applyUptimeHistoryToBars(cachedUptime.dailyHistory || window.UPTIME_DAILY_HISTORY || {}, cachedUptime.incidents || []);
+              applyUptimeMetrics(cachedUptime);
+            }
+            return null;
+          });
       }
       return Promise.resolve(null);
     }
 
     let sparklineAnimId = null;
+    let sparklineResizeObserver = null;
 
     function renderSparklineFrame() {
       sparklineAnimId = null;
@@ -4226,20 +4204,24 @@
       if (!canvas) return;
 
       const rect = canvas.getBoundingClientRect();
+      const dpr = Math.min((typeof window !== 'undefined' && window.devicePixelRatio) ? window.devicePixelRatio : 1, 3);
       const displayW = Math.round(rect.width || (canvas.parentElement ? canvas.parentElement.clientWidth : 960));
       const displayH = 80;
-      if (displayW > 0 && (canvas.width !== displayW || canvas.height !== displayH)) {
-        canvas.width = displayW;
-        canvas.height = displayH;
+      if (displayW <= 60) return;
+
+      const targetW = Math.round(displayW * dpr);
+      const targetH = Math.round(displayH * dpr);
+      if (canvas.width !== targetW || canvas.height !== targetH) {
+        canvas.width = targetW;
+        canvas.height = targetH;
       }
 
-      const w = canvas.width;
-      const h = canvas.height;
-      if (w <= 60 || h <= 20) return;
-
+      const w = displayW;
+      const h = displayH;
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, w, h);
 
       const axisX = 48;
@@ -4407,8 +4389,18 @@
         sparklineAnimId = null;
       }
       const canvas = document.getElementById('uptimeSparkline');
-      if (canvas && !document.hidden) {
-        sparklineAnimId = requestAnimationFrame(renderSparklineFrame);
+      if (canvas) {
+        if (typeof ResizeObserver !== 'undefined' && !sparklineResizeObserver) {
+          sparklineResizeObserver = new ResizeObserver(() => {
+            if (!document.hidden && !sparklineAnimId) {
+              sparklineAnimId = requestAnimationFrame(renderSparklineFrame);
+            }
+          });
+          sparklineResizeObserver.observe(canvas);
+        }
+        if (!document.hidden) {
+          sparklineAnimId = requestAnimationFrame(renderSparklineFrame);
+        }
       }
     }
 
@@ -4560,6 +4552,7 @@
       const timeoutId = controller ? setTimeout(() => controller.abort(), 4000) : null;
 
       return fetch(`${GATEWAY}/services-health`, {
+        credentials: 'include',
         signal: controller ? controller.signal : undefined
       })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
@@ -6781,7 +6774,7 @@
 
     function fetchFeederStatus() {
       const ctrl = (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(4000) : undefined;
-      return fetch(`${GATEWAY}/api/feeder/status`, { signal: ctrl })
+      return fetch(`${GATEWAY}/api/feeder/status`, { credentials: 'include', signal: ctrl })
         .then(r => r.ok ? r.json() : null)
         .then(data => {
           if (data && data.status === 'success' && data.feeder) {

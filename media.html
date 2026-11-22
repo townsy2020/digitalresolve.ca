@@ -7,8 +7,8 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Media Suite & Torrent Swarm - Homelab</title>
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.68 - Media Suite & Torrent Swarm - Homelab">
-  <link rel="stylesheet" href="styles.css?v=2.8.68">
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.69 - Media Suite & Torrent Swarm - Homelab">
+  <link rel="stylesheet" href="styles.css?v=2.8.69">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -255,7 +255,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.68</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.69</span>)</span>
             </button>
             <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO(true, event)" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -565,7 +565,7 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.68</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.69</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
         <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 29,234 Lines of Code (HTML: 15,927 lines | CSS: 6,349 lines | JS: 6,957 lines | CNAME)">
@@ -1165,17 +1165,31 @@
       </div>
 
             <div class="changelog-body">
-        <!-- Version v2.8.68 (Current) -->
+        <!-- Version v2.8.69 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.68 | Current</span>
+            <span class="ver-tag current">v2.8.69 | Current</span>
+            <span class="ver-date">November 22, 2026</span>
+          </div>
+          <h4 class="ver-title">Cloudflare Access Credentials, ISP Telemetry Helper, Uptime dailyHistory &amp; HiDPI Ping Sparkline</h4>
+          <ul class="ver-list">
+            <li><strong>Cloudflare Access SSO Credentials:</strong> Added explicit <code>credentials: 'include'</code> across all GATEWAY fetches so cross-origin Cloudflare Access SSO sessions work seamlessly.</li>
+            <li><strong>Unified ISP Telemetry &amp; Snapshot Refresh:</strong> Refactored <code>fetchISPHistory()</code> into a shared <code>applyIspTelemetry()</code> helper across live, <code>isp-health.json</code>, and <code>localStorage</code> paths with null guards and refreshed <code>isp-health.json</code>.</li>
+            <li><strong>90-Day Uptime dailyHistory &amp; HiDPI Ping Sparkline:</strong> Added <code>dailyHistory</code> + <code>dr_uptime_cache</code> hydration in <code>renderUptimeMatrix()</code> and HiDPI <code>devicePixelRatio</code> + <code>ResizeObserver</code> rendering for <code>#uptimeSparkline</code>.</li>
+          </ul>
+        </div>
+
+        <!-- Version v2.8.68 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.68</span>
             <span class="ver-date">November 22, 2026</span>
           </div>
           <h4 class="ver-title">Form Control Accessibility, Standalone Camera Focus/Skip Links &amp; Exact LOC Sync</h4>
           <ul class="ver-list">
             <li><strong>Form Control ARIA &amp; Focus Ring Fixes:</strong> Added <code>aria-label="Ask Edge AI a question"</code> to <code>#edge-ai-input</code> on <code>index.html</code> and <code>ops.html</code>, removed inline <code>outline: none</code> from <code>#quick-magnet-target</code> on <code>index.html</code>, and added <code>aria-label="Target node for magnet download"</code> so unlabelled form controls across all 9 pages = 0.</li>
             <li><strong>Standalone WebRTC/AI Focus &amp; Skip Links:</strong> Added <code>:focus-visible</code> outline rules, <code>.skip-to-content</code> styling, skip-to-content links, and <code>id="main-content"</code> landmarks to <code>webrtc.html</code> and <code>ai.html</code> with 100% SHA-256 NUC mirror parity.</li>
-            <li><strong>Version v2.8.68 &amp; Exact LOC Sync:</strong> Bumped <code>styles.css?v=2.8.68</code>, <code>app.js?v=2.8.68</code>, meta descriptions, menu/footer version badges, and static changelog fallback to <code>v2.8.68</code> across all 7 dashboard pages with recalculated exact codebase LOC.</li>
+            <li><strong>Version v2.8.68 &amp; Exact LOC Sync:</strong> Bumped <code>styles.css?v=2.8.69</code>, <code>app.js?v=2.8.69</code>, meta descriptions, menu/footer version badges, and static changelog fallback to <code>v2.8.68</code> across all 7 dashboard pages with recalculated exact codebase LOC.</li>
           </ul>
         </div>
                                 <!-- Version v2.8.67 -->
@@ -1201,7 +1215,7 @@
           <ul class="ver-list">
             <li><strong>Live Audiobookshelf Library Grid:</strong> Removed all 4 hardcoded placeholder books from <code>index.html</code>, <code>media.html</code>, and <code>ops.html</code> and wired <code>renderAudiobookshelfGrid()</code> in <code>app.js</code> to hydrate real NUC Audiobookshelf items from <code>/stats</code> (with <code>/api/audiobooks</code> fallback and honest unavailable notice).</li>
             <li><strong>Honest Storage Legend Placeholders:</strong> Replaced stale static storage legend GB strings on <code>index.html</code> and <code>media.html</code> with <code>-- GB</code> until live <code>/stats</code> telemetry hydrates them.</li>
-            <li><strong>Cache-Busters &amp; Codebase Scale Sync:</strong> Updated <code>styles.css?v=2.8.68</code> and <code>app.js?v=2.8.68</code>, synchronized footer/menu version badges across all 7 dashboard pages, and recalculated exact codebase Lines of Code.</li>
+            <li><strong>Cache-Busters &amp; Codebase Scale Sync:</strong> Updated <code>styles.css?v=2.8.69</code> and <code>app.js?v=2.8.69</code>, synchronized footer/menu version badges across all 7 dashboard pages, and recalculated exact codebase Lines of Code.</li>
           </ul>
         </div>
         <!-- Version v2.8.63 -->
@@ -1214,7 +1228,7 @@
           <ul class="ver-list">
             <li><strong>SSO Cookie Credentials on Gateway Fetches:</strong> Added <code>credentials: 'include'</code> to all 11 authenticated cross-origin <code>GATEWAY</code> <code>fetch()</code> calls in <code>app.js</code> (<code>/api/logs</code>, <code>/api/agy/send</code>, <code>/api/agy/launch</code>, <code>/add</code>, and <code>/api/control</code> maintenance actions) so Microsoft 365 SSO session cookies are consistently forwarded.</li>
             <li><strong>Honest Null-State Torrent Node Latency:</strong> Updated <code>meta-watch-torrents</code> in <code>app.js</code> to render <code>Online</code> when <code>latencyMs</code> is <code>null</code> and <code>0 ms</code> when <code>0</code> instead of falling back to <code>&lt; 1 ms</code>.</li>
-            <li><strong>Cache-Busters &amp; Codebase Scale Sync:</strong> Updated <code>styles.css?v=2.8.68</code> and <code>app.js?v=2.8.68</code>, synchronized footer/menu version badges across all 7 dashboard pages, and recalculated exact codebase Lines of Code.</li>
+            <li><strong>Cache-Busters &amp; Codebase Scale Sync:</strong> Updated <code>styles.css?v=2.8.69</code> and <code>app.js?v=2.8.69</code>, synchronized footer/menu version badges across all 7 dashboard pages, and recalculated exact codebase Lines of Code.</li>
           </ul>
         </div>
         <!-- Version v2.8.62 -->
@@ -1576,6 +1590,6 @@
       </div>
     </div>
   </div>
-  <script src="app.js?v=2.8.68"></script>
+  <script src="app.js?v=2.8.69"></script>
 </body>
 </html>

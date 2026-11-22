@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-22T07:45:00Z",
-    "currentVersion":  "v2.8.68",
+    "updatedAt":  "2026-11-22T13:15:00Z",
+    "currentVersion":  "v2.8.69",
     "releases":  [
+                     {
+                         "version":  "v2.8.69",
+                         "date":  "November 22, 2026",
+                         "title":  "Cloudflare Access Credentials, ISP Telemetry Helper, Uptime dailyHistory & HiDPI Ping Sparkline",
+                         "changes":  [
+                                         {
+                                             "label":  "Cloudflare Access SSO Credentials",
+                                             "text":  "Added explicit credentials: 'include' across all GATEWAY fetches (/api/isp-health, /uptime, /stats, /status, /services-health, /climate, /api/feeder/status, /api/quota/history, /api/agy/session) so cross-origin Cloudflare Access SSO sessions work seamlessly."
+                                         },
+                                         {
+                                             "label":  "Unified ISP Telemetry & Snapshot Refresh",
+                                             "text":  "Refactored fetchISPHistory() into a single applyIspTelemetry() helper shared across live, isp-health.json, and localStorage fallback paths with full null guards and refreshed isp-health.json from real measured history."
+                                         },
+                                         {
+                                             "label":  "90-Day Uptime dailyHistory & HiDPI Ping Sparkline",
+                                             "text":  "Added dailyHistory + dr_uptime_cache hydration in renderUptimeMatrix() and HiDPI devicePixelRatio + ResizeObserver rendering for #uptimeSparkline."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.68",
                          "date":  "November 22, 2026",
