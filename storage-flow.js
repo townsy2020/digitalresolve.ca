@@ -50,7 +50,7 @@
     'desktop-qbit': {
       title: 'Desktop qBittorrent Ingest (:8080)',
       scriptName: 'qBittorrent Workstation Swarm',
-      scriptPath: 'C:\\ProgramData\\qBittorrent-Automation\\postprocess.ps1',
+      scriptPath: 'C:\\ProgramData\\qBittorrent-Automation\\PostProcess-Torrent.ps1',
       route: 'WAN Swarm -> Desktop Staging -> NUC Hot Media',
       schedule: 'Event-driven on torrent completion',
       description: 'High-speed workstation torrent ingest feeding PostProcess 7z extraction and NUC media library.',
@@ -59,7 +59,7 @@
     'postprocess-7z': {
       title: 'PostProcess 7z Archive Extractor',
       scriptName: 'qBittorrent Post-Process Hook',
-      scriptPath: 'C:\\ProgramData\\qBittorrent-Automation\\postprocess.ps1',
+      scriptPath: 'C:\\ProgramData\\qBittorrent-Automation\\PostProcess-Torrent.ps1',
       route: 'Completed Downloads -> Extracted Arr Staging',
       schedule: 'Triggered on torrent completion',
       description: 'Automatically extracts multi-part 7z/RAR archives for Sonarr, Radarr, and Readarr import.',
@@ -214,9 +214,6 @@
     let res = null;
     try {
       res = await fetch(primaryUrl, primaryOpts);
-      if ((res.status === 401 || res.status === 403) && !isHttps && primaryUrl !== lanUrl) {
-        res = await fetch(lanUrl, { signal: AbortSignal.timeout ? AbortSignal.timeout(10000) : undefined });
-      }
     } catch (_err) {
       if (!isHttps && primaryUrl !== gatewayUrl) {
         try {
@@ -378,14 +375,14 @@
     setText('node-meta-desktop-drives', `${fmtGB(desk.freeGB)} Free / ${fmtGB(desk.totalGB)}${deskTemp}`);
 
     const nuc = t.nuc_hot || {};
-    const dFreeGB = safeNum(nuc.dDriveFreeGB, 970);
-    const dTotalGB = safeNum(nuc.dDriveTotalGB, 1862);
-    const dUsedPct = Math.min(100, Math.max(0, safeNum(nuc.dDriveUsedGB && dTotalGB ? (nuc.dDriveUsedGB / dTotalGB) * 100 : 48, 48)));
-    setText('node-tag-nuc-d', `${Math.round(dFreeGB)} GB Free`);
-    setText('node-meta-nuc-d', `${fmtGB(dFreeGB)} Free / ${fmtGB(dTotalGB)} • 30% Offload Guardrail`);
+    const dFreeGB = safeNum(nuc.dDriveFreeGB, 0);
+    const dTotalGB = safeNum(nuc.dDriveTotalGB, 0);
+    const dUsedPct = dTotalGB > 0 ? Math.min(100, Math.max(0, (safeNum(nuc.dDriveUsedGB, Math.max(0, dTotalGB - dFreeGB)) / dTotalGB) * 100)) : 0;
+    setText('node-tag-nuc-d', dTotalGB > 0 ? `${Math.round(dFreeGB)} GB Free` : '--');
+    setText('node-meta-nuc-d', dTotalGB > 0 ? `${fmtGB(dFreeGB)} Free / ${fmtGB(dTotalGB)} • 30% Offload Guardrail` : 'Awaiting telemetry...');
     const fillEl = document.getElementById('nuc-d-threshold-fill');
     if (fillEl) fillEl.style.width = dUsedPct.toFixed(1) + '%';
-    setText('nuc-d-used-lbl', `${dUsedPct.toFixed(0)}% Used`);
+    setText('nuc-d-used-lbl', dTotalGB > 0 ? `${dUsedPct.toFixed(0)}% Used` : '--');
 
     const nucTempVal = getMaxNvmeTemp(nuc);
     const nucTemp = nucTempVal !== null ? ` • NVMe ${nucTempVal}°C` : '';
@@ -393,15 +390,15 @@
     setText('node-meta-nuc-c', `192.168.2.35 • ${fmtGB(nuc.freeGB)} Free / ${fmtGB(nuc.totalGB)}${nucTemp}`);
 
     const smb = t.qnap_smb || {};
-    setText('node-tag-qnap-smb', fmtGB(smb.totalGB || 9161.55));
+    setText('node-tag-qnap-smb', safeNum(smb.totalGB, 0) > 0 ? fmtGB(smb.totalGB) : '--');
     setText('node-meta-qnap-smb', `${safeStr(smb.path, '\\\\192.168.2.125\\Torrents')} • ${fmtGB(smb.freeGB)} Free`);
 
     const iNuc = t.qnap_iscsi_nuc || {};
-    setText('node-tag-qnap-iscsi-nuc', fmtGB(iNuc.totalGB || 2047.98));
+    setText('node-tag-qnap-iscsi-nuc', safeNum(iNuc.totalGB, 0) > 0 ? fmtGB(iNuc.totalGB) : '--');
     setText('node-meta-qnap-iscsi-nuc', `${safeStr(iNuc.drive, 'E:')} • ${fmtGB(iNuc.freeGB)} Free • ${iNuc.sessionConnected ? 'iSCSI Connected' : 'Standby'}`);
 
     const iDesk = t.qnap_iscsi_desktop || {};
-    setText('node-tag-qnap-iscsi-desktop', fmtGB(iDesk.totalGB || 2047.98));
+    setText('node-tag-qnap-iscsi-desktop', safeNum(iDesk.totalGB, 0) > 0 ? fmtGB(iDesk.totalGB) : '--');
     setText('node-meta-qnap-iscsi-desktop', `${safeStr(iDesk.drive, 'E:')} • ${fmtGB(iDesk.freeGB)} Free • Mirrored Snapshots`);
 
     const od = t.cloud_onedrive || {};
@@ -543,7 +540,7 @@
 
     const pts = state.waveformHistory.length > 1
       ? state.waveformHistory
-      : [{ nuc: 0.4, qnap: 0.2, desk: 0.3 }, { nuc: 0.6, qnap: 0.3, desk: 0.4 }];
+      : [{ nuc: 0, qnap: 0, desk: 0 }, state.waveformHistory[0] || { nuc: 0, qnap: 0, desk: 0 }];
 
     const maxVal = Math.max(10, ...pts.map(p => Math.max(p.nuc, p.qnap, p.desk)));
 
@@ -582,38 +579,38 @@
       {
         label: 'QNAP SMB Cold Archive (Q:)',
         used: safeNum(t.qnap_smb && t.qnap_smb.usedGB),
-        total: safeNum(t.qnap_smb && t.qnap_smb.totalGB, 9161.55),
+        total: safeNum(t.qnap_smb && t.qnap_smb.totalGB, 0),
         color: '#10b981'
       },
       {
         label: 'Desktop Hot Array (C:/D:/F:)',
         used: safeNum(t.desktop_hot && t.desktop_hot.usedGB),
-        total: safeNum(t.desktop_hot && t.desktop_hot.totalGB, 6519.41),
+        total: safeNum(t.desktop_hot && t.desktop_hot.totalGB, 0),
         color: '#3b82f6'
       },
       {
         label: 'NUC D: FireCuda SSHD (30% Marker)',
         used: safeNum(t.nuc_hot && t.nuc_hot.dDriveUsedGB),
-        total: safeNum(t.nuc_hot && t.nuc_hot.dDriveTotalGB, 1862),
+        total: safeNum(t.nuc_hot && t.nuc_hot.dDriveTotalGB, 0),
         color: '#a855f7',
         marker70: true
       },
       {
         label: 'NUC iSCSI LUN (E:)',
         used: safeNum(t.qnap_iscsi_nuc && t.qnap_iscsi_nuc.usedGB),
-        total: safeNum(t.qnap_iscsi_nuc && t.qnap_iscsi_nuc.totalGB, 2047.98),
+        total: safeNum(t.qnap_iscsi_nuc && t.qnap_iscsi_nuc.totalGB, 0),
         color: '#38bdf8'
       },
       {
         label: 'Desktop iSCSI LUN (E:)',
         used: safeNum(t.qnap_iscsi_desktop && t.qnap_iscsi_desktop.usedGB),
-        total: safeNum(t.qnap_iscsi_desktop && t.qnap_iscsi_desktop.totalGB, 2047.98),
+        total: safeNum(t.qnap_iscsi_desktop && t.qnap_iscsi_desktop.totalGB, 0),
         color: '#60a5fa'
       },
       {
         label: 'OneDrive Cloud Vault',
         used: safeNum(t.cloud_onedrive && t.cloud_onedrive.totalGB),
-        total: Math.max(100, safeNum(t.cloud_onedrive && t.cloud_onedrive.totalGB, 3.3) * 10),
+        total: Math.max(1024, safeNum(t.cloud_onedrive && t.cloud_onedrive.totalGB, 0)),
         color: '#f59e0b',
         isCloud: true
       }
@@ -630,7 +627,7 @@
     const barsEl = document.getElementById('storage-capacity-bars');
     if (barsEl) {
       barsEl.innerHTML = rows.map(r => {
-        const pct = r.isCloud ? Math.min(100, Math.max(6, (r.used / 1024) * 100)) : Math.min(100, Math.max(0, (r.used / Math.max(1, r.total)) * 100));
+        const pct = r.isCloud ? Math.min(100, Math.max(0, (r.used / 1024) * 100)) : Math.min(100, Math.max(0, r.total > 0 ? (r.used / r.total) * 100 : 0));
         const rightLbl = r.isCloud ? `${fmtGB(r.used)} Synced` : `${fmtGB(r.used)} / ${fmtGB(r.total)} (${pct.toFixed(0)}%)`;
         return `
           <div class="storage-cap-row">
@@ -673,6 +670,12 @@
       setText('insp-rate', '0.0 MB/s');
       setText('insp-exit', 'Healthy');
       setText('insp-health-badge', 'Online');
+      const trigBtn = document.getElementById('insp-trigger-btn');
+      if (trigBtn) {
+        trigBtn.disabled = true;
+        trigBtn.textContent = 'Node Telemetry Only';
+        trigBtn.onclick = null;
+      }
       return;
     }
 
@@ -791,8 +794,8 @@
           <td class="mono" style="font-size:0.76rem;color:#94a3b8;">${escapeHtml(ts)}</td>
           <td><strong>${escapeHtml(safeStr(p.name, ev.pipelineId))}</strong></td>
           <td class="mono" style="font-size:0.75rem;">${escapeHtml(safeStr(ev.host, 'NUC'))}</td>
-          <td class="mono" style="font-size:0.76rem;">${escapeHtml(safeStr(p.bytesCopiedFormatted, fmtBytes(p.bytesCopied)))}</td>
-          <td class="mono" style="font-size:0.76rem;">${safeNum(p.rateMBps, 0).toFixed(1)} MB/s</td>
+          <td class="mono" style="font-size:0.76rem;">${ev.bytesFormatted ? escapeHtml(ev.bytesFormatted) : '--'}</td>
+          <td class="mono" style="font-size:0.76rem;">${ev.rateMBps != null ? safeNum(ev.rateMBps, 0).toFixed(1) + ' MB/s' : '--'}</td>
           <td><span class="storage-node-tag ${tagCls}">${escapeHtml(safeStr(ev.level, 'INFO').toUpperCase())}</span> <span style="font-size:0.76rem;color:#cbd5e1;margin-left:6px;">${escapeHtml(safeStr(ev.message, ''))}</span></td>
         </tr>`;
     }).join('');
@@ -822,8 +825,9 @@
     executePipelineTrigger(pipeline);
   }
 
-  async function executePipelineTrigger(pipeline) {
-    const url = `${GATEWAY}/api/storage-flow/trigger`;
+  async function executePipelineTrigger(pipeline, retried = false) {
+    const base = isHttps ? GATEWAY : LAN_BASE;
+    const url = `${base}/api/storage-flow/trigger`;
     const headers = typeof window.getAdminAuthHeaders === 'function'
       ? window.getAdminAuthHeaders({ 'Content-Type': 'application/json' })
       : { 'Content-Type': 'application/json' };
@@ -836,8 +840,10 @@
         body: JSON.stringify({ action: pipeline.triggerAction })
       });
       if (res.status === 401 || res.status === 403) {
-        if (typeof window.openGlobalSSOModal === 'function') {
-          window.openGlobalSSOModal(`Authorize Pipeline: ${pipeline.name}`, () => executePipelineTrigger(pipeline));
+        if (!retried && typeof window.openGlobalSSOModal === 'function') {
+          window.openGlobalSSOModal(`Authorize Pipeline: ${pipeline.name}`, () => executePipelineTrigger(pipeline, true));
+        } else if (typeof window.showToast === 'function') {
+          window.showToast('error', 'Authorization Required', `Pipeline trigger returned HTTP ${res.status}.`, 4500);
         }
         return;
       }

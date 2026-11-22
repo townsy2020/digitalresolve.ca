@@ -163,42 +163,27 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.78';
+          const activeVer = match ? match[0] : 'v2.8.79';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 19220;
-      const baseCssLines = 7269;
-      const baseJsLines = 8211;
+      const baseHtmlLines = 19337;
+      const baseCssLines = 7267;
+      const baseJsLines = 8253;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
+      const totalFormatted = defaultTotal.toLocaleString();
 
-      // Asynchronously count exact live lines via parallel cache-busted fetch
-      Promise.all([
-        fetch('styles.css?_t=' + Date.now(), { signal: _fetchSig(6000) }).then(r => r.ok ? r.text() : null).catch(() => null),
-        fetch('app.js?_t=' + Date.now(), { signal: _fetchSig(6000) }).then(r => r.ok ? r.text() : null).catch(() => null),
-        fetch('storage-flow.js?_t=' + Date.now(), { signal: _fetchSig(6000) }).then(r => r.ok ? r.text() : null).catch(() => null)
-      ]).then(([cssSrc, jsSrc, sfSrc]) => {
-        const cLines = cssSrc ? cssSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : baseCssLines;
-        const jLines = (jsSrc ? jsSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : 7293) + (sfSrc ? sfSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : 918);
-        const total = baseHtmlLines + cLines + jLines + baseCnameLines;
-        const totalFormatted = total.toLocaleString();
+      const locEl = document.getElementById('project-loc-count');
+      if (locEl) locEl.textContent = totalFormatted;
 
-        const locEl = document.getElementById('project-loc-count');
-        if (locEl) locEl.textContent = totalFormatted;
-
-        const locBadge = document.getElementById('footer-loc-badge');
-        if (locBadge) {
-          locBadge.title = `Project Codebase Scale: ${totalFormatted} Lines of Code (HTML: ${baseHtmlLines.toLocaleString()} lines | CSS: ${cLines.toLocaleString()} lines | JS: ${jLines.toLocaleString()} lines | CNAME)`;
-        }
-      }).catch(() => {
-        const totalFormatted = defaultTotal.toLocaleString();
-        const locEl = document.getElementById('project-loc-count');
-        if (locEl) locEl.textContent = totalFormatted;
-      });
+      const locBadge = document.getElementById('footer-loc-badge');
+      if (locBadge) {
+        locBadge.title = `Project Codebase Scale: ${totalFormatted} Lines of Code (HTML: ${baseHtmlLines.toLocaleString()} lines | CSS: ${baseCssLines.toLocaleString()} lines | JS: ${baseJsLines.toLocaleString()} lines | CNAME)`;
+      }
       } catch(err) {
         console.error('Error updating codebase metrics:', err);
       }
@@ -226,7 +211,7 @@
     /* Mobile Device Detection & Adaptive Layout Mode Switcher (dr_layout_mode) */
     function detectMobileDevice() {
       try {
-        return window.innerWidth <= 768;
+        return (window.matchMedia && window.matchMedia('(max-width: 768px)').matches) || window.innerWidth <= 768;
       } catch (e) {
         return false;
       }
@@ -279,6 +264,7 @@
 
       if (mode === 'mobile') {
         html.classList.remove('desktop-layout');
+        html.classList.remove('desktop-forced');
         html.classList.add('mobile-layout');
         html.setAttribute('data-layout-mode', 'mobile');
         if (body) {
@@ -288,6 +274,11 @@
       } else {
         html.classList.remove('mobile-layout');
         html.classList.add('desktop-layout');
+        if (savePreference || getStoredLayoutMode() === 'desktop') {
+          html.classList.add('desktop-forced');
+        } else {
+          html.classList.remove('desktop-forced');
+        }
         html.setAttribute('data-layout-mode', 'desktop');
         if (body) {
           body.classList.remove('mobile-layout');
@@ -765,33 +756,46 @@
 
         // 1. NUC Core Server
         if (text.includes('Intel NUC Core Server')) {
-          const isOnline = telemetry.nucOnline !== undefined ? telemetry.nucOnline : true;
-          const lat = (telemetry.nucLatency !== null && telemetry.nucLatency !== undefined) ? telemetry.nucLatency : 0.2;
-          if (statusSpan) {
-            statusSpan.style.color = isOnline ? '#34d399' : '#ef4444';
-            statusSpan.textContent = isOnline ? `100% (${lat} ms)` : '0% (Offline)';
-          }
-          if (fillBar) {
-            fillBar.style.width = isOnline ? '100%' : '0%';
-            fillBar.style.background = isOnline ? '#10b981' : '#ef4444';
-          }
-          if (subText) {
-            subText.textContent = isOnline ? 'Services: Swarm Engine, CatCam Proxy, StreamHub 8088, WireGuard Tunnel' : 'Server Unreachable • Re-trying Gateway Heartbeat';
+          const isOnline = telemetry.nucOnline !== undefined ? telemetry.nucOnline : window.NUC_IS_ONLINE;
+          const rawLat = telemetry.nucLatency !== undefined && telemetry.nucLatency !== null ? telemetry.nucLatency : window.LAST_NUC_LATENCY;
+          const latVal = (rawLat !== null && rawLat !== undefined && rawLat !== '' && Number.isFinite(Number(rawLat))) ? Number(rawLat) : null;
+          if (isOnline === undefined) {
+            if (statusSpan) { statusSpan.style.color = '#94a3b8'; statusSpan.textContent = 'Awaiting telemetry'; }
+            if (fillBar) { fillBar.style.width = '0%'; fillBar.style.background = '#64748b'; }
+            if (subText) { subText.textContent = 'Awaiting gateway heartbeat'; }
+          } else {
+            if (statusSpan) {
+              statusSpan.style.color = isOnline ? '#34d399' : '#ef4444';
+              statusSpan.textContent = isOnline ? (latVal !== null ? `100% (${latVal} ms)` : '100% (Online)') : '0% (Offline)';
+            }
+            if (fillBar) {
+              fillBar.style.width = isOnline ? '100%' : '0%';
+              fillBar.style.background = isOnline ? '#10b981' : '#ef4444';
+            }
+            if (subText) {
+              subText.textContent = isOnline ? 'Services: Swarm Engine, CatCam Proxy, StreamHub 8088, WireGuard Tunnel' : 'Server Unreachable • Re-trying Gateway Heartbeat';
+            }
           }
         }
         // 2. Desktop Workstation
         else if (text.includes('Desktop Workstation')) {
-          const isOnline = telemetry.desktopOnline !== undefined ? telemetry.desktopOnline : (window.DESKTOP_IS_ONLINE !== undefined ? window.DESKTOP_IS_ONLINE : true);
-          if (statusSpan) {
-            statusSpan.style.color = isOnline ? '#34d399' : '#ef4444';
-            statusSpan.textContent = isOnline ? '100% (Bell Fiber)' : '0% (Offline / Standby)';
-          }
-          if (fillBar) {
-            fillBar.style.width = isOnline ? '100%' : '0%';
-            fillBar.style.background = isOnline ? '#10b981' : '#ef4444';
-          }
-          if (subText) {
-            subText.textContent = isOnline ? 'Services: Antigravity Autonomous Agent, High-Speed Torrenting, Git Sync' : 'System Offline • Sleep/Standby Mode • Wake-on-LAN Ready';
+          const isOnline = telemetry.desktopOnline !== undefined ? telemetry.desktopOnline : window.DESKTOP_IS_ONLINE;
+          if (isOnline === undefined) {
+            if (statusSpan) { statusSpan.style.color = '#94a3b8'; statusSpan.textContent = 'Awaiting telemetry'; }
+            if (fillBar) { fillBar.style.width = '0%'; fillBar.style.background = '#64748b'; }
+            if (subText) { subText.textContent = 'Awaiting workstation status'; }
+          } else {
+            if (statusSpan) {
+              statusSpan.style.color = isOnline ? '#34d399' : '#ef4444';
+              statusSpan.textContent = isOnline ? '100% (Bell Fiber)' : '0% (Offline / Standby)';
+            }
+            if (fillBar) {
+              fillBar.style.width = isOnline ? '100%' : '0%';
+              fillBar.style.background = isOnline ? '#10b981' : '#ef4444';
+            }
+            if (subText) {
+              subText.textContent = isOnline ? 'Services: Antigravity Autonomous Agent, High-Speed Torrenting, Git Sync' : 'System Offline • Sleep/Standby Mode • Wake-on-LAN Ready';
+            }
           }
         }
         // 3. Mullvad WireGuard Privacy Shield
@@ -863,36 +867,46 @@
               }
             } catch (e) {}
           }
-          if (disk && disk.freeGB) {
+          if (disk && disk.freeGB !== undefined && disk.freeGB !== null) {
             const free = Math.round(disk.freeGB);
-            const usedPct = disk.usedPercent || 73.4;
+            const totalG = (disk.totalGB && Number.isFinite(Number(disk.totalGB))) ? Number(disk.totalGB) : null;
+            const usedG = (disk.usedGB !== undefined && disk.usedGB !== null) ? disk.usedGB : (totalG !== null ? Math.round(totalG - free) : '--');
+            const computedPct = (disk.usedPercent !== undefined && disk.usedPercent !== null)
+              ? disk.usedPercent
+              : (totalG && usedG !== '--' ? Math.round((usedG / totalG) * 1000) / 10 : null);
             if (statusSpan) {
               statusSpan.style.color = '#60a5fa';
-              statusSpan.textContent = `${free} GB Free (${usedPct}% Used)`;
+              statusSpan.textContent = computedPct !== null ? `${free} GB Free (${computedPct}% Used)` : `${free} GB Free`;
             }
             if (fillBar) {
-              fillBar.style.width = `${usedPct}%`;
+              fillBar.style.width = computedPct !== null ? `${computedPct}%` : '0%';
             }
             if (subText) {
-              const usedG = disk.usedGB || Math.round((disk.totalGB || 1863) - free);
-              subText.textContent = `File System: Healthy • D:\\Torrents: ${usedG} GB used of ${disk.totalGB || 1863} GB`;
+              subText.textContent = totalG !== null
+                ? `File System: Healthy • D:\\Torrents: ${usedG} GB used of ${totalG} GB`
+                : `File System: Healthy • D:\\Torrents: ${free} GB free`;
             }
           } else {
             if (statusSpan) {
-              statusSpan.style.color = '#60a5fa';
-              statusSpan.textContent = 'Healthy (Pool Online)';
+              statusSpan.style.color = '#94a3b8';
+              statusSpan.textContent = 'Awaiting telemetry';
             }
-            if (fillBar) fillBar.style.width = '75%';
+            if (fillBar) {
+              fillBar.style.width = '0%';
+              fillBar.style.background = '#64748b';
+            }
+            if (subText) subText.textContent = 'File System: Awaiting storage probe';
           }
         }
         // 6. Zero Trust Perimeter & M365 SSO Shield
         else if (text.includes('Zero Trust Perimeter')) {
+          const ssoActive = typeof isSSOAuthenticated === 'function' && isSSOAuthenticated();
           if (statusSpan) {
-            statusSpan.style.color = '#c084fc';
-            statusSpan.textContent = '100% Shielded';
+            statusSpan.style.color = ssoActive ? '#34d399' : '#c084fc';
+            statusSpan.textContent = ssoActive ? 'M365 SSO Active' : 'CF Access Armed';
           }
           if (fillBar) {
-            fillBar.style.width = '100%';
+            fillBar.style.width = ssoActive ? '100%' : '60%';
           }
         }
       });
@@ -900,9 +914,12 @@
       // Overall Health Score (in health modal header)
       const scoreEl = document.getElementById('modal-health-score');
       if (scoreEl) {
-        const nOnline = telemetry.nucOnline !== undefined ? telemetry.nucOnline : true;
+        const nOnline = telemetry.nucOnline !== undefined ? telemetry.nucOnline : window.NUC_IS_ONLINE;
         const dOnline = telemetry.desktopOnline !== undefined ? telemetry.desktopOnline : window.DESKTOP_IS_ONLINE;
-        if (nOnline && dOnline) {
+        if (nOnline === undefined) {
+          scoreEl.textContent = 'Syncing Telemetry...';
+          scoreEl.style.color = '#94a3b8';
+        } else if (nOnline && dOnline) {
           scoreEl.textContent = '100% Optimal';
           scoreEl.style.color = '#34d399';
         } else if (nOnline && !dOnline) {
@@ -967,7 +984,9 @@
       document.querySelectorAll('#schematic-vpn-throughput').forEach(el => {
         if (!el.textContent || el.textContent.includes('--') || el.textContent === 'NYC Relay') el.textContent = 'WireGuard';
       });
-      document.querySelectorAll('#schematic-tunnel-throughput').forEach(el => el.textContent = 'Tunnel OK');
+      document.querySelectorAll('#schematic-tunnel-throughput').forEach(el => {
+        el.textContent = window.NUC_IS_ONLINE === true ? 'Tunnel Active' : (window.NUC_IS_ONLINE === false ? 'Tunnel Offline' : 'Awaiting Telemetry');
+      });
       if (window.LAST_AI_MODEL_FOOTPRINT) {
         document.querySelectorAll('#ai-model-footprint').forEach(el => el.textContent = window.LAST_AI_MODEL_FOOTPRINT);
       }
@@ -985,7 +1004,9 @@
         if (!el.textContent || el.textContent.includes('--')) el.textContent = hasNucLatGlobal ? `${window.LAST_NUC_LATENCY} ms` : '-- ms';
       });
       document.querySelectorAll('#schematic-desktop-throughput').forEach(el => {
-        if (!el.textContent || el.textContent.includes('--')) el.textContent = (window.DESKTOP_IS_ONLINE !== false) ? '2.5 Gbps' : 'Standby';
+        if (!el.textContent || el.textContent.includes('--')) {
+          el.textContent = window.DESKTOP_IS_ONLINE === true ? '2.5 Gbps' : (window.DESKTOP_IS_ONLINE === false ? 'Standby' : '--');
+        }
       });
       document.querySelectorAll('#schematic-storage-capacity').forEach(el => {
         if (window.LAST_NUC_DISK && typeof window.LAST_NUC_DISK.freeGB === 'number') {
@@ -1002,28 +1023,43 @@
       const nucLat = Number.isFinite(rawNucLat) ? rawNucLat : null;
       const rawIspLat = (window.ISP_LATEST && window.ISP_LATEST.pingAvgMs !== undefined && window.ISP_LATEST.pingAvgMs !== null && window.ISP_LATEST.pingAvgMs !== '') ? Number(window.ISP_LATEST.pingAvgMs) : NaN;
       const ispLat = Number.isFinite(rawIspLat) ? rawIspLat : null;
-      const nucOnline = (window.NUC_IS_ONLINE !== false);
+      const isUnknownNuc = (typeof window.NUC_IS_ONLINE === 'undefined');
+      const hasLiveSvc = !!window._hasLiveServicesHealth;
       const svcs = (window.LAST_SERVICES_HEALTH && window.LAST_SERVICES_HEALTH.services) ? window.LAST_SERVICES_HEALTH.services : null;
 
       const svcState = (key) => {
         const entry = svcs && svcs[key];
-        const ok = entry ? !!entry.online : nucOnline;
+        if (!entry) {
+          if (window.NUC_IS_ONLINE === false) {
+            return { unknown: false, ok: false, lat: '--', uptimePct: 'Offline' };
+          }
+          if (isUnknownNuc || !hasLiveSvc) {
+            return { unknown: true, ok: false, lat: '--', uptimePct: '--' };
+          }
+        }
+        const ok = entry ? !!entry.online : (window.NUC_IS_ONLINE === true);
         const lat = (entry && typeof entry.latencyMs === 'number' && Number.isFinite(entry.latencyMs))
           ? entry.latencyMs.toFixed(1)
           : '--';
         const uptimePct = (entry && entry.uptimePct) ? entry.uptimePct : (ok ? 'Online' : 'Offline');
-        return { ok, lat, uptimePct };
+        return { unknown: false, ok, lat, uptimePct };
       };
 
-      const setKuma = (id, ms, statusId, isGood, goodTxt = 'Healthy', badTxt = 'Degraded', uptimeId = null, uptimePct = null) => {
+      const setKuma = (id, svcObj, statusId, goodTxt = 'Healthy', badTxt = 'Degraded', uptimeId = null) => {
+        const ms = svcObj.lat;
         document.querySelectorAll('#' + id + ', .' + id).forEach(el => el.textContent = ms === '--' ? '--' : `${ms} ms`);
         document.querySelectorAll('#' + statusId + ', .' + statusId).forEach(st => {
-          st.textContent = isGood ? goodTxt : badTxt;
-          st.className = `item-tag ${isGood ? 'online' : 'offline'}`;
+          if (svcObj.unknown) {
+            st.textContent = 'Checking...';
+            st.className = 'item-tag';
+          } else {
+            st.textContent = svcObj.ok ? goodTxt : badTxt;
+            st.className = `item-tag ${svcObj.ok ? 'online' : 'offline'}`;
+          }
         });
         if (uptimeId) {
-          const resolvedUptime = uptimePct || (isGood ? 'Online' : 'Offline');
-          document.querySelectorAll('#' + uptimeId).forEach(u => u.textContent = isGood ? resolvedUptime : 'Offline');
+          const resolvedUptime = svcObj.unknown ? '--' : (svcObj.uptimePct || (svcObj.ok ? 'Online' : 'Offline'));
+          document.querySelectorAll('#' + uptimeId).forEach(u => u.textContent = svcObj.unknown ? '--' : (svcObj.ok ? resolvedUptime : 'Offline'));
         }
       };
 
@@ -1034,12 +1070,12 @@
       const sCam = svcState('cam');
       const sCf = svcState('cf');
 
-      setKuma('kuma-lat-stream', sStream.lat, 'kuma-status-stream', sStream.ok, 'Healthy', 'Degraded', 'kuma-uptime-stream', sStream.uptimePct);
-      setKuma('kuma-lat-files', sFiles.lat, 'kuma-status-files', sFiles.ok, 'Healthy', 'Degraded', 'kuma-uptime-files', sFiles.uptimePct);
-      setKuma('kuma-lat-qbit', sQbit.lat, 'kuma-status-qbit', sQbit.ok, 'Healthy', 'Degraded', 'kuma-uptime-qbit', sQbit.uptimePct);
-      setKuma('kuma-lat-wol', sWol.lat, 'kuma-status-wol', sWol.ok, 'Healthy', 'Degraded', 'kuma-uptime-wol', sWol.uptimePct);
-      setKuma('kuma-lat-catcam', sCam.lat, 'kuma-status-catcam', sCam.ok, 'Healthy', 'Degraded', 'kuma-uptime-catcam', sCam.uptimePct);
-      setKuma('kuma-lat-cf', sCf.lat, 'kuma-status-cf', sCf.ok, 'Shield Active', 'Degraded', 'kuma-uptime-cf', sCf.uptimePct);
+      setKuma('kuma-lat-stream', sStream, 'kuma-status-stream', 'Healthy', 'Degraded', 'kuma-uptime-stream');
+      setKuma('kuma-lat-files', sFiles, 'kuma-status-files', 'Healthy', 'Degraded', 'kuma-uptime-files');
+      setKuma('kuma-lat-qbit', sQbit, 'kuma-status-qbit', 'Healthy', 'Degraded', 'kuma-uptime-qbit');
+      setKuma('kuma-lat-wol', sWol, 'kuma-status-wol', 'Healthy', 'Degraded', 'kuma-uptime-wol');
+      setKuma('kuma-lat-catcam', sCam, 'kuma-status-catcam', 'Healthy', 'Degraded', 'kuma-uptime-catcam');
+      setKuma('kuma-lat-cf', sCf, 'kuma-status-cf', 'Shield Active', 'Degraded', 'kuma-uptime-cf');
 
       document.querySelectorAll('#spark-leg-nuc').forEach(el => el.textContent = nucLat !== null ? `${nucLat.toFixed(1)} ms` : '--');
       if (typeof initSparklineHeartbeat === 'function') initSparklineHeartbeat();
@@ -1846,7 +1882,7 @@
         const isAuthFailure = !isTransient && (status === 401 || status === 403);
         let syncAttempted = false;
         try { syncAttempted = Boolean(sessionStorage.getItem('dr_sso_sync_attempted')); } catch(e) {}
-        if (autoRedirect && isAuthFailure && window.location.hostname === 'digitalresolve.ca' && !syncAttempted) {
+        if (autoRedirect && isAuthFailure && /(^|\.)digitalresolve\.ca$/i.test(window.location.hostname) && !syncAttempted) {
           try { sessionStorage.setItem('dr_sso_sync_attempted', '1'); } catch(e) {}
           window.location.href = GATEWAY + '/api/sso/login?return=' + encodeURIComponent(window.location.href);
           return false;

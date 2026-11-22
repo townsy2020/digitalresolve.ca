@@ -8,8 +8,8 @@
   <meta http-equiv="Expires" content="0">
   <title>Uptime & SLA Matrix - Homelab Operations</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b0f17'/%3E%3Cpath d='M8 22V10h7a6 6 0 0 1 0 12H8zm4-3.5h3a2.5 2.5 0 0 0 0-5h-3v5z' fill='%2338bdf8'/%3E%3C/svg%3E">
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.78 - Uptime & SLA Matrix - Homelab Operations">
-  <link rel="stylesheet" href="styles.css?v=2.8.78">
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.79 - Uptime & SLA Matrix - Homelab Operations">
+  <link rel="stylesheet" href="styles.css?v=2.8.79">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -262,7 +262,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.78</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.79</span>)</span>
             </button>
             <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO(true, event)" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -934,12 +934,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.78</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.79</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 34,701 Lines of Code (HTML: 19,220 lines | CSS: 7,269 lines | JS: 8,211 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 34,858 Lines of Code (HTML: 19,337 lines | CSS: 7,267 lines | JS: 8,253 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">34,701</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">34,858</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1534,10 +1534,24 @@
       </div>
 
             <div class="changelog-body">
-                                        <!-- Version v2.8.78 (Current) -->
+                                                <!-- Version v2.8.79 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.78 | Current</span>
+            <span class="ver-tag current">v2.8.79 | Current</span>
+            <span class="ver-date">November 22, 2026</span>
+          </div>
+          <h4 class="ver-title">Wave 3 Deep Hardening: Mobile Camera Fix, Quota Protection, Backup Sync &amp; Pipeline Recovery</h4>
+          <ul class="ver-list">
+            <li><strong>Mobile &amp; Layout:</strong> Removed forced display:block on idle #camera-live-frame causing mobile CTA clipping on index.html and penny.html, plus desktop-to-mobile resize trap</li>
+            <li><strong>Telemetry Honesty:</strong> Eliminated fake Health Radar / Uptime Kuma / capacity baselines in app.js &amp; storage-flow.js and removed 580 KB cache-busted LOC re-fetches</li>
+            <li><strong>AI Quota &amp; Backups:</strong> Protected Desktop 1.34B all-time token sum from NUC overwrite on sleep, added .tmp staging and mutex to Backup-HomelabResilience.ps1, and fixed Sync-QNAP-HomelabBackups scheduling/refresh</li>
+            <li><strong>Pipeline &amp; Watchdog Recovery:</strong> Fixed cross-host iSCSI log poisoning, Mullvad AutoFix regex, queued Desktop storage triggers, and dr-nightly latest-snapshot math</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.78 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.78</span>
             <span class="ver-date">November 22, 2026</span>
           </div>
           <h4 class="ver-title">Wave 2 P1/P2 Fixes: 1024px Responsive Fix, Honest Service Telemetry, Favicons &amp; Backend Parity</h4>
@@ -2075,6 +2089,6 @@
       </div>
     </div>
   </div>
-  <script src="app.js?v=2.8.78"></script>
+  <script src="app.js?v=2.8.79"></script>
 </body>
 </html>

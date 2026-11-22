@@ -1,7 +1,30 @@
 {
-    "updatedAt":  "2026-11-22T19:16:17Z",
-    "currentVersion":  "v2.8.78",
+    "updatedAt":  "2026-11-22T20:14:39Z",
+    "currentVersion":  "v2.8.79",
     "releases":  [
+                     {
+                         "version":  "v2.8.79",
+                         "date":  "November 22, 2026",
+                         "title":  "Wave 3 Deep Hardening: Mobile Camera Fix, Quota Protection, Backup Sync \u0026 Pipeline Recovery",
+                         "changes":  [
+                                         {
+                                             "label":  "Mobile \u0026 Layout",
+                                             "text":  "Removed forced display:block on idle #camera-live-frame causing mobile CTA clipping on index.html and penny.html, plus desktop-to-mobile resize trap"
+                                         },
+                                         {
+                                             "label":  "Telemetry Honesty",
+                                             "text":  "Eliminated fake Health Radar / Uptime Kuma / capacity baselines in app.js \u0026 storage-flow.js and removed 580 KB cache-busted LOC re-fetches"
+                                         },
+                                         {
+                                             "label":  "AI Quota \u0026 Backups",
+                                             "text":  "Protected Desktop 1.34B all-time token sum from NUC overwrite on sleep, added .tmp staging and mutex to Backup-HomelabResilience.ps1, and fixed Sync-QNAP-HomelabBackups scheduling/refresh"
+                                         },
+                                         {
+                                             "label":  "Pipeline \u0026 Watchdog Recovery",
+                                             "text":  "Fixed cross-host iSCSI log poisoning, Mullvad AutoFix regex, queued Desktop storage triggers, and dr-nightly latest-snapshot math"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.78",
                          "date":  "November 22, 2026",

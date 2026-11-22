@@ -3653,13 +3653,13 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
   transform: translateY(1px) scale(0.98);
 }
 
-/* When in desktop-layout on small viewports (<= 768px), enforce desktop canvas */
+/* When in desktop-layout on small viewports (<= 768px), enforce desktop canvas only when explicitly user-forced */
 @media (max-width: 768px) {
-  html.desktop-layout {
+  html.desktop-layout.desktop-forced {
     overflow-x: auto;
   }
 
-  html.desktop-layout body {
+  html.desktop-layout.desktop-forced body {
     min-width: 1080px;
   }
 }
@@ -3790,7 +3790,6 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
     aspect-ratio: 16 / 9 !important;
     min-height: 200px !important;
     max-height: 340px !important;
-    display: block !important;
   }
   html.mobile-layout #camera-feed-card .btn,
   html.mobile-layout #camera-feed-card .btn-secondary {
@@ -4225,7 +4224,6 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
     aspect-ratio: 16 / 9 !important;
     min-height: 200px !important;
     max-height: 340px !important;
-    display: block !important;
   }
 
   html:not(.desktop-layout) #camera-feed-card .control-matrix-header,

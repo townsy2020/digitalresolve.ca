@@ -1083,7 +1083,7 @@
     setInterval(pollStatus, 5000);
 
     video.addEventListener('loadeddata', () => {
-      if (video.videoWidth > 0 || video.readyState >= 2) {
+      if (video.videoWidth > 0 && video.videoHeight > 0 && video.readyState >= 2) {
         markStreamOnline(ms ? 'LIVE MSE' : 'LIVE WEBRTC');
       }
     });
@@ -1096,11 +1096,13 @@
     });
 
     video.addEventListener('playing', () => {
-      markStreamOnline(ms ? 'LIVE MSE' : 'LIVE WEBRTC');
+      if (video.videoWidth > 0 && video.videoHeight > 0) {
+        markStreamOnline(ms ? 'LIVE MSE' : 'LIVE WEBRTC');
+      }
     });
 
     video.addEventListener('timeupdate', () => {
-      if (!streamConnected && video.currentTime > 0) {
+      if (!streamConnected && video.currentTime > 0 && video.videoWidth > 0 && video.videoHeight > 0) {
         markStreamOnline(ms ? 'LIVE MSE' : 'LIVE WEBRTC');
       }
     });
