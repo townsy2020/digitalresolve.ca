@@ -7,8 +7,8 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Media Suite & Torrent Swarm - Homelab</title>
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.76 - Media Suite & Torrent Swarm - Homelab">
-  <link rel="stylesheet" href="styles.css?v=2.8.74">
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.77 - Media Suite & Torrent Swarm - Homelab">
+  <link rel="stylesheet" href="styles.css?v=2.8.77">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -261,7 +261,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.76</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.77</span>)</span>
             </button>
             <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO(true, event)" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -571,12 +571,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.76</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.77</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 34,410 Lines of Code (HTML: 18,998 lines | CSS: 7,267 lines | JS: 8,144 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 34,546 Lines of Code (HTML: 19,102 lines | CSS: 7,267 lines | JS: 8,176 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">34,410</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">34,546</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1171,10 +1171,23 @@
       </div>
 
             <div class="changelog-body">
-                        <!-- Version v2.8.76 (Current) -->
+                                <!-- Version v2.8.77 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.76 | Current</span>
+            <span class="ver-tag current">v2.8.77 | Current</span>
+            <span class="ver-date">November 22, 2026</span>
+          </div>
+          <h4 class="ver-title">Wave 1 P0 Fixes: Instant Uptime Endpoint, Redacted Storage Pipelines, NVMe Telemetry &amp; WAN SSO</h4>
+          <ul class="ver-list">
+            <li><strong>Incremental /api/uptime &amp; Polling Storm Eliminated:</strong> Added incremental byte-offset log cursors and 60s cache TTL to wol-listener.ps1 (reducing /api/uptime from ~9.4s to 25ms warm), removed accidental 4s renderUptimeMatrix() calls in app.js, and bumped storage-flow.js/uptime fetch timeouts.</li>
+            <li><strong>Sanitized Storage Pipelines &amp; Honest Errors:</strong> Redacted raw media paths in Parse-StorageLogEvents, promoted error log lines so failing postprocess-torrent, audiobook-ingest, and audible-sync pipelines report error instead of false success, and fixed NVMe array flattening + nvmeMaxTempC display.</li>
+            <li><strong>WAN Power Polling &amp; SSO Callback Fix:</strong> Added credentials: include on WoL/sleep/stats failover fetches, stopped false sleep-success on Desktop gateway errors, preserved pendingSSOCallback across modal close in verifySpeedtestSSO(), and upgraded release.ps1 + smoke-cdp.ps1 gates.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.76 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.76</span>
             <span class="ver-date">November 22, 2026</span>
           </div>
           <h4 class="ver-title">Honest 6-Tier ISP Quality Rubric &amp; Removal of Hardcoded Ultra Stable Labels</h4>
@@ -1686,6 +1699,6 @@
       </div>
     </div>
   </div>
-  <script src="app.js?v=2.8.76"></script>
+  <script src="app.js?v=2.8.77"></script>
 </body>
 </html>

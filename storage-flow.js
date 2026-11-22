@@ -208,19 +208,19 @@
     const lanUrl = `${LAN_BASE}/api/storage-flow`;
     const primaryUrl = isHttps ? gatewayUrl : lanUrl;
     const primaryOpts = isHttps
-      ? { credentials: 'include', signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined }
-      : { signal: AbortSignal.timeout ? AbortSignal.timeout(5000) : undefined };
+      ? { credentials: 'include', signal: AbortSignal.timeout ? AbortSignal.timeout(12000) : undefined }
+      : { signal: AbortSignal.timeout ? AbortSignal.timeout(10000) : undefined };
 
     let res = null;
     try {
       res = await fetch(primaryUrl, primaryOpts);
       if ((res.status === 401 || res.status === 403) && !isHttps && primaryUrl !== lanUrl) {
-        res = await fetch(lanUrl, { signal: AbortSignal.timeout ? AbortSignal.timeout(5000) : undefined });
+        res = await fetch(lanUrl, { signal: AbortSignal.timeout ? AbortSignal.timeout(10000) : undefined });
       }
     } catch (_err) {
       if (!isHttps && primaryUrl !== gatewayUrl) {
         try {
-          res = await fetch(gatewayUrl, { credentials: 'include', signal: AbortSignal.timeout ? AbortSignal.timeout(6000) : undefined });
+          res = await fetch(gatewayUrl, { credentials: 'include', signal: AbortSignal.timeout ? AbortSignal.timeout(12000) : undefined });
         } catch (_gwErr) {
           renderOfflineFallback();
           return;
@@ -343,11 +343,38 @@
     setText('waveform-active-badge', activeProcs);
   }
 
+  function getMaxNvmeTemp(tier) {
+    if (!tier) return null;
+    if (tier.nvmeMaxTempC !== undefined && tier.nvmeMaxTempC !== null && Number.isFinite(Number(tier.nvmeMaxTempC))) {
+      return Number(tier.nvmeMaxTempC);
+    }
+    if (tier.nvme && !Array.isArray(tier.nvme) && tier.nvme.maxTempC !== undefined && tier.nvme.maxTempC !== null && Number.isFinite(Number(tier.nvme.maxTempC))) {
+      return Number(tier.nvme.maxTempC);
+    }
+    if (Array.isArray(tier.nvme)) {
+      let best = null;
+      tier.nvme.forEach(item => {
+        if (Array.isArray(item)) {
+          item.forEach(sub => {
+            if (sub && sub.temperature !== undefined && sub.temperature !== null && Number.isFinite(Number(sub.temperature))) {
+              best = best === null ? Number(sub.temperature) : Math.max(best, Number(sub.temperature));
+            }
+          });
+        } else if (item && item.temperature !== undefined && item.temperature !== null && Number.isFinite(Number(item.temperature))) {
+          best = best === null ? Number(item.temperature) : Math.max(best, Number(item.temperature));
+        }
+      });
+      return best;
+    }
+    return null;
+  }
+
   function renderTierNodes(data) {
     const t = data.tiers || {};
     const desk = t.desktop_hot || {};
     setText('node-tag-desktop-drives', desk.online ? 'Online' : 'Standby');
-    const deskTemp = desk.nvme && desk.nvme.maxTempC ? ` • NVMe ${desk.nvme.maxTempC}°C` : '';
+    const deskTempVal = getMaxNvmeTemp(desk);
+    const deskTemp = deskTempVal !== null ? ` • NVMe ${deskTempVal}°C` : '';
     setText('node-meta-desktop-drives', `${fmtGB(desk.freeGB)} Free / ${fmtGB(desk.totalGB)}${deskTemp}`);
 
     const nuc = t.nuc_hot || {};
@@ -360,8 +387,10 @@
     if (fillEl) fillEl.style.width = dUsedPct.toFixed(1) + '%';
     setText('nuc-d-used-lbl', `${dUsedPct.toFixed(0)}% Used`);
 
+    const nucTempVal = getMaxNvmeTemp(nuc);
+    const nucTemp = nucTempVal !== null ? ` • NVMe ${nucTempVal}°C` : '';
     setText('node-tag-nuc-c', nuc.online ? 'Online' : 'Standby');
-    setText('node-meta-nuc-c', `192.168.2.35 • ${fmtGB(nuc.freeGB)} Free / ${fmtGB(nuc.totalGB)}`);
+    setText('node-meta-nuc-c', `192.168.2.35 • ${fmtGB(nuc.freeGB)} Free / ${fmtGB(nuc.totalGB)}${nucTemp}`);
 
     const smb = t.qnap_smb || {};
     setText('node-tag-qnap-smb', fmtGB(smb.totalGB || 9161.55));

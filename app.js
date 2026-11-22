@@ -163,16 +163,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.76';
+          const activeVer = match ? match[0] : 'v2.8.77';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 18998;
+      const baseHtmlLines = 19102;
       const baseCssLines = 7267;
-      const baseJsLines = 8144;
+      const baseJsLines = 8176;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
@@ -183,7 +183,7 @@
         fetch('storage-flow.js?_t=' + Date.now(), { signal: _fetchSig(6000) }).then(r => r.ok ? r.text() : null).catch(() => null)
       ]).then(([cssSrc, jsSrc, sfSrc]) => {
         const cLines = cssSrc ? cssSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : baseCssLines;
-        const jLines = (jsSrc ? jsSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : 7255) + (sfSrc ? sfSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : 889);
+        const jLines = (jsSrc ? jsSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : 7258) + (sfSrc ? sfSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : 918);
         const total = baseHtmlLines + cLines + jLines + baseCnameLines;
         const totalFormatted = total.toLocaleString();
 
@@ -671,7 +671,7 @@
               return;
             }
             attempts++;
-            fetch(`${GATEWAY}/status?target=${target}`, { signal: _fetchSig(5000) })
+            fetch(`${GATEWAY}/status?target=${encodeURIComponent(target)}`, { credentials: 'include', cache: 'no-store', signal: _fetchSig(5000) })
               .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
               .then(data => {
                 if (settled) return;
@@ -722,7 +722,7 @@
           const maxAttempts = 10;
           pollInterval = setInterval(() => {
             attempts++;
-            fetch(`${GATEWAY}/status?target=${target}`, { signal: _fetchSig(5000) })
+            fetch(`${GATEWAY}/status?target=${encodeURIComponent(target)}`, { credentials: 'include', cache: 'no-store', signal: _fetchSig(5000) })
               .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
               .then(data => {
                 consecutiveErrors = 0;
@@ -737,10 +737,13 @@
               })
               .catch(() => {
                 consecutiveErrors++;
-                if (consecutiveErrors >= 2 || attempts >= maxAttempts) {
+                if (target === 'nuc' && consecutiveErrors >= 3) {
                   clearInterval(pollInterval);
-                  showToast('success', `${dev.name} is now Asleep`, 'Device offline / in standby.', 6000);
+                  showToast('success', `${dev.name} is now Asleep`, 'Gateway offline / in standby.', 6000);
                   updateStatusUI(target, false);
+                } else if (attempts >= maxAttempts) {
+                  clearInterval(pollInterval);
+                  showToast('error', 'Status Check Interrupted', `Could not confirm ${dev.name} sleep state via gateway.`, 5000);
                 }
               });
           }, 2500);
@@ -1328,9 +1331,6 @@
         }
         if (typeof updateHealthRadarUI === 'function') {
           updateHealthRadarUI({ desktopOnline: isOnline });
-        }
-        if (typeof renderUptimeMatrix === 'function') {
-          try { renderUptimeMatrix(); } catch(e) {}
         }
         const uptimeDeskStatus = document.getElementById('uptime-desktop-status');
         if (uptimeDeskStatus) {
@@ -3246,7 +3246,10 @@
           // Failover Method 1: Alternate endpoint or direct LAN
           const isHttps = typeof window !== 'undefined' && window.location && window.location.protocol === 'https:';
           const altStatsUrl = isHttps ? `${GATEWAY}/status?target=all` : `http://192.168.2.35:8082/stats`;
-          return fetch(altStatsUrl, { cache: 'no-store', signal: _fetchSig(5000) })
+          const altOpts = isHttps
+            ? { credentials: 'include', cache: 'no-store', signal: _fetchSig(5000) }
+            : { cache: 'no-store', signal: _fetchSig(5000) };
+          return fetch(altStatsUrl, altOpts)
             .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(altData => {
               return applyClusterStatsPayload(altData);
@@ -4453,13 +4456,13 @@
           setEl('#uptime-desktop-sla-val', 'Sign in for SLA');
           return null;
         };
-        return fetch(`${GATEWAY}/uptime`, { credentials: 'include', signal: _fetchSig(5000) })
+        return fetch(`${GATEWAY}/uptime`, { credentials: 'include', signal: _fetchSig(10000) })
           .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
           .then(handleUptimePayload)
           .catch(() => {
             const isHttps = typeof window !== 'undefined' && window.location && window.location.protocol === 'https:';
             if (!isHttps) {
-              return fetch('http://192.168.2.35:8082/uptime', { cache: 'no-store', signal: _fetchSig(5000) })
+              return fetch('http://192.168.2.35:8082/uptime', { cache: 'no-store', signal: _fetchSig(10000) })
                 .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
                 .then(handleUptimePayload)
                 .catch(applyUptimeSsoFallback);
@@ -6137,6 +6140,7 @@
     window.launchProtectedService = launchProtectedService;
 
     async function verifySpeedtestSSO() {
+      const savedCb = window.pendingSSOCallback;
       closeSpeedtestSSOModal();
       try { sessionStorage.removeItem('dr_sso_sync_attempted'); } catch(e) {}
       if (/(^|\.)digitalresolve\.ca$/i.test(window.location.hostname)) {
@@ -6145,9 +6149,8 @@
       }
       const ok = await syncCloudflareAccessSession(false);
       if (ok) {
-        const cb = window.pendingSSOCallback;
         window.pendingSSOCallback = null;
-        if (typeof cb === 'function') cb();
+        if (typeof savedCb === 'function') savedCb();
       } else if (typeof showToast === 'function') {
         showToast('error', 'SSO Session Not Verified', 'Open https://digitalresolve.ca over HTTPS to sign in with Microsoft 365 Entra ID.', 5000);
       }

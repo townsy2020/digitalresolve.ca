@@ -1,18 +1,37 @@
-﻿{
-    "updatedAt":  "2026-11-22T16:52:00Z",
-    "currentVersion":  "v2.8.76",
+{
+    "updatedAt":  "2026-11-22T19:05:34Z",
+    "currentVersion":  "v2.8.77",
     "releases":  [
+                     {
+                         "version":  "v2.8.77",
+                         "date":  "November 22, 2026",
+                         "title":  "Wave 1 P0 Fixes: Instant Uptime Endpoint, Redacted Storage Pipelines, NVMe Telemetry \u0026 WAN SSO",
+                         "changes":  [
+                                         {
+                                             "label":  "Incremental /api/uptime \u0026 Polling Storm Eliminated",
+                                             "text":  "Added incremental byte-offset log cursors and 60s cache TTL to wol-listener.ps1 (reducing /api/uptime from ~9.4s to 25ms warm), removed accidental 4s renderUptimeMatrix() calls in app.js, and bumped storage-flow.js/uptime fetch timeouts."
+                                         },
+                                         {
+                                             "label":  "Sanitized Storage Pipelines \u0026 Honest Errors",
+                                             "text":  "Redacted raw media paths in Parse-StorageLogEvents, promoted error log lines so failing postprocess-torrent, audiobook-ingest, and audible-sync pipelines report error instead of false success, and fixed NVMe array flattening + nvmeMaxTempC display."
+                                         },
+                                         {
+                                             "label":  "WAN Power Polling \u0026 SSO Callback Fix",
+                                             "text":  "Added credentials: include on WoL/sleep/stats failover fetches, stopped false sleep-success on Desktop gateway errors, preserved pendingSSOCallback across modal close in verifySpeedtestSSO(), and upgraded release.ps1 + smoke-cdp.ps1 gates."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.76",
                          "date":  "November 22, 2026",
-                         "title":  "Honest 6-Tier ISP Quality Rubric & Removal of Hardcoded Ultra Stable Labels",
+                         "title":  "Honest 6-Tier ISP Quality Rubric \u0026 Removal of Hardcoded Ultra Stable Labels",
                          "changes":  [
                                          {
                                              "label":  "6-Tier WAN Grading Scale (A+ to F)",
-                                             "text":  "Replaced loose Test-ISPHealth.ps1 thresholds (previously up to 40 ms ping and 2% loss graded A+) with a strict worst-metric-wins rubric (A+ Optimal: 0% loss, <=15ms ping, <=3ms jitter through F Degraded: >10% loss, >150ms ping, or >50ms jitter)."
+                                             "text":  "Replaced loose Test-ISPHealth.ps1 thresholds (previously up to 40 ms ping and 2% loss graded A+) with a strict worst-metric-wins rubric (A+ Optimal: 0% loss, \u003c=15ms ping, \u003c=3ms jitter through F Degraded: \u003e10% loss, \u003e150ms ping, or \u003e50ms jitter)."
                                          },
                                          {
-                                             "label":  "Dynamic UI Badges, Tooltips & Fallback Removal",
+                                             "label":  "Dynamic UI Badges, Tooltips \u0026 Fallback Removal",
                                              "text":  "Added evaluateIspGrade() in app.js, removed hardcoded (Ultra Stable), Zero Bufferbloat, and fake A+/100% fallbacks across Health Radar, ISP history rows, and #isp-grade-tag, and exposed the exact threshold scale in hover tooltips."
                                          }
                                      ]
@@ -20,14 +39,14 @@
                      {
                          "version":  "v2.8.75",
                          "date":  "November 22, 2026",
-                         "title":  "3-Minute AGY Quota Sync, Clear All-Time Token Labels & Dropdown Wrap Fix",
+                         "title":  "3-Minute AGY Quota Sync, Clear All-Time Token Labels \u0026 Dropdown Wrap Fix",
                          "changes":  [
                                          {
                                              "label":  "Live /usage Sync Parity",
                                              "text":  "Reduced Export-AgyQuota.ps1 /usage cache cooldown from 15m to 2.5m so every 3-minute AGY-Quota-Sync task updates Weekly and 5-Hour limits promptly without 18-minute lag."
                                          },
                                          {
-                                             "label":  "Clearer All-Time Scope Labels & Dropdown Wrap Fix",
+                                             "label":  "Clearer All-Time Scope Labels \u0026 Dropdown Wrap Fix",
                                              "text":  "Relabeled ribbon, card, and modal token readouts to AGY Tokens (All-Time) / All-Time AGY Tokens and added flex-wrap and nowrap styling to prevent Claude/GPT footer wrapping in the quota dropdown."
                                          }
                                      ]
@@ -35,15 +54,15 @@
                      {
                          "version":  "v2.8.74",
                          "date":  "November 22, 2026",
-                         "title":  "Accurate Additive AI Token Telemetry, Billions Formatting & Planner-Only Transcript Sums",
+                         "title":  "Accurate Additive AI Token Telemetry, Billions Formatting \u0026 Planner-Only Transcript Sums",
                          "changes":  [
                                          {
-                                             "label":  "Planner-Only Transcript Aggregation & Additive Headline",
+                                             "label":  "Planner-Only Transcript Aggregation \u0026 Additive Headline",
                                              "text":  "Filtered Export-AgyQuota.ps1 to count only model PLANNER_RESPONSE turns (eliminating +13.1M phantom tool-output tokens) and reported additive grandTotal = New In + Out + Cached alongside uncachedTotal."
                                          },
                                          {
-                                             "label":  "Billions (B) Formatting & Clear Cache Hit Math",
-                                             "text":  "Updated formatTokenNumber() in app.js to format >=1B values as 1.xxB instead of 1206.89M, aligned updateTokenCounterUI() to show additive New In + Out + Cached = total, and replaced misleading Gateway: 8082 footer text on app-card-tokens-port with Processed."
+                                             "label":  "Billions (B) Formatting \u0026 Clear Cache Hit Math",
+                                             "text":  "Updated formatTokenNumber() in app.js to format \u003e=1B values as 1.xxB instead of 1206.89M, aligned updateTokenCounterUI() to show additive New In + Out + Cached = total, and replaced misleading Gateway: 8082 footer text on app-card-tokens-port with Processed."
                                          }
                                      ]
                      },
