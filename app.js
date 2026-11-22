@@ -163,16 +163,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.57';
+          const activeVer = match ? match[0] : 'v2.8.58';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 15558;
+      const baseHtmlLines = 15642;
       const baseCssLines = 6349;
-      const baseJsLines = 6801;
+      const baseJsLines = 6851;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
@@ -1901,10 +1901,11 @@
         if (modalScreen) modalScreen.style.display = 'block';
         if (modalChips) modalChips.style.display = 'flex';
         if (modalInput) modalInput.style.display = 'flex';
-        if (modalTitle) modalTitle.innerHTML = 'Antigravity (AGY) Live Terminal | <span class="mono" style="color: #60a5fa;">' + escapeHtml(window.AGY_SESSION_NAME || ('webdev (' + (window.AGY_SESSION_ID ? window.AGY_SESSION_ID.substring(0,8) : 'active') + ')')) + '</span>';
-        const isDeskOnline = window.DESKTOP_IS_ONLINE !== undefined ? window.DESKTOP_IS_ONLINE : true;
-        if (modalPulse) { modalPulse.style.background = isDeskOnline ? '#10b981' : '#6366f1'; modalPulse.style.boxShadow = isDeskOnline ? '0 0 8px #10b981' : '0 0 8px #6366f1'; }
-        if (modalStatus) { modalStatus.textContent = isDeskOnline ? 'ONLINE (Desktop :8082)' : 'STANDBY (Desktop Sleeping • WoL Ready)'; modalStatus.className = `item-tag ${isDeskOnline ? 'online' : 'offline'}`; }
+        if (modalTitle) modalTitle.innerHTML = 'Antigravity (AGY) Live Terminal | <span class="mono" style="color: #60a5fa;">' + escapeHtml(window.AGY_SESSION_NAME || (window.AGY_SESSION_ID ? ('Session (' + window.AGY_SESSION_ID.substring(0,8) + ')') : 'Detecting active session...')) + '</span>';
+        const isAgyNuc = (window.AGY_SESSION_HOST === 'nuc');
+        const activeHostOnline = isAgyNuc ? (window.NUC_IS_ONLINE !== false) : (window.DESKTOP_IS_ONLINE !== undefined ? window.DESKTOP_IS_ONLINE : true);
+        if (modalPulse) { modalPulse.style.background = activeHostOnline ? '#10b981' : '#6366f1'; modalPulse.style.boxShadow = activeHostOnline ? '0 0 8px #10b981' : '0 0 8px #6366f1'; }
+        if (modalStatus) { modalStatus.textContent = activeHostOnline ? (isAgyNuc ? 'ONLINE (NUC :8082)' : 'ONLINE (Desktop :8082)') : 'STANDBY (Desktop Sleeping • WoL Ready)'; modalStatus.className = `item-tag ${activeHostOnline ? 'online' : 'offline'}`; }
 
         // Unlocked Ollama Edge AI Card
         if (aiGate) aiGate.style.display = 'none';
@@ -2179,24 +2180,28 @@
       }, 2500);
     }
 
-    window.AGY_SESSION_NAME = 'webdev (active)';
+    window.AGY_SESSION_NAME = 'Detecting active session...';
     window.AGY_SESSION_ID = '';
+    window.AGY_SESSION_HOST = null;
 
-    function updateAgySessionDisplay(cid, name) {
-      if (!cid) cid = window.AGY_SESSION_ID || '';
+    function updateAgySessionDisplay(cid, name, hostNode) {
+      if (cid === undefined || cid === null) cid = window.AGY_SESSION_ID || '';
       window.AGY_SESSION_ID = cid;
-      const shortId = cid ? cid.substring(0, 8) : 'active';
+      if (hostNode) window.AGY_SESSION_HOST = hostNode;
+      const activeHost = window.AGY_SESSION_HOST;
+      const shortId = cid ? cid.substring(0, 8) : '--';
       if (!name || name === 'webdev1.0') {
-        name = `webdev (${shortId})`;
+        name = cid ? ((activeHost === 'nuc' ? 'NUC' : activeHost === 'desktop' ? 'Desktop' : 'Session') + ` (${shortId})`) : 'No Active Session';
       }
       window.AGY_SESSION_NAME = name;
       const sName = window.AGY_SESSION_NAME;
-      const isOnline = window.DESKTOP_IS_ONLINE !== undefined ? window.DESKTOP_IS_ONLINE : true;
+      const isOnline = activeHost === 'nuc' ? (window.NUC_IS_ONLINE !== false) : (window.DESKTOP_IS_ONLINE !== undefined ? window.DESKTOP_IS_ONLINE : true);
+      const hostLabel = activeHost === 'nuc' ? 'NUC Core Server (24/7)' : (activeHost === 'desktop' ? 'Desktop Workstation' : 'Auto-Detect (NUC / Desktop)');
 
       const tab = document.getElementById('tab-agy');
       if (tab) {
         tab.textContent = '[AGY]';
-        tab.title = `View Active Antigravity Autonomous Agent Stream (${sName} | ${cid})`;
+        tab.title = cid ? `View Active Antigravity Autonomous Agent Stream (${sName} | ${cid})` : 'No active Antigravity session detected';
       }
 
       const modalTitle = document.getElementById('agy-modal-title-text');
@@ -2208,19 +2213,45 @@
       if (metaName) metaName.textContent = sName;
 
       const metaCid = document.getElementById('agy-meta-cid');
-      if (metaCid) metaCid.textContent = cid;
+      if (metaCid) metaCid.textContent = cid || '--';
+
+      const metaNode = document.getElementById('agy-meta-node');
+      if (metaNode) metaNode.textContent = hostLabel;
+
+      const modalPulse = document.getElementById('agy-modal-pulse-dot');
+      if (modalPulse) {
+        modalPulse.style.background = (cid && isOnline) ? '#10b981' : '#6366f1';
+        modalPulse.style.boxShadow = (cid && isOnline) ? '0 0 8px #10b981' : '0 0 8px #6366f1';
+      }
+      const modalStatus = document.getElementById('agy-console-status');
+      if (modalStatus) {
+        if (!cid) {
+          modalStatus.textContent = 'IDLE (No Active Session)';
+          modalStatus.className = 'item-tag';
+        } else if (activeHost === 'nuc') {
+          modalStatus.textContent = (window.NUC_IS_ONLINE !== false) ? 'ONLINE (NUC :8082)' : 'OFFLINE (NUC Unreachable)';
+          modalStatus.className = `item-tag ${(window.NUC_IS_ONLINE !== false) ? 'online' : 'offline'}`;
+        } else {
+          modalStatus.textContent = isOnline ? 'ONLINE (Desktop :8082)' : 'STANDBY (Desktop Sleeping • WoL Ready)';
+          modalStatus.className = `item-tag ${isOnline ? 'online' : 'offline'}`;
+        }
+      }
 
       const connLine = document.getElementById('agy-conn-line');
-      if (connLine) connLine.textContent = `[SYSTEM] Connected to AGY conversation stream: ${sName} (${cid})`;
+      if (connLine) {
+        connLine.textContent = cid
+          ? `[SYSTEM] Connected to AGY conversation stream on ${hostLabel}: ${sName} (${cid})`
+          : '[SYSTEM] No active AGY session detected on NUC or Desktop.';
+      }
 
       document.querySelectorAll('.agy-session-link-btn').forEach(btn => {
-        btn.title = `Open Interactive Terminal for Active Session ${sName}`;
+        btn.title = cid ? `Open Interactive Terminal for Active Session ${sName}` : 'Open Antigravity Interactive Terminal';
         const span = btn.querySelector('span:not(.dropdown-dot)');
-        if (span) span.textContent = isOnline ? `Open AGY Terminal (${sName})` : `AGY Terminal (${shortId} \u2022 Standby)`;
+        if (span) span.textContent = cid ? (isOnline ? `Open AGY Terminal (${sName})` : `AGY Terminal (${shortId} \u2022 Standby)`) : 'Open AGY Terminal (Idle)';
         const tag = btn.querySelector('.item-tag');
         if (tag) {
-          tag.textContent = isOnline ? 'Live' : 'Standby';
-          tag.className = `item-tag ${isOnline ? 'online' : 'offline'}`;
+          tag.textContent = cid ? (isOnline ? 'Live' : 'Standby') : 'Idle';
+          tag.className = `item-tag ${cid ? (isOnline ? 'online' : 'offline') : ''}`.trim();
         }
       });
 
@@ -2241,14 +2272,18 @@
       return fetch(`${GATEWAY}/api/agy/session`, { signal: _fetchSig(6000) })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(data => {
-          if (data && data.conversationId) {
+          if (data) {
             const prevCid = window.AGY_SESSION_ID;
             if (data.workspace) window.AGY_WORKSPACE = data.workspace;
-            updateAgySessionDisplay(data.conversationId, data.sessionName);
-            if (prevCid && prevCid !== data.conversationId) {
-              console.log(`[AGY] Active session transitioned: ${prevCid} -> ${data.conversationId}`);
+            updateAgySessionDisplay(data.conversationId || '', data.sessionName || 'No Active Session', data.hostNode || null);
+            if (prevCid && data.conversationId && prevCid !== data.conversationId) {
+              console.log(`[AGY] Active session transitioned: ${prevCid} -> ${data.conversationId} (${data.hostNode || 'unknown'})`);
               if (typeof currentLogTab !== 'undefined' && currentLogTab === 'agy') {
                 if (typeof loadLog === 'function') loadLog('agy');
+              }
+              const modal = document.getElementById('agy-console-modal-overlay');
+              if (modal && modal.classList.contains('active') && typeof refreshAgyConsole === 'function') {
+                refreshAgyConsole(true);
               }
             }
           }
@@ -2256,7 +2291,7 @@
           return data;
         })
         .catch(() => {
-          updateAgySessionDisplay(window.AGY_SESSION_ID || '', window.AGY_SESSION_NAME || 'webdev (active)');
+          updateAgySessionDisplay(window.AGY_SESSION_ID || '', window.AGY_SESSION_ID ? window.AGY_SESSION_NAME : 'Unavailable (Gateway Offline)', window.AGY_SESSION_HOST || null);
           if (callback) callback(null);
           return null;
         });
@@ -3074,6 +3109,9 @@
       })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(data => {
+          if (name === 'agy' && data && (data.conversationId || data.hostNode || data.sessionName)) {
+            updateAgySessionDisplay(data.conversationId || '', data.sessionName || null, data.hostNode || null);
+          }
           if (body && data.lines) {
             body.textContent = data.lines.join('\n');
             body.scrollTop = body.scrollHeight;
@@ -4611,12 +4649,18 @@
       }
     }
 
+    let consolePollTick = 0;
     function startConsoleAutoPoll() {
       stopConsoleAutoPoll();
       if (!consoleAutoPollActive) return;
+      consolePollTick = 0;
       consoleAutoPollTimer = setInterval(() => {
         const modal = document.getElementById('agy-console-modal-overlay');
         if (modal && modal.classList.contains('active')) {
+          consolePollTick++;
+          if (consolePollTick % 4 === 0 && typeof fetchAgySessionInfo === 'function') {
+            fetchAgySessionInfo();
+          }
           refreshAgyConsole(true);
         }
       }, 2500);
@@ -4644,6 +4688,9 @@
       })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(data => {
+          if (data && (data.conversationId || data.hostNode || data.sessionName)) {
+            updateAgySessionDisplay(data.conversationId || '', data.sessionName || null, data.hostNode || null);
+          }
           if (data && data.lines && screen) {
             const isNearBottom = screen.scrollHeight - screen.scrollTop - screen.clientHeight < 80;
             
@@ -4675,7 +4722,8 @@
               screen.scrollTop = screen.scrollHeight;
             }
             if (statusTag) {
-              statusTag.textContent = 'ONLINE (Desktop :8082)';
+              const activeHost = (data && data.hostNode) || window.AGY_SESSION_HOST || 'desktop';
+              statusTag.textContent = activeHost === 'nuc' ? 'ONLINE (NUC :8082)' : 'ONLINE (Desktop :8082)';
               statusTag.className = 'item-tag online';
             }
             if (typeof updateQuotaHistorySparkline === 'function') {
@@ -5956,6 +6004,7 @@
         .then(r => r.json().then(d => ({ ok: r.ok, status: r.status, data: d })).catch(() => { throw new Error('HTTP ' + r.status); }))
         .then(({ ok, status, data }) => {
           if (timerId) clearTimeout(timerId);
+          if (window._edgeAiAbortCtrl !== ctrl) return;
           if (!ok || !data || data.status !== 'success' || !data.response) {
             throw new Error((data && data.message) ? data.message : ('HTTP ' + status));
           }
@@ -5964,8 +6013,9 @@
           const badge = `<br><span style="color: #34d399; font-size: 0.72rem;">Verified On-Premise Ollama (${modelName})</span>`;
           typeEdgeAiResponse(feed, stats, prefix, String(data.response), badge, data.evalCount, data.tokensPerSec);
         })
-        .catch(() => {
+        .catch((err) => {
           if (timerId) clearTimeout(timerId);
+          if ((err && err.name === 'AbortError') || window._edgeAiAbortCtrl !== ctrl) return;
           const fallback = `[Offline Local Summary] ${generateClusterAiResponse(promptText)}`;
           const prefix = `${userLine}<span style="color: #f59e0b;">dr-ollama [Offline Fallback]&gt;</span> `;
           const badge = `<br><span style="color: #f59e0b; font-size: 0.72rem;">Gateway/Ollama offline - showing local summary</span>`;

@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-22T00:50:00Z",
-    "currentVersion":  "v2.8.57",
+    "updatedAt":  "2026-11-22T01:15:00Z",
+    "currentVersion":  "v2.8.58",
     "releases":  [
+                     {
+                         "version":  "v2.8.58",
+                         "date":  "November 21, 2026",
+                         "title":  "Dynamic Cross-Host Active AGY Session Discovery \u0026 Edge AI Race Fix",
+                         "changes":  [
+                                         {
+                                             "label":  "Dynamic NUC \u0026 Desktop AGY Session Resolution",
+                                             "text":  "Removed the hardcoded 53c2a1ff conversation ID across all 7 pages, wol-listener.ps1, and Sync-AgyTranscript.ps1; both Desktop and NUC gateways now compare real conversation activity timestamps across NUC and Desktop and dynamically bind logs, prompts, and terminal UI controls to the active session."
+                                         },
+                                         {
+                                             "label":  "Host-Aware Terminal Metadata \u0026 Edge AI Abort Guard",
+                                             "text":  "Added live host node indicators (NUC Core Server vs Desktop Workstation) in the AGY modal and dropdowns, fixed the single-line history.jsonl parsing bug, and guarded runLiveEdgeAiQuery against aborted-request race overwrites."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.57",
                          "date":  "November 21, 2026",

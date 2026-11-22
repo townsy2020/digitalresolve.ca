@@ -7,8 +7,8 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Penny's Cat Cam & Feeder IoT - Homelab</title>
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.57 - Penny's Cat Cam & Feeder IoT - Homelab">
-  <link rel="stylesheet" href="styles.css?v=2.8.57">
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.58 - Penny's Cat Cam & Feeder IoT - Homelab">
+  <link rel="stylesheet" href="styles.css?v=2.8.58">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -231,9 +231,9 @@
             <span>Ops &amp; Tools</span> <span class="dropdown-arrow">&#9662;</span>
           </button>
           <div class="dropdown-menu">
-            <button type="button" class="btn-action-item agy-session-link-btn" onclick="openEmbeddedConsole()" title="Open Live Interactive Terminal for Active Session 53c2a1ff">
+            <button type="button" class="btn-action-item agy-session-link-btn" onclick="openEmbeddedConsole()" title="Open Live Interactive Terminal for Active AGY Session">
               <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
-              <span>Open AGY Terminal (webdev)</span>
+              <span>Open AGY Terminal (Auto-Detect)</span>
               <span class="item-tag online">Live</span>
             </button>
             <a href="ops.html#ops-ai" class="btn-action-item" title="Jump to In-Page Compute, AI &amp; Terminal Operations Console">
@@ -254,7 +254,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.57</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.58</span>)</span>
             </button>
             <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO(true, event)" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -473,12 +473,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.57</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.58</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 28,709 Lines of Code (HTML: 15,558 lines | CSS: 6,349 lines | JS: 6,801 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 28,843 Lines of Code (HTML: 15,642 lines | CSS: 6,349 lines | JS: 6,851 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">28,709</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">28,843</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -567,13 +567,13 @@
 
       <!-- Quick Session Bar -->
       <div class="agy-session-meta-bar" id="agy-session-meta-bar" style="display: none;">
-        <div class="meta-item"><span class="meta-lbl">Session:</span> <span class="meta-val"><strong style="color: #60a5fa;" id="agy-meta-name">webdev (53c2a1ff)</strong></span></div>
-        <div class="meta-item"><span class="meta-lbl">Session ID:</span> <span id="agy-meta-cid" class="meta-val mono">53c2a1ff-4c8c-4051-aae0-8bf4e62f57b3</span></div>
+        <div class="meta-item"><span class="meta-lbl">Session:</span> <span class="meta-val"><strong style="color: #60a5fa;" id="agy-meta-name">Detecting...</strong></span></div>
+        <div class="meta-item"><span class="meta-lbl">Session ID:</span> <span id="agy-meta-cid" class="meta-val mono">--</span></div>
         <div class="meta-item"><span class="meta-lbl">Session Tokens:</span> <span class="meta-val mono" id="modal-token-count">-- (Syncing...)</span></div>
         <div class="meta-item"><span class="meta-lbl">Model Tier:</span> <span class="meta-val" id="modal-model-val" style="color: #34d399;">Detecting model...</span></div>
         <div class="meta-item"><span class="meta-lbl">Model Breakdown:</span> <span class="meta-val" id="modal-model-breakdown">Calculating breakdown...</span></div>
         <div class="meta-item"><span class="meta-lbl">Cost Efficiency:</span> <span class="meta-val" id="modal-savings-val" style="color: #34d399;">Calculating savings...</span></div>
-        <div class="meta-item"><span class="meta-lbl">Node:</span> <span class="meta-val">DESKTOP (NetBIOS)</span></div>
+        <div class="meta-item"><span class="meta-lbl">Node:</span> <span class="meta-val" id="agy-meta-node">Auto-Detect (NUC / Desktop)</span></div>
         <div class="meta-item"><span class="meta-lbl">Auth Gateway:</span> <span class="meta-val">wake.digitalresolve.ca (M365 Entra ID SSO)</span></div>
         <div class="meta-actions">
           <button type="button" class="meta-link-btn" onclick="refreshAgyConsole()" title="Force Refresh Stream">Refresh Stream &#x21bb;</button>
@@ -610,8 +610,8 @@
 
       <!-- Live Terminal Stream Output Screen -->
       <div class="agy-console-screen" id="agy-console-screen" style="display: none;">
-        <div class="agy-line system">[SYSTEM] Establishing encrypted tunnel to Cory-Desktop (Port 8082 via M365 SSO)...</div>
-        <div class="agy-line system">[SYSTEM] Connected to AGY conversation stream: 53c2a1ff-4c8c-4051-aae0-8bf4e62f57b3</div>
+        <div class="agy-line system">[SYSTEM] Establishing encrypted tunnel to active AGY host (Port 8082 via M365 SSO)...</div>
+        <div class="agy-line system" id="agy-conn-line">[SYSTEM] Detecting active AGY conversation stream across NUC &amp; Desktop...</div>
       </div>
 
       <!-- Command Quick Chips -->
@@ -1074,10 +1074,22 @@
       </div>
 
             <div class="changelog-body">
-                                <!-- Version v2.8.57 (Current) -->
+                                <!-- Version v2.8.58 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.57 | Current</span>
+            <span class="ver-tag current">v2.8.58 | Current</span>
+            <span class="ver-date">November 21, 2026</span>
+          </div>
+          <h4 class="ver-title">Dynamic Cross-Host Active AGY Session Discovery &amp; Edge AI Race Fix</h4>
+          <ul class="ver-list">
+            <li><strong>Dynamic NUC &amp; Desktop AGY Session Resolution:</strong> Removed the hardcoded <code>53c2a1ff</code> conversation ID across all 7 pages, <code>wol-listener.ps1</code>, and <code>Sync-AgyTranscript.ps1</code>; both Desktop and NUC gateways now compare real conversation activity timestamps across NUC and Desktop and dynamically bind logs, prompts, and terminal UI controls to the active session.</li>
+            <li><strong>Host-Aware Terminal Metadata &amp; Edge AI Abort Guard:</strong> Added live host node indicators (NUC Core Server vs Desktop Workstation) in the AGY modal and dropdowns, fixed the single-line <code>history.jsonl</code> parsing bug, and guarded <code>runLiveEdgeAiQuery</code> against aborted-request race overwrites.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.57 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.57</span>
             <span class="ver-date">November 21, 2026</span>
           </div>
           <h4 class="ver-title">Live NUC Ollama Edge AI, Real WAN Probes, Honest Telemetry Fallbacks &amp; Operations Hardening</h4>
@@ -1370,6 +1382,6 @@
       </div>
     </div>
   </div>
-  <script src="app.js?v=2.8.57"></script>
+  <script src="app.js?v=2.8.58"></script>
 </body>
 </html>
