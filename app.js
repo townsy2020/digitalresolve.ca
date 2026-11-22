@@ -163,16 +163,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.63';
+          const activeVer = match ? match[0] : 'v2.8.64';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 16104;
+      const baseHtmlLines = 15979;
       const baseCssLines = 6349;
-      const baseJsLines = 6831;
+      const baseJsLines = 6915;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
@@ -1628,7 +1628,14 @@
       const hasTermDom = () => Boolean(document.getElementById('terminal-content'));
 
       // Start live stats & terminal stream with Page Visibility + DOM presence throttling
-      fetchClusterStats();
+      const statsPromise = fetchClusterStats();
+      if (document.getElementById('abs-bookshelf-grid')) {
+        Promise.resolve(statsPromise).then(() => {
+          if (!window._absHydrated && typeof fetchAudiobookshelfFallback === 'function') fetchAudiobookshelfFallback();
+        }).catch(() => {
+          if (!window._absHydrated && typeof fetchAudiobookshelfFallback === 'function') fetchAudiobookshelfFallback();
+        });
+      }
       setInterval(() => { if (!document.hidden) fetchClusterStats(); }, 4000);
       if (hasClimateDom()) {
         setInterval(() => { if (!document.hidden && typeof fetchClimateData === 'function') fetchClimateData(); }, 10000);
@@ -2814,6 +2821,80 @@
         })
         .catch(() => { _quotaSparklineInFlight = false; });
     }
+    function renderAudiobookshelfGrid(absData) {
+      const grid = document.getElementById('abs-bookshelf-grid');
+      const subEl = document.getElementById('abs-vault-subtitle');
+      if (!grid) return;
+
+      if (absData && absData.online && Array.isArray(absData.items) && absData.items.length > 0) {
+        window._absHydrated = true;
+        const totalBooks = Number(absData.totalBooks !== undefined && absData.totalBooks !== null ? absData.totalBooks : absData.items.length) || absData.items.length;
+        const inProgress = Number(absData.inProgressCount || 0);
+        if (subEl) {
+          subEl.innerHTML = `${escapeHtml(totalBooks.toLocaleString())} real audiobooks on NUC &bull; ${escapeHtml(String(inProgress))} in progress`;
+        }
+        const palettes = [
+          { cover: 'linear-gradient(135deg, #1e3a8a, #0f172a)', accent: '#60a5fa', bar: '#38bdf8' },
+          { cover: 'linear-gradient(135deg, #065f46, #022c22)', accent: '#34d399', bar: '#10b981' },
+          { cover: 'linear-gradient(135deg, #581c87, #2e1065)', accent: '#c084fc', bar: '#a855f7' },
+          { cover: 'linear-gradient(135deg, #78350f, #451a03)', accent: '#fbbf24', bar: '#f59e0b' }
+        ];
+        grid.innerHTML = absData.items.slice(0, 4).map((item, idx) => {
+          const pal = palettes[idx % palettes.length];
+          const status = item && item.status ? String(item.status) : 'Audiobook';
+          const author = item && item.author ? String(item.author) : 'Unknown Author';
+          const title = item && item.title ? String(item.title) : 'Untitled Audiobook';
+          const subtitle = item && item.subtitle ? String(item.subtitle) : '';
+          const pctRaw = Number(item && (item.progressPct !== undefined ? item.progressPct : item.progress));
+          const pct = Number.isFinite(pctRaw) ? Math.max(0, Math.min(100, Math.round(pctRaw))) : 0;
+          const progressText = pct > 0 ? `Progress: ${pct}%` : status;
+          const remainingLabel = item && item.remainingLabel ? String(item.remainingLabel) : (pct >= 100 ? 'Completed' : 'Ready');
+          const rawUrl = item && item.url ? String(item.url) : 'https://audiobooks.digitalresolve.ca';
+          const safeUrl = /^https?:\/\//i.test(rawUrl) ? rawUrl : 'https://audiobooks.digitalresolve.ca';
+          const safeTitle = title || 'Audiobookshelf';
+          return `<div class="book-card" style="cursor: pointer;" onclick="launchProtectedService('${escapeHtml(safeUrl)}', '${escapeHtml(safeTitle)}')">
+                <div class="book-cover" style="background: ${pal.cover};"></div>
+                <div class="book-body">
+                  <div style="font-size: 0.72rem; color: ${pal.accent}; font-weight: 700; text-transform: uppercase;">${escapeHtml(status)} &bull; ${escapeHtml(author)}</div>
+                  <div style="font-weight: 800; color: #f8fafc; font-size: 0.92rem;">${escapeHtml(title)}</div>
+                  <div style="font-size: 0.76rem; color: #94a3b8;">${escapeHtml(subtitle)}</div>
+                  <div style="margin-top: auto; padding-top: 10px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #64748b; margin-bottom: 4px;">
+                      <span>${escapeHtml(progressText)}</span>
+                      <span>${escapeHtml(remainingLabel)}</span>
+                    </div>
+                    <div style="height: 4px; background: rgba(255,255,255,0.1); border-radius: 9999px; overflow: hidden;">
+                      <div style="width: ${pct}%; height: 100%; background: ${pal.bar};"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>`;
+        }).join('');
+      } else {
+        if (subEl) {
+          subEl.textContent = 'Audiobookshelf library unavailable or offline on NUC.';
+        }
+        grid.innerHTML = '<div class="book-card" style="grid-column: 1 / -1;"><div class="book-body" style="color: #94a3b8; font-size: 0.85rem;">Audiobookshelf library is currently unavailable on NUC. Use <strong>Launch Audiobookshelf</strong> above to connect directly.</div></div>';
+      }
+    }
+    window.renderAudiobookshelfGrid = renderAudiobookshelfGrid;
+
+    function fetchAudiobookshelfFallback() {
+      if (!document.getElementById('abs-bookshelf-grid') || window._absHydrated) return Promise.resolve(null);
+      return fetch(`${GATEWAY}/api/audiobooks`, { credentials: 'include', cache: 'no-store', signal: _fetchSig(5000) })
+        .then(r => (r.ok ? r.json() : null))
+        .then(d => {
+          if (d) renderAudiobookshelfGrid(d);
+          else if (!window._absHydrated) renderAudiobookshelfGrid(null);
+          return d;
+        })
+        .catch(() => {
+          if (!window._absHydrated) renderAudiobookshelfGrid(null);
+          return null;
+        });
+    }
+    window.fetchAudiobookshelfFallback = fetchAudiobookshelfFallback;
+
     function applyClusterStatsPayload(data) {
       if (!data) return null;
       try { localStorage.setItem('dr_cluster_stats', JSON.stringify(data)); } catch (e) {}
@@ -2943,6 +3024,9 @@
       }
       if (data.climate) {
         updateClimateUI(data.climate);
+      }
+      if (data.audiobooks && typeof renderAudiobookshelfGrid === 'function') {
+        renderAudiobookshelfGrid(data.audiobooks);
       }
       return data;
     }

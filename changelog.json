@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-22T05:35:00Z",
-    "currentVersion":  "v2.8.63",
+    "updatedAt":  "2026-11-22T06:05:00Z",
+    "currentVersion":  "v2.8.64",
     "releases":  [
+                     {
+                         "version":  "v2.8.64",
+                         "date":  "November 22, 2026",
+                         "title":  "Live Audiobookshelf Library Integration \u0026 Storage Legend Null-State",
+                         "changes":  [
+                                         {
+                                             "label":  "Live Audiobookshelf Library Grid",
+                                             "text":  "Removed all 4 hardcoded placeholder books from index.html, media.html, and ops.html and wired renderAudiobookshelfGrid() in app.js to hydrate real NUC Audiobookshelf items from /stats (with /api/audiobooks fallback and honest unavailable notice)."
+                                         },
+                                         {
+                                             "label":  "Honest Storage Legend Placeholders",
+                                             "text":  "Replaced stale static storage legend GB strings on index.html and media.html with -- GB until live /stats telemetry hydrates them."
+                                         },
+                                         {
+                                             "label":  "Cache-Busters \u0026 Codebase Scale Sync",
+                                             "text":  "Bumped styles.css?v=2.8.64 and app.js?v=2.8.64, synchronized footer/menu version badges across all 7 dashboard pages, and recalculated exact codebase Lines of Code."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.63",
                          "date":  "November 22, 2026",
