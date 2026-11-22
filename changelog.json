@@ -1,26 +1,45 @@
-{
-    "updatedAt":  "2026-11-22T14:45:00Z",
-    "currentVersion":  "v2.8.72",
+﻿{
+    "updatedAt":  "2026-11-22T15:50:00Z",
+    "currentVersion":  "v2.8.73",
     "releases":  [
+                     {
+                         "version":  "v2.8.73",
+                         "date":  "November 22, 2026",
+                         "title":  "Tiered Storage \u0026 Live Data Flow Schematic, 8-Tab Navbar \u0026 Pipeline Inspector",
+                         "changes":  [
+                                         {
+                                             "label":  "Standalone Tiered Storage Flow Page",
+                                             "text":  "Added storage.html and isolated storage-flow.js featuring a 5-card KPI strip, interactive 4-tier animated SVG flowchart (Workstation -\u003e NUC Hot Media -\u003e QNAP SMB \u0026 Dual iSCSI -\u003e OneDrive Vault), HiDPI throughput waveform canvas, capacity distribution bars, clickable node/pipe inspector, and script pipeline matrix."
+                                         },
+                                         {
+                                             "label":  "Live /api/storage-flow \u0026 M365-Gated Triggers",
+                                             "text":  "Integrated live NUC gateway telemetry (/api/storage-flow) with LAN fallback, category filtering (All Flows, Media Tiering, Backups \u0026 DR, Guardrails), and M365-SSO-gated manual pipeline triggers (/api/storage-flow/trigger)."
+                                         },
+                                         {
+                                             "label":  "Site-Wide 8-Tab Navbar \u0026 v2.8.73 LOC Sync",
+                                             "text":  "Added STORAGE tab and Tiered Storage Live Flow dropdown entry across all 8 dashboard pages, tuned .nav-pages-group for single-row 1280x720/1440x900 fit, and synchronized exact codebase LOC metrics."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.72",
                          "date":  "November 22, 2026",
-                         "title":  "Bedroom Camera MSE/WebRTC Reliability, In-Place Switching & NUC Gateway Player Sync",
+                         "title":  "Bedroom Camera MSE/WebRTC Reliability, In-Place Switching \u0026 NUC Gateway Player Sync",
                          "changes":  [
                                          {
-                                             "label":  "MSE Init Queue & First-Frame Fallback",
+                                             "label":  "MSE Init Queue \u0026 First-Frame Fallback",
                                              "text":  "Buffered binary fMP4 chunks before SourceBuffer readiness so init segments are preserved, separated buffer eviction from append cycles, fixed QuotaExceededError stalls, and added a 10s first-frame watchdog and Video/SourceBuffer error fallback to WebRTC in webrtc.html and ai.html."
                                          },
                                          {
-                                             "label":  "In-Place Camera Switching & WebRTC ICE Queue",
+                                             "label":  "In-Place Camera Switching \u0026 WebRTC ICE Queue",
                                              "text":  "Added remote-description ICE candidate queueing and pagehide/beforeunload cleanup in webrtc.html and ai.html, updated app.js updateCamFeed() to switch Bedroom/Feeder/HD/SD streams in-place via selectCamera() without stale iframe reloads, removed lazy/strict iframe throttling, and updated Bedroom Cam 2 labels."
                                          },
                                          {
-                                             "label":  "NUC Static Player Parity & CORS Suppression",
+                                             "label":  "NUC Static Player Parity \u0026 CORS Suppression",
                                              "text":  "Skipped cross-origin wake.digitalresolve.ca cam status polls when hosted directly on cam.digitalresolve.ca, synced webrtc.html and ai.html to NUC go2rtc static www directory, and bumped assets to v2.8.72."
                                          },
                                          {
-                                             "label":  "Navbar Overflow, HTTPS qBittorrent & Zero-Placeholder Telemetry",
+                                             "label":  "Navbar Overflow, HTTPS qBittorrent \u0026 Zero-Placeholder Telemetry",
                                              "text":  "Added viewport-clamped scrollable dropdown menus, preserved HTTPS torrents.digitalresolve.ca routing, standardized Cloudflare Dashboard links with z-index layering, and hydrated Cloudflare tunnel egress, Health Radar bars, and topology inspector states with zero placeholder values."
                                          }
                                      ]
@@ -28,7 +47,7 @@
                      {
                          "version":  "v2.8.71",
                          "date":  "November 22, 2026",
-                         "title":  "Ops Bell Speedtest Hydration, NUC Sparkline Latency Guard & Cloudflare Egress Fallback",
+                         "title":  "Ops Bell Speedtest Hydration, NUC Sparkline Latency Guard \u0026 Cloudflare Egress Fallback",
                          "changes":  [
                                          {
                                              "label":  "Ops Bell Speedtest Telemetry",
@@ -36,10 +55,10 @@
                                          },
                                          {
                                              "label":  "NUC 0.0 ms Sparkline Race Fix",
-                                             "text":  "Guarded updateStatusUI() against overwriting valid >0 ms LAST_NUC_LATENCY with 0 ms from /status?target=nuc so index.html renders the live NUC latency curve."
+                                             "text":  "Guarded updateStatusUI() against overwriting valid \u003e0 ms LAST_NUC_LATENCY with 0 ms from /status?target=nuc so index.html renders the live NUC latency curve."
                                          },
                                          {
-                                             "label":  "Cloudflare Tunnel Egress & Mobile Polish",
+                                             "label":  "Cloudflare Tunnel Egress \u0026 Mobile Polish",
                                              "text":  "Displayed tunnel egress in #edge-cache-val when hitRatio is unavailable, prevented Port 11434 badge wrapping on mobile, and bumped assets to v2.8.71."
                                          }
                                      ]
@@ -47,18 +66,18 @@
                      {
                          "version":  "v2.8.70",
                          "date":  "November 22, 2026",
-                         "title":  "Accurate Cluster 90-Day SLA Math, Dynamic Grade Badges & Incident Downtime Attribution",
+                         "title":  "Accurate Cluster 90-Day SLA Math, Dynamic Grade Badges \u0026 Incident Downtime Attribution",
                          "changes":  [
                                          {
                                              "label":  "True Cluster Availability Math",
-                                             "text":  "Updated /api/uptime to factor actual NUC crash downtime (including today's 68m 32s outage) and ongoing offline state into overallSla, slaGrade, and rolling 90-day uptime-incidents.json history instead of masking cluster outages with 100% ISP probe availability."
+                                             "text":  "Updated /api/uptime to factor actual NUC crash downtime (including today\u0027s 68m 32s outage) and ongoing offline state into overallSla, slaGrade, and rolling 90-day uptime-incidents.json history instead of masking cluster outages with 100% ISP probe availability."
                                          },
                                          {
-                                             "label":  "Dynamic SLA, Heartbeat, Outage & MTTR Badges",
+                                             "label":  "Dynamic SLA, Heartbeat, Outage \u0026 MTTR Badges",
                                              "text":  "Replaced static Grade A+, Zero Loss, and Instant tags in index.html and uptime.html with live severity-driven badges and downtime summaries in applyUptimeMetrics()."
                                          },
                                          {
-                                             "label":  "Version v2.8.70 & Asset Cache-Busters",
+                                             "label":  "Version v2.8.70 \u0026 Asset Cache-Busters",
                                              "text":  "Bumped styles.css?v=2.8.70, app.js?v=2.8.70, and version badges across all 7 dashboard pages with exact codebase LOC sync."
                                          }
                                      ]
@@ -66,18 +85,18 @@
                      {
                          "version":  "v2.8.69",
                          "date":  "November 22, 2026",
-                         "title":  "Cloudflare Access Credentials, ISP Telemetry Helper, Uptime dailyHistory & HiDPI Ping Sparkline",
+                         "title":  "Cloudflare Access Credentials, ISP Telemetry Helper, Uptime dailyHistory \u0026 HiDPI Ping Sparkline",
                          "changes":  [
                                          {
                                              "label":  "Cloudflare Access SSO Credentials",
-                                             "text":  "Added explicit credentials: 'include' across all GATEWAY fetches (/api/isp-health, /uptime, /stats, /status, /services-health, /climate, /api/feeder/status, /api/quota/history, /api/agy/session) so cross-origin Cloudflare Access SSO sessions work seamlessly."
+                                             "text":  "Added explicit credentials: \u0027include\u0027 across all GATEWAY fetches (/api/isp-health, /uptime, /stats, /status, /services-health, /climate, /api/feeder/status, /api/quota/history, /api/agy/session) so cross-origin Cloudflare Access SSO sessions work seamlessly."
                                          },
                                          {
-                                             "label":  "Unified ISP Telemetry & Snapshot Refresh",
+                                             "label":  "Unified ISP Telemetry \u0026 Snapshot Refresh",
                                              "text":  "Refactored fetchISPHistory() into a single applyIspTelemetry() helper shared across live, isp-health.json, and localStorage fallback paths with full null guards and refreshed isp-health.json from real measured history."
                                          },
                                          {
-                                             "label":  "90-Day Uptime dailyHistory & HiDPI Ping Sparkline",
+                                             "label":  "90-Day Uptime dailyHistory \u0026 HiDPI Ping Sparkline",
                                              "text":  "Added dailyHistory + dr_uptime_cache hydration in renderUptimeMatrix() and HiDPI devicePixelRatio + ResizeObserver rendering for #uptimeSparkline."
                                          }
                                      ]
@@ -85,18 +104,18 @@
                      {
                          "version":  "v2.8.68",
                          "date":  "November 22, 2026",
-                         "title":  "Form Control Accessibility, Standalone Camera Focus/Skip Links & Exact LOC Sync",
+                         "title":  "Form Control Accessibility, Standalone Camera Focus/Skip Links \u0026 Exact LOC Sync",
                          "changes":  [
                                          {
-                                             "label":  "Form Control ARIA & Focus Ring Fixes",
+                                             "label":  "Form Control ARIA \u0026 Focus Ring Fixes",
                                              "text":  "Added aria-label=\"Ask Edge AI a question\" to #edge-ai-input on index.html and ops.html, removed inline outline: none from #quick-magnet-target on index.html, and added aria-label=\"Target node for magnet download\" so unlabelled form controls across all 9 pages = 0."
                                          },
                                          {
-                                             "label":  "Standalone WebRTC/AI Focus & Skip Links",
+                                             "label":  "Standalone WebRTC/AI Focus \u0026 Skip Links",
                                              "text":  "Added :focus-visible outline rules, .skip-to-content styling, skip-to-content links, and id=\"main-content\" landmarks to webrtc.html and ai.html with 100% SHA-256 NUC mirror parity."
                                          },
                                          {
-                                             "label":  "Version v2.8.68 & Exact LOC Sync",
+                                             "label":  "Version v2.8.68 \u0026 Exact LOC Sync",
                                              "text":  "Bumped styles.css?v=2.8.68, app.js?v=2.8.68, meta descriptions, menu/footer version badges, and static changelog fallback to v2.8.68 across all 7 dashboard pages with recalculated exact codebase LOC."
                                          }
                                      ]
@@ -104,18 +123,18 @@
                      {
                          "version":  "v2.8.67",
                          "date":  "November 22, 2026",
-                         "title":  "Accessibility Hardening, 375px Mobile Overflow Fix, CSS Cleanup & WebRTC/AI Landmarks",
+                         "title":  "Accessibility Hardening, 375px Mobile Overflow Fix, CSS Cleanup \u0026 WebRTC/AI Landmarks",
                          "changes":  [
                                          {
-                                             "label":  "Keyboard & ARIA Accessibility",
+                                             "label":  "Keyboard \u0026 ARIA Accessibility",
                                              "text":  "Added role=\"button\", tabindex=\"0\", and Enter/Space keyboard handlers to all 7 .schematic-node-card elements on index.html and fleet.html and the .book-card template in app.js, added aria-label=\"Close Tailscale modal\" to ensureTailscaleModalDOM, and added skip-to-content links across all 7 dashboard pages."
                                          },
                                          {
-                                             "label":  "375px Mobile Overflow & CSS Cleanup",
+                                             "label":  "375px Mobile Overflow \u0026 CSS Cleanup",
                                              "text":  "Fixed 375px horizontal overflow in styles.css (nav-mobile-actions wrapping/compact sizing, scrollable .nuc-tabs/.nuc-tabs-bar, responsive tables, and clipped mobile body), raised .magnet-modal-overlay z-index to 10002, consolidated duplicate .nav-links rules, and added base rules for referenced utility classes."
                                          },
                                          {
-                                             "label":  "WebRTC/AI Landmarks, Changelog Sync & Exact LOC",
+                                             "label":  "WebRTC/AI Landmarks, Changelog Sync \u0026 Exact LOC",
                                              "text":  "Added @media (max-width: 680px) responsive rules to webrtc.html, added semantic header/footer landmarks to webrtc.html and ai.html with NUC mirror parity, fixed the stale v2.8.64 changelog modal fallback across all 7 pages, and synced exact codebase LOC to v2.8.67."
                                          }
                                      ]

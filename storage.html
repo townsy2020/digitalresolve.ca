@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Tiered Storage &amp; Live Data Flow - DigitalResolve</title>
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.73 - Tiered Storage &amp; Live Data Flow">
+  <link rel="stylesheet" href="styles.css?v=2.8.73">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://wake.digitalresolve.ca">
+  <link rel="preconnect" href="https://cam.digitalresolve.ca">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="canonical" href="https://digitalresolve.ca/storage.html" />
+  <script>
+    (function() {
+      try {
+        var stored = localStorage.getItem('dr_layout_mode');
+        var isMobile = false;
+        if (stored === 'mobile') {
+          isMobile = true;
+        } else if (stored === 'desktop') {
+          isMobile = false;
+        } else {
+          isMobile = (window.innerWidth <= 768);
+        }
+        var doc = document.documentElement;
+        if (isMobile) {
+          doc.setAttribute('data-layout-mode', 'mobile');
+          doc.classList.add('mobile-layout');
+        } else {
+          doc.setAttribute('data-layout-mode', 'desktop');
+          doc.classList.add('desktop-layout');
+        }
+      } catch(e) {}
+    })();
+  </script>
+</head>
+<body id="top">
+  <a href="#main-content" class="skip-to-content">Skip to main content</a>
+  <header class="header" id="site-header">
+    <div class="container nav-container">
+      <a href="index.html#deck" class="logo" title="DigitalResolve Homelab Deck">
+        <span class="logo-text-group"><span class="logo-accent">Digital</span>Resolve</span>
+        </a>
+      <nav class="nav-links">
+        <!-- Primary Category Pages Navigation -->
+        <div class="nav-pages-group">
+          <a href="index.html" class="btn-nav">DECK</a>
+          <a href="services.html" class="btn-nav">SERVICES</a>
+          <a href="fleet.html" class="btn-nav">NODES</a>
+          <a href="storage.html" class="btn-nav active">STORAGE</a>
+          <a href="uptime.html" class="btn-nav">UPTIME</a>
+          <a href="media.html" class="btn-nav">MEDIA</a>
+          <a href="penny.html" class="btn-nav">PENNY</a>
+          <a href="ops.html" class="btn-nav">OPS &amp; AI</a>
+        </div>
+
+        <div class="nav-divider" aria-hidden="true"></div>
+
+        <!-- Contextual Quick-Action Tool Menus -->
+        <div class="nav-tools-group">
+
+        <!-- Consolidated Menu 1: Cluster & Media -->
+        <div class="dropdown">
+          <button type="button" class="btn-nav" id="cluster-menu-btn" aria-haspopup="true" aria-expanded="false" title="Cluster Nodes, Media Streaming, and NUC Microservices">
+            <span>Cluster &amp; Media</span> <span class="dropdown-arrow">&#9662;</span>
+          </button>
+          <div class="dropdown-menu">
+            <a href="uptime.html#service-status" class="btn-action-item" title="Open Live Homelab Service Status Dashboard">
+              <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+              <span>Live Service Status Dashboard</span>
+              <span class="item-tag online">Live</span>
+            </a>
+            <a href="storage.html" class="btn-action-item" title="Open Tiered Storage &amp; Live Data Flow Schematic">
+              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+              <span>Tiered Storage Live Flow</span>
+              <span class="item-tag online">4 Tiers</span>
+            </a>
+            <a href="ops.html#nuc-services" class="btn-action-item" title="Open NUC 24/7 Telemetry &amp; Microservices Suite">
+              <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+              <span>NUC 24/7 Services Suite</span>
+              <span class="item-tag online">Active</span>
+            </a>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://stream.digitalresolve.ca', 'Watch Library &amp; StreamHub (stream.digitalresolve.ca)')" class="btn-action-item" title="Open Watch Library (stream.digitalresolve.ca)">
+              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+              <span>Watch Library (Stream 4K/HD)</span>
+              <span class="item-tag online">Live</span>
+            </a>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://jellyfin.digitalresolve.ca', 'Jellyfin Media Server (jellyfin.digitalresolve.ca)')" class="btn-action-item" title="Open Jellyfin Media Server">
+              <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 8px #a855f7;"></span>
+              <span>Jellyfin Media Server</span>
+              <span class="item-tag online">Port 8920</span>
+            </a>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://files.digitalresolve.ca/files/', 'Media &amp; File Vault (files.digitalresolve.ca)')" class="btn-action-item" title="Open File Vault (files.digitalresolve.ca)">
+              <span class="dropdown-dot dot-2"></span>
+              <span>Browse Media &amp; Files (NUC)</span>
+              <span class="item-tag">Vault</span>
+            </a>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://audiobooks.digitalresolve.ca', 'Audiobook Server (Audiobookshelf)')" class="btn-action-item" title="Open Audiobook Server (audiobooks.digitalresolve.ca)">
+              <span class="dropdown-dot" style="background-color: #fbbf24; box-shadow: 0 0 8px #fbbf24;"></span>
+              <span>Audiobook Server (Audiobookshelf)</span>
+              <span class="item-tag online">Port 3333</span>
+            </a>
+            <a href="javascript:void(0)" onclick="openTailscaleModal()" class="btn-action-item" title="Connect Tailscale Mesh VPN to access LAN services directly anywhere">
+              <span class="dropdown-dot" style="background-color: #06b6d4; box-shadow: 0 0 8px #06b6d4;"></span>
+              <span>⚡ Connect LAN Mesh (Tailscale)</span>
+              <span class="item-tag" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.3);">Mesh VPN</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="penny.html#camera-feed-card" class="btn-action-item" title="Penny's Cat Hub - Live Optical Stream &amp; Smart Feeder IoT">
+              <span class="dropdown-dot" style="background-color: #f472b6; box-shadow: 0 0 8px #f472b6;"></span>
+              <span>Penny's Cat Hub (Stream &amp; Feeder)</span>
+              <span class="item-tag online">Live &bull; 192.168.2.22</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents.digitalresolve.ca', 'qBittorrent Workstation (torrents.digitalresolve.ca)')" class="btn-action-item" title="Open Workstation qBittorrent">
+              <span class="dropdown-dot dot-1"></span>
+              <span>Torrents (Desktop qBit)</span>
+              <span class="item-tag" id="desktop-disk-tag">--</span>
+            </a>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents2.digitalresolve.ca', 'qBittorrent NUC (torrents2.digitalresolve.ca)')" class="btn-action-item" title="Open NUC qBittorrent">
+              <span class="dropdown-dot dot-2"></span>
+              <span>Torrents (NUC qBit)</span>
+              <span class="item-tag" id="nuc-disk-tag">--</span>
+            </a>
+            <a href="javascript:void(0)" onclick="openMagnetModal()" class="btn-action-item" title="Open Rapid Torrent &amp; Magnet Ingestion Console">
+              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+              <span>+ Quick-Drop Magnet Link</span>
+              <span class="item-tag">Inject</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://sonarr.digitalresolve.ca', 'Sonarr (TV Automation)')" class="btn-action-item" title="Open Sonarr TV Automation">
+              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+              <span>Sonarr (TV Automation)</span>
+              <span class="item-tag online">Port 8990</span>
+            </a>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://radarr.digitalresolve.ca', 'Radarr (Movie Automation)')" class="btn-action-item" title="Open Radarr Movie Automation">
+              <span class="dropdown-dot" style="background-color: #fb923c; box-shadow: 0 0 8px #fb923c;"></span>
+              <span>Radarr (Movie Automation)</span>
+              <span class="item-tag online">Port 7878</span>
+            </a>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://prowlarr.digitalresolve.ca', 'Prowlarr (Indexer Swarm)')" class="btn-action-item" title="Open Prowlarr Indexer Swarm">
+              <span class="dropdown-dot" style="background-color: #f87171; box-shadow: 0 0 8px #f87171;"></span>
+              <span>Prowlarr (Indexers)</span>
+              <span class="item-tag online">Port 9696</span>
+            </a>
+            <a href="javascript:void(0)" onclick="launchProtectedService('https://readarr.digitalresolve.ca', 'Readarr (Book Automation)')" class="btn-action-item" title="Open Readarr Book Automation">
+              <span class="dropdown-dot" style="background-color: #34d399; box-shadow: 0 0 8px #34d399;"></span>
+              <span>Readarr (Book Automation)</span>
+              <span class="item-tag online">Port 8787</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <div class="disk-widget" id="nuc-disk-widget">
+              <div class="disk-widget-header">
+                <span class="disk-label">NUC Storage (D:)</span>
+                <span class="disk-val" id="nuc-disk-val">--</span>
+              </div>
+              <div class="disk-bar-bg">
+                <div class="disk-bar-fill" id="nuc-disk-bar" style="width: 0%;"></div>
+              </div>
+              <div class="disk-subtext" id="nuc-disk-sub">Awaiting telemetry...</div>
+            </div>
+            <div class="disk-widget" id="desktop-disk-widget" style="margin-top: 10px;">
+              <div class="disk-widget-header">
+                <span class="disk-label">Desktop Storage (C: + D:)</span>
+                <span class="disk-val" id="desktop-disk-val">--</span>
+              </div>
+              <div class="disk-bar-bg">
+                <div class="disk-bar-fill" id="desktop-disk-bar" style="width: 0%; background: linear-gradient(90deg, #38bdf8, #10b981);"></div>
+              </div>
+              <div class="disk-subtext" id="desktop-disk-sub">Awaiting telemetry...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Consolidated Menu 2: Power & Fleet -->
+        <div class="dropdown">
+          <button type="button" class="btn-nav" id="wol-btn" aria-haspopup="true" title="Wake-on-LAN, Remote Power, and Hardware Topology">
+            <span>Power &amp; Fleet</span> <span class="dropdown-arrow">&#9662;</span>
+          </button>
+          <div class="dropdown-menu">
+            <button type="button" class="btn-action-item" onclick="sendWol('desktop')" title="Send Wake-on-LAN Magic Packet to Desktop">
+              <span class="dropdown-dot dot-1" id="badge-desktop"></span>
+              <span>Wake Desktop</span>
+              <span class="item-tag online" id="status-tag-desktop">Active</span>
+            </button>
+            <button type="button" class="btn-action-item btn-sleep" onclick="sendSleep('desktop')" title="Put Desktop PC into Sleep Standby">
+              <span class="dropdown-dot dot-sleep"></span>
+              <span>Sleep Desktop</span>
+              <span class="item-tag">Standby</span>
+            </button>
+            <button type="button" class="btn-action-item" onclick="sendWol('nuc')" title="Send Wake-on-LAN Magic Packet to NUC Server">
+              <span class="dropdown-dot dot-2" id="badge-nuc"></span>
+              <span>Wake NUC</span>
+              <span class="item-tag online" id="status-tag-nuc">24/7 Core</span>
+            </button>
+            <button type="button" class="btn-action-item" onclick="sendWol('both')" title="Broadcast Wake-on-LAN Magic Packets to Both Desktop and NUC">
+              <span class="dropdown-dot dot-1"></span>
+              <span>Wake Both</span>
+            </button>
+            <div class="dropdown-divider"></div>
+            <a href="fleet.html#fleet" class="btn-action-item" title="Jump to Cluster Hardware Topology &amp; Circuit Schematic">
+              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+              <span>Hardware Topology &amp; Schematic</span>
+              <span class="item-tag">Schematic</span>
+            </a>
+            <a href="uptime.html#uptime" class="btn-action-item" title="Jump to Cluster Availability &amp; 90-Day SLA History">
+              <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+              <span>90-Day SLA &amp; Uptime History</span>
+              <span class="item-tag online nav-sla-tag">--</span>
+            </a>
+            <button type="button" class="btn-action-item" onclick="openCloudflareStatsModal()" title="View Cloudflare Edge Traffic, Cache &amp; Security Statistics">
+              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+              <span>Cloudflare Site Statistics</span>
+              <span class="item-tag" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">Edge Analytics</span>
+            </button>
+            <div class="dropdown-divider"></div>
+            <button type="button" class="btn-action-item" onclick="checkStatus('nuc')" title="Query Live Status and Latency for NUC Server">
+              <span class="dropdown-dot dot-2"></span>
+              <span>Ping NUC Server</span>
+              <span class="item-tag online" id="latency-nuc">-- ms</span>
+            </button>
+            <button type="button" class="btn-action-item" onclick="checkStatus('desktop')" title="Query Live Status and Latency for Desktop">
+              <span class="dropdown-dot dot-1"></span>
+              <span>Ping Desktop Node</span>
+              <span class="item-tag online" id="latency-desktop">-- ms</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Consolidated Menu 3: Ops, AI & Resilience -->
+        <div class="dropdown">
+          <button type="button" class="btn-nav" id="ops-menu-btn" aria-haspopup="true" title="Antigravity Autonomous Agent, Disaster Resilience Test, and AI Telemetry">
+            <span>Ops &amp; Tools</span> <span class="dropdown-arrow">&#9662;</span>
+          </button>
+          <div class="dropdown-menu">
+            <button type="button" class="btn-action-item agy-session-link-btn" onclick="openEmbeddedConsole()" title="Open Live Interactive Terminal for Active AGY Session">
+              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+              <span>Open AGY Terminal (Auto-Detect)</span>
+              <span class="item-tag online">Live</span>
+            </button>
+            <a href="ops.html#ops-ai" class="btn-action-item" title="Jump to In-Page Compute, AI &amp; Terminal Operations Console">
+              <span class="dropdown-dot dot-1"></span>
+              <span>In-Page Terminal &amp; Ollama</span>
+              <span class="item-tag">Ops Hub</span>
+            </a>
+            <button type="button" class="btn-action-item" onclick="openEmbeddedConsole(true)" title="Open Fullscreen Antigravity Command &amp; Telemetry Console">
+              <span class="dropdown-dot dot-1"></span>
+              <span>Fullscreen AGY Console</span>
+              <span class="item-tag online">Active</span>
+            </button>
+            <div class="dropdown-divider"></div>
+            <button type="button" class="btn-action-item" onclick="openDisasterModal()" title="Launch Disaster Recovery Test Workbench">
+              <span class="dropdown-dot" style="background-color: #f59e0b; box-shadow: 0 0 8px #f59e0b;"></span>
+              <span>Disaster Test &amp; Chaos Lab</span>
+              <span class="item-tag">Chaos Lab</span>
+            </button>
+            <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
+              <span class="dropdown-dot dot-2"></span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.73</span>)</span>
+            </button>
+            <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO(true, event)" title="Sign out and refresh deck behind Microsoft 365 SSO">
+              <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
+              <span>Sign Out (M365)</span>
+              <span class="item-tag">Sign Out</span>
+            </button>
+            <div class="dropdown-divider"></div>
+            <!-- Embedded AI Token Widget -->
+            <div style="padding: 8px 14px 6px; font-size: 0.78rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span style="color: #94a3b8; font-weight: 600;">Antigravity Quota:</span>
+                <span id="menu-token-val" class="mono" style="font-weight: 700; color: #38bdf8;">--% Weekly</span>
+              </div>
+              <!-- Weekly Limit Progress Bar -->
+              <div style="font-size: 0.7rem; color: #cbd5e1; margin-bottom: 2px; display: flex; justify-content: space-between;">
+                <span>Gemini Weekly Limit</span>
+                <span style="color: #34d399; font-weight: 700;" id="menu-pct-flash">--% Remaining</span>
+              </div>
+              <div class="model-progress-bar" id="menu-progress-bar" title="Gemini Weekly Limit">
+                <div class="model-segment flash" id="menu-bar-flash" style="width: 0%; background: #38bdf8;"></div>
+                <div class="model-segment pro" id="menu-bar-pro" style="width: 0%; display: block; background: rgba(255,255,255,0.15);"></div>
+              </div>
+              <!-- 5-Hour Limit Progress Bar -->
+              <div style="font-size: 0.7rem; color: #cbd5e1; margin-top: 6px; margin-bottom: 2px; display: flex; justify-content: space-between;">
+                <span>5-Hour Rolling Limit</span>
+                <span style="color: #f59e0b; font-weight: 700;" id="menu-pct-5h">--% (--)</span>
+              </div>
+              <div class="model-progress-bar" id="menu-progress-bar-5h" title="5-Hour Rolling Limit">
+                <div class="model-segment" id="menu-bar-5h" style="width: 0%; background: #f59e0b;"></div>
+              </div>
+              <div style="margin-top: 6px; font-size: 0.68rem; color: #64748b; display: flex; justify-content: space-between;">
+                <span>Account: <span id="menu-account-user" style="color: #cbd5e1;">--</span></span>
+                <span>Claude/GPT: <span id="menu-claude-pct" style="color: #34d399; font-weight: 700;">--</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </nav>
+
+      <!-- Top Right Actions: Dedicated SSO Login / Logout Controls & Layout Toggle -->
+      <div class="nav-mobile-actions">
+        <!-- Top Dedicated SSO Controls -->
+        <div id="top-sso-container" class="top-sso-container">
+          <!-- Logged Out: SSO Login Button -->
+          <button type="button" class="btn-sso-login" id="top-sso-login-btn" onclick="unlockSSO('m365')" title="Sign in with Microsoft 365 Entra ID SSO">
+            <span class="dropdown-dot" style="background-color: #f59e0b; box-shadow: 0 0 8px #f59e0b;"></span>
+            <span>Sign In with M365</span>
+          </button>
+
+          <!-- Logged In: User Profile Badge & Dedicated Logout Button -->
+          <div id="top-sso-authed-group" class="top-sso-authed-group" style="display: none;">
+            <div class="top-sso-user-pill" title="Authenticated via Microsoft 365 Entra ID">
+              <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 6px #10b981;"></span>
+              <span id="top-sso-user-name">Cory Townsend</span>
+            </div>
+            <button type="button" class="btn-sso-logout" id="top-sso-logout-btn" onclick="lockSSO(true, event)" title="Sign out of Microsoft 365 Admin Session">
+              <span>Sign Out (M365)</span>
+            </button>
+          </div>
+        </div>
+
+                <button type="button" class="btn-nav poll-data-btn" id="btn-poll-real-data" onclick="pollRealData(this)" title="Poll real live telemetry from NUC &amp; Desktop cluster" aria-label="Poll Real Telemetry">
+          <span id="poll-data-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px;"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg></span>
+          <span class="poll-data-text" id="poll-data-text">Update</span>
+        </button>
+        <button type="button" class="btn-nav layout-toggle-btn" id="layout-toggle-nav" onclick="toggleLayoutMode()" title="Switch layout mode (Mobile / Desktop)" aria-label="Toggle Layout Mode">
+          <span class="layout-toggle-icon" id="layout-toggle-nav-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px;"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg></span>
+          <span class="layout-toggle-text" id="layout-toggle-nav-text">Mobile View</span>
+        </button>
+        <button type="button" class="btn-nav nav-menu-toggle" id="nav-menu-toggle" onclick="toggleMobileNav()" aria-label="Toggle navigation menu" aria-expanded="false">
+          <span id="nav-toggle-icon">&#9776;</span>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main id="main-content" class="storage-main">
+    <div class="storage-container">
+      <!-- Hero Banner -->
+      <section class="storage-hero" aria-label="Tiered Storage Overview">
+        <div>
+          <div class="storage-hero-eyebrow">TIERED STORAGE &amp; LIVE DATA FLOW</div>
+          <h1 class="storage-hero-title">Cluster Storage Architecture &amp; Automation Pipelines</h1>
+          <p class="storage-hero-sub">Real-time data tiering across Workstation Ingest, Intel NUC 24/7 Hot Media, QNAP TS-639 Cold Archive &amp; Dual iSCSI LUNs, and OneDrive Offsite Cloud Vault.</p>
+        </div>
+        <div class="storage-hero-badges">
+          <span class="storage-status-pill" id="storage-route-pill">
+            <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+            <span id="storage-route-text">Live Cluster Telemetry</span>
+          </span>
+          <span class="storage-status-pill" id="storage-updated-pill">
+            <span id="storage-updated-text">Synced: Ready</span>
+          </span>
+        </div>
+      </section>
+
+      <!-- M365 SSO Banner (shown only if unauthenticated on WAN) -->
+      <div class="storage-sso-banner" id="storage-sso-banner" role="status">
+        <div>
+          <strong>M365 SSO Required for Live Storage Telemetry &amp; Manual Triggers:</strong> Sign in with Microsoft 365 Entra ID to stream live NUC &amp; QNAP metrics.
+        </div>
+        <button type="button" class="btn-sso-login" onclick="unlockSSO('m365')">
+          <span class="dropdown-dot" style="background-color: #f59e0b; box-shadow: 0 0 8px #f59e0b;"></span>
+          <span>Sign In with M365</span>
+        </button>
+      </div>
+
+      <!-- Summary KPI Strip (5 Glass Cards) -->
+      <section class="storage-kpi-strip" aria-label="Storage Cluster KPIs">
+        <div class="storage-kpi-card">
+          <div class="storage-kpi-label">Total Cluster Capacity</div>
+          <div class="storage-kpi-value" id="kpi-total-capacity">15.1 TB+</div>
+          <div class="storage-kpi-sub" id="kpi-total-capacity-sub">Desktop + NUC + QNAP SMB &amp; Dual iSCSI + OneDrive</div>
+        </div>
+        <div class="storage-kpi-card">
+          <div class="storage-kpi-label">QNAP TS-639 Link &amp; Latency</div>
+          <div class="storage-kpi-value" id="kpi-qnap-link">SMB + iSCSI</div>
+          <div class="storage-kpi-sub" id="kpi-qnap-sub">192.168.2.125 &bull; SMB :445 + iSCSI :3260</div>
+        </div>
+        <div class="storage-kpi-card">
+          <div class="storage-kpi-label">Live / Last Flowrate</div>
+          <div class="storage-kpi-value" id="kpi-flowrate">0.0 MB/s</div>
+          <div class="storage-kpi-sub" id="kpi-flowrate-sub">Latest verified pipeline throughput</div>
+        </div>
+        <div class="storage-kpi-card">
+          <div class="storage-kpi-label">Last Sync / Offload</div>
+          <div class="storage-kpi-value" id="kpi-last-sync">Scheduled</div>
+          <div class="storage-kpi-sub" id="kpi-last-sync-sub">Most recent completed offload run</div>
+        </div>
+        <div class="storage-kpi-card">
+          <div class="storage-kpi-label">Tracked Data Moved</div>
+          <div class="storage-kpi-value" id="kpi-data-moved">0.0 GB</div>
+          <div class="storage-kpi-sub" id="kpi-data-moved-sub">Cumulative verified pipeline payload</div>
+        </div>
+      </section>
+
+      <!-- Toolbar -->
+      <section class="storage-toolbar" aria-label="Flow Filters and Controls">
+        <div class="storage-filter-pills" id="storage-filter-pills" role="tablist" aria-label="Pipeline Categories">
+          <button type="button" class="storage-filter-pill active" data-filter="all" role="tab" aria-selected="true">All Flows</button>
+          <button type="button" class="storage-filter-pill" data-filter="media" role="tab" aria-selected="false">Media Tiering</button>
+          <button type="button" class="storage-filter-pill" data-filter="backup" role="tab" aria-selected="false">Backups &amp; DR</button>
+          <button type="button" class="storage-filter-pill" data-filter="guardrail" role="tab" aria-selected="false">Guardrails</button>
+        </div>
+        <div class="storage-toolbar-actions">
+          <button type="button" class="btn btn-secondary" id="btn-toggle-flow-anim" style="padding: 7px 14px; font-size: 0.8rem;">Pause Flow Animation</button>
+          <button type="button" class="btn btn-primary" id="btn-refresh-storage-flow" style="padding: 7px 14px; font-size: 0.8rem;">Refresh Telemetry</button>
+        </div>
+      </section>
+
+      <!-- Interactive 4-Tier Animated SVG Flowchart -->
+      <section class="storage-flow-panel" id="storage-flow-panel" aria-label="4-Tier Storage Topology Flowchart">
+        <div class="storage-panel-header">
+          <div>
+            <h2 class="storage-panel-title">Interactive 4-Tier Data Flow Schematic</h2>
+            <div class="storage-panel-sub">Click any storage tier node or animated flow pipe to inspect script paths, schedules, throughput, and trigger runs.</div>
+          </div>
+          <span class="storage-node-tag info" id="flow-active-count">8 Active Pipelines</span>
+        </div>
+
+        <div class="storage-flow-stage" id="storage-flow-stage">
+          <svg id="storage-flow-svg" class="storage-flow-svg" aria-hidden="true"></svg>
+
+          <div class="storage-flow-grid">
+            <!-- Tier 0: Workstation & Ingest -->
+            <div class="storage-tier-col" data-tier="0">
+              <div class="storage-tier-header">
+                <span class="storage-tier-badge tier-0">TIER 0</span>
+                <span class="storage-tier-title">Workstation &amp; Ingest</span>
+              </div>
+
+              <button type="button" class="storage-node-card is-selected" data-node-id="desktop-drives" data-category="backup">
+                <div class="storage-node-top">
+                  <span class="storage-node-name">Desktop C: / D: / F:</span>
+                  <span class="storage-node-tag ok" id="node-tag-desktop-drives">Online</span>
+                </div>
+                <div class="storage-node-meta" id="node-meta-desktop-drives">NVMe + HDD Array &bull; 192.168.2.62</div>
+                <div class="storage-node-desc" id="node-desc-desktop-drives">Primary workstation ingest, NVMe thermals &amp; bare-metal snapshot source.</div>
+              </button>
+
+              <button type="button" class="storage-node-card" data-node-id="desktop-qbit" data-category="media">
+                <div class="storage-node-top">
+                  <span class="storage-node-name">qBittorrent :8080</span>
+                  <span class="storage-node-tag info" id="node-tag-desktop-qbit">Ingest</span>
+                </div>
+                <div class="storage-node-meta" id="node-meta-desktop-qbit">Desktop Port 8080 &bull; Active Swarm</div>
+                <div class="storage-node-desc">High-speed desktop torrent ingest staging before archive extraction.</div>
+              </button>
+
+              <button type="button" class="storage-node-card" data-node-id="postprocess-7z" data-category="media">
+                <div class="storage-node-top">
+                  <span class="storage-node-name">PostProcess 7z</span>
+                  <span class="storage-node-tag ok" id="node-tag-postprocess-7z">Ready</span>
+                </div>
+                <div class="storage-node-meta" id="node-meta-postprocess-7z">7-Zip Archive Extractor</div>
+                <div class="storage-node-desc">Unpacks completed release archives for Sonarr, Radarr, and Readarr import.</div>
+              </button>
+
+              <button type="button" class="storage-node-card" data-node-id="audible-sync" data-category="media">
+                <div class="storage-node-top">
+                  <span class="storage-node-name">Audible Sync</span>
+                  <span class="storage-node-tag ok" id="node-tag-audible-sync">Scheduled</span>
+                </div>
+                <div class="storage-node-meta" id="node-meta-audible-sync">Audiobookshelf Pipeline</div>
+                <div class="storage-node-desc">Converts &amp; syncs Audible library titles into NUC Audiobookshelf vault.</div>
+              </button>
+            </div>
+
+            <!-- Tier 1: Intel NUC 24/7 Hot Media -->
+            <div class="storage-tier-col" data-tier="1">
+              <div class="storage-tier-header">
+                <span class="storage-tier-badge tier-1">TIER 1</span>
+                <span class="storage-tier-title">Intel NUC 24/7 Hot Media</span>
+              </div>
+
+              <button type="button" class="storage-node-card" data-node-id="nuc-c" data-category="backup">
+                <div class="storage-node-top">
+                  <span class="storage-node-name">NUC C: NVMe OS</span>
+                  <span class="storage-node-tag ok" id="node-tag-nuc-c">Online</span>
+                </div>
+                <div class="storage-node-meta" id="node-meta-nuc-c">192.168.2.35 &bull; Gateway &amp; Services</div>
+                <div class="storage-node-desc" id="node-desc-nuc-c">24/7 homelab gateway, go2rtc, Jellyfin, Arr stack &amp; Antigravity configs.</div>
+              </button>
+
+              <button type="button" class="storage-node-card" data-node-id="nuc-d" data-category="media,guardrail">
+                <div class="storage-node-top">
+                  <span class="storage-node-name">NUC D: 1.86 TB FireCuda SSHD</span>
+                  <span class="storage-node-tag ok" id="node-tag-nuc-d">970 GB Free</span>
+                </div>
+                <div class="storage-node-meta" id="node-meta-nuc-d">Hot Media Buffer &bull; 30% Offload Guardrail</div>
+                <div class="storage-threshold-track" title="30% Free Space Offload Threshold (70% Used)">
+                  <div class="storage-threshold-fill" id="nuc-d-threshold-fill" style="width: 48%;"></div>
+                  <div class="storage-threshold-marker" title="30% Free Offload Threshold"></div>
+                </div>
+                <div class="storage-threshold-label">
+                  <span id="nuc-d-used-lbl">48% Used</span>
+                  <span style="color: #fbbf24;">30% Free Threshold</span>
+                </div>
+                <div class="storage-node-desc">Hot seeding &amp; streaming buffer; auto-tiers to QNAP SMB below 30% free.</div>
+              </button>
+
+              <button type="button" class="storage-node-card" data-node-id="nuc-qbit" data-category="media,guardrail">
+                <div class="storage-node-top">
+                  <span class="storage-node-name">qBittorrent :8081</span>
+                  <span class="storage-node-tag info" id="node-tag-nuc-qbit">24/7 Seed</span>
+                </div>
+                <div class="storage-node-meta" id="node-meta-nuc-qbit">NUC Port 8081 &bull; Automated Arr</div>
+                <div class="storage-node-desc">24/7 seeding &amp; hot media queue monitored by space guardrails.</div>
+              </button>
+            </div>
+
+            <!-- Tier 2: QNAP TS-639 NAS -->
+            <div class="storage-tier-col" data-tier="2">
+              <div class="storage-tier-header">
+                <span class="storage-tier-badge tier-2">TIER 2</span>
+                <span class="storage-tier-title">QNAP TS-639 NAS (192.168.2.125)</span>
+              </div>
+
+              <button type="button" class="storage-node-card" data-node-id="qnap-smb" data-category="media">
+                <div class="storage-node-top">
+                  <span class="storage-node-name">SMB Cold Archive</span>
+                  <span class="storage-node-tag ok" id="node-tag-qnap-smb">9.16 TB</span>
+                </div>
+                <div class="storage-node-meta" id="node-meta-qnap-smb">\\192.168.2.125\Torrents / Q: &bull; 9.16 TB</div>
+                <div class="storage-node-desc">Primary cold media archive receiving automated NUC D: tiering offloads.</div>
+              </button>
+
+              <button type="button" class="storage-node-card" data-node-id="qnap-iscsi-nuc" data-category="backup">
+                <div class="storage-node-top">
+                  <span class="storage-node-name">NUC iSCSI LUN (E:)</span>
+                  <span class="storage-node-tag ok" id="node-tag-qnap-iscsi-nuc">2.05 TB</span>
+                </div>
+                <div class="storage-node-meta" id="node-meta-qnap-iscsi-nuc">E: &bull; 2.05 TB &bull; Homelab Resilience &amp; WindowsImageBackup</div>
+                <div class="storage-node-desc">Dedicated iSCSI block target for NUC bare-metal images &amp; state snapshots.</div>
+              </button>
+
+              <button type="button" class="storage-node-card" data-node-id="qnap-iscsi-desktop" data-category="backup">
+                <div class="storage-node-top">
+                  <span class="storage-node-name">Desktop iSCSI LUN (E:)</span>
+                  <span class="storage-node-tag ok" id="node-tag-qnap-iscsi-desktop">2.05 TB</span>
+                </div>
+                <div class="storage-node-meta" id="node-meta-qnap-iscsi-desktop">E: &bull; 2.05 TB &bull; Mirrored Snapshots &amp; Bare-Metal</div>
+                <div class="storage-node-desc">Dedicated iSCSI block target for Desktop mirrored snapshots &amp; bare-metal DR.</div>
+              </button>
+            </div>
+
+            <!-- Tier 3: Offsite Cloud Vault -->
+            <div class="storage-tier-col" data-tier="3">
+              <div class="storage-tier-header">
+                <span class="storage-tier-badge tier-3">TIER 3</span>
+                <span class="storage-tier-title">Offsite Cloud Vault</span>
+              </div>
+
+              <button type="button" class="storage-node-card" data-node-id="onedrive-vault" data-category="backup">
+                <div class="storage-node-top">
+                  <span class="storage-node-name">OneDrive Cloud Vault</span>
+                  <span class="storage-node-tag info" id="node-tag-onedrive-vault">Synced</span>
+                </div>
+                <div class="storage-node-meta" id="node-meta-onedrive-vault">OneDrive - digitalresolve.ca\Antigravity-Backups</div>
+                <div class="storage-node-desc">Offsite encrypted cloud mirror for critical homelab scripts, configs, and website backups.</div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Graphics Row (2 Cards) -->
+      <section class="storage-graphics-row" aria-label="Throughput Waveform and Tier Capacity">
+        <div class="storage-card">
+          <div class="storage-panel-header" style="margin-bottom: 6px;">
+            <div>
+              <h2 class="storage-panel-title">Tier Throughput &amp; Disk Flowrate Waveform</h2>
+              <div class="storage-panel-sub">Real-time MB/s multi-series trace across NUC, Desktop, and QNAP I/O</div>
+            </div>
+            <span class="storage-node-tag ok" id="waveform-active-badge">Idle / Ready</span>
+          </div>
+          <div class="storage-waveform-wrap">
+            <canvas id="storage-waveform-canvas"></canvas>
+          </div>
+          <div class="storage-waveform-legend">
+            <span><span style="color:#38bdf8;">&#9632;</span> NUC Tiering I/O (MB/s)</span>
+            <span><span style="color:#a855f7;">&#9632;</span> QNAP SMB / iSCSI (MB/s)</span>
+            <span><span style="color:#10b981;">&#9632;</span> Desktop Snapshot / Cloud (MB/s)</span>
+          </div>
+        </div>
+
+        <div class="storage-card">
+          <div class="storage-panel-header" style="margin-bottom: 6px;">
+            <div>
+              <h2 class="storage-panel-title">Tier Capacity Distribution &amp; Cold-Tier Headroom</h2>
+              <div class="storage-panel-sub">Used vs. free allocation with NUC D: 30% offload threshold marker</div>
+            </div>
+            <span class="storage-node-tag info" id="capacity-summary-badge">4 Tiers</span>
+          </div>
+          <div class="storage-capacity-stacked" id="storage-capacity-stacked"></div>
+          <div class="storage-capacity-bars" id="storage-capacity-bars"></div>
+        </div>
+      </section>
+
+      <!-- Clickable Node & Pipe Inspector Panel -->
+      <section class="storage-inspector-card" id="storage-inspector-card" aria-label="Pipeline and Node Inspector">
+        <div class="storage-panel-header">
+          <div>
+            <div class="storage-hero-eyebrow" style="margin-bottom: 2px;">SELECTED NODE / PIPELINE INSPECTOR</div>
+            <h2 class="storage-panel-title" id="insp-title">Tier-ColdStorage Offload Pipeline</h2>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <span class="storage-node-tag ok" id="insp-health-badge">Healthy</span>
+            <button type="button" class="btn btn-primary" id="insp-trigger-btn" style="padding: 7px 14px; font-size: 0.8rem;">Run Pipeline Now (M365 SSO)</button>
+          </div>
+        </div>
+        <p class="storage-script-desc" id="insp-desc" style="margin: 0;">Select any node or animated flow pipe above to inspect its exact script path, schedule, and transfer metrics.</p>
+        <div class="storage-inspector-grid">
+          <div class="storage-inspector-item">
+            <div class="storage-inspector-key">Script / Component</div>
+            <div class="storage-inspector-val" id="insp-script-name">Tier-ColdStorage</div>
+          </div>
+          <div class="storage-inspector-item">
+            <div class="storage-inspector-key">Exact Script Path</div>
+            <div class="storage-inspector-val" id="insp-script-path">C:\ProgramData\DigitalResolve\Tier-ColdStorage.ps1</div>
+          </div>
+          <div class="storage-inspector-item">
+            <div class="storage-inspector-key">Source &rarr; Destination</div>
+            <div class="storage-inspector-val" id="insp-route">NUC D:\ &rarr; \\192.168.2.125\Torrents</div>
+          </div>
+          <div class="storage-inspector-item">
+            <div class="storage-inspector-key">Schedule &amp; Next Run</div>
+            <div class="storage-inspector-val" id="insp-schedule">Automated Threshold / Scheduled</div>
+          </div>
+          <div class="storage-inspector-item">
+            <div class="storage-inspector-key">Last Synced / Copied</div>
+            <div class="storage-inspector-val" id="insp-last-sync">Verified Ready</div>
+          </div>
+          <div class="storage-inspector-item">
+            <div class="storage-inspector-key">Data Copied / Files</div>
+            <div class="storage-inspector-val" id="insp-bytes">0.0 GB (0 files)</div>
+          </div>
+          <div class="storage-inspector-item">
+            <div class="storage-inspector-key">Duration &amp; Avg Flowrate</div>
+            <div class="storage-inspector-val" id="insp-rate">0.0 MB/s</div>
+          </div>
+          <div class="storage-inspector-item">
+            <div class="storage-inspector-key">Task Exit / Health</div>
+            <div class="storage-inspector-val" id="insp-exit">Exit 0 (Healthy)</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Script Pipeline Matrix Grid -->
+      <section aria-label="Storage Script Pipeline Matrix" style="margin-bottom: 24px;">
+        <div class="storage-panel-header">
+          <div>
+            <h2 class="storage-panel-title">Automation Script Pipeline Matrix</h2>
+            <div class="storage-panel-sub">Filterable live inventory of tiering, backup, iSCSI snapshot, and guardrail scripts</div>
+          </div>
+        </div>
+        <div class="storage-matrix-grid" id="storage-matrix-grid"></div>
+      </section>
+
+      <!-- Recent Transfer Activity Table -->
+      <section class="storage-card" aria-label="Recent Transfer Activity">
+        <div class="storage-panel-header" style="margin-bottom: 4px;">
+          <div>
+            <h2 class="storage-panel-title">Recent Transfer &amp; Sync Activity</h2>
+            <div class="storage-panel-sub">Latest timestamped log events parsed from NUC &amp; Desktop storage automation logs</div>
+          </div>
+        </div>
+        <div class="storage-activity-table-wrap">
+          <table class="storage-activity-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Pipeline / Script</th>
+                <th>Route</th>
+                <th>Data Moved</th>
+                <th>Avg Rate</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="storage-activity-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+  <footer class="footer">
+    <div class="container footer-container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+      <p>&copy; 2026 Digital Resolve &bull; Homelab Operations Deck &bull; Cory Townsend</p>
+      <div class="footer-meta" style="display: flex; align-items: center; flex-wrap: wrap; gap: 14px;">
+        <button type="button" class="version-badge-btn layout-toggle-btn" id="layout-toggle-footer" onclick="toggleLayoutMode()" title="Switch layout mode (Mobile / Desktop)" aria-label="Toggle Layout Mode">
+          <span class="layout-toggle-icon" id="layout-toggle-footer-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px;"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg></span>
+          <span class="layout-toggle-text" id="layout-toggle-footer-text">Mobile View</span>
+        </button>
+        <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
+          <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.73</span>
+          <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
+        </button>
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 34,053 Lines of Code (HTML: 18,718 lines | CSS: 7,267 lines | JS: 8,067 lines | CNAME)">
+          <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">34,053</span>
+          <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
+        </div>
+        <div class="footer-links">
+          <a href="#top" onclick="scrollToTop(event)" role="button" aria-label="Back to top">Back to top &uarr;</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating Back to Top Button -->
+  <button type="button" id="btn-floating-top" class="btn-floating-top" onclick="scrollToTop(event)" title="Back to top" aria-label="Back to top">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 15l-6-6-6 6"/>
+    </svg>
+  </button>
+
+  <!-- Notification Toast -->
+  <div id="wol-toast" class="wol-toast" role="alert" aria-live="polite">
+    <span class="toast-dot" id="toast-dot"></span>
+    <div class="toast-content">
+      <span id="toast-message" class="toast-title">Notification</span>
+      <span id="toast-subtext" class="toast-subtext"></span>
+    </div>
+  </div>
+  <div id="magnet-modal-overlay" class="magnet-modal-overlay" style="display: none;" onclick="closeMagnetModalOnBackdrop(event)">
+    <div class="magnet-modal" role="dialog" aria-modal="true" aria-label="Remote torrent magnet drop">
+      <div class="magnet-header">
+        <div class="magnet-title">[+] Remote Torrent / Magnet Drop</div>
+        <button type="button" class="magnet-close" onclick="closeMagnetModal()" title="Close Remote Magnet Modal" aria-label="Close magnet dialog">&times;</button>
+      </div>
+      <div id="magnet-modal-unlocked">
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.5;">
+          Inject any torrent or magnet link into your home server. Traffic is downloaded through Mullvad WireGuard VPN and auto-unpacked.
+        </p>
+        <textarea id="magnet-input" class="magnet-input" aria-label="Magnet link or torrent URL" placeholder="Paste magnet:?xt=... or .torrent HTTP URL here"></textarea>
+        <div class="magnet-targets">
+          <label class="magnet-target-label">
+            <input type="radio" name="magnet-target" value="nuc" checked>
+            <span>NUC Home Server (24/7 &bull; D:\Torrents)</span>
+          </label>
+          <label class="magnet-target-label">
+            <input type="radio" name="magnet-target" value="desktop">
+            <span>Desktop Workstation</span>
+          </label>
+        </div>
+        <button type="button" class="magnet-submit-btn" id="magnet-submit-btn" onclick="submitMagnet()" title="Inject Torrent Magnet into qBittorrent via Mullvad VPN">Start Remote Download</button>
+      </div>
+      <!-- Locked SSO Gate Overlay for Magnet Modal -->
+      <div id="magnet-modal-sso-gate" style="display: none; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 24px 16px; text-align: center;">
+        <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.6rem;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        </div>
+        <div style="font-weight: 700; color: #f8fafc; font-size: 1.05rem;">Microsoft 365 Entra ID SSO Required</div>
+        <p style="font-size: 0.85rem; color: #94a3b8; max-width: 380px; margin: 0 auto; line-height: 1.4;">
+          Direct torrent and magnet ingestion to local storage drives requires authenticated administrator access.
+        </p>
+        <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" style="padding: 10px 22px; font-size: 0.92rem;">
+          Sign In with M365
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Embedded Antigravity (AGY) Interactive Terminal Console Modal -->
+  <div id="agy-console-modal-overlay" class="agy-modal-overlay" style="display: none;" onclick="closeAgyConsoleOnBackdrop(event)">
+    <div class="agy-console-window" id="agy-console-window" role="dialog" aria-modal="true" aria-label="Antigravity live terminal">
+      <div class="agy-console-header">
+        <div class="agy-window-controls">
+          <button type="button" class="win-dot dot-close" onclick="closeAgyConsole()" title="Close" aria-label="Close terminal console"></button>
+          <button type="button" class="win-dot dot-min" onclick="closeAgyConsole()" title="Minimize" aria-label="Minimize terminal console"></button>
+          <button type="button" class="win-dot dot-max" onclick="maximizeAgyConsole()" title="Fullscreen" aria-label="Toggle fullscreen terminal console"></button>
+        </div>
+        <div class="agy-console-title">
+          <span class="pulse-dot" id="agy-modal-pulse-dot"></span>
+          <span id="agy-modal-title-text">Antigravity (AGY) Live Terminal</span>
+        </div>
+        <div class="agy-console-header-actions">
+          <span class="item-tag online" id="agy-console-status">ONLINE (Desktop :8082)</span>
+          <button type="button" class="btn-console-act" onclick="resumeAgySessionOnDesktop()" style="color: #34d399; border-color: rgba(52, 211, 153, 0.4);" title="Resume Session webdev in Windows Terminal on Desktop">Resume on Desktop &nearr;</button>
+          <button type="button" class="btn-console-act" onclick="startNewAgySession('desktop')" style="color: #60a5fa; border-color: rgba(59, 130, 246, 0.4);" title="Start New AGY Session on Desktop: agy --dangerously-skip-permissions">+ New: Desktop</button>
+          <button type="button" class="btn-console-act" onclick="startNewAgySession('nuc')" style="color: #c084fc; border-color: rgba(192, 132, 252, 0.4);" title="Start New AGY Session on NUC: agy --dangerously-skip-permissions">+ New: NUC</button>
+          <button type="button" class="btn-console-act" onclick="toggleConsoleAutoPoll()" id="btn-console-poll" title="Toggle 2s Live Auto-Polling">Auto-Stream: ON</button>
+          <button type="button" class="btn-console-act" onclick="refreshAgyConsole()" title="Refresh Now" aria-label="Refresh terminal stream">&#x21bb;</button>
+          <button type="button" class="btn-console-act" onclick="closeAgyConsole()" title="Close Fullscreen Terminal Console" aria-label="Close terminal console">&times;</button>
+        </div>
+      </div>
+
+      <!-- Quick Session Bar -->
+      <div class="agy-session-meta-bar" id="agy-session-meta-bar" style="display: none;">
+        <div class="meta-item"><span class="meta-lbl">Session:</span> <span class="meta-val"><strong style="color: #60a5fa;" id="agy-meta-name">Detecting...</strong></span></div>
+        <div class="meta-item"><span class="meta-lbl">Session ID:</span> <span id="agy-meta-cid" class="meta-val mono">--</span></div>
+        <div class="meta-item"><span class="meta-lbl">Session Tokens:</span> <span class="meta-val mono" id="modal-token-count">-- (Syncing...)</span></div>
+        <div class="meta-item"><span class="meta-lbl">Model Tier:</span> <span class="meta-val" id="modal-model-val" style="color: #34d399;">Detecting model...</span></div>
+        <div class="meta-item"><span class="meta-lbl">Model Breakdown:</span> <span class="meta-val" id="modal-model-breakdown">Calculating breakdown...</span></div>
+        <div class="meta-item"><span class="meta-lbl">Cost Efficiency:</span> <span class="meta-val" id="modal-savings-val" style="color: #34d399;">Calculating savings...</span></div>
+        <div class="meta-item"><span class="meta-lbl">Node:</span> <span class="meta-val" id="agy-meta-node">Auto-Detect (NUC / Desktop)</span></div>
+        <div class="meta-item"><span class="meta-lbl">Auth Gateway:</span> <span class="meta-val">wake.digitalresolve.ca (M365 Entra ID SSO)</span></div>
+        <div class="meta-actions">
+          <button type="button" class="meta-link-btn" onclick="refreshAgyConsole()" title="Force Refresh Stream">Refresh Stream &#x21bb;</button>
+          <button type="button" class="meta-link-btn" onclick="launchAgySession('app')" title="Launch in Local AGY App">Open in App &nearr;</button>
+          <button type="button" class="meta-link-btn" onclick="launchAgySession('copy')" title="Copy ID">Copy CID</button>
+        </div>
+      </div>
+
+      <!-- Modal SSO Gate (Shown until unlocked) -->
+      <div class="modal-sso-gate" id="modal-sso-gate" style="display: flex;">
+        <div style="max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 16px;">
+          <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 24px rgba(59, 130, 246, 0.25);">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          </div>
+          <div class="sso-badge-row">
+            <span class="sso-badge-tag">Zero Trust Edge Protected</span>
+            <span class="sso-badge-tag green">Entra ID MFA</span>
+          </div>
+          <h2 class="sr-only">Operations Console</h2>
+          <h3 style="font-size: 1.25rem; font-weight: 700; color: #f8fafc; margin: 0;">Live Interactive Terminal</h3>
+          <p style="font-size: 0.88rem; color: #94a3b8; line-height: 1.5; margin: 0;">
+            Authentication required before viewing real-time terminal interactions or dispatching commands to the active Antigravity session.
+          </p>
+          
+          <!-- One-Click Microsoft 365 Entra ID SSO Unlock Button -->
+          <div style="display: flex; gap: 10px; width: 100%; max-width: 440px; margin-top: 6px;">
+            <button type="button" class="btn btn-primary" onclick="unlockSSO('m365')" title="Authenticate with Microsoft 365 Entra ID SSO" style="flex: 1; padding: 12px 18px; font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 0 18px rgba(59, 130, 246, 0.4); cursor: pointer;">
+              <svg width="18" height="18" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;" aria-hidden="true" focusable="false"><path d="M0 0h9.9v9.9H0z" fill="#f25022"/><path d="M11.1 0H21v9.9h-9.9z" fill="#7fba00"/><path d="M0 11.1h9.9V21H0z" fill="#00a4ef"/><path d="M11.1 11.1H21V21h-9.9z" fill="#ffb900"/></svg>
+              <span>Sign In with M365</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Terminal Stream Output Screen -->
+      <div class="agy-console-screen" id="agy-console-screen" style="display: none;">
+        <div class="agy-line system">[SYSTEM] Establishing encrypted tunnel to active AGY host (Port 8082 via M365 SSO)...</div>
+        <div class="agy-line system" id="agy-conn-line">[SYSTEM] Detecting active AGY conversation stream across NUC &amp; Desktop...</div>
+      </div>
+
+      <!-- Command Quick Chips -->
+      <div class="agy-quick-chips" id="agy-quick-chips" style="display: none;">
+        <button type="button" class="quick-chip" onclick="triggerQuickChip(this, 'Check cluster health and uptime stats')" title="Query Cluster Health &amp; Uptime Stats">Cluster Health</button>
+        <button type="button" class="quick-chip" onclick="triggerQuickChip(this, 'Run deep codebase audit')" title="Execute Deep Codebase Security &amp; Health Audit">Code Audit</button>
+        <button type="button" class="quick-chip" onclick="triggerQuickChip(this, 'Report ISP jitter, loss, and latency')" title="Report Bell Canada Gigabit Jitter, Packet Loss, and Latency">ISP Diagnostics</button>
+        <button type="button" class="quick-chip" onclick="triggerQuickChip(this, 'Review current git branch and changes')" title="Review Current Git Branch &amp; Uncommitted Worktree Changes">Git Status</button>
+        <button type="button" class="quick-chip" onclick="startNewAgySession('desktop')" style="border-color: #38bdf8; background: rgba(56, 189, 248, 0.2); color: #93c5fd;" title="Start New AGY Session on Desktop: agy --dangerously-skip-permissions">New: Desktop</button>
+        <button type="button" class="quick-chip" onclick="startNewAgySession('nuc')" style="border-color: #a78bfa; background: rgba(167, 139, 250, 0.2); color: #c4b5fd;" title="Start New AGY Session on NUC: agy --dangerously-skip-permissions">New: NUC</button>
+      </div>
+
+      <!-- Interactive Shell Prompt Input Bar -->
+      <div class="agy-console-input-bar" id="agy-console-input-bar" style="display: none;">
+        <div class="agy-prompt-label">
+          <span style="color: #4ade80;">agy</span><span style="color: #94a3b8;">@</span><span style="color: #38bdf8;">digitalresolve</span><span style="color: #f8fafc;">:</span><span style="color: #a78bfa;">~</span><span style="color: #4ade80;">$</span>
+        </div>
+        <input type="text" id="agy-modal-input" class="agy-modal-input" aria-label="Terminal command prompt" placeholder="Type prompt or command to transmit to active AGY agent..." onkeydown="if(event.key==='Enter') sendConsolePrompt()" autocomplete="off" spellcheck="false" />
+        <button type="button" class="agy-send-btn" id="agy-modal-send-btn" onclick="sendConsolePrompt()" title="Execute Prompt in Active AGY Autonomous Session">Execute &crarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Homelab Health Index Radar Breakdown Modal -->
+  <div id="health-modal-overlay" class="health-modal-overlay" style="display: none;" onclick="closeHealthModalOnBackdrop(event)">
+    <div class="health-modal-window" role="dialog" aria-modal="true" aria-label="Homelab Cluster Health Radar">
+      <div class="health-modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="pulse-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+          <span style="font-weight: 700; color: #f8fafc; font-size: 1rem;">Homelab Health Radar &bull; Diagnostic Scorecard</span>
+        </div>
+        <button type="button" class="changelog-close" onclick="closeHealthModal()" title="Close Health Radar Modal" aria-label="Close health dialog">&times;</button>
+      </div>
+      <div class="health-modal-body">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px;">
+          <div>
+            <div style="font-size: 0.78rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Aggregate Cluster Health Index</div>
+            <div style="font-size: 1.5rem; font-weight: 800; color: #34d399; margin-top: 2px;" id="modal-health-score">--</div>
+          </div>
+          <span class="item-tag online" style="font-size: 0.82rem; padding: 4px 10px;">All Systems Green</span>
+        </div>
+
+        <div class="health-radar-row">
+          <div class="health-radar-header">
+            <span><strong style="color: #f1f5f9;">Intel NUC Core Server (24/7 Node)</strong> &bull; 192.168.2.35</span>
+            <span style="color: #34d399; font-weight: 700;">--</span>
+          </div>
+          <div class="health-meter-bar"><div class="health-meter-fill" style="width: 0%;"></div></div>
+          <div style="font-size: 0.72rem; color: #64748b;">Services: Swarm Engine, CatCam Proxy, StreamHub 8088, WireGuard Tunnel</div>
+        </div>
+
+        <div class="health-radar-row">
+          <div class="health-radar-header">
+            <span><strong style="color: #f1f5f9;">Desktop Workstation (Cory-Desktop)</strong> &bull; 192.168.2.62</span>
+            <span style="color: #34d399; font-weight: 700;">--</span>
+          </div>
+          <div class="health-meter-bar"><div class="health-meter-fill" style="width: 0%;"></div></div>
+          <div style="font-size: 0.72rem; color: #64748b;">Services: Antigravity Autonomous Agent, High-Speed Torrenting, Git Sync</div>
+        </div>
+
+        <div class="health-radar-row">
+          <div class="health-radar-header">
+            <span><strong style="color: #f1f5f9;">Mullvad WireGuard Privacy Shield</strong></span>
+            <span style="color: #34d399; font-weight: 700;">--</span>
+          </div>
+          <div class="health-meter-bar"><div class="health-meter-fill" style="width: 0%;"></div></div>
+          <div style="font-size: 0.72rem; color: #64748b;">Tunnel Status: Active &bull; Zero IP/DNS Leaks Detected &bull; Kill-switch Enforced</div>
+        </div>
+
+        <div class="health-radar-row">
+          <div class="health-radar-header">
+            <span><strong style="color: #f1f5f9;">Bell Canada Gigabit Fiber Telemetry</strong></span>
+            <span style="color: #38bdf8; font-weight: 700;">Measuring...</span>
+          </div>
+          <div class="health-meter-bar"><div class="health-meter-fill" style="width: 0%; background: linear-gradient(90deg, #0ea5e9, #38bdf8);"></div></div>
+          <div style="font-size: 0.72rem; color: #64748b;">ISP Performance: Bell Gigabit Fiber &bull; Telemetry Probe Active</div>
+        </div>
+
+        <div class="health-radar-row">
+          <div class="health-radar-header">
+            <span><strong style="color: #f1f5f9;">Media Storage Capacity (D:\Torrents)</strong></span>
+            <span style="color: #60a5fa; font-weight: 700;">Scanning...</span>
+          </div>
+          <div class="health-meter-bar"><div class="health-meter-fill" style="width: 0%; background: linear-gradient(90deg, #3b82f6, #60a5fa);"></div></div>
+          <div style="font-size: 0.72rem; color: #64748b;">File System: Healthy &bull; Auto-Unpack Enabled &bull; Eco Cleanup Configured</div>
+        </div>
+
+        <div class="health-radar-row">
+          <div class="health-radar-header">
+            <span><strong style="color: #f1f5f9;">Zero Trust Perimeter &amp; M365 SSO Shield</strong></span>
+            <span style="color: #c084fc; font-weight: 700;">--</span>
+          </div>
+          <div class="health-meter-bar"><div class="health-meter-fill" style="width: 0%; background: linear-gradient(90deg, #9333ea, #c084fc);"></div></div>
+          <div style="font-size: 0.72rem; color: #64748b;">Security: 0 Open Router Ports &bull; Cloudflare Tunnel Ingress &bull; M365 Entra ID SSO &amp; Passkey</div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+          <button type="button" class="btn btn-secondary" onclick="closeHealthModal()" style="font-size: 0.82rem; padding: 6px 14px;">Close</button>
+          <button type="button" class="btn btn-primary" onclick="closeHealthModal(); checkStatus('both'); showToast('info', 'Diagnostic Dispatched', 'Probing NUC &amp; Desktop nodes in real-time...');" style="font-size: 0.82rem; padding: 6px 14px;">Run Live Probing &rarr;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cloudflare Site Statistics & Traffic Analytics Modal -->
+  <div id="cloudflare-stats-modal-overlay" class="health-modal-overlay" style="display: none;" onclick="if(event.target===this)closeCloudflareStatsModal()">
+    <div class="health-modal-window" role="dialog" aria-modal="true" aria-label="Cloudflare Site Statistics and Traffic Analytics" style="max-width: 820px; max-height: 88vh; display: flex; flex-direction: column;">
+      <div class="health-modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 12px; margin-bottom: 14px;">
+        <div>
+          <h3 style="font-size: 1.05rem; font-weight: 800; color: #f8fafc; margin: 0; display: flex; align-items: center; gap: 8px;">
+            <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+            Cloudflare Site Statistics &amp; Edge Analytics &bull; digitalresolve.ca
+          </h3>
+          <div style="font-size: 0.76rem; color: #94a3b8; margin-top: 2px;">
+            Live 24-hour edge traffic telemetry, cache hit efficiency, WAF bot defense, and subdomain tunnel throughput.
+          </div>
+        </div>
+        <button type="button" class="btn btn-secondary" aria-label="Close Cloudflare statistics modal" onclick="closeCloudflareStatsModal()" style="font-size: 0.8rem; padding: 4px 10px; cursor: pointer;">&times;</button>
+      </div>
+
+      <div style="overflow-y: auto; flex: 1; padding-right: 4px; display: flex; flex-direction: column; gap: 16px;">
+        <!-- Top 4 KPI Metrics -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px;">
+          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px; padding: 12px;">
+            <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Total Edge Requests</div>
+            <div style="font-size: 1.6rem; font-weight: 800; color: #38bdf8; font-family: 'JetBrains Mono', monospace; margin: 4px 0;" class="cf-kpi-requests">--</div>
+            <div style="font-size: 0.72rem; color: #34d399;" class="cf-kpi-sla">&bull; Awaiting telemetry</div>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 12px;">
+            <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;" class="cf-kpi-ratio-label">Edge Cache Hit Ratio</div>
+            <div style="font-size: 1.6rem; font-weight: 800; color: #34d399; font-family: 'JetBrains Mono', monospace; margin: 4px 0;" class="cf-kpi-ratio">--</div>
+            <div style="font-size: 0.72rem; color: #94a3b8;" class="cf-kpi-saved">&bull; Awaiting telemetry</div>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(192, 132, 252, 0.3); border-radius: 8px; padding: 12px;">
+            <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;" class="cf-kpi-visitors-label">Unique Visitors (24h)</div>
+            <div style="font-size: 1.6rem; font-weight: 800; color: #c084fc; font-family: 'JetBrains Mono', monospace; margin: 4px 0;" class="cf-kpi-visitors">--</div>
+            <div style="font-size: 0.72rem; color: #94a3b8;" class="cf-kpi-toppop">&bull; Top PoP: YUL (Montreal)</div>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 12px;">
+            <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Threats &amp; Bots Blocked</div>
+            <div style="font-size: 1.6rem; font-weight: 800; color: #fbbf24; font-family: 'JetBrains Mono', monospace; margin: 4px 0;" class="cf-kpi-threats">--</div>
+            <div style="font-size: 0.72rem; color: #34d399;" class="cf-kpi-geoshield">&bull; CA/US Geo-Shield</div>
+          </div>
+        </div>
+
+        <!-- Subdomain Routing & Traffic Telemetry Table -->
+        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 14px;">
+          <div style="font-size: 0.84rem; font-weight: 700; color: #f8fafc; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+            <span>Subdomain Routing &amp; Edge Ingress Matrix</span>
+            <span style="font-size: 0.72rem; color: #64748b; font-family: monospace;">Encrypted Tunnel Transport</span>
+          </div>
+          <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.76rem; text-align: left;">
+              <thead>
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.08); color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">
+                  <th style="padding: 6px 8px;">Domain Hostname</th>
+                  <th style="padding: 6px 8px;">Origin Target</th>
+                  <th style="padding: 6px 8px;">24h Requests</th>
+                  <th style="padding: 6px 8px;">Cache &bull; Latency</th>
+                  <th style="padding: 6px 8px;">Status</th>
+                </tr>
+              </thead>
+              <tbody style="color: #cbd5e1;">
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
+                  <td style="padding: 8px;"><strong style="color: #38bdf8;">digitalresolve.ca</strong> (Apex)</td>
+                  <td style="padding: 8px; font-family: monospace;">GitHub Pages (Cloudflare Edge Proxy)</td>
+                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-apex">--</td>
+                  <td style="padding: 10px 14px;"><span class="item-tag online" style="font-size: 0.72rem; padding: 5px 12px; border-radius: 6px; display: inline-flex; align-items: center; white-space: nowrap;">GitHub Pages Edge</span></td>
+                  <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
+                  <td style="padding: 8px;"><strong style="color: #38bdf8;">wake.digitalresolve.ca</strong></td>
+                  <td style="padding: 8px; font-family: monospace;">NUC (192.168.2.35:8082 &bull; API Gateway &amp; Telemetry)</td>
+                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-wake">--</td>
+                  <td style="padding: 8px; color: #34d399;">Tunnel Proxy</td>
+                  <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
+                  <td style="padding: 8px;"><strong style="color: #38bdf8;">cam.digitalresolve.ca</strong></td>
+                  <td style="padding: 8px; font-family: monospace;">NUC (:8089 CatCam / WebRTC)</td>
+                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-cam">--</td>
+                  <td style="padding: 8px; color: #34d399;">WebRTC Tunnel</td>
+                  <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
+                  <td style="padding: 8px;"><strong style="color: #38bdf8;">torrents.digitalresolve.ca</strong></td>
+                  <td style="padding: 8px; font-family: monospace;">Desktop (192.168.2.62:8080 &bull; M365 SSO)</td>
+                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-torrents">--</td>
+                  <td style="padding: 8px; color: #38bdf8;">Protected Tunnel</td>
+                  <td style="padding: 8px;"><span class="item-tag online cf-sub-torrents-badge" id="cf-sub-torrents-badge" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
+                  <td style="padding: 8px;"><strong style="color: #38bdf8;">torrents2.digitalresolve.ca</strong></td>
+                  <td style="padding: 8px; font-family: monospace;">NUC (192.168.2.35:8081 &bull; M365 SSO)</td>
+                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-torrents2">--</td>
+                  <td style="padding: 8px; color: #38bdf8;">Protected Tunnel</td>
+                  <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
+                </tr>
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
+                  <td style="padding: 8px;"><strong style="color: #38bdf8;">stream.digitalresolve.ca</strong></td>
+                  <td style="padding: 8px; font-family: monospace;">NUC (:8088 / :3333)</td>
+                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-stream">--</td>
+                  <td style="padding: 8px; color: #c4b5fd;">Protected Tunnel</td>
+                  <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px;"><strong style="color: #38bdf8;">files.digitalresolve.ca</strong></td>
+                  <td style="padding: 8px; font-family: monospace;">NUC (:8085 File Vault)</td>
+                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-files">--</td>
+                  <td style="padding: 8px; color: #94a3b8;">Tunnel Proxy</td>
+                  <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Security, SSL & Protocol Specifications -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px;">
+          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 12px; font-size: 0.78rem; line-height: 1.6; color: #94a3b8;">
+            <div style="color: #f8fafc; font-weight: 700; margin-bottom: 4px;">Edge Transport &amp; Security</div>
+            <div>&bull; Transport Protocol: <strong style="color: #cbd5e1;">HTTP/3 (QUIC) &bull; HTTP/2</strong></div>
+            <div>&bull; TLS Version: <strong style="color: #34d399;">TLS 1.3 (0-RTT Session Resumption)</strong></div>
+            <div>&bull; SSL Certificate: <strong style="color: #cbd5e1;" class="ssl-cert-days">Cloudflare Universal SSL (Let's Encrypt ECDSA) (85 Days Left)</strong></div>
+            <div>&bull; DNSSEC: <strong style="color: #34d399;">Enabled &amp; Validated (100% Authenticated)</strong></div>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 12px; font-size: 0.78rem; line-height: 1.6; color: #94a3b8;">
+            <div style="color: #f8fafc; font-weight: 700; margin-bottom: 4px;">Zero Trust Perimeter Policy</div>
+            <div>&bull; Identity Provider: <strong style="color: #38bdf8;">Microsoft 365 Entra ID SAML</strong></div>
+            <div>&bull; Geo-Fencing: <strong style="color: #cbd5e1;">Canada &amp; United States (Strict Whitelist)</strong></div>
+            <div>&bull; Origin Port Exposure: <strong style="color: #34d399;">0 Open WAN Ports (Argo Ingress)</strong></div>
+            <div>&bull; Edge PoPs: <strong style="color: #cbd5e1;">YUL (Montreal) &bull; YYZ (Toronto)</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 12px; margin-top: 14px; flex-wrap: wrap; gap: 8px;">
+        <a href="https://dash.cloudflare.com/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.78rem; padding: 6px 12px; color: #38bdf8 !important; border-color: rgba(56, 189, 248, 0.4);">
+          Open Cloudflare Dashboard &nearr;
+        </a>
+        <button type="button" class="btn btn-primary" onclick="closeCloudflareStatsModal()" style="font-size: 0.8rem; padding: 6px 16px; background: linear-gradient(135deg, #0284c7, #0369a1); border-color: #0284c7; color: white !important; cursor: pointer;">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Disaster Recovery & Resilience Test Modal -->
+  <div id="disaster-modal-overlay" class="disaster-modal-overlay chaos-modal-overlay" style="position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 10005; background: rgba(2, 6, 23, 0.94); display: none; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box;" onclick="closeDisasterModalOnBackdrop(event)">
+    <div class="disaster-modal-window chaos-modal-window" role="dialog" aria-modal="true" aria-label="Homelab Disaster Recovery Test" style="background: #090d16; border: 1px solid rgba(245, 158, 11, 0.45); border-radius: 16px; width: 95%; max-width: 860px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 35px rgba(245, 158, 11, 0.22); overflow: hidden;">
+      <div class="disaster-modal-header chaos-modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.35rem;"></span>
+          <div>
+            <div style="font-weight: 800; color: #f8fafc; font-size: 1.05rem; letter-spacing: -0.3px;">Disaster Recovery Test &bull; Homelab Resilience Lab <span class="item-tag" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; margin-left: 8px; font-size: 0.68rem;">[SIMULATION MODE]</span></div>
+            <div style="font-size: 0.74rem; color: #94a3b8;">Simulate real-world outages &amp; verify autonomous self-healing sentinel failover.</div>
+          </div>
+        </div>
+        <button type="button" class="changelog-close" onclick="closeDisasterModal()" title="Close Disaster Test" aria-label="Close disaster test dialog">&times;</button>
+      </div>
+
+      <div class="chaos-modal-body">
+        <!-- Top Status Bar -->
+        <div class="chaos-status-bar">
+          <div class="chaos-score-container">
+            <div>
+              <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Cluster Resilience Index</div>
+              <div class="chaos-score-val" id="chaos-score-val">100% Optimal</div>
+            </div>
+            <span class="item-tag online" id="chaos-fault-counter">0 Outages Active</span>
+          </div>
+          <div class="chaos-actions-top">
+            <button type="button" class="btn-chaos-action btn-chaos-sound" id="btn-chaos-sound" onclick="toggleChaosSound()" title="Toggle Web Audio procedural synthesizer sound effects">
+              Sound: OFF
+            </button>
+            <button type="button" class="btn-chaos-action btn-chaos-heal" onclick="restoreAllChaos()" title="Master Sentinel Override: Restore all nodes to 100% green">
+              Recover All Nodes
+            </button>
+          </div>
+        </div>
+
+        <!-- Interactive Topology & Circuit Schematic Map -->
+        <div class="chaos-topology-box">
+          <div class="chaos-topology-header">
+            <span style="font-size: 0.78rem; font-weight: 700; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px;">Live Topology Schematic</span>
+            <span style="font-size: 0.72rem; color: #64748b;">Autonomous Sentinel Watchdog: Active (3m schedule)</span>
+          </div>
+
+          <div class="chaos-grid-nodes">
+            <!-- 1. Cloudflare Edge -->
+            <div class="chaos-node node-ok" id="c-node-cf">
+              <div class="chaos-node-icon"></div>
+              <div class="chaos-node-name">Cloudflare Edge</div>
+              <span class="chaos-node-status ok">Active (Zero Trust)</span>
+            </div>
+
+            <!-- 2. Bell Fiber GigaHub -->
+            <div class="chaos-node node-ok" id="c-node-bell">
+              <div class="chaos-node-icon"></div>
+              <div class="chaos-node-name">Bell Fiber 1.5G</div>
+              <span class="chaos-node-status ok">1.5 Gbps (Optimal)</span>
+            </div>
+
+            <!-- 3. Mullvad VPN -->
+            <div class="chaos-node node-ok" id="c-node-vpn">
+              <div class="chaos-node-icon"></div>
+              <div class="chaos-node-name">Mullvad Tunnel</div>
+              <span class="chaos-node-status ok">Encrypted (WireGuard)</span>
+            </div>
+
+            <!-- 4. Intel NUC Core -->
+            <div class="chaos-node node-ok" id="c-node-nuc">
+              <div class="chaos-node-icon"></div>
+              <div class="chaos-node-name">Intel NUC 24/7</div>
+              <span class="chaos-node-status ok">Healthy (100%)</span>
+            </div>
+
+            <!-- 5. Desktop Workstation -->
+            <div class="chaos-node node-ok" id="c-node-desktop">
+              <div class="chaos-node-icon"></div>
+              <div class="chaos-node-name">Desktop Workstation</div>
+              <span class="chaos-node-status ok">Healthy (100%)</span>
+            </div>
+
+            <!-- 6. Storage Pool -->
+            <div class="chaos-node node-ok" id="c-node-storage">
+              <div class="chaos-node-icon"></div>
+              <div class="chaos-node-name">Storage Pools</div>
+              <span class="chaos-node-status ok">Healthy (Storage Online)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chaos Arsenal: Fault Injection Controls -->
+        <div>
+          <div style="font-size: 0.78rem; font-weight: 700; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
+            Disaster Scenarios (Click to Inject / Recover)
+          </div>
+          <div class="chaos-arsenal-grid">
+            <!-- Scenario 1: Bell Fiber -->
+            <div class="chaos-card" id="c-card-fiber">
+              <div>
+                <div class="chaos-card-header">
+                  <span></span>
+                  <span>Cut Bell Fiber Uplink</span>
+                </div>
+                <div class="chaos-card-desc">
+                  Simulates complete physical fiber carrier drop. Sentinel triggers multi-WAN failover to standby cellular WireGuard route.
+                </div>
+              </div>
+              <button type="button" class="chaos-card-trigger" id="btn-fault-fiber" onclick="triggerChaosFault('bellFiber')">
+                Sever Fiber Link
+              </button>
+            </div>
+
+            <!-- Scenario 2: Desktop Hard Power Loss -->
+            <div class="chaos-card" id="c-card-desktop">
+              <div>
+                <div class="chaos-card-header">
+                  
+                  <span>Desktop Sudden Power Cut</span>
+                </div>
+                <div class="chaos-card-desc">
+                  Simulates workstation power outage (0W). NUC assumes queued torrent &amp; agent proxies; arms Wake-on-LAN reboot packet.
+                </div>
+              </div>
+              <button type="button" class="chaos-card-trigger" id="btn-fault-desktop" onclick="triggerChaosFault('desktopPower')">
+                Pull Desktop Plug
+              </button>
+            </div>
+
+            <!-- Scenario 3: Volumetric DDoS -->
+            <div class="chaos-card" id="c-card-ddos">
+              <div>
+                <div class="chaos-card-header">
+                  
+                  <span>50k req/s Volumetric DDoS</span>
+                </div>
+                <div class="chaos-card-desc">
+                  Simulates synthetic SYN/HTTP flood assault against public endpoints. Cloudflare Under-Attack defense shields local origin NUC.
+                </div>
+              </div>
+              <button type="button" class="chaos-card-trigger" id="btn-fault-ddos" onclick="triggerChaosFault('ddosFlood')">
+                Flood Edge with 50k SYN
+              </button>
+            </div>
+
+            <!-- Scenario 4: Storage Saturation -->
+            <div class="chaos-card" id="c-card-disk">
+              <div>
+                <div class="chaos-card-header">
+                  
+                  <span>Storage Saturation (99.8%)</span>
+                </div>
+                <div class="chaos-card-desc">
+                  Simulates torrent disk exhaustion (&lt;300MB free). Sentinel executes automated temp buffer pruning and SMB relocation.
+                </div>
+              </div>
+              <button type="button" class="chaos-card-trigger" id="btn-fault-disk" onclick="triggerChaosFault('diskFull')">
+                Fill Disk to 99.8%
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Streaming Chaos Console Feed -->
+        <div class="chaos-console-box">
+          <div class="chaos-console-header">
+            <span>LIVE SENTINEL EVENT STREAM</span>
+            <span>AUTO-SCROLL &bull; REAL-TIME</span>
+          </div>
+          <div class="chaos-console-feed" id="chaos-console-feed">
+            <div class="chaos-line sys">[SYSTEM] Disaster Recovery Sentinel v2.6.0 initialized. Topology verified green.</div>
+            <div class="chaos-line info">[PROBE] All 6 infrastructure nodes responding within SLA (&lt; 12ms latency).</div>
+            <div class="chaos-line heal">[READY] Autonomous failover triggers armed. Select an outage scenario above to test resilience.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Universal Admin SSO Verification Gate Modal -->
+  <div id="speedtest-sso-modal-overlay" class="speedtest-sso-modal-overlay" style="display: none;" onclick="if(event.target===this)closeSpeedtestSSOModal()">
+    <div class="speedtest-sso-modal" role="dialog" aria-modal="true" aria-label="Admin SSO Authorization for Homelab Operations">
+      <div style="background: rgba(15, 23, 42, 0.95); padding: 18px 22px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.4rem;"></span>
+          <div>
+            <div style="font-weight: 800; font-size: 1.02rem; color: #f8fafc;">Admin Authorization Required</div>
+            <div style="font-size: 0.74rem; color: #f59e0b; font-family: monospace;" id="sso-gate-action-name">Interactive System Operation &bull; M365 SSO</div>
+          </div>
+        </div>
+        <button type="button" class="changelog-close" onclick="closeSpeedtestSSOModal()" title="Close SSO Dialog" aria-label="Close dialog">&times;</button>
+      </div>
+      <div style="padding: 22px; display: flex; flex-direction: column; gap: 16px;">
+        <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 14px; font-size: 0.8rem; color: #fde68a; line-height: 1.55;">
+          <strong> Zero Trust Security Policy:</strong><br>
+          All Digital Resolve operations are protected by <strong>Cloudflare Access and Microsoft 365 Entra ID SSO</strong> (<code>cory.townsend@digitalresolve.ca</code>, 30-day session). Sign in once with your Microsoft 365 account to unlock live hardware controls and telemetry.
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 4px;">
+          <button type="button" class="btn btn-primary" onclick="verifySpeedtestSSO()" style="width: 100%; padding: 13px 20px; font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); cursor: pointer;">
+            <span>Sign In with Microsoft 365 (Entra ID)</span>
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="closeSpeedtestSSOModal()" style="font-size: 0.82rem; cursor: pointer; padding: 8px 16px; border-color: rgba(255, 255, 255, 0.15); align-self: center;">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comprehensive High-Level System Release Changelog Modal -->
+  <div id="changelog-modal-overlay" class="changelog-modal-overlay" style="display: none;" onclick="closeChangelogModalOnBackdrop(event)">
+    <div class="changelog-modal" role="dialog" aria-modal="true" aria-label="System changelog">
+      <div class="changelog-header">
+        <div class="changelog-title-group">
+          <span class="pulse-dot"></span>
+          <span class="changelog-title">Digital Resolve System Changelog &amp; Release History</span>
+        </div>
+        <button type="button" class="changelog-close" onclick="closeChangelogModal()" title="Close Changelog Modal" aria-label="Close changelog">&times;</button>
+      </div>
+
+            <div class="changelog-body">
+                                                <!-- Version v2.8.73 (Current) -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag current">v2.8.73 | Current</span>
+            <span class="ver-date">November 22, 2026</span>
+          </div>
+          <h4 class="ver-title">Tiered Storage &amp; Live Data Flow Schematic, 8-Tab Navbar &amp; Pipeline Inspector</h4>
+          <ul class="ver-list">
+            <li><strong>Standalone Tiered Storage Flow Page:</strong> Added <code>storage.html</code> and isolated <code>storage-flow.js</code> featuring a 5-card KPI strip, interactive 4-tier animated SVG flowchart (Workstation &rarr; NUC Hot Media &rarr; QNAP SMB &amp; Dual iSCSI &rarr; OneDrive Vault), HiDPI throughput waveform canvas, capacity distribution bars, clickable node/pipe inspector, and script pipeline matrix.</li>
+            <li><strong>Live /api/storage-flow &amp; M365-Gated Triggers:</strong> Integrated live NUC gateway telemetry (<code>/api/storage-flow</code>) with LAN fallback, category filtering (<code>All Flows</code>, <code>Media Tiering</code>, <code>Backups &amp; DR</code>, <code>Guardrails</code>), and M365-SSO-gated manual pipeline triggers (<code>/api/storage-flow/trigger</code>).</li>
+            <li><strong>Site-Wide 8-Tab Navbar &amp; v2.8.73 LOC Sync:</strong> Added <code>STORAGE</code> tab and <code>Tiered Storage Live Flow</code> dropdown entry across all 8 dashboard pages, tuned <code>.nav-pages-group</code> for single-row <code>1280x720</code>/<code>1440x900</code> fit, and synchronized exact codebase LOC metrics.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.72 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.72</span>
+            <span class="ver-date">November 22, 2026</span>
+          </div>
+          <h4 class="ver-title">Bedroom Camera MSE/WebRTC Reliability, In-Place Switching &amp; NUC Gateway Player Sync</h4>
+          <ul class="ver-list">
+            <li><strong>MSE Init Queue &amp; First-Frame Fallback:</strong> Buffered fMP4 chunks prior to <code>SourceBuffer</code> readiness, eliminated append/remove queue deadlocks, handled <code>QuotaExceededError</code>, and added a 10s first-frame watchdog and error fallback to WebRTC in <code>webrtc.html</code> and <code>ai.html</code>.</li>
+            <li><strong>In-Place Camera Switching &amp; ICE Queue:</strong> Added ICE candidate buffering and <code>pagehide</code>/<code>beforeunload</code> cleanup in <code>webrtc.html</code> and <code>ai.html</code>, switched cameras in-place via <code>selectCamera()</code> in <code>app.js</code>, removed lazy/strict iframe throttling, and updated Bedroom Cam 2 labels.</li>
+            <li><strong>NUC Gateway Static Sync &amp; CORS Guard:</strong> Suppressed cross-origin <code>/api/cam/status</code> polling when hosted on <code>cam.digitalresolve.ca</code>, synced <code>webrtc.html</code> and <code>ai.html</code> to NUC <code>go2rtc/www</code>, and bumped assets to <code>v2.8.72</code>.</li>
+            <li><strong>Navbar Overflow, HTTPS qBittorrent &amp; Zero-Placeholder Telemetry:</strong> Added viewport-clamped scrollable dropdown menus, preserved HTTPS <code>torrents.digitalresolve.ca</code> routing, standardized <code>https://dash.cloudflare.com/</code> links with <code>z-index: 2</code>, and hydrated Cloudflare tunnel egress, Health Radar bars, and topology inspector states with zero placeholder values.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.71 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.71</span>
+            <span class="ver-date">November 22, 2026</span>
+          </div>
+          <h4 class="ver-title">Ops Bell Speedtest Hydration, NUC Sparkline Latency Guard &amp; Cloudflare Egress Fallback</h4>
+          <ul class="ver-list">
+            <li><strong>Ops Bell Speedtest Telemetry:</strong> Extended <code>hasIspDom()</code> in <code>app.js</code> to detect <code>#st-val-down</code> and <code>#gauge-live-num</code> so <code>ops.html</code> hydrates live Bell Fiber throughput, ping, and jitter.</li>
+            <li><strong>NUC 0.0 ms Sparkline Race Fix:</strong> Guarded <code>updateStatusUI()</code> against overwriting valid &gt;0 ms <code>LAST_NUC_LATENCY</code> with <code>0 ms</code> from <code>/status?target=nuc</code> so <code>index.html</code> renders the live NUC latency curve.</li>
+            <li><strong>Cloudflare Tunnel Egress &amp; Mobile Polish:</strong> Displayed tunnel egress in <code>#edge-cache-val</code> when <code>hitRatio</code> is unavailable, prevented <code>Port 11434</code> badge wrapping on mobile, and bumped assets to <code>v2.8.71</code>.</li>
+          </ul>
+        </div>
+
+        <!-- Version v2.8.70 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.70</span>
+            <span class="ver-date">November 22, 2026</span>
+          </div>
+          <h4 class="ver-title">Accurate Cluster 90-Day SLA Math, Dynamic Grade Badges &amp; Incident Downtime Attribution</h4>
+          <ul class="ver-list">
+            <li><strong>True Cluster Availability Math:</strong> Updated <code>/api/uptime</code> to factor actual NUC crash downtime (including today's <code>68m 32s</code> outage) and ongoing offline state into <code>overallSla</code>, <code>slaGrade</code>, and rolling 90-day <code>uptime-incidents.json</code> history instead of masking cluster outages with 100% ISP probe availability.</li>
+            <li><strong>Dynamic SLA, Heartbeat, Outage &amp; MTTR Badges:</strong> Replaced static <code>Grade A+</code>, <code>Zero Loss</code>, and <code>Instant</code> tags in <code>index.html</code> and <code>uptime.html</code> with live severity-driven badges and downtime summaries in <code>applyUptimeMetrics()</code>.</li>
+            <li><strong>Version v2.8.70 &amp; Asset Cache-Busters:</strong> Bumped <code>styles.css?v=2.8.71</code>, <code>app.js?v=2.8.71</code>, and version badges across all 7 dashboard pages with exact codebase LOC sync.</li>
+          </ul>
+        </div>
+
+        <!-- Version v2.8.69 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.69</span>
+            <span class="ver-date">November 22, 2026</span>
+          </div>
+          <h4 class="ver-title">Cloudflare Access Credentials, ISP Telemetry Helper, Uptime dailyHistory &amp; HiDPI Ping Sparkline</h4>
+          <ul class="ver-list">
+            <li><strong>Cloudflare Access SSO Credentials:</strong> Added explicit <code>credentials: 'include'</code> across all GATEWAY fetches so cross-origin Cloudflare Access SSO sessions work seamlessly.</li>
+            <li><strong>Unified ISP Telemetry &amp; Snapshot Refresh:</strong> Refactored <code>fetchISPHistory()</code> into a shared <code>applyIspTelemetry()</code> helper across live, <code>isp-health.json</code>, and <code>localStorage</code> paths with null guards and refreshed <code>isp-health.json</code>.</li>
+            <li><strong>90-Day Uptime dailyHistory &amp; HiDPI Ping Sparkline:</strong> Added <code>dailyHistory</code> + <code>dr_uptime_cache</code> hydration in <code>renderUptimeMatrix()</code> and HiDPI <code>devicePixelRatio</code> + <code>ResizeObserver</code> rendering for <code>#uptimeSparkline</code>.</li>
+          </ul>
+        </div>
+
+        <!-- Version v2.8.68 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.68</span>
+            <span class="ver-date">November 22, 2026</span>
+          </div>
+          <h4 class="ver-title">Form Control Accessibility, Standalone Camera Focus/Skip Links &amp; Exact LOC Sync</h4>
+          <ul class="ver-list">
+            <li><strong>Form Control ARIA &amp; Focus Ring Fixes:</strong> Added <code>aria-label="Ask Edge AI a question"</code> to <code>#edge-ai-input</code> on <code>index.html</code> and <code>ops.html</code>, removed inline <code>outline: none</code> from <code>#quick-magnet-target</code> on <code>index.html</code>, and added <code>aria-label="Target node for magnet download"</code> so unlabelled form controls across all 9 pages = 0.</li>
+            <li><strong>Standalone WebRTC/AI Focus &amp; Skip Links:</strong> Added <code>:focus-visible</code> outline rules, <code>.skip-to-content</code> styling, skip-to-content links, and <code>id="main-content"</code> landmarks to <code>webrtc.html</code> and <code>ai.html</code> with 100% SHA-256 NUC mirror parity.</li>
+            <li><strong>Version v2.8.68 &amp; Exact LOC Sync:</strong> Bumped <code>styles.css?v=2.8.69</code>, <code>app.js?v=2.8.69</code>, meta descriptions, menu/footer version badges, and static changelog fallback to <code>v2.8.68</code> across all 7 dashboard pages with recalculated exact codebase LOC.</li>
+          </ul>
+        </div>
+                                <!-- Version v2.8.67 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.67</span>
+            <span class="ver-date">November 22, 2026</span>
+          </div>
+          <h4 class="ver-title">Accessibility Hardening, 375px Mobile Overflow Fix, CSS Cleanup &amp; WebRTC/AI Landmarks</h4>
+          <ul class="ver-list">
+            <li><strong>Keyboard &amp; ARIA Accessibility:</strong> Added <code>role="button"</code>, <code>tabindex="0"</code>, and Enter/Space keyboard handlers to all 7 <code>.schematic-node-card</code> elements on <code>index.html</code> and <code>fleet.html</code> and the <code>.book-card</code> template in <code>app.js</code>, added <code>aria-label="Close Tailscale modal"</code> to <code>ensureTailscaleModalDOM</code>, and added skip-to-content links across all 7 dashboard pages.</li>
+            <li><strong>375px Mobile Overflow &amp; CSS Cleanup:</strong> Fixed 375px horizontal overflow in <code>styles.css</code> (<code>nav-mobile-actions</code> wrapping/compact sizing, scrollable <code>.nuc-tabs</code>/<code>.nuc-tabs-bar</code>, responsive tables, and clipped mobile body), raised <code>.magnet-modal-overlay</code> <code>z-index</code> to <code>10002</code>, consolidated duplicate <code>.nav-links</code> rules, and added base rules for referenced utility classes.</li>
+            <li><strong>WebRTC/AI Landmarks, Changelog Sync &amp; Exact LOC:</strong> Added <code>@media (max-width: 680px)</code> responsive rules to <code>webrtc.html</code>, added semantic <code>&lt;header&gt;</code>/<code>&lt;footer&gt;</code> landmarks to <code>webrtc.html</code> and <code>ai.html</code> with NUC mirror parity, fixed the stale <code>v2.8.64</code> changelog modal fallback across all 7 pages, and synced exact codebase LOC to <code>v2.8.67</code>.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.64 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.64</span>
+            <span class="ver-date">November 22, 2026</span>
+          </div>
+          <h4 class="ver-title">Live Audiobookshelf Library Integration &amp; Storage Legend Null-State</h4>
+          <ul class="ver-list">
+            <li><strong>Live Audiobookshelf Library Grid:</strong> Removed all 4 hardcoded placeholder books from <code>index.html</code>, <code>media.html</code>, and <code>ops.html</code> and wired <code>renderAudiobookshelfGrid()</code> in <code>app.js</code> to hydrate real NUC Audiobookshelf items from <code>/stats</code> (with <code>/api/audiobooks</code> fallback and honest unavailable notice).</li>
+            <li><strong>Honest Storage Legend Placeholders:</strong> Replaced stale static storage legend GB strings on <code>index.html</code> and <code>media.html</code> with <code>-- GB</code> until live <code>/stats</code> telemetry hydrates them.</li>
+            <li><strong>Cache-Busters &amp; Codebase Scale Sync:</strong> Updated <code>styles.css?v=2.8.69</code> and <code>app.js?v=2.8.69</code>, synchronized footer/menu version badges across all 7 dashboard pages, and recalculated exact codebase Lines of Code.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.63 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.63</span>
+            <span class="ver-date">November 22, 2026</span>
+          </div>
+          <h4 class="ver-title">SSO Gateway Fetch Credentials &amp; Torrent Node Latency Guard</h4>
+          <ul class="ver-list">
+            <li><strong>SSO Cookie Credentials on Gateway Fetches:</strong> Added <code>credentials: 'include'</code> to all 11 authenticated cross-origin <code>GATEWAY</code> <code>fetch()</code> calls in <code>app.js</code> (<code>/api/logs</code>, <code>/api/agy/send</code>, <code>/api/agy/launch</code>, <code>/add</code>, and <code>/api/control</code> maintenance actions) so Microsoft 365 SSO session cookies are consistently forwarded.</li>
+            <li><strong>Honest Null-State Torrent Node Latency:</strong> Updated <code>meta-watch-torrents</code> in <code>app.js</code> to render <code>Online</code> when <code>latencyMs</code> is <code>null</code> and <code>0 ms</code> when <code>0</code> instead of falling back to <code>&lt; 1 ms</code>.</li>
+            <li><strong>Cache-Busters &amp; Codebase Scale Sync:</strong> Updated <code>styles.css?v=2.8.69</code> and <code>app.js?v=2.8.69</code>, synchronized footer/menu version badges across all 7 dashboard pages, and recalculated exact codebase Lines of Code.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.62 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.62</span>
+            <span class="ver-date">November 21, 2026</span>
+          </div>
+          <h4 class="ver-title">Null-State Telemetry Integrity: Remove Residual Fake Latency, Disk &amp; Climate Fallbacks</h4>
+          <ul class="ver-list">
+            <li><strong>Honest Null-State UI Rendering:</strong> Replaced residual hardcoded climate (<code>23.3&deg;C / 43% RH</code>), NUC/Edge/Cloudflare latency (<code>0.8 ms</code> / <code>0.9 ms</code> / <code>1.1 ms</code> / <code>&lt; 1 ms</code>), Desktop latency (<code>4 ms</code>), and Desktop disk (<code>6,054 GB / 5.0%</code>) fallbacks in <code>app.js</code> with honest <code>Awaiting Telemetry</code>, <code>Online</code>, <code>Anycast OK</code>, and guarded disk states.</li>
+            <li><strong>Cache-Busters &amp; Codebase Scale Sync:</strong> Updated <code>styles.css?v=2.8.62</code> and <code>app.js?v=2.8.62</code>, synchronized footer/menu version badges across all 7 dashboard pages, and recalculated exact codebase Lines of Code.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.61 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.61</span>
+            <span class="ver-date">November 21, 2026</span>
+          </div>
+          <h4 class="ver-title">Wave 10 Runtime Recovery: deskCpu Fix, V8 TDZ Bootstrap &amp; Live DOM Polling Guards</h4>
+          <ul class="ver-list">
+            <li><strong>Critical Runtime &amp; Bootstrap Fixes:</strong> Restored <code>deskCpu</code> declaration in <code>applyClusterStatsPayload</code> (unblocking token, camera, and climate telemetry updates) and moved <code>initApp()</code> bootstrap to the bottom of <code>app.js</code> to eliminate V8 TDZ ReferenceErrors when <code>readyState !== 'loading'</code>.</li>
+            <li><strong>DOM Presence Guards &amp; Honest Telemetry:</strong> Aligned <code>hasClimateDom</code>, <code>hasIspDom</code>, <code>hasUptimeDom</code>, and <code>hasServicesDom</code> with real HTML element IDs (restoring Kuma &amp; climate polling on <code>ops.html</code>), removed stale <code>localStorage</code> online overrides and offline <code>0% CPU</code> / <code>5.0% Used</code> hardcodes, and refreshed Kuma rows on <code>/services-health</code> updates.</li>
+            <li><strong>Cache-Busters &amp; UI Label Accuracy:</strong> Updated <code>styles.css?v=2.8.62</code> and <code>app.js?v=2.8.62</code> across all 7 dashboard pages, cleared static Kuma latency placeholders, and replaced stale <code>Kavita</code> / <code>D:\Media</code> labels with <code>FileBrowser</code> and live <code>D:\Torrents &amp; E:\Audiobooks</code> paths.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.60 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.60</span>
+            <span class="ver-date">November 21, 2026</span>
+          </div>
+          <h4 class="ver-title">Wave 9 Telemetry Parity, Optical Cam Scope &amp; Media Automation Hardening</h4>
+          <ul class="ver-list">
+            <li><strong>Gateway &amp; Core Ops Parity:</strong> Fixed NUC/Desktop <code>wol-listener</code> Prometheus scientific-notation parsing, live camera status probing with null offline latencies, <code>desktop.disk</code> per-drive totals, smart feeder <code>opticalWatchdog</code>/<code>lastDispenseGrams</code> exposure, <code>/services-health</code> stopwatch ordering with Cloudflare port 20241&ndash;20243 checks, and <code>/api/logs</code> newest-file tail reading.</li>
+            <li><strong>Website UI &amp; AdGuard Accuracy:</strong> Scoped <code>ai.html</code> <code>detectFeederRedBlink()</code> to Cam 1 (<code>pennys_feeder</code>), removed hardcoded WebRTC/inference/sparkline/disk placeholders, restored token reset and Claude quota fields in <code>updateTokenCounterUI</code>, removed redundant <code>initApp</code> fetches, corrected <code>AdGuardHome.yaml</code> feeder IP to <code>192.168.2.22</code>, and updated DNS routes to <code>7 LAN Routes</code>.</li>
+            <li><strong>Media RSS, StreamHub &amp; Update Suite:</strong> Enforced audiobook-only filtering and title deduplication across RSS generators, switched <code>Invoke-RssAutoDownload.ps1</code> to UTF-8 JSON decoding, fixed StreamHub MIME types and 240s catalog watchdog reset, fixed physical-disk SSD vs HDD detection and Winget exclusions in the update suite, and enforced workstation reboot safety policy.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.59 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.59</span>
+            <span class="ver-date">November 21, 2026</span>
+          </div>
+          <h4 class="ver-title">Sparkline &amp; Telemetry Accuracy Fixes, Zero-Falsy Guards &amp; Dead Wrapper Cleanup</h4>
+          <ul class="ver-list">
+            <li><strong>Cloudflare Access CORS Preflight Fix:</strong> Removed <code>X-Requested-With</code> custom header blocking <code>wake.digitalresolve.ca</code> CORS preflight, restoring <code>/api/logs</code>, <code>/api/agy/send</code>, power, AI chat, and feeder controls.</li>
+            <li><strong>Sparkline &amp; Latency Telemetry Accuracy:</strong> Removed continuous 60fps <code>requestAnimationFrame</code> spinning in <code>renderSparklineFrame</code>, fixed Edge latency modulo distortion and scale ceiling calculation, triggered sparkline re-renders on live telemetry updates, and made NUC/ISP/speedprobe/WebRTC latency formatting finite-safe and zero-safe.</li>
+            <li><strong>Disk &amp; Route Accuracy + Dead Wrapper Cleanup:</strong> Updated DNS KPI routes to <code>7 LAN Routes</code>, fixed zero-falsy <code>disk.usedPercent</code> and zero-total Desktop segment bar guards, corrected the Edge AI summary prompt to <code>AMD Ryzen 7 workstation</code>, and removed unused <code>onControlNodeChange</code>, <code>reloadCurrentLog</code>, and <code>setConsolePrompt</code> wrappers.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.58 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.58</span>
+            <span class="ver-date">November 21, 2026</span>
+          </div>
+          <h4 class="ver-title">Dynamic Cross-Host Active AGY Session Discovery &amp; Edge AI Race Fix</h4>
+          <ul class="ver-list">
+            <li><strong>Dynamic NUC &amp; Desktop AGY Session Resolution:</strong> Removed the hardcoded <code>53c2a1ff</code> conversation ID across all 7 pages, <code>wol-listener.ps1</code>, and <code>Sync-AgyTranscript.ps1</code>; both Desktop and NUC gateways now compare real conversation activity timestamps across NUC and Desktop and dynamically bind logs, prompts, and terminal UI controls to the active session.</li>
+            <li><strong>Host-Aware Terminal Metadata &amp; Edge AI Abort Guard:</strong> Added live host node indicators (NUC Core Server vs Desktop Workstation) in the AGY modal and dropdowns, fixed the single-line <code>history.jsonl</code> parsing bug, and guarded <code>runLiveEdgeAiQuery</code> against aborted-request race overwrites.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.57 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.57</span>
+            <span class="ver-date">November 21, 2026</span>
+          </div>
+          <h4 class="ver-title">Live NUC Ollama Edge AI, Real WAN Probes, Honest Telemetry Fallbacks &amp; Operations Hardening</h4>
+          <ul class="ver-list">
+            <li><strong>Live NUC Ollama Chat &amp; Real WAN Speedprobe:</strong> Added an SSO/admin-gated <code>POST /api/ai/chat</code> gateway proxy backed by <code>llama3.2:3b</code> on NUC port 11434 and wired the Edge AI console and Gigabit WAN test to real backend execution and chronological ISP telemetry.</li>
+            <li><strong>Honest Fallbacks &amp; UI Bug Fixes:</strong> Replaced stale disk/swarm/Cloudflare/feeder/sparkline placeholders with explicit telemetry-pending states, wired hero status pill updates and reboot confirmation prompts, fixed the Chaos Lab Desktop MAC and split-horizon StreamHub label, and filtered bird/sheep pet boxes in <code>ai.html</code>.</li>
+            <li><strong>NUC Media, Prowlarr &amp; Ops Reliability:</strong> Resolved active Audiobookshelf library UUIDs dynamically, excluded slow/failing indexers cleanly from RSS generators, preserved torrent piece files in post-processing, and tightened atomic temp writes and cross-host watchdogs.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.56 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.56</span>
+            <span class="ver-date">November 21, 2026</span>
+          </div>
+          <h4 class="ver-title">Tailscale &amp; SSO Callback Fixes, Mobile Panning, Telemetry Accuracy &amp; Camera Recovery</h4>
+          <ul class="ver-list">
+            <li><strong>Tailscale Routing, SSO Host Matching &amp; Mobile View Panning:</strong> Routed Tailscale <code>torrents2.digitalresolve.ca</code> traffic to <code>http://100.68.136.76:8081</code>, enabled Microsoft 365 SSO redirects on <code>www.</code>/subdomain origins with post-auth callback execution, and updated <code>html</code> overflow to <code>clip</code> with <code>html.desktop-layout { overflow-x: auto; }</code>.</li>
+            <li><strong>Accurate Offline Status, Sleep Polling &amp; ISP Baseline Order:</strong> Gated NUC latency text cleanly when offline, required consecutive transient probe misses before declaring sleep completion, and sorted the offline ISP fallback history chronologically so the newest sample drives headline gauges.</li>
+            <li><strong>Instant Camera WebRTC Fallback &amp; AdGuard Upgrade Hygiene:</strong> Triggered immediate WebRTC handoff on unsupported MSE codecs, reset MSE state so active WebRTC streams report <code>LIVE WEBRTC</code>, added 10s standby reconnect retries in <code>webrtc.html</code>, and skipped redundant service registration in <code>deploy/adguard/deploy.ps1</code>.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.55 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.55</span>
+            <span class="ver-date">November 21, 2026</span>
+          </div>
+          <h4 class="ver-title">Files SSO Routing Fix, Telemetry XSS/Fallback Cleanup, WS Race Guards &amp; Escape Dedup</h4>
+          <ul class="ver-list">
+            <li><strong>Cross-Device File Browser SSO &amp; Auth Session Fixes:</strong> Removed the broken <code>files.digitalresolve.ca</code> LAN/Tailscale rewrite so FileBrowser authenticates cleanly through Cloudflare Access M365 SSO on every device, wired <code>lockSSO(true, event)</code> onto header and dock lock buttons, and fixed offline/<code>TimeoutError</code> SSO redirect loops.</li>
+            <li><strong>Telemetry Sanitization, Real Vitals &amp; Maintenance Verification:</strong> Extended finite-number and HTML escaping across remaining dashboard and <code>safeMetric</code> sinks, replaced synthetic Desktop CPU/RAM fallbacks with awaiting-vitals states, gated maintenance toggles on verified gateway responses, and deduplicated global Escape modal listeners.</li>
+            <li><strong>WebSocket Fallback Race Hardening &amp; Deploy Script Tracking:</strong> Bound per-socket instances in <code>ai.html</code> and <code>webrtc.html</code> MSE/WebRTC pipelines with timeout/error handled guards, added legacy <code>AbortSignal.timeout</code> fallback guards, and updated <code>.gitignore</code> and AdGuard deploy scripts.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.54 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.54</span>
+            <span class="ver-date">November 21, 2026</span>
+          </div>
+          <h4 class="ver-title">Cache-Bust Asset Sync, Full ISP XSS Sanitization, WS Race Guards &amp; A11y Headings</h4>
+          <ul class="ver-list">
+            <li><strong>Asset Cache-Busting &amp; Complete XSS Sanitization:</strong> Bumped <code>styles.css</code> and <code>app.js</code> cache-busting query strings to <code>v2.8.54</code> across all 7 main pages, extended finite-number validation to all ISP history/baseline DOM paths and disk subtitles, and tightened gateway fetch origin prefix matching.</li>
+            <li><strong>WebSocket Fallback Race Fix &amp; Firefox Shift-Logout:</strong> Hoisted per-socket <code>handled</code> guards above WebSocket connect timeouts on <code>ai.html</code> and <code>webrtc.html</code> to stop duplicate fallback handoffs, and passed explicit click events into <code>lockSSO()</code> for cross-browser Shift+Sign Out support.</li>
+            <li><strong>Semantic Heading Hierarchy &amp; Deploy Script Cleanup:</strong> Added screen-reader section headings to eliminate <code>h1</code>-to-<code>h3</code> level skips across all subpages and removed the stale missing GitHub fallback URL from <code>deploy/adguard/deploy.ps1</code>.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.53 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.53</span>
+            <span class="ver-date">November 21, 2026</span>
+          </div>
+          <h4 class="ver-title">CSRF/SSO Hardening, Modal/Route/XSS Fixes &amp; Mobile Layout Cleanup</h4>
+          <ul class="ver-list">
+            <li><strong>CSRF &amp; Dual-App SSO Sign-Out Hardening:</strong> Converted state-changing gateway actions (power, wake, sleep, feeder dispense/refill) to POST with <code>X-Requested-With</code> headers, avoided transient 5xx/AbortError SSO redirect loops, and cleared <code>wake.digitalresolve.ca</code> Access sessions during sign-out.</li>
+            <li><strong>Accurate Telemetry &amp; XSS Sanitization:</strong> Removed synthetic online/kibble fallback telemetry on fetch errors, escaped ISP history strings and WebRTC status text safely, fixed duplicate WebSocket error/close fallback races, and corrected AI Ops navigation routing.</li>
+            <li><strong>Modal, DOM, Mobile Nav &amp; SEO Alignment:</strong> Fixed maintenance modal scroll lock and <code>.active</code> visibility, closed unclosed uptime legend wrappers, scoped mobile-layout nav drawer collapsing, and synchronized per-page canonical URLs and exact codebase LOC counts.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.52 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.52</span>
+            <span class="ver-date">November 21, 2026</span>
+          </div>
+          <h4 class="ver-title">Unified Microsoft 365 Entra ID Zero Trust SSO, Cryptographic JWT Gateway Verification &amp; LOC Sync</h4>
+          <ul class="ver-list">
+            <li><strong>Unified Microsoft 365 Entra ID SSO:</strong> Placed <code>digitalresolve.ca</code>, <code>wake.digitalresolve.ca</code>, <code>torrents</code>, <code>torrents2</code>, and <code>files</code> behind Cloudflare Access M365 Entra ID SSO (30-day session), eliminating manual admin key prompts while preserving Home Network Bypass on StreamHub, Jellyfin, and CatCam.</li>
+            <li><strong>Cryptographic RS256 Gateway Auth:</strong> Upgraded <code>wol-listener.ps1</code> to verify signed <code>Cf-Access-Jwt-Assertion</code> tokens against Cloudflare Access JWKS and hardened CORS/CSRF controls.</li>
+            <li><strong>Release Log &amp; Metrics Synchronization:</strong> Updated footer/menu version badges and exact codebase Lines of Code counters across all pages.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.22 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.22</span>
+            <span class="ver-date">October 30, 2026</span>
+          </div>
+          <h4 class="ver-title">Dynamic Antigravity Session Synchronization, Live Console Stream & Responsive Navigation</h4>
+          <ul class="ver-list">
+            <li><strong>Dynamic AGY Session Tracking:</strong> Autonomous detection and real-time switching to whichever active Antigravity session is currently working on the website via <code>history.jsonl</code> and multi-node active-session publishing, eliminating hardcoded session IDs.</li>
+            <li><strong>Live Console & Terminal Streaming:</strong> Instant terminal transcript streaming from the NUC gateway via <code>/api/logs?name=agy</code> and remote prompt queueing via <code>/api/agy/send</code>.</li>
+            <li><strong>Desktop Navigation Architecture:</strong> Restored unified horizontal desktop navigation flexbar and eliminated layout-breaking vertical cascading overrides and legacy UTF-8 BOM prefixes across all HTML templates.</li>
+            <li><strong>Automated Dynamic Codebase Metrics:</strong> Live line-of-code calculation dynamically evaluating active stylesheet and JavaScript scale.</li>
+            <li><strong>Dynamic Changelog Engine:</strong> Centralized, non-hardcoded release telemetry powered by dynamic JSON ingestion across all pages and modals.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.20 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.20</span>
+            <span class="ver-date">October 29, 2026</span>
+          </div>
+          <h4 class="ver-title">Streamlined Nodes Navigation, Sleek Button Pills & Unified Control Styling</h4>
+          <ul class="ver-list">
+            <li><strong>Streamlined Nodes Navigation:</strong> Renamed primary category navigation button from <em>FLEET NODES</em> to <code>NODES</code> across all headers and page titles.</li>
+            <li><strong>Sleek Button Pills & Styling Consistency:</strong> Replaced plain radio controls with sleek, interactive button pills (<code>Desktop Node (192.168.2.62)</code> and <code>NUC Server (192.168.2.35)</code>) with cyan/emerald glowing borders and dedicated typography hierarchy for <code>WoL</code>, <code>Sleep</code>, <code>Reboot</code>, and <code>Broadcast WoL</code>.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.19 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.19</span>
+            <span class="ver-date">October 29, 2026</span>
+          </div>
+          <h4 class="ver-title">Instant WebRTC Stream Play, Symmetrical Hardware Telemetry & Remote Power Operations</h4>
+          <ul class="ver-list">
+            <li><strong>Instant WebRTC Streaming:</strong> Hardware-accelerated optical WebRTC feed from Penny's Cat Hub (<code>cam.digitalresolve.ca</code>) with sub-50ms glass-to-glass latency and automated reconnect loop.</li>
+            <li><strong>Symmetrical Node Telemetry:</strong> Synchronized dual-node hardware metrics, CPU/memory vitals, disk arrays, and network transport matrix between NUC server and Desktop workstation.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.7 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.7</span>
+            <span class="ver-date">October 28, 2026</span>
+          </div>
+          <h4 class="ver-title">Unified Homelab Service Dashboard Button Styles & Cache-Busted Pipeline</h4>
+          <ul class="ver-list">
+            <li><strong>Strict Button Hierarchy & Consistency:</strong> Standardized all dashboard filter tabs and card action buttons under the shared <code>.btn-schematic-chip</code> class, guaranteeing uniform padding, typography, hover glow, and active click states.</li>
+            <li><strong>Cache-Busted Distribution:</strong> Bumped stylesheet distribution ensuring instant viewport synchronization across Cloudflare Edge and client browsers.</li>
+            <li><strong>Pure ASCII Guarantees:</strong> Replaced dynamic refresh indicators with pure ASCII inline SVG vectors to permanently prevent character decoding artifacts.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.6 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.6</span>
+            <span class="ver-date">October 28, 2026</span>
+          </div>
+          <h4 class="ver-title">M365 Dedicated SSO Authentication Symmetrical Refresh & Connected Pet Feeder IoT Bridge</h4>
+          <ul class="ver-list">
+            <li><strong>M365 Sign In Multi-Layer Synchronization:</strong> Restored top navigation <code>[ Sign In with M365 ]</code> authentication engine with symmetrical cookie synchronization, global scope variable resolution, and automatic cache-busting reload.</li>
+            <li><strong>Penny's Smart Feeder IoT Bridge:</strong> Fully connected and armed Penny's Smart Feeder IoT (<code>192.168.2.22</code>) with active hardware bridge via NUC backend endpoint (<code>/api/feeder/dispense</code>), live multi-portion motor actuation, and real-time telemetry logging.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.5 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.5</span>
+            <span class="ver-date">October 28, 2026</span>
+          </div>
+          <h4 class="ver-title">Dynamic 2-Decimal Precision Telemetry & Non-Hardcoded Quota Ingestion</h4>
+          <ul class="ver-list">
+            <li><strong>Dynamic Real-Time Precision:</strong> Replaced static allocation percentages with live mathematical calculations computed to 2 decimal places ingested directly from live session transcripts.</li>
+            <li><strong>Symmetrical Ingestion & UI Binding:</strong> Synchronized frontend telemetry controllers and NUC webhook listener with live float precision, eliminating hardcoded model estimates across all dashboard decks.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.4 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.4</span>
+            <span class="ver-date">October 28, 2026</span>
+          </div>
+          <h4 class="ver-title">Accurate Gemini Usage & Multi-Tier Model Allocation</h4>
+          <ul class="ver-list">
+            <li><strong>Accurate Gemini Telemetry:</strong> Updated token allocation across header tags, status ribbon, and AGY console modal to reflect multi-tier model usage.</li>
+            <li><strong>Dynamic Model Allocation Meter:</strong> Updated progress bar and telemetry badges with segmented visualization.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.3 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.3</span>
+            <span class="ver-date">October 28, 2026</span>
+          </div>
+          <h4 class="ver-title">NUC Scheduled Maintenance Mode & Zero-Penalty SLA Shield</h4>
+          <ul class="ver-list">
+            <li><strong>NUC Server Maintenance Window Engine:</strong> Introduced dedicated scheduled maintenance mode controller in the Control Matrix and SLA Telemetry ribbon to protect 90-Day SLA metrics during Windows Updates, driver installs, and reboots.</li>
+            <li><strong>Zero-Penalty SLA Protection:</strong> Planned maintenance windows are mathematically exempt from unplanned outage incidents, preserving live Grade A+ uptime compliance.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.2 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.2</span>
+            <span class="ver-date">October 28, 2026</span>
+          </div>
+          <h4 class="ver-title">Topology Circuit Flows, Heartbeat Sparkline & Dynamic Codebase Metrics</h4>
+          <ul class="ver-list">
+            <li><strong>Hardware Topology Schematic Packet Flows:</strong> Restored and enhanced animated glowing SVG packet streams with hardware-accelerated <code>stroke-dashoffset</code> keyframes across Firefox, Chrome, and Edge.</li>
+            <li><strong>Dynamic Heartbeat Oscilloscope:</strong> Activated dynamic multi-tier waveform rendering on the 24-Hour SLA Latency Sparkline canvas with tab-visibility management.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.1 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.1</span>
+            <span class="ver-date">October 28, 2026</span>
+          </div>
+          <h4 class="ver-title">Live Token Telemetry, Zero-PIN Security & Dynamic Codebase Metrics</h4>
+          <ul class="ver-list">
+            <li><strong>Dynamic AI Token Telemetry:</strong> Real-time regex ingestion of active Antigravity session transcripts (Gemini Flash: 100%, Context Cache Reused).</li>
+            <li><strong>Zero-PIN Security Deprecation:</strong> Completely eradicated PIN credentials across client and server in favor of strict Microsoft 365 Entra ID SSO & MFA.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.0 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.0</span>
+            <span class="ver-date">October 27, 2026</span>
+          </div>
+          <h4 class="ver-title">Consolidated Compute & AI Console, Clean UI & Top SSO</h4>
+          <ul class="ver-list">
+            <li><strong>Consolidated Compute & Operations:</strong> Grouped the Live Interactive Terminal and Ollama 24/7 Local Inference Playground together in a unified operations hub.</li>
+            <li><strong>Cloudflare Zero Trust Edge Lockdown:</strong> Enforced strict Microsoft 365 identity challenges on 100% of subdomain requests.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- NUC Server Scheduled Maintenance & SLA Protection Modal -->
+  <div id="maintenance-modal-overlay" class="health-modal-overlay" style="display: none;" onclick="if(event.target===this)closeMaintenanceModal()">
+    <div class="health-modal-window" role="dialog" aria-modal="true" aria-label="NUC Server Scheduled Maintenance Mode" style="max-width: 680px; max-height: 90vh; display: flex; flex-direction: column;">
+      <div class="health-modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 14px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.4rem;">[MAINT]</span>
+          <div>
+            <h3 style="font-size: 1.05rem; font-weight: 800; color: #f8fafc; margin: 0;">NUC Server Scheduled Maintenance Window</h3>
+            <div style="font-size: 0.76rem; color: #94a3b8; margin-top: 2px;">Protect 90-Day SLA &amp; Cluster Heartbeat (0 Outage Impact) during Windows Updates &amp; Reboots</div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-secondary" aria-label="Close maintenance modal" onclick="closeMaintenanceModal()" style="font-size: 0.85rem; padding: 4px 10px; cursor: pointer;">&times;</button>
+      </div>
+
+      <div class="health-modal-body" style="padding: 18px 0; display: flex; flex-direction: column; gap: 16px; overflow-y: auto;">
+        <!-- Status Banner -->
+        <div id="maint-modal-banner" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span class="pulse-dot" id="maint-banner-dot" style="background: #10b981; box-shadow: 0 0 8px #10b981; width: 10px; height: 10px;"></span>
+            <div>
+              <div style="font-weight: 700; color: #f0fdf4; font-size: 0.88rem;" id="maint-banner-title">Normal 24/7 Operations &mdash; 90-Day SLA: --</div>
+              <div style="font-size: 0.76rem; color: #94a3b8;" id="maint-banner-sub">Planned maintenance windows are excluded from outage penalties.</div>
+            </div>
+          </div>
+          <span class="item-tag online" id="maint-banner-tag">SLA Protected</span>
+        </div>
+
+        <!-- Window Duration Selector -->
+        <div>
+          <label style="font-size: 0.8rem; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 8px;">Select Maintenance Window Duration:</label>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px;">
+            <button type="button" class="btn btn-secondary maint-dur-btn" data-dur="15" onclick="selectMaintDuration(15)" style="font-size: 0.78rem; padding: 8px; text-align: center; border-color: rgba(255,255,255,0.15);">15 Minutes<br><span style="font-size: 0.68rem; color: #94a3b8;">Quick Patch</span></button>
+            <button type="button" class="btn btn-secondary maint-dur-btn active" data-dur="30" onclick="selectMaintDuration(30)" style="font-size: 0.78rem; padding: 8px; text-align: center; border-color: #f59e0b; color: #fef08a !important; background: rgba(245, 158, 11, 0.15);">30 Minutes<br><span style="font-size: 0.68rem; color: #cbd5e1;">Windows Update</span></button>
+            <button type="button" class="btn btn-secondary maint-dur-btn" data-dur="60" onclick="selectMaintDuration(60)" style="font-size: 0.78rem; padding: 8px; text-align: center; border-color: rgba(255,255,255,0.15);">1 Hour<br><span style="font-size: 0.68rem; color: #94a3b8;">Deep Updates</span></button>
+            <button type="button" class="btn btn-secondary maint-dur-btn" data-dur="120" onclick="selectMaintDuration(120)" style="font-size: 0.78rem; padding: 8px; text-align: center; border-color: rgba(255,255,255,0.15);">2 Hours<br><span style="font-size: 0.68rem; color: #94a3b8;">Hardware/Driver</span></button>
+            <button type="button" class="btn btn-secondary maint-dur-btn" data-dur="0" onclick="selectMaintDuration(0)" style="font-size: 0.78rem; padding: 8px; text-align: center; border-color: rgba(255,255,255,0.15);">Manual Toggle<br><span style="font-size: 0.68rem; color: #94a3b8;">Until Closed</span></button>
+          </div>
+        </div>
+
+        <!-- Reason Input -->
+        <div>
+          <label for="maint-reason-input" style="font-size: 0.8rem; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 6px;">Maintenance Reason / Work Description:</label>
+          <input type="text" id="maint-reason-input" class="quick-drop-input" value="Windows Updates &amp; Optimization" placeholder="e.g. Windows Cumulative Update &amp; Reboot" style="width: 100%; box-sizing: border-box;">
+        </div>
+
+        <!-- DevOps SLA Protection Features -->
+        <div style="background: rgba(2, 6, 23, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 12px 14px; font-size: 0.78rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 8px;">
+          <div style="font-weight: 700; color: #60a5fa; display: flex; align-items: center; gap: 6px;">
+            Zero-Penalty SLA Shield Protections:
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="maint-chk-pause" checked style="accent-color: #3b82f6;">
+            <label for="maint-chk-pause">Gracefully pause torrent swarms during maintenance</label>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="maint-chk-resume" checked style="accent-color: #3b82f6;">
+            <label for="maint-chk-resume">Auto-resume all torrents &amp; background daemons when maintenance ends</label>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="maint-chk-sla" checked disabled style="accent-color: #10b981;">
+            <label for="maint-chk-sla" style="color: #6ee7b7;">Exempt reboots from 90-Day SLA downtime &amp; suppress watchdog failure alerts</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Buttons -->
+      <div style="border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <button type="button" class="btn btn-secondary" onclick="closeMaintenanceModal()" style="font-size: 0.8rem; padding: 6px 14px;">Close</button>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button type="button" id="btn-maint-trigger-update" class="btn btn-secondary" onclick="activateMaintenanceWithUpdate()" style="font-size: 0.8rem; padding: 6px 14px; color: #38bdf8 !important; border-color: rgba(56, 189, 248, 0.4);" title="Activate maintenance window and immediately execute Update-Computer on NUC">
+            Maintenance &amp; Run Update-Computer
+          </button>
+          <button type="button" id="btn-maint-toggle-action" class="btn btn-primary" onclick="confirmToggleMaintenance()" style="font-size: 0.8rem; padding: 6px 16px; background: linear-gradient(135deg, #f59e0b, #d97706); border-color: #f59e0b;">
+            Activate Maintenance Window
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="app.js?v=2.8.73"></script>
+  <script src="storage-flow.js?v=2.8.73"></script>
+</body>
+</html>

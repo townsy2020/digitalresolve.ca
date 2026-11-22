@@ -7,8 +7,8 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Uptime & SLA Matrix - Homelab Operations</title>
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.72 - Uptime & SLA Matrix - Homelab Operations">
-  <link rel="stylesheet" href="styles.css?v=2.8.72">
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.73 - Uptime & SLA Matrix - Homelab Operations">
+  <link rel="stylesheet" href="styles.css?v=2.8.73">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -52,6 +52,7 @@
           <a href="index.html" class="btn-nav">DECK</a>
           <a href="services.html" class="btn-nav">SERVICES</a>
           <a href="fleet.html" class="btn-nav">NODES</a>
+          <a href="storage.html" class="btn-nav">STORAGE</a>
           <a href="uptime.html" class="btn-nav active">UPTIME</a>
           <a href="media.html" class="btn-nav">MEDIA</a>
           <a href="penny.html" class="btn-nav">PENNY</a>
@@ -73,6 +74,11 @@
               <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
               <span>Live Service Status Dashboard</span>
               <span class="item-tag online">Live</span>
+            </a>
+            <a href="storage.html" class="btn-action-item" title="Open Tiered Storage &amp; Live Data Flow Schematic">
+              <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+              <span>Tiered Storage Live Flow</span>
+              <span class="item-tag online">4 Tiers</span>
             </a>
             <a href="ops.html#nuc-services" class="btn-action-item" title="Open NUC 24/7 Telemetry &amp; Microservices Suite">
               <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
@@ -255,7 +261,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.72</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.73</span>)</span>
             </button>
             <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO(true, event)" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -927,12 +933,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.72</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.73</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 30,539 Lines of Code (HTML: 16,801 lines | CSS: 6,560 lines | JS: 7,177 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 34,053 Lines of Code (HTML: 18,718 lines | CSS: 7,267 lines | JS: 8,067 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">30,539</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">34,053</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1527,10 +1533,23 @@
       </div>
 
             <div class="changelog-body">
-                        <!-- Version v2.8.72 (Current) -->
+                                                <!-- Version v2.8.73 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.72 | Current</span>
+            <span class="ver-tag current">v2.8.73 | Current</span>
+            <span class="ver-date">November 22, 2026</span>
+          </div>
+          <h4 class="ver-title">Tiered Storage &amp; Live Data Flow Schematic, 8-Tab Navbar &amp; Pipeline Inspector</h4>
+          <ul class="ver-list">
+            <li><strong>Standalone Tiered Storage Flow Page:</strong> Added <code>storage.html</code> and isolated <code>storage-flow.js</code> featuring a 5-card KPI strip, interactive 4-tier animated SVG flowchart (Workstation &rarr; NUC Hot Media &rarr; QNAP SMB &amp; Dual iSCSI &rarr; OneDrive Vault), HiDPI throughput waveform canvas, capacity distribution bars, clickable node/pipe inspector, and script pipeline matrix.</li>
+            <li><strong>Live /api/storage-flow &amp; M365-Gated Triggers:</strong> Integrated live NUC gateway telemetry (<code>/api/storage-flow</code>) with LAN fallback, category filtering (<code>All Flows</code>, <code>Media Tiering</code>, <code>Backups &amp; DR</code>, <code>Guardrails</code>), and M365-SSO-gated manual pipeline triggers (<code>/api/storage-flow/trigger</code>).</li>
+            <li><strong>Site-Wide 8-Tab Navbar &amp; v2.8.73 LOC Sync:</strong> Added <code>STORAGE</code> tab and <code>Tiered Storage Live Flow</code> dropdown entry across all 8 dashboard pages, tuned <code>.nav-pages-group</code> for single-row <code>1280x720</code>/<code>1440x900</code> fit, and synchronized exact codebase LOC metrics.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.72 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.72</span>
             <span class="ver-date">November 22, 2026</span>
           </div>
           <h4 class="ver-title">Bedroom Camera MSE/WebRTC Reliability, In-Place Switching &amp; NUC Gateway Player Sync</h4>
@@ -1994,6 +2013,6 @@
       </div>
     </div>
   </div>
-  <script src="app.js?v=2.8.72"></script>
+  <script src="app.js?v=2.8.73"></script>
 </body>
 </html>

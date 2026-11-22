@@ -163,26 +163,27 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.72';
+          const activeVer = match ? match[0] : 'v2.8.73';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 16801;
-      const baseCssLines = 6560;
-      const baseJsLines = 7177;
+      const baseHtmlLines = 18718;
+      const baseCssLines = 7267;
+      const baseJsLines = 8067;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
       // Asynchronously count exact live lines via parallel cache-busted fetch
       Promise.all([
         fetch('styles.css?_t=' + Date.now(), { signal: _fetchSig(6000) }).then(r => r.ok ? r.text() : null).catch(() => null),
-        fetch('app.js?_t=' + Date.now(), { signal: _fetchSig(6000) }).then(r => r.ok ? r.text() : null).catch(() => null)
-      ]).then(([cssSrc, jsSrc]) => {
+        fetch('app.js?_t=' + Date.now(), { signal: _fetchSig(6000) }).then(r => r.ok ? r.text() : null).catch(() => null),
+        fetch('storage-flow.js?_t=' + Date.now(), { signal: _fetchSig(6000) }).then(r => r.ok ? r.text() : null).catch(() => null)
+      ]).then(([cssSrc, jsSrc, sfSrc]) => {
         const cLines = cssSrc ? cssSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : baseCssLines;
-        const jLines = jsSrc ? jsSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : baseJsLines;
+        const jLines = (jsSrc ? jsSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : 7178) + (sfSrc ? sfSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : 889);
         const total = baseHtmlLines + cLines + jLines + baseCnameLines;
         const totalFormatted = total.toLocaleString();
 
