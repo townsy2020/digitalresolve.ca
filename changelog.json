@@ -1,7 +1,22 @@
 ﻿{
-    "updatedAt":  "2026-11-22T16:38:00Z",
-    "currentVersion":  "v2.8.75",
+    "updatedAt":  "2026-11-22T16:52:00Z",
+    "currentVersion":  "v2.8.76",
     "releases":  [
+                     {
+                         "version":  "v2.8.76",
+                         "date":  "November 22, 2026",
+                         "title":  "Honest 6-Tier ISP Quality Rubric & Removal of Hardcoded Ultra Stable Labels",
+                         "changes":  [
+                                         {
+                                             "label":  "6-Tier WAN Grading Scale (A+ to F)",
+                                             "text":  "Replaced loose Test-ISPHealth.ps1 thresholds (previously up to 40 ms ping and 2% loss graded A+) with a strict worst-metric-wins rubric (A+ Optimal: 0% loss, <=15ms ping, <=3ms jitter through F Degraded: >10% loss, >150ms ping, or >50ms jitter)."
+                                         },
+                                         {
+                                             "label":  "Dynamic UI Badges, Tooltips & Fallback Removal",
+                                             "text":  "Added evaluateIspGrade() in app.js, removed hardcoded (Ultra Stable), Zero Bufferbloat, and fake A+/100% fallbacks across Health Radar, ISP history rows, and #isp-grade-tag, and exposed the exact threshold scale in hover tooltips."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.75",
                          "date":  "November 22, 2026",

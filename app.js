@@ -163,16 +163,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.75';
+          const activeVer = match ? match[0] : 'v2.8.76';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 18902;
+      const baseHtmlLines = 18998;
       const baseCssLines = 7267;
-      const baseJsLines = 8090;
+      const baseJsLines = 8144;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
@@ -183,7 +183,7 @@
         fetch('storage-flow.js?_t=' + Date.now(), { signal: _fetchSig(6000) }).then(r => r.ok ? r.text() : null).catch(() => null)
       ]).then(([cssSrc, jsSrc, sfSrc]) => {
         const cLines = cssSrc ? cssSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : baseCssLines;
-        const jLines = (jsSrc ? jsSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : 7201) + (sfSrc ? sfSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : 889);
+        const jLines = (jsSrc ? jsSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : 7255) + (sfSrc ? sfSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : 889);
         const total = baseHtmlLines + cLines + jLines + baseCnameLines;
         const totalFormatted = total.toLocaleString();
 
@@ -819,23 +819,30 @@
             const ping = isp.pingAvgMs;
             const jit = isp.jitterMs !== undefined ? isp.jitterMs : 0;
             const loss = isp.packetLoss !== undefined ? isp.packetLoss : 0;
+            const meta = evaluateIspGrade(ping, jit, loss, isp.grade);
             if (statusSpan) {
-              statusSpan.style.color = '#38bdf8';
-              statusSpan.textContent = `${isp.grade || 'A+'} (${ping} ms • ±${jit} ms Jitter)`;
+              statusSpan.style.color = meta.color;
+              statusSpan.textContent = `${meta.grade} (${ping} ms • ±${jit} ms Jitter)`;
+              statusSpan.title = meta.tooltip;
             }
             if (fillBar) {
-              const pct = Math.max(90, Math.min(100, Math.round(100 - (ping * 1.5))));
-              fillBar.style.width = `${pct}%`;
+              fillBar.style.width = `${meta.score}%`;
+              fillBar.style.background = meta.barColor;
             }
             if (subText) {
-              subText.textContent = `ISP Performance: Bell Gigabit Fiber • Packet Loss: ${loss}% • Zero Bufferbloat`;
+              subText.textContent = `ISP Performance: ${isp.isp || 'Bell Canada'} • Loss: ${loss}% • ${meta.label}`;
+              subText.title = meta.tooltip;
             }
           } else {
             if (statusSpan) {
-              statusSpan.style.color = '#38bdf8';
-              statusSpan.textContent = '100% (Bell FTTH)';
+              statusSpan.style.color = '#94a3b8';
+              statusSpan.textContent = 'Awaiting probe';
             }
-            if (fillBar) fillBar.style.width = '100%';
+            if (fillBar) {
+              fillBar.style.width = '0%';
+              fillBar.style.background = '#64748b';
+            }
+            if (subText) subText.textContent = 'ISP Performance: Awaiting telemetry probe';
           }
         }
         // 5. Media Storage Capacity (D:\Torrents)
@@ -3292,6 +3299,49 @@
         });
     }
 
+    // Honest 6-tier WAN Quality Grade rubric (worst metric wins: A+ -> F)
+    function evaluateIspGrade(pingAvg, jitter, loss, rawGrade) {
+      const p = (pingAvg !== null && pingAvg !== undefined && pingAvg !== '' && Number.isFinite(Number(pingAvg))) ? Number(pingAvg) : null;
+      const j = (jitter !== null && jitter !== undefined && jitter !== '' && Number.isFinite(Number(jitter))) ? Number(jitter) : null;
+      const l = (loss !== null && loss !== undefined && loss !== '' && Number.isFinite(Number(loss))) ? Number(loss) : null;
+      const tiers = {
+        'A+': { label: 'Optimal',   cls: 'item-tag online',  style: '', score: 100, color: '#34d399', barColor: '#10b981' },
+        'A':  { label: 'Very Good', cls: 'item-tag online',  style: '', score: 90,  color: '#38bdf8', barColor: '#38bdf8' },
+        'B':  { label: 'Good',      cls: 'item-tag',         style: '', score: 78,  color: '#38bdf8', barColor: '#38bdf8' },
+        'C':  { label: 'Fair',      cls: 'item-tag',         style: 'background: rgba(245, 158, 11, 0.18); color: #fbbf24; border-color: rgba(245, 158, 11, 0.4);', score: 60, color: '#fbbf24', barColor: '#f59e0b' },
+        'D':  { label: 'Poor',      cls: 'item-tag offline', style: '', score: 35,  color: '#f87171', barColor: '#ef4444' },
+        'F':  { label: 'Degraded',  cls: 'item-tag offline', style: '', score: 10,  color: '#f87171', barColor: '#ef4444' }
+      };
+      const scaleDesc = 'Scale: A+ Optimal (0% loss, <=15ms, <=3ms jit) | A Very Good (<=0.5%, <=25ms, <=6ms) | B Good (<=1%, <=45ms, <=12ms) | C Fair (<=3%, <=80ms, <=25ms) | D Poor (<=10%, <=150ms, <=50ms) | F Degraded (>10% / >150ms / >50ms)';
+      let grade = '--';
+      if (p !== null && j !== null && l !== null) {
+        grade = 'A+';
+        if (p > 15 || j > 3 || l > 0) grade = 'A';
+        if (p > 25 || j > 6 || l > 0.5) grade = 'B';
+        if (p > 45 || j > 12 || l > 1) grade = 'C';
+        if (p > 80 || j > 25 || l > 3) grade = 'D';
+        if (p > 150 || j > 50 || l > 10 || l >= 100) grade = 'F';
+      } else if (rawGrade) {
+        const norm = String(rawGrade).trim();
+        grade = (norm === 'Degraded') ? 'F' : (tiers[norm] ? norm : '--');
+      }
+      const meta = tiers[grade] || { label: 'Awaiting probe', cls: 'item-tag', style: '', score: 0, color: '#94a3b8', barColor: '#64748b' };
+      const measuredStr = (p !== null && j !== null && l !== null)
+        ? `Measured: ${p} ms avg | ±${j} ms jitter | ${l}% loss\n`
+        : '';
+      return {
+        grade,
+        label: meta.label,
+        cls: meta.cls,
+        style: meta.style,
+        score: meta.score,
+        color: meta.color,
+        barColor: meta.barColor,
+        tooltip: `${measuredStr}${scaleDesc}`
+      };
+    }
+    window.evaluateIspGrade = evaluateIspGrade;
+
     // ISP Diagnostics & History Poller
     function fetchISPHistory() {
       const numField = (v, fb) => (v !== null && v !== undefined && v !== '' && Number.isFinite(Number(v))) ? Number(v) : fb;
@@ -3304,6 +3354,7 @@
           const max = numField(r && r.pingMaxMs, null);
           const jit = numField(r && r.jitterMs, null);
           const loss = numField(r && r.packetLoss, 0);
+          const rowMeta = evaluateIspGrade(avg, jit, loss, r && r.grade);
           return `
                 <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
                   <td style="padding: 6px 8px; color: #8b949e;">${escapeHtml(String((r && (r.timeShort || r.timestamp)) || 'Recent'))}</td>
@@ -3312,7 +3363,7 @@
                   <td style="padding: 6px 8px;">${min !== null && max !== null ? `${min} / ${max} ms` : '--'}</td>
                   <td style="padding: 6px 8px; color: #4ade80;">${jit !== null ? `&plusmn; ${jit} ms` : '--'}</td>
                   <td style="padding: 6px 8px;">${loss !== null ? `${loss}%` : '--'}</td>
-                  <td style="padding: 6px 8px;"><span class="item-tag online" style="font-size: 0.7rem; padding: 2px 6px;">${escapeHtml(String((r && r.grade) || 'A+'))}</span></td>
+                  <td style="padding: 6px 8px;"><span class="${rowMeta.cls}" style="font-size: 0.7rem; padding: 2px 6px; ${rowMeta.style}" title="${escapeHtml(rowMeta.tooltip)}">${escapeHtml(rowMeta.grade)}</span></td>
                 </tr>
               `;
         }).join('');
@@ -3376,8 +3427,11 @@
         if (jitterVal) jitterVal.innerHTML = jitter !== null ? `&plusmn; ${jitter} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>` : `-- <span style="font-size: 0.9rem; color: #8b949e;">ms</span>`;
         if (lossSub) lossSub.textContent = `Packet Loss: ${loss !== null ? loss + '%' : '--'} | Fiber Optic`;
         if (gradeTag) {
-          gradeTag.textContent = grade !== '--' ? `Grade: ${grade} (Ultra Stable)` : 'Grade: --';
-          gradeTag.className = grade === 'A+' ? 'item-tag online' : 'item-tag';
+          const gradeMeta = evaluateIspGrade(pingAvg, jitter, loss, grade !== '--' ? grade : null);
+          gradeTag.textContent = gradeMeta.grade !== '--' ? `Grade: ${gradeMeta.grade} (${gradeMeta.label})` : 'Grade: --';
+          gradeTag.className = gradeMeta.cls;
+          gradeTag.style.cssText = gradeMeta.style || '';
+          gradeTag.title = gradeMeta.tooltip;
         }
         if (carrierVal) carrierVal.textContent = carrier;
         if (uptimeVal && uptimeStr && (!uptimeVal.textContent || uptimeVal.textContent.trim() === '--')) {
@@ -6153,8 +6207,8 @@
           const downStr = (rawDown !== null && Number.isFinite(rawDown)) ? String(rawDown) : '--';
           const upStr = (rawUp !== null && Number.isFinite(rawUp)) ? String(rawUp) : '--';
           const realCarrier = latest.isp || carrier;
-          const realGrade = latest.grade || '--';
           const realLoss = (latest.packetLoss !== undefined && latest.packetLoss !== null) ? latest.packetLoss : 0;
+          const realGrade = evaluateIspGrade(rawPing, latest.jitterMs, realLoss, latest.grade).grade;
 
           if (pingEl) pingEl.innerHTML = `${pingStr} <span style="font-size: 0.85rem; color: #94a3b8;">ms</span>`;
           if (downEl) downEl.innerHTML = downStr === '--' ? `--` : `${downStr} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;

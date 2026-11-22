@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Services - Self-Hosted Homelab Portfolio</title>
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.75 - Services - Self-Hosted Homelab Portfolio">
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.76 - Services - Self-Hosted Homelab Portfolio">
   <link rel="stylesheet" href="styles.css?v=2.8.74">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -261,7 +261,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.75</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.76</span>)</span>
             </button>
             <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO(true, event)" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -577,12 +577,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.75</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.76</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 34,260 Lines of Code (HTML: 18,902 lines | CSS: 7,267 lines | JS: 8,090 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 34,410 Lines of Code (HTML: 18,998 lines | CSS: 7,267 lines | JS: 8,144 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">34,260</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">34,410</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1178,10 +1178,22 @@
       </div>
 
             <div class="changelog-body">
-                <!-- Version v2.8.75 (Current) -->
+                        <!-- Version v2.8.76 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.75 | Current</span>
+            <span class="ver-tag current">v2.8.76 | Current</span>
+            <span class="ver-date">November 22, 2026</span>
+          </div>
+          <h4 class="ver-title">Honest 6-Tier ISP Quality Rubric &amp; Removal of Hardcoded Ultra Stable Labels</h4>
+          <ul class="ver-list">
+            <li><strong>6-Tier WAN Grading Scale (A+ to F):</strong> Replaced loose thresholds in <code>Test-ISPHealth.ps1</code> (previously up to 40 ms ping and 2% loss graded A+) with a strict worst-metric-wins rubric (<code>A+ Optimal</code>: 0% loss, &le;15 ms ping, &le;3 ms jitter down to <code>F Degraded</code>).</li>
+            <li><strong>Dynamic UI Badges &amp; Threshold Tooltips:</strong> Added <code>evaluateIspGrade()</code> in <code>app.js</code>, removed hardcoded <code>(Ultra Stable)</code>, <code>Zero Bufferbloat</code>, and fake <code>A+</code>/<code>100%</code> fallbacks, and exposed the exact rubric in hover tooltips.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.75 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.75</span>
             <span class="ver-date">November 22, 2026</span>
           </div>
           <h4 class="ver-title">3-Minute AGY Quota Sync, Clear All-Time Token Labels &amp; Dropdown Wrap Fix</h4>
@@ -1681,6 +1693,6 @@
       </div>
     </div>
   </div>
-  <script src="app.js?v=2.8.75"></script>
+  <script src="app.js?v=2.8.76"></script>
 </body>
 </html>
