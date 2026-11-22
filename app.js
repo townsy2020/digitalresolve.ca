@@ -163,16 +163,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.77';
+          const activeVer = match ? match[0] : 'v2.8.78';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 19102;
-      const baseCssLines = 7267;
-      const baseJsLines = 8176;
+      const baseHtmlLines = 19220;
+      const baseCssLines = 7269;
+      const baseJsLines = 8211;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
@@ -183,7 +183,7 @@
         fetch('storage-flow.js?_t=' + Date.now(), { signal: _fetchSig(6000) }).then(r => r.ok ? r.text() : null).catch(() => null)
       ]).then(([cssSrc, jsSrc, sfSrc]) => {
         const cLines = cssSrc ? cssSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : baseCssLines;
-        const jLines = (jsSrc ? jsSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : 7258) + (sfSrc ? sfSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : 918);
+        const jLines = (jsSrc ? jsSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : 7293) + (sfSrc ? sfSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : 918);
         const total = baseHtmlLines + cLines + jLines + baseCnameLines;
         const totalFormatted = total.toLocaleString();
 
@@ -797,16 +797,19 @@
         // 3. Mullvad WireGuard Privacy Shield
         else if (text.includes('Mullvad WireGuard')) {
           const vpnIp = telemetry.vpnExitIp || (window.LAST_SWARM && window.LAST_SWARM.vpnExitIp);
-          if (statusSpan) {
-            statusSpan.style.color = '#34d399';
-            statusSpan.textContent = vpnIp ? `100% (Protected)` : '100% (Encrypted)';
-          }
-          if (fillBar) {
-            fillBar.style.width = '100%';
-            fillBar.style.background = '#10b981';
-          }
-          if (subText && vpnIp) {
-            subText.textContent = `Tunnel Status: Active • VPN Exit: ${vpnIp} • Kill-switch Enforced`;
+          const nucOnline = window.NUC_IS_ONLINE !== false;
+          if (vpnIp) {
+            if (statusSpan) { statusSpan.style.color = '#34d399'; statusSpan.textContent = '100% (Protected)'; }
+            if (fillBar) { fillBar.style.width = '100%'; fillBar.style.background = '#10b981'; }
+            if (subText) subText.textContent = `Tunnel Status: Active • VPN Exit: ${vpnIp} • Kill-switch Enforced`;
+          } else if (!nucOnline) {
+            if (statusSpan) { statusSpan.style.color = '#ef4444'; statusSpan.textContent = '0% (Offline)'; }
+            if (fillBar) { fillBar.style.width = '0%'; fillBar.style.background = '#ef4444'; }
+            if (subText) subText.textContent = 'Tunnel Status: Gateway Offline';
+          } else {
+            if (statusSpan) { statusSpan.style.color = '#94a3b8'; statusSpan.textContent = 'Awaiting VPN status'; }
+            if (fillBar) { fillBar.style.width = '0%'; fillBar.style.background = '#64748b'; }
+            if (subText) subText.textContent = 'Tunnel Status: Awaiting telemetry';
           }
         }
         // 4. Bell Canada Gigabit Fiber
@@ -938,7 +941,7 @@
 
       if (nCpuTemp) nCpuTemp.textContent = 'No Sensor';
       if (dCpuTemp) dCpuTemp.textContent = isDeskOnline ? 'No Sensor' : 'Standby (No Sensor)';
-      if (thTag) {
+      if (thTag && !window._hasLiveClimate) {
         thTag.textContent = 'No Sensor';
       }
       const ambTemp = document.getElementById('iot-ambient-temp');
@@ -1250,12 +1253,14 @@
             schematicNodesData.storage.services = `Local Drive D: (${disk.usedPercent}% Full) - Desktop NVMe Backup Pool`;
           }
         } catch (e) {}
-        ['stag-streamhub', 'stag-files', 'stag-cam', 'stag-wol', 'stag-torrents2'].forEach(id => {
-          const el = document.getElementById(id);
-          if (el) { el.className = `item-tag ${isOnline ? 'online' : 'offline'}`; el.textContent = isOnline ? 'Operational' : 'Unreachable'; }
-        });
-        const stagCf = document.getElementById('stag-cf');
-        if (stagCf) { stagCf.className = `item-tag ${isOnline ? 'online' : 'offline'}`; stagCf.textContent = isOnline ? 'Shield Active' : 'Origin Standby'; }
+        if (!isOnline || !window._hasLiveServicesHealth) {
+          ['stag-streamhub', 'stag-files', 'stag-cam', 'stag-wol', 'stag-torrents2'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) { el.className = `item-tag ${isOnline ? 'online' : 'offline'}`; el.textContent = isOnline ? 'Operational' : 'Unreachable'; }
+          });
+          const stagCf = document.getElementById('stag-cf');
+          if (stagCf) { stagCf.className = `item-tag ${isOnline ? 'online' : 'offline'}`; stagCf.textContent = isOnline ? 'Shield Active' : 'Origin Standby'; }
+        }
 
         const stNuc = document.getElementById('status-tag-nuc');
         if (stNuc) { stNuc.textContent = isOnline ? '24/7 Core' : 'Offline'; stNuc.className = 'item-tag ' + (isOnline ? 'online' : 'offline'); }
@@ -1267,18 +1272,20 @@
         if (fLatNuc) { fLatNuc.textContent = isOnline ? `192.168.2.35 • ${latencyMs !== null ? `${latencyMs} ms (8.8.8.8)` : 'Online'}` : `192.168.2.35 • Unreachable`; }
 
         const latS = safeNum(latencyMs, null);
-        const mStream = document.getElementById('meta-watch-streamhub');
-        if (mStream) mStream.innerHTML = isOnline ? `${latS !== null ? latS + ' ms' : 'Online'} &bull; Sentinel Armed (3m)` : 'Unreachable &bull; Offline';
-        const mFiles = document.getElementById('meta-watch-files');
-        if (mFiles) mFiles.innerHTML = isOnline ? `${latS !== null ? latS + ' ms' : 'Online'} &bull; Auto-Mount Active` : 'Unreachable &bull; Offline';
-        const mCam = document.getElementById('meta-watch-cam');
-        if (mCam) mCam.innerHTML = isOnline ? '&lt;50ms Low-Latency WebRTC' : 'Unreachable &bull; Offline';
-        const mWol = document.getElementById('meta-watch-wol');
-        if (mWol) mWol.innerHTML = isOnline ? `${latS !== null ? latS + ' ms' : 'Online'} &bull; Fast-Path` : 'Unreachable &bull; Offline';
-        const mTorrents2 = document.getElementById('meta-watch-torrents2');
-        if (mTorrents2) mTorrents2.innerHTML = isOnline ? `${latS !== null ? latS + ' ms' : 'Online'} &bull; Swarm Active` : 'Unreachable &bull; Offline';
-        const mCf = document.getElementById('meta-watch-cf');
-        if (mCf) mCf.innerHTML = isOnline ? 'Anycast OK &bull; Global Anycast Resilient' : 'Standby &bull; Ingress Suspended';
+        if (!isOnline || !window._hasLiveServicesHealth) {
+          const mStream = document.getElementById('meta-watch-streamhub');
+          if (mStream) mStream.innerHTML = isOnline ? `${latS !== null ? latS + ' ms' : 'Online'} &bull; Sentinel Armed (3m)` : 'Unreachable &bull; Offline';
+          const mFiles = document.getElementById('meta-watch-files');
+          if (mFiles) mFiles.innerHTML = isOnline ? `${latS !== null ? latS + ' ms' : 'Online'} &bull; Auto-Mount Active` : 'Unreachable &bull; Offline';
+          const mCam = document.getElementById('meta-watch-cam');
+          if (mCam) mCam.innerHTML = isOnline ? '&lt;50ms Low-Latency WebRTC' : 'Unreachable &bull; Offline';
+          const mWol = document.getElementById('meta-watch-wol');
+          if (mWol) mWol.innerHTML = isOnline ? `${latS !== null ? latS + ' ms' : 'Online'} &bull; Fast-Path` : 'Unreachable &bull; Offline';
+          const mTorrents2 = document.getElementById('meta-watch-torrents2');
+          if (mTorrents2) mTorrents2.innerHTML = isOnline ? `${latS !== null ? latS + ' ms' : 'Online'} &bull; Swarm Active` : 'Unreachable &bull; Offline';
+          const mCf = document.getElementById('meta-watch-cf');
+          if (mCf) mCf.innerHTML = isOnline ? 'Anycast OK &bull; Global Anycast Resilient' : 'Standby &bull; Ingress Suspended';
+        }
         if (vitals) {
           const fVitals = document.getElementById('fleet-vitals-nuc');
           const fVpn = document.getElementById('fleet-vpn-nuc');
@@ -1405,16 +1412,18 @@
             if (dFreeEl) dFreeEl.innerHTML = `<span class="legend-dot" style="background: rgba(16, 185, 129, 0.35);"></span> D: ${(dFree / 1000).toFixed(2)}T Free`;
           }
         }
-        const stagTorrents = document.getElementById('stag-torrents');
-        if (stagTorrents) {
-          stagTorrents.className = `item-tag ${isOnline ? 'online' : 'offline'}`;
-          stagTorrents.textContent = isOnline ? 'Operational' : 'Standby';
-        }
-        const dLatS = safeNum(latencyMs, null);
-        const metaTorrents = document.getElementById('meta-watch-torrents');
-        if (metaTorrents) {
-          metaTorrents.style.color = isOnline ? '#34d399' : '#94a3b8';
-          metaTorrents.innerHTML = isOnline ? `${dLatS !== null ? dLatS + ' ms' : 'Online'} &bull; Interactive Node Active` : 'Standby &bull; Sleeping (WoL Ready)';
+        if (!isOnline || !window._hasLiveServicesHealth) {
+          const stagTorrents = document.getElementById('stag-torrents');
+          if (stagTorrents) {
+            stagTorrents.className = `item-tag ${isOnline ? 'online' : 'offline'}`;
+            stagTorrents.textContent = isOnline ? 'Operational' : 'Standby';
+          }
+          const dLatS = safeNum(latencyMs, null);
+          const metaTorrents = document.getElementById('meta-watch-torrents');
+          if (metaTorrents) {
+            metaTorrents.style.color = isOnline ? '#34d399' : '#94a3b8';
+            metaTorrents.innerHTML = isOnline ? `${dLatS !== null ? dLatS + ' ms' : 'Online'} &bull; Interactive Node Active` : 'Standby &bull; Sleeping (WoL Ready)';
+          }
         }
         const stDesk = document.getElementById('status-tag-desktop');
         if (stDesk) { stDesk.textContent = isOnline ? 'Active' : 'Standby'; stDesk.className = 'item-tag ' + (isOnline ? 'online' : 'offline'); }
@@ -3027,9 +3036,13 @@
           const swTag = document.getElementById('swarm-tag');
 
           const safeActiveDl = (sw.activeDl !== null && sw.activeDl !== undefined && !isNaN(sw.activeDl)) ? Number(sw.activeDl) : 0;
+          const safeActiveUp = (sw.activeUp !== null && sw.activeUp !== undefined && !isNaN(sw.activeUp)) ? Number(sw.activeUp) : null;
           const safeTotalTorrents = (sw.totalTorrents !== null && sw.totalTorrents !== undefined && !isNaN(sw.totalTorrents)) ? Number(sw.totalTorrents) : null;
-          const safeSeed = safeTotalTorrents !== null ? Math.max(0, safeTotalTorrents - safeActiveDl) : null;
-          if (swAct) swAct.textContent = safeTotalTorrents !== null ? `${safeActiveDl} Active | ${safeSeed} Seed` : `${safeActiveDl} Active | -- Seed`;
+          if (swAct) {
+            swAct.textContent = safeActiveUp !== null
+              ? `${safeActiveDl} DL | ${safeActiveUp} Seed`
+              : (safeTotalTorrents !== null ? `${safeActiveDl} Active | ${safeTotalTorrents} Total` : `${safeActiveDl} Active | -- Seed`);
+          }
           if (swTag) swTag.textContent = safeTotalTorrents !== null ? `${safeTotalTorrents} Managed` : '-- Managed';
           if (dht) dht.textContent = (sw.dhtNodes !== null && sw.dhtNodes !== undefined && !isNaN(sw.dhtNodes)) ? `DHT: ${sw.dhtNodes} Nodes` : 'DHT: --';
           if (vpnIp) vpnIp.textContent = sw.vpnExitIp ? `VPN: ${sw.vpnExitIp}` : 'VPN: --';
@@ -3045,10 +3058,14 @@
           if (upSpd) upSpd.textContent = upText;
 
           if (throttleTag) {
-            if (sw.dlRateLimit > 0) {
+            if (sw.dlRateLimit > 0 && sw.dlRateLimit <= 1048576) {
               throttleTag.textContent = `Eco-Throttled (${Math.round(sw.dlRateLimit / 1024)} KB/s)`;
               throttleTag.style.background = 'rgba(245, 158, 11, 0.2)';
               throttleTag.style.color = '#fde047';
+            } else if (sw.dlRateLimit > 1048576) {
+              throttleTag.textContent = `Speed Cap (${(sw.dlRateLimit / 1048576).toFixed(1)} MB/s)`;
+              throttleTag.style.background = 'rgba(59, 130, 246, 0.2)';
+              throttleTag.style.color = '#60a5fa';
             } else {
               throttleTag.textContent = 'Unconstrained';
               throttleTag.style.background = 'rgba(59, 130, 246, 0.2)';
@@ -3198,8 +3215,20 @@
 
       const thTag = document.getElementById('iot-thermal-tag');
       if (thTag) {
-        thTag.textContent = isOnline ? 'Nominal \u2022 YoLink LoRa' : 'Offline';
-        if (isOnline) thTag.className = 'item-tag online';
+        const lowBat = (climate.battery !== undefined && climate.battery !== null && Number(climate.battery) <= 1);
+        if (!isOnline) {
+          thTag.textContent = 'Offline';
+          thTag.className = 'item-tag offline';
+          thTag.style.cssText = '';
+        } else if (lowBat) {
+          thTag.textContent = 'Nominal \u2022 YoLink LoRa \u2022 Low Battery';
+          thTag.className = 'item-tag';
+          thTag.style.cssText = 'background: rgba(245, 158, 11, 0.18); color: #fbbf24; border-color: rgba(245, 158, 11, 0.4);';
+        } else {
+          thTag.textContent = 'Nominal \u2022 YoLink LoRa';
+          thTag.className = 'item-tag online';
+          thTag.style.cssText = '';
+        }
       }
 
       // 4. YoLink Water Leak Sensor
@@ -4711,6 +4740,7 @@
 
     function updateServiceDashboardUI(health) {
       if (!health || !health.services) return;
+      window._hasLiveServicesHealth = true;
       const s = health.services;
       const count = (typeof health.onlineCount === 'number') ? health.onlineCount : Object.values(s).filter(item => item && item.online).length;
 
@@ -4886,24 +4916,25 @@
             ? window.LAST_SERVICES_HEALTH.onlineCount
             : null;
 
-          if (liveCount === null) {
-            const nucOn = window.NUC_IS_ONLINE !== false;
-            const deskOn = window.DESKTOP_IS_ONLINE === true;
-            liveCount = 6;
-            if (!nucOn) liveCount = 0;
-            if (deskOn) liveCount += 2;
-          }
-
           document.querySelectorAll('#dash-global-status').forEach(globalStatus => {
-            globalStatus.textContent = `${liveCount}/8 Services Online`;
-            globalStatus.className = liveCount === 8 ? 'item-tag online' : (liveCount >= 5 ? 'item-tag warn' : 'item-tag offline');
+            if (liveCount === null) {
+              globalStatus.textContent = '--/8 Services';
+              globalStatus.className = 'item-tag';
+            } else {
+              globalStatus.textContent = `${liveCount}/8 Services Online`;
+              globalStatus.className = liveCount === 8 ? 'item-tag online' : (liveCount >= 5 ? 'item-tag warn' : 'item-tag offline');
+            }
           });
           document.querySelectorAll('#hero-service-status-pill').forEach(heroPill => {
-            heroPill.textContent = `Service Status (${liveCount}/8 Online)`;
+            heroPill.textContent = liveCount === null ? 'Service Status (--/8 Verified)' : `Service Status (${liveCount}/8 Online)`;
           });
 
           if (typeof showToast === 'function') {
-            showToast('success', 'Real Telemetry Polled', `Cluster state synchronized: ${liveCount}/8 services verified online.`, 3500);
+            if (liveCount === null) {
+              showToast('warning', 'Telemetry Partially Polled', 'Cluster telemetry synchronized (service port probe pending).', 3500);
+            } else {
+              showToast('success', 'Real Telemetry Polled', `Cluster state synchronized: ${liveCount}/8 services verified online.`, 3500);
+            }
           }
         }, 800);
       });
@@ -4928,9 +4959,13 @@
           if (icon) icon.style.transform = 'none';
           const count = (window.LAST_SERVICES_HEALTH && typeof window.LAST_SERVICES_HEALTH.onlineCount === 'number')
             ? window.LAST_SERVICES_HEALTH.onlineCount
-            : 8;
+            : null;
           if (typeof showToast === 'function') {
-            showToast('success', 'Services Refreshed', `${count}/8 microservices responding and operational.`, 3000);
+            if (count === null) {
+              showToast('warning', 'Service Probe Incomplete', 'Could not verify all 8 microservice ports.', 3500);
+            } else {
+              showToast('success', 'Services Refreshed', `${count}/8 microservices responding and operational.`, 3000);
+            }
           }
         }, 600);
       });
@@ -6506,7 +6541,7 @@
       };
 
       document.querySelectorAll('.cf-kpi-ratio-label').forEach(el => {
-        el.textContent = isZoneScope ? 'Edge Cache Hit Ratio' : 'Tunnel Egress Saved';
+        el.textContent = isZoneScope ? 'Edge Cache Hit Ratio' : 'Tunnel Egress (24h)';
       });
       document.querySelectorAll('.cf-kpi-visitors-label').forEach(el => {
         el.textContent = isZoneScope ? 'Unique Visitors (24h)' : 'Edge Tunnel Channels';
@@ -6573,7 +6608,7 @@
       }
       const edgeBar = document.getElementById('edge-cache-bar');
       if (edgeBar) {
-        const hrStr = isZoneScope ? String(cur.hitRatio).trim() : '100%';
+        const hrStr = isZoneScope ? String(cur.hitRatio).trim() : '0%';
         edgeBar.style.width = hrStr.includes('%') ? hrStr : `${hrStr}%`;
       }
 

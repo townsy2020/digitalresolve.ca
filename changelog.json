@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-22T19:05:34Z",
-    "currentVersion":  "v2.8.77",
+    "updatedAt":  "2026-11-22T19:16:17Z",
+    "currentVersion":  "v2.8.78",
     "releases":  [
+                     {
+                         "version":  "v2.8.78",
+                         "date":  "November 22, 2026",
+                         "title":  "Wave 2 P1/P2 Fixes: 1024px Responsive Fix, Honest Service Telemetry, Favicons \u0026 Backend Parity",
+                         "changes":  [
+                                         {
+                                             "label":  "1024px Multi-Viewport Overflow \u0026 UI Fixes",
+                                             "text":  "Scoped forced min-width: 1080px rule in styles.css to max-width: 768px (eliminating +56px overflow across all 8 pages at 1024px), corrected Jellyfin Port 8096 labels, added SVG favicons across all 10 pages, and guarded ai.html video dimension checks."
+                                         },
+                                         {
+                                             "label":  "Honest Telemetry, Anti-Clobber \u0026 YoLink Low-Battery",
+                                             "text":  "Guarded Mullvad VPN, pollRealData/refreshServiceDashboard counts, Cloudflare tunnel bar/labels, swarm seed counts, Eco-Throttled thresholds, and YoLink offline/low-battery badges while stopping 4s status polls from clobbering live services-health."
+                                         },
+                                         {
+                                             "label":  "Live Desktop Torrent \u0026 NUC NVMe Status Sync",
+                                             "text":  "Updated Sync-AgyTranscript.ps1 to report PLANNER_RESPONSE-only additive tokens + Desktop qBittorrent transfer speeds into desktop-vitals.json, updated wol-listener.ps1 Check-DeviceStatus for Desktop torrent + NUC NVMe, synced Backup-HomelabResilience.ps1, and added 1024px + backend checks to smoke-cdp.ps1."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.77",
                          "date":  "November 22, 2026",

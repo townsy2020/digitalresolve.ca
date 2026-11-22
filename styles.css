@@ -3653,13 +3653,15 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
   transform: translateY(1px) scale(0.98);
 }
 
-/* When in desktop-layout on mobile/tablet viewports, enforce desktop canvas */
-html.desktop-layout {
-  overflow-x: auto;
-}
+/* When in desktop-layout on small viewports (<= 768px), enforce desktop canvas */
+@media (max-width: 768px) {
+  html.desktop-layout {
+    overflow-x: auto;
+  }
 
-html.desktop-layout body {
-  min-width: 1080px;
+  html.desktop-layout body {
+    min-width: 1080px;
+  }
 }
 
 /* When forced mobile view on larger desktop screens (>768px), enhance touch targets without breaking desktop width */

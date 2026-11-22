@@ -7,8 +7,9 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Uptime & SLA Matrix - Homelab Operations</title>
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.77 - Uptime & SLA Matrix - Homelab Operations">
-  <link rel="stylesheet" href="styles.css?v=2.8.77">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b0f17'/%3E%3Cpath d='M8 22V10h7a6 6 0 0 1 0 12H8zm4-3.5h3a2.5 2.5 0 0 0 0-5h-3v5z' fill='%2338bdf8'/%3E%3C/svg%3E">
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.78 - Uptime & SLA Matrix - Homelab Operations">
+  <link rel="stylesheet" href="styles.css?v=2.8.78">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -93,7 +94,7 @@
             <a href="javascript:void(0)" onclick="launchProtectedService('https://jellyfin.digitalresolve.ca', 'Jellyfin Media Server (jellyfin.digitalresolve.ca)')" class="btn-action-item" title="Open Jellyfin Media Server">
               <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 8px #a855f7;"></span>
               <span>Jellyfin Media Server</span>
-              <span class="item-tag online">Port 8920</span>
+              <span class="item-tag online">Port 8096</span>
             </a>
             <a href="javascript:void(0)" onclick="launchProtectedService('https://files.digitalresolve.ca/files/', 'Media &amp; File Vault (files.digitalresolve.ca)')" class="btn-action-item" title="Open File Vault (files.digitalresolve.ca)">
               <span class="dropdown-dot dot-2"></span>
@@ -261,7 +262,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.77</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.78</span>)</span>
             </button>
             <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO(true, event)" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -933,12 +934,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.77</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.78</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 34,546 Lines of Code (HTML: 19,102 lines | CSS: 7,267 lines | JS: 8,176 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 34,701 Lines of Code (HTML: 19,220 lines | CSS: 7,269 lines | JS: 8,211 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">34,546</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">34,701</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1533,10 +1534,23 @@
       </div>
 
             <div class="changelog-body">
-                                <!-- Version v2.8.77 (Current) -->
+                                        <!-- Version v2.8.78 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.77 | Current</span>
+            <span class="ver-tag current">v2.8.78 | Current</span>
+            <span class="ver-date">November 22, 2026</span>
+          </div>
+          <h4 class="ver-title">Wave 2 P1/P2 Fixes: 1024px Responsive Fix, Honest Service Telemetry, Favicons &amp; Backend Parity</h4>
+          <ul class="ver-list">
+            <li><strong>1024px Multi-Viewport Overflow &amp; UI Fixes:</strong> Scoped forced min-width: 1080px rule in styles.css to max-width: 768px (eliminating +56px overflow across all 8 pages at 1024px), corrected Jellyfin Port 8096 labels, added SVG favicons across all 10 pages, and guarded ai.html video dimension checks.</li>
+            <li><strong>Honest Telemetry, Anti-Clobber &amp; YoLink Low-Battery:</strong> Guarded Mullvad VPN, pollRealData/refreshServiceDashboard counts, Cloudflare tunnel bar/labels, swarm seed counts, Eco-Throttled thresholds, and YoLink offline/low-battery badges while stopping 4s status polls from clobbering live services-health.</li>
+            <li><strong>Live Desktop Torrent &amp; NUC NVMe Status Sync:</strong> Updated Sync-AgyTranscript.ps1 to report PLANNER_RESPONSE-only additive tokens + Desktop qBittorrent transfer speeds into desktop-vitals.json, updated wol-listener.ps1 Check-DeviceStatus for Desktop torrent + NUC NVMe, synced Backup-HomelabResilience.ps1, and added 1024px + backend checks to smoke-cdp.ps1.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.77 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.77</span>
             <span class="ver-date">November 22, 2026</span>
           </div>
           <h4 class="ver-title">Wave 1 P0 Fixes: Instant Uptime Endpoint, Redacted Storage Pipelines, NVMe Telemetry &amp; WAN SSO</h4>
@@ -2061,6 +2075,6 @@
       </div>
     </div>
   </div>
-  <script src="app.js?v=2.8.77"></script>
+  <script src="app.js?v=2.8.78"></script>
 </body>
 </html>
