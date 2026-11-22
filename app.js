@@ -163,16 +163,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.59';
+          const activeVer = match ? match[0] : 'v2.8.60';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 15733;
+      const baseHtmlLines = 15838;
       const baseCssLines = 6349;
-      const baseJsLines = 6836;
+      const baseJsLines = 6855;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
@@ -907,7 +907,9 @@
       if (dnsDaemon) dnsDaemon.textContent = 'Awaiting Install';
       document.querySelectorAll('#schematic-cf-throughput').forEach(el => el.textContent = '100% Shield');
       document.querySelectorAll('#schematic-bell-throughput').forEach(el => el.textContent = '1.5G / 940M');
-      document.querySelectorAll('#schematic-vpn-throughput').forEach(el => el.textContent = 'NYC Relay');
+      document.querySelectorAll('#schematic-vpn-throughput').forEach(el => {
+        if (!el.textContent || el.textContent.includes('--') || el.textContent === 'NYC Relay') el.textContent = 'WireGuard';
+      });
       document.querySelectorAll('#schematic-tunnel-throughput').forEach(el => el.textContent = 'Tunnel OK');
       document.querySelectorAll('#ai-model-footprint').forEach(el => el.textContent = '2.0 GB');
       document.querySelectorAll('#nuc-hw-ram').forEach(el => el.textContent = '32 GB');
@@ -1159,7 +1161,7 @@
           if (fStorage) fStorage.textContent = `${disk.freeGB} GB Free (${disk.usedPercent}%)`;
           if (fBar) fBar.style.width = `${disk.usedPercent}%`;
           const nFreeEl = document.getElementById('stat-nuc-free-legend');
-          if (nFreeEl && disk.freeGB) {
+          if (nFreeEl && disk.freeGB !== undefined && disk.freeGB !== null) {
             nFreeEl.innerHTML = `<span class="legend-dot seg-free"></span> Free (${Math.round(disk.freeGB)} GB)`;
           }
           const sgTag = document.getElementById('stat-disk-safeguard-tag');
@@ -1207,7 +1209,7 @@
         const mCam = document.getElementById('meta-watch-cam');
         if (mCam) mCam.innerHTML = isOnline ? '&lt;50ms Low-Latency WebRTC' : 'Unreachable &bull; Offline';
         const mWol = document.getElementById('meta-watch-wol');
-        if (mWol) mWol.innerHTML = isOnline ? `${latS ? latS + ' ms' : '< 1 ms'} &bull; Fast-Path` : 'Unreachable &bull; Offline';
+        if (mWol) mWol.innerHTML = isOnline ? `${latS !== null ? latS + ' ms' : '< 1 ms'} &bull; Fast-Path` : 'Unreachable &bull; Offline';
         const mTorrents2 = document.getElementById('meta-watch-torrents2');
         if (mTorrents2) mTorrents2.innerHTML = isOnline ? `${latS !== null ? latS : 0.8} ms &bull; Swarm Active` : 'Unreachable &bull; Offline';
         const mCf = document.getElementById('meta-watch-cf');
@@ -1244,7 +1246,7 @@
 
         const rNuc = document.getElementById('ribbon-nuc');
         if (rNuc) {
-          rNuc.innerHTML = `<span class="dropdown-dot dot-2"></span> ${latS !== null ? latS + ' ms' : '0 ms'} | ${isOnline ? 'Online' : 'Offline'}`;
+          rNuc.innerHTML = `<span class="dropdown-dot dot-2"></span> ${latS !== null ? latS + ' ms' : '-- ms'} | ${isOnline ? 'Online' : 'Offline'}`;
         }
         const rStorage = document.getElementById('ribbon-storage');
         if (rStorage && disk) {
@@ -1253,12 +1255,12 @@
         if (typeof updateHealthRadarUI === 'function') {
           updateHealthRadarUI({ nucOnline: isOnline, nucLatency: latencyMs, nucDisk: disk });
         }
-        updateClusterPowerAndThermalsUI(window.DESKTOP_IS_ONLINE !== undefined ? window.DESKTOP_IS_ONLINE : true);
+        updateClusterPowerAndThermalsUI(Boolean(window.DESKTOP_IS_ONLINE));
         updateSslCertExpiryUI();
       } else if (target === 'desktop') {
         window.DESKTOP_IS_ONLINE = isOnline;
         updateClusterPowerAndThermalsUI(isOnline);
-        updateAgySessionDisplay(window.AGY_SESSION_ID || '', window.AGY_SESSION_NAME || '');
+        updateAgySessionDisplay(window.AGY_SESSION_ID || '', window.AGY_SESSION_NAME || '', window.AGY_SESSION_HOST || null);
         if (typeof updateCloudflareStatsUI === 'function') {
           try { updateCloudflareStatsUI(); } catch(e) {}
         }
@@ -1274,7 +1276,8 @@
           uptimeDeskStatus.className = `tier-status ${isOnline ? 'online' : 'offline'}`;
         }
         document.querySelectorAll('#stat-desktop-pool-tag').forEach(el => {
-          el.textContent = isOnline ? 'Dual Drive (6.05 TB)' : 'Standby Pool (6.05 TB)';
+          const poolTbStr = (disk && Number.isFinite(Number(disk.totalGB)) && Number(disk.totalGB) > 0) ? ` (${(Number(disk.totalGB) / 1000).toFixed(2)} TB)` : '';
+          el.textContent = isOnline ? `Dual Drive${poolTbStr}` : `Standby Pool${poolTbStr}`;
           el.className = isOnline ? 'item-tag online' : 'item-tag';
         });
         const uptimeScaleToday = document.getElementById('uptime-desktop-scale-today');
@@ -1306,11 +1309,14 @@
         if (dSegWrap && disk) {
           const segs = dSegWrap.children;
           if (segs.length >= 4) {
-            const cUsed = disk.cTotalGB ? Math.round(disk.cTotalGB - disk.cFreeGB) : 90;
-            const cFree = disk.cFreeGB ? Math.round(disk.cFreeGB) : 375;
-            const dUsed = disk.dTotalGB ? Math.round(disk.dTotalGB - disk.dFreeGB) : 213;
-            const dFree = disk.dFreeGB ? Math.round(disk.dFreeGB) : 5376;
-            const total = (disk.totalGB || 6054);
+            const hasC = (disk.cTotalGB !== undefined && disk.cTotalGB !== null && disk.cFreeGB !== undefined && disk.cFreeGB !== null);
+            const hasD = (disk.dTotalGB !== undefined && disk.dTotalGB !== null && disk.dFreeGB !== undefined && disk.dFreeGB !== null);
+            const cUsed = hasC ? Math.max(0, Math.round(Number(disk.cTotalGB) - Number(disk.cFreeGB))) : 0;
+            const cFree = (disk.cFreeGB !== undefined && disk.cFreeGB !== null) ? Math.max(0, Math.round(Number(disk.cFreeGB))) : 0;
+            const dUsed = hasD ? Math.max(0, Math.round(Number(disk.dTotalGB) - Number(disk.dFreeGB))) : 0;
+            const dFree = (disk.dFreeGB !== undefined && disk.dFreeGB !== null) ? Math.max(0, Math.round(Number(disk.dFreeGB))) : 0;
+            const computedTotal = cUsed + cFree + dUsed + dFree;
+            const total = (disk.totalGB !== undefined && disk.totalGB !== null && Number(disk.totalGB) > 0) ? Number(disk.totalGB) : computedTotal;
             const safeTot = (Number.isFinite(Number(total)) && Number(total) > 0) ? Number(total) : 1;
 
             const cUsedPct = ((cUsed / safeTot) * 100).toFixed(1);
@@ -1525,13 +1531,10 @@
       }
       updateTokenCounterUI();
       updateSslCertExpiryUI();
-      updateClusterPowerAndThermalsUI(window.DESKTOP_IS_ONLINE !== undefined ? window.DESKTOP_IS_ONLINE : true);
+      updateClusterPowerAndThermalsUI(Boolean(window.DESKTOP_IS_ONLINE));
       updateCloudflareStatsUI();
       fetchAgySessionInfo();
-      if (typeof fetchISPHistory === 'function') fetchISPHistory();
       if (typeof fetchFeederStatus === 'function') fetchFeederStatus();
-      if (typeof fetchClusterStats === 'function') fetchClusterStats();
-      if (typeof fetchClimateData === 'function') fetchClimateData();
 
       // Ensure all modal overlays are strictly hidden on load
       ['magnet-modal-overlay', 'agy-console-modal-overlay', 'changelog-modal-overlay', 'health-modal-overlay', 'chaos-modal-overlay', 'disaster-modal-overlay', 'speedtest-sso-modal-overlay', 'cloudflare-stats-modal-overlay', 'adguard-modal-overlay', 'tailscale-modal-overlay'].forEach(id => {
@@ -1659,7 +1662,7 @@
       });
 
       const hasClimateDom = () => Boolean(document.getElementById('climate-temp-val') || document.getElementById('climate-temp') || document.querySelector('[id*="climate-"]'));
-      const hasIspDom = () => Boolean(document.getElementById('isp-ping-val') || document.getElementById('isp-history-body'));
+      const hasIspDom = () => Boolean(document.getElementById('isp-ping-val') || document.getElementById('isp-history-body') || document.getElementById('latency-sparkline-canvas'));
       const hasUptimeDom = () => Boolean(document.getElementById('uptime-matrix-grid') || document.getElementById('uptime-sla-val') || document.querySelector('[id*="uptime-"]'));
       const hasServicesDom = () => Boolean(document.getElementById('dash-service-grid') || document.getElementById('dash-global-status') || document.querySelector('[id^="svc-"]'));
       const hasTermDom = () => Boolean(document.getElementById('terminal-content'));
@@ -2371,7 +2374,8 @@
           const newName = data.sessionName || ('session-' + data.shortId);
           window.AGY_SESSION_ID = newCid;
           window.AGY_SESSION_NAME = newName;
-          updateAgySessionDisplay(newCid, newName);
+          window.AGY_SESSION_HOST = data.hostNode || null;
+          updateAgySessionDisplay(newCid, newName, data.hostNode || null);
 
           if (screen) {
             const activeLine = document.createElement('div');
@@ -2571,8 +2575,13 @@
           weeklyLimitRemaining: metrics.weeklyLimitRemaining != null ? metrics.weeklyLimitRemaining : defMetrics.weeklyLimitRemaining,
           fiveHourLimitRemaining: metrics.fiveHourLimitRemaining != null ? metrics.fiveHourLimitRemaining : defMetrics.fiveHourLimitRemaining,
           weeklyRefresh: metrics.weeklyRefresh || defMetrics.weeklyRefresh,
+          weeklyResetTime: metrics.weeklyResetTime || defMetrics.weeklyResetTime,
           fiveHourRefresh: metrics.fiveHourRefresh || defMetrics.fiveHourRefresh,
+          fiveHourResetTime: metrics.fiveHourResetTime || defMetrics.fiveHourResetTime,
           claudeWeeklyRemaining: metrics.claudeWeeklyRemaining != null ? metrics.claudeWeeklyRemaining : (metrics.claudeLimitRemaining != null ? metrics.claudeLimitRemaining : defMetrics.claudeWeeklyRemaining),
+          claudeWeeklyResetTime: metrics.claudeWeeklyResetTime || defMetrics.claudeWeeklyResetTime,
+          claudeFiveHourRemaining: metrics.claudeFiveHourRemaining != null ? metrics.claudeFiveHourRemaining : defMetrics.claudeFiveHourRemaining,
+          claudeFiveHourResetTime: metrics.claudeFiveHourResetTime || defMetrics.claudeFiveHourResetTime,
           claudeLimitRemaining: metrics.claudeLimitRemaining != null ? metrics.claudeLimitRemaining : (metrics.claudeWeeklyRemaining != null ? metrics.claudeWeeklyRemaining : defMetrics.claudeLimitRemaining),
           account: metrics.account || defMetrics.account
         };
@@ -2851,6 +2860,7 @@
       try { localStorage.setItem('dr_cluster_stats', JSON.stringify(data)); } catch (e) {}
       if (data.status === 'success' && data.nuc) {
         const nuc = data.nuc;
+        updateStatusUI('nuc', Boolean(nuc.online), nuc.latencyMs, nuc.disk, nuc.swarm, nuc.vitals);
         if (nuc.swarm) {
           const sw = nuc.swarm;
           const swAct = document.getElementById('stat-swarm-active');
@@ -2868,9 +2878,14 @@
           if (swTag) swTag.textContent = safeTotalTorrents !== null ? `${safeTotalTorrents} Managed` : '-- Managed';
           if (dht) dht.textContent = (sw.dhtNodes !== null && sw.dhtNodes !== undefined && !isNaN(sw.dhtNodes)) ? `DHT: ${sw.dhtNodes} Nodes` : 'DHT: --';
           if (vpnIp) vpnIp.textContent = sw.vpnExitIp ? `VPN: ${sw.vpnExitIp}` : 'VPN: --';
+          document.querySelectorAll('#schematic-vpn-throughput').forEach(el => {
+            el.textContent = sw.vpnExitIp ? `Exit: ${sw.vpnExitIp}` : 'WireGuard';
+          });
           
-          const dlText = sw.dlSpeed >= 1048576 ? `${(sw.dlSpeed / 1048576).toFixed(1)} MB/s` : `${Math.round(sw.dlSpeed / 1024)} KB/s`;
-          const upText = sw.upSpeed >= 1048576 ? `${(sw.upSpeed / 1048576).toFixed(1)} MB/s` : `${Math.round(sw.upSpeed / 1024)} KB/s`;
+          const rawDl = safeNum(sw.dlSpeed, 0);
+          const rawUp = safeNum(sw.upSpeed, 0);
+          const dlText = rawDl >= 1048576 ? `${(rawDl / 1048576).toFixed(1)} MB/s` : `${Math.round(rawDl / 1024)} KB/s`;
+          const upText = rawUp >= 1048576 ? `${(rawUp / 1048576).toFixed(1)} MB/s` : `${Math.round(rawUp / 1024)} KB/s`;
           if (dlSpd) dlSpd.innerHTML = `${dlText} <span style="font-size: 0.95rem; color: #8b949e; margin-left: 6px;">&darr;</span>`;
           if (upSpd) upSpd.textContent = upText;
 
@@ -2950,12 +2965,14 @@
       }
       if (data.desktop) {
         updateStatusUI('desktop', data.desktop.online, data.desktop.latencyMs, data.desktop.disk, data.desktop.torrent, data.desktop.vitals);
-        const deskCpu = safeNum(data.desktop.cpuLoad, null);
+        const sDeskCpu = document.getElementById('stat-desktop-cpu-val');
+        const fCpu = document.getElementById('fleet-cpu-desktop');
         if (deskCpu !== null && data.desktop.online) {
-          const sDeskCpu = document.getElementById('stat-desktop-cpu-val');
           if (sDeskCpu) sDeskCpu.innerHTML = `${deskCpu}% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>`;
-          const fCpu = document.getElementById('fleet-cpu-desktop');
           if (fCpu) fCpu.textContent = `AMD Ryzen 7 | ${deskCpu}% Load (8C / 16T)`;
+        } else if (!data.desktop.online) {
+          if (sDeskCpu) sDeskCpu.innerHTML = `--% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>`;
+          if (fCpu) fCpu.textContent = 'AMD Ryzen 7 | Offline (8C / 16T)';
         }
       }
       if (data.tokens) {
@@ -3173,7 +3190,7 @@
 
             // Store real measured historical pings for live sparkline plotting
             window.ISP_HISTORY_PINGS = rawList.map(h => typeof h.pingAvgMs === 'number' ? h.pingAvgMs : 4.0);
-            window.ISP_EDGE_PINGS = rawList.map(h => typeof h.googleDnsMs === 'number' ? Math.min(10, h.googleDnsMs) : 1.1);
+            window.ISP_EDGE_PINGS = rawList.map(h => (typeof h.googleDnsMs === 'number' && isFinite(h.googleDnsMs)) ? h.googleDnsMs : null);
             window.ISP_LATEST = latest;
 
             if (latest && typeof updateHealthRadarUI === 'function') {
@@ -4175,22 +4192,24 @@
 
       // Tick markers and Y-axis scale labels (10 ms, 5 ms, 0 ms)
       const yZero = h - 14;  // 0 ms baseline (66px)
-      const nucLatVal = (window.LAST_NUC_LATENCY !== undefined && window.LAST_NUC_LATENCY !== null)
+      const nucLatVal = (window.LAST_NUC_LATENCY !== undefined && window.LAST_NUC_LATENCY !== null && isFinite(Number(window.LAST_NUC_LATENCY)))
         ? Number(window.LAST_NUC_LATENCY)
-        : 0.22;
-      const bellLatVal = (window.ISP_LATEST && window.ISP_LATEST.pingAvgMs !== undefined)
+        : 0;
+      const bellLatVal = (window.ISP_LATEST && window.ISP_LATEST.pingAvgMs !== undefined && isFinite(Number(window.ISP_LATEST.pingAvgMs)))
         ? Number(window.ISP_LATEST.pingAvgMs)
-        : 4.5;
-      const edgeLatVal = (window.ISP_LATEST && window.ISP_LATEST.googleDnsMs !== undefined)
+        : 0;
+      const edgeLatVal = (window.ISP_LATEST && window.ISP_LATEST.googleDnsMs !== undefined && isFinite(Number(window.ISP_LATEST.googleDnsMs)))
         ? Number(window.ISP_LATEST.googleDnsMs)
-        : 1.1;
+        : 0;
 
       let maxObserved = Math.max(nucLatVal, bellLatVal, edgeLatVal);
       if (window.ISP_HISTORY_PINGS && window.ISP_HISTORY_PINGS.length > 0) {
-        maxObserved = Math.max(maxObserved, ...window.ISP_HISTORY_PINGS);
+        const finiteHist = window.ISP_HISTORY_PINGS.filter(v => typeof v === 'number' && isFinite(v));
+        if (finiteHist.length > 0) maxObserved = Math.max(maxObserved, ...finiteHist);
       }
       if (window.ISP_EDGE_PINGS && window.ISP_EDGE_PINGS.length > 0) {
-        maxObserved = Math.max(maxObserved, ...window.ISP_EDGE_PINGS);
+        const finiteEdge = window.ISP_EDGE_PINGS.filter(v => typeof v === 'number' && isFinite(v));
+        if (finiteEdge.length > 0) maxObserved = Math.max(maxObserved, ...finiteEdge);
       }
       let scaleMax = 20;
       if (maxObserved > 18) {
@@ -4950,7 +4969,7 @@
         subtitle: 'Zero-Logging Cryptographic Outbound Proxy',
         status: 'Encrypted & Active',
         statusClass: 'online',
-        net: 'wg0  -  UDP:51820  -  NYC/Mtl Exit',
+        net: 'wg0  -  UDP:51820  -  Mullvad Exit',
         sec: 'ChaCha20-Poly1305  -  Killswitch Active',
         speed: 'WireGuard Tunnel (<28ms latency)',
         role: 'High-Speed Torrent & Stream Privacy',

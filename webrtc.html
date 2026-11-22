@@ -321,7 +321,7 @@
         <div class="hud-metrics-row">
           <div class="hud-metric-pill online">State: <strong id="valState">ONLINE</strong></div>
           <div class="hud-metric-pill">IP: <strong id="valIp">192.168.2.24</strong></div>
-          <div class="hud-metric-pill">Latency: <strong id="valLatency">2.4 ms</strong></div>
+          <div class="hud-metric-pill">Latency: <strong id="valLatency">-- ms</strong></div>
           <div class="hud-metric-pill">Gateway: <strong>go2rtc (NUC)</strong></div>
         </div>
 
@@ -919,7 +919,7 @@
               const lat = (c.latencyMs !== null && c.latencyMs !== undefined && Number.isFinite(Number(c.latencyMs))) ? c.latencyMs + ' ms' : '--';
               valLatency.textContent = lat;
               if (!streamConnected) {
-                statusText.textContent = `HARDWARE ONLINE \u2022 ${lat}`;
+                statusText.textContent = c.online ? `HARDWARE ONLINE \u2022 ${lat}` : 'CAMERA OFFLINE';
               }
               return;
             }

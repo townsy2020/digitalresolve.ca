@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Uptime & SLA Matrix - Homelab Operations</title>
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.59 - Uptime & SLA Matrix - Homelab Operations">
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.60 - Uptime & SLA Matrix - Homelab Operations">
   <link rel="stylesheet" href="styles.css?v=2.8.59">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -254,7 +254,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.59</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.60</span>)</span>
             </button>
             <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO(true, event)" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -944,12 +944,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.59</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.60</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 28,919 Lines of Code (HTML: 15,733 lines | CSS: 6,349 lines | JS: 6,836 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 29,043 Lines of Code (HTML: 15,838 lines | CSS: 6,349 lines | JS: 6,855 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">28,919</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">29,043</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1544,10 +1544,23 @@
       </div>
 
             <div class="changelog-body">
-                                <!-- Version v2.8.59 (Current) -->
+                                        <!-- Version v2.8.60 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.59 | Current</span>
+            <span class="ver-tag current">v2.8.60 | Current</span>
+            <span class="ver-date">November 21, 2026</span>
+          </div>
+          <h4 class="ver-title">Wave 9 Telemetry Parity, Optical Cam Scope &amp; Media Automation Hardening</h4>
+          <ul class="ver-list">
+            <li><strong>Gateway &amp; Core Ops Parity:</strong> Fixed NUC/Desktop <code>wol-listener</code> Prometheus scientific-notation parsing, live camera status probing with null offline latencies, <code>desktop.disk</code> per-drive totals, smart feeder <code>opticalWatchdog</code>/<code>lastDispenseGrams</code> exposure, <code>/services-health</code> stopwatch ordering with Cloudflare port 20241&ndash;20243 checks, and <code>/api/logs</code> newest-file tail reading.</li>
+            <li><strong>Website UI &amp; AdGuard Accuracy:</strong> Scoped <code>ai.html</code> <code>detectFeederRedBlink()</code> to Cam 1 (<code>pennys_feeder</code>), removed hardcoded WebRTC/inference/sparkline/disk placeholders, restored token reset and Claude quota fields in <code>updateTokenCounterUI</code>, removed redundant <code>initApp</code> fetches, corrected <code>AdGuardHome.yaml</code> feeder IP to <code>192.168.2.22</code>, and updated DNS routes to <code>7 LAN Routes</code>.</li>
+            <li><strong>Media RSS, StreamHub &amp; Update Suite:</strong> Enforced audiobook-only filtering and title deduplication across RSS generators, switched <code>Invoke-RssAutoDownload.ps1</code> to UTF-8 JSON decoding, fixed StreamHub MIME types and 240s catalog watchdog reset, fixed physical-disk SSD vs HDD detection and Winget exclusions in the update suite, and enforced workstation reboot safety policy.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.59 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.59</span>
             <span class="ver-date">November 21, 2026</span>
           </div>
           <h4 class="ver-title">Sparkline &amp; Telemetry Accuracy Fixes, Zero-Falsy Guards &amp; Dead Wrapper Cleanup</h4>

@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-22T01:40:00Z",
-    "currentVersion":  "v2.8.59",
+    "updatedAt":  "2026-11-22T03:20:00Z",
+    "currentVersion":  "v2.8.60",
     "releases":  [
+                     {
+                         "version":  "v2.8.60",
+                         "date":  "November 21, 2026",
+                         "title":  "Wave 9 Telemetry Parity, Optical Cam Scope \u0026 Media Automation Hardening",
+                         "changes":  [
+                                         {
+                                             "label":  "Gateway \u0026 Core Ops Parity",
+                                             "text":  "Fixed NUC/Desktop wol-listener Prometheus scientific-notation parsing, live camera status probing with null offline latencies, desktop.disk per-drive totals, smart feeder opticalWatchdog/lastDispenseGrams exposure, /services-health stopwatch ordering with Cloudflare port 20241-20243 checks, and /api/logs newest-file tail reading."
+                                         },
+                                         {
+                                             "label":  "Website UI \u0026 AdGuard Accuracy",
+                                             "text":  "Scoped ai.html detectFeederRedBlink() to Cam 1 (pennys_feeder), removed hardcoded WebRTC/inference/sparkline/disk placeholders, restored token reset and Claude quota fields in updateTokenCounterUI, removed redundant initApp fetches, corrected AdGuardHome.yaml feeder IP to 192.168.2.22, and updated DNS routes to 7 LAN Routes."
+                                         },
+                                         {
+                                             "label":  "Media RSS, StreamHub \u0026 Update Suite",
+                                             "text":  "Enforced audiobook-only filtering and title deduplication across RSS generators, switched Invoke-RssAutoDownload.ps1 to UTF-8 JSON decoding, fixed StreamHub MIME types and 240s catalog watchdog reset, fixed physical-disk SSD vs HDD detection and Winget exclusions in the update suite, and enforced workstation reboot safety policy."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.59",
                          "date":  "November 21, 2026",

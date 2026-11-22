@@ -260,7 +260,7 @@
       </div>
 
       <div class="hud-stats-group" id="hud-stats-group">
-        <span id="inference-time">14.2 ms</span>
+        <span id="inference-time">-- ms</span>
         <span class="hud-stats-separator" style="color: rgba(255,255,255,0.2);">|</span>
         <span id="detected-feed" class="detected-feed-text">Scanning</span>
         <span style="color: rgba(255,255,255,0.2);">|</span>
@@ -480,6 +480,7 @@
       } else {
         src = src.includes('sd') ? 'pennys_feeder_sd' : 'pennys_feeder';
       }
+      window.ACTIVE_CAM_STREAM = src;
 
       const endpoints = getStreamEndpoints(src);
       connectEndpoint(endpoints, 0);
@@ -1014,8 +1015,13 @@
       } catch (err) {}
     }
 
-      // Optical Feeder Blink Check
-      detectFeederRedBlink(video);
+      // Optical Feeder Blink Check (Cam 1 Pennys Feeder only)
+      if (!window.ACTIVE_CAM_STREAM || window.ACTIVE_CAM_STREAM.indexOf('pennys_feeder') !== -1) {
+        detectFeederRedBlink(video);
+      } else {
+        isFeederFoodLow = false;
+        if (hopperBeaconBadge) hopperBeaconBadge.style.display = 'none';
+      }
 
       // Render Bounding Boxes on Canvas with Smooth Interpolation
       if (showBoundingBoxes) {
