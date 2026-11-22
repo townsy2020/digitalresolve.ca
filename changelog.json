@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-22T06:27:23Z",
-    "currentVersion":  "v2.8.65",
+    "updatedAt":  "2026-11-22T07:00:00Z",
+    "currentVersion":  "v2.8.66",
     "releases":  [
+                     {
+                         "version":  "v2.8.66",
+                         "date":  "November 22, 2026",
+                         "title":  "Complete Static Default Purge, Health Radar Null-States \u0026 Live Telemetry Honesty",
+                         "changes":  [
+                                         {
+                                             "label":  "ISP \u0026 Speedtest Static Default Purge",
+                                             "text":  "Replaced remaining hardcoded ISP ping/jitter/uptime defaults and static 3-row diagnostic history on index.html and uptime.html with -- and an honest awaiting-telemetry row, and cleared static jitter/ingress placeholders on index.html, fleet.html, and ops.html."
+                                         },
+                                         {
+                                             "label":  "Health Radar, Quota Bars \u0026 SLA Null-States",
+                                             "text":  "Reset nav quota bars (#menu-bar-flash, #menu-bar-5h), Health Radar modal scorecards, hero Health Radar pills, SLA Shield chip, and 90-day Today label across all 7 dashboard pages to honest initial -- / 0% / Checking... states."
+                                         },
+                                         {
+                                             "label":  "Version \u0026 Cache-Buster Sync",
+                                             "text":  "Bumped styles.css?v=2.8.66, app.js?v=2.8.66, meta descriptions, menu changelog badges, and footer version tags to v2.8.66 across all 7 dashboard pages."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.65",
                          "date":  "November 22, 2026",

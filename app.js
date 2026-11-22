@@ -163,16 +163,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.65';
+          const activeVer = match ? match[0] : 'v2.8.66';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 15979;
+      const baseHtmlLines = 15927;
       const baseCssLines = 6349;
-      const baseJsLines = 6950;
+      const baseJsLines = 6957;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
@@ -677,8 +677,10 @@
                 if (data.online) {
                   settled = true;
                   clearInterval(pollInterval);
-                  const diskSub = (data.disk && data.disk.drive) ? ` | D: ${data.disk.freeGB} GB free` : '';
-                  showToast('success', `${dev.name} is Awake & Online!`, `${data.latencyMs} ms latency${diskSub}`, 6000);
+                  const latPart = (data.latencyMs !== null && data.latencyMs !== undefined && Number.isFinite(Number(data.latencyMs))) ? `${data.latencyMs} ms latency` : '';
+                  const diskPart = (data.disk && data.disk.drive) ? `D: ${data.disk.freeGB} GB free` : '';
+                  const toastBody = [latPart, diskPart].filter(Boolean).join(' | ') || 'Online';
+                  showToast('success', `${dev.name} is Awake & Online!`, toastBody, 6000);
                   updateStatusUI(target, true, data.latencyMs, data.disk);
                 } else if (attempts >= maxAttempts) {
                   settled = true;
@@ -1418,8 +1420,8 @@
             const rPct = safeNum(vitals.ramPercent, '--');
             const cLd = vitals.cpuLoad !== undefined ? safeNum(vitals.cpuLoad, null) : null;
             if (fVitals) fVitals.textContent = `${rUsed} GB / ${rTot} GB (${rPct}%) | Active`;
-            if (fCpu && cLd !== null) fCpu.textContent = `AMD Ryzen 7 | ${cLd}% Load (8C / 16T)`;
-            if (sDeskCpu && cLd !== null) sDeskCpu.innerHTML = `${cLd}% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>`;
+            if (fCpu) fCpu.textContent = cLd !== null ? `AMD Ryzen 7 | ${cLd}% Load (8C / 16T)` : 'AMD Ryzen 7 | Online (8C / 16T)';
+            if (sDeskCpu) sDeskCpu.innerHTML = cLd !== null ? `${cLd}% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>` : `-- <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>`;
             if (sDeskRam) sDeskRam.textContent = `Memory: ${rUsed} GB / ${rTot} GB (${rPct}%) | Active Session`;
           } else {
             if (fVitals) fVitals.textContent = 'Awaiting Vitals | Online';
@@ -2558,7 +2560,8 @@
       const inFmt = formatTokenNumber(metrics.inputTokens);
       const outFmt = formatTokenNumber(metrics.outputTokens);
       const cacheFmt = formatTokenNumber(metrics.cacheTokens);
-      const fullTotalStr = Number(metrics.totalTokens).toLocaleString();
+      const totalTokRaw = metrics.totalTokens;
+      const fullTotalStr = (totalTokRaw !== null && totalTokRaw !== undefined && totalTokRaw !== '' && Number.isFinite(Number(totalTokRaw))) ? Number(totalTokRaw).toLocaleString() : '--';
 
       // Dynamic live breakdown calculation to 2 decimal places (Real-time Transcript Ingestion)
       const inTok = Number(metrics.inputTokens) || 0;
@@ -2946,7 +2949,7 @@
         const cpuVal = document.getElementById('stat-cpu-val');
         const ramSub = document.getElementById('stat-ram-sub');
         const nucCpu = safeNum(nuc.cpuLoad, null);
-        if (cpuVal && nucCpu !== null) cpuVal.innerHTML = `${nucCpu}% <span style="font-size: 0.9rem; color: #8b949e;">CPU</span>`;
+        if (cpuVal) cpuVal.innerHTML = nucCpu !== null ? `${nucCpu}% <span style="font-size: 0.9rem; color: #8b949e;">CPU</span>` : `-- <span style="font-size: 0.9rem; color: #8b949e;">CPU</span>`;
         if (ramSub && nuc.vitals) {
           ramSub.textContent = `Memory: ${safeNum(nuc.vitals.ramUsedGB, 0)} GB / ${safeNum(nuc.vitals.ramTotalGB, 0)} GB (${safeNum(nuc.vitals.ramPercent, 0)}%) | ${nuc.vitals.uptime || '--'} up`;
         }
@@ -3009,11 +3012,11 @@
         const deskCpu = safeNum(data.desktop.cpuLoad, null);
         const sDeskCpu = document.getElementById('stat-desktop-cpu-val');
         const fCpu = document.getElementById('fleet-cpu-desktop');
-        if (deskCpu !== null && data.desktop.online) {
-          if (sDeskCpu) sDeskCpu.innerHTML = `${deskCpu}% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>`;
-          if (fCpu) fCpu.textContent = `AMD Ryzen 7 | ${deskCpu}% Load (8C / 16T)`;
-        } else if (!data.desktop.online) {
-          if (sDeskCpu) sDeskCpu.innerHTML = `--% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>`;
+        if (data.desktop.online) {
+          if (sDeskCpu) sDeskCpu.innerHTML = deskCpu !== null ? `${deskCpu}% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>` : `-- <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>`;
+          if (fCpu) fCpu.textContent = deskCpu !== null ? `AMD Ryzen 7 | ${deskCpu}% Load (8C / 16T)` : 'AMD Ryzen 7 | Online (8C / 16T)';
+        } else {
+          if (sDeskCpu) sDeskCpu.innerHTML = `-- <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>`;
           if (fCpu) fCpu.textContent = 'AMD Ryzen 7 | Offline (8C / 16T)';
         }
       }
@@ -3235,30 +3238,32 @@
             const pingTag = document.getElementById('isp-ping-tag');
 
             // Store real measured historical pings for live sparkline plotting
-            window.ISP_HISTORY_PINGS = rawList.map(h => typeof h.pingAvgMs === 'number' ? h.pingAvgMs : 4.0);
-            window.ISP_EDGE_PINGS = rawList.map(h => (typeof h.googleDnsMs === 'number' && isFinite(h.googleDnsMs)) ? h.googleDnsMs : null);
+            window.ISP_HISTORY_PINGS = rawList
+              .map(h => (h && typeof h.pingAvgMs === 'number' && isFinite(h.pingAvgMs)) ? h.pingAvgMs : null)
+              .filter(v => v !== null);
+            window.ISP_EDGE_PINGS = rawList.map(h => (h && typeof h.googleDnsMs === 'number' && isFinite(h.googleDnsMs)) ? h.googleDnsMs : null);
             window.ISP_LATEST = latest;
 
             if (latest && typeof updateHealthRadarUI === 'function') {
               updateHealthRadarUI({ isp: latest });
             }
 
-            const pingAvg = latest ? numField(latest.pingAvgMs, 4.2) : 4.2;
-            const pingMin = latest ? numField(latest.pingMinMs, 4) : 4;
-            const pingMax = latest ? numField(latest.pingMaxMs, 5) : 5;
-            const googleDns = latest ? numField(latest.googleDnsMs, 4.5) : 4.5;
-            const jitter = latest ? numField(latest.jitterMs, 0.3) : 0.3;
-            const loss = latest ? numField(latest.packetLoss, 0) : 0;
-            const grade = (latest && latest.grade) ? String(latest.grade) : 'A+';
-            const carrier = (latest && latest.isp) ? String(latest.isp) : 'Bell Canada';
+            const pingAvg = latest ? numField(latest.pingAvgMs, null) : null;
+            const pingMin = latest ? numField(latest.pingMinMs, null) : null;
+            const pingMax = latest ? numField(latest.pingMaxMs, null) : null;
+            const googleDns = latest ? numField(latest.googleDnsMs, null) : null;
+            const jitter = latest ? numField(latest.jitterMs, null) : null;
+            const loss = latest ? numField(latest.packetLoss, null) : null;
+            const grade = (latest && latest.grade) ? String(latest.grade) : '--';
+            const carrier = (latest && latest.isp) ? String(latest.isp) : '--';
             const extIp = (latest && latest.externalIp) ? String(latest.externalIp) : 'n/a';
 
-            if (pingVal) pingVal.innerHTML = `${pingAvg} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>`;
-            if (pingSub) pingSub.textContent = `Min: ${pingMin} ms | Max: ${pingMax} ms | Google: ${googleDns} ms`;
-            if (jitterVal) jitterVal.innerHTML = `&plusmn; ${jitter} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>`;
-            if (lossSub) lossSub.textContent = `Packet Loss: ${loss}% | Fiber Optic`;
+            if (pingVal) pingVal.innerHTML = pingAvg !== null ? `${pingAvg} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>` : `-- <span style="font-size: 0.9rem; color: #8b949e;">ms</span>`;
+            if (pingSub) pingSub.textContent = `Min: ${pingMin !== null ? pingMin : '--'} ms | Max: ${pingMax !== null ? pingMax : '--'} ms | Google: ${googleDns !== null ? googleDns : '--'} ms`;
+            if (jitterVal) jitterVal.innerHTML = jitter !== null ? `&plusmn; ${jitter} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>` : `-- <span style="font-size: 0.9rem; color: #8b949e;">ms</span>`;
+            if (lossSub) lossSub.textContent = `Packet Loss: ${loss !== null ? loss + '%' : '--'} | Fiber Optic`;
             if (gradeTag) {
-              gradeTag.textContent = `Grade: ${grade} (Ultra Stable)`;
+              gradeTag.textContent = grade !== '--' ? `Grade: ${grade} (Ultra Stable)` : 'Grade: --';
               gradeTag.className = grade === 'A+' ? 'item-tag online' : 'item-tag';
             }
             if (carrierVal) carrierVal.textContent = carrier;
@@ -3288,21 +3293,21 @@
                 tierBellIp.style.fontFamily = 'inherit';
               }
             }
-            if (pingTag) pingTag.textContent = `${pingAvg} ms`;
+            if (pingTag) pingTag.textContent = pingAvg !== null ? `${pingAvg} ms` : '-- ms';
             document.querySelectorAll('#uptime-isp-jitter-status').forEach(el => {
-              el.textContent = `± ${jitter} ms Jitter`;
+              el.textContent = jitter !== null ? `± ${jitter} ms Jitter` : '-- ms Jitter';
             });
             document.querySelectorAll('#isp-jitter-tag').forEach(el => {
-              el.textContent = jitter < 1 ? '< 1 ms' : `± ${jitter} ms`;
+              el.textContent = jitter !== null ? (jitter < 1 ? '< 1 ms' : `± ${jitter} ms`) : '--';
             });
             document.querySelectorAll('#uptime-scale-bell-today').forEach(el => {
-              el.textContent = `Today (${pingAvg} ms ping)`;
+              el.textContent = pingAvg !== null ? `Today (${pingAvg} ms ping)` : 'Today (-- ms ping)';
             });
             document.querySelectorAll('#st-sub-jitter').forEach(el => {
-              el.innerHTML = `&plusmn; ${jitter} ms Jitter &bull; Cloudflare YYZ`;
+              el.innerHTML = jitter !== null ? `&plusmn; ${jitter} ms Jitter &bull; Cloudflare YYZ` : `-- ms Jitter &bull; Cloudflare YYZ`;
             });
             document.querySelectorAll('#st-sub-bloat').forEach(el => {
-              el.textContent = `+${jitter} ms latency under full saturation`;
+              el.textContent = jitter !== null ? `+${jitter} ms latency under full saturation` : '-- ms latency under full saturation';
             });
             document.querySelectorAll('#spark-leg-bell').forEach(el => {
               el.textContent = `${pingAvg} ms`;
@@ -3964,7 +3969,7 @@
           if (chipText) chipText.textContent = 'NUC Maintenance Active (SLA Shield)';
         } else {
           if (chipDot) { chipDot.style.backgroundColor = '#10b981'; chipDot.style.boxShadow = '0 0 6px #10b981'; }
-          if (chipText) chipText.textContent = 'SLA Shield: 100% Protected';
+          if (chipText) chipText.textContent = 'SLA Shield: Active';
         }
       }
 
@@ -6012,7 +6017,8 @@
 
       // 6. Network / Speed / Fiber / Latency / Bell
       if (q.match(/\b(speed|internet|fiber|bandwidth|bell|ping|latency|jitter)\b/)) {
-        const ping = (window.ISP_LATEST && window.ISP_LATEST.pingAvgMs !== undefined) ? `${window.ISP_LATEST.pingAvgMs} ms` : '--';
+        const rawPing = window.ISP_LATEST ? window.ISP_LATEST.pingAvgMs : null;
+        const ping = (rawPing !== undefined && rawPing !== null && rawPing !== '' && Number.isFinite(Number(rawPing))) ? `${rawPing} ms` : '--';
         return `Network Telemetry: Bell Gigabit Fiber gateway latest measured ping is ${ping}.`;
       }
 
@@ -6193,7 +6199,7 @@
       const cur = {
         totalRequests: (source && source.totalRequests !== undefined && source.totalRequests !== null) ? (typeof source.totalRequests === 'number' ? source.totalRequests.toLocaleString() : source.totalRequests) : defStats.totalRequests,
         ingressSla: (source && source.ingressSla) ? source.ingressSla : defStats.ingressSla,
-        hitRatio: (source && source.hitRatio !== undefined && source.hitRatio !== null) ? (typeof source.hitRatio === 'number' ? `${source.hitRatio}%` : (String(source.hitRatio).includes('%') ? source.hitRatio : `${source.hitRatio}%`)) : defStats.hitRatio,
+        hitRatio: (source && source.hitRatio !== undefined && source.hitRatio !== null && String(source.hitRatio).trim() !== '') ? (typeof source.hitRatio === 'number' ? `${source.hitRatio}%` : (String(source.hitRatio).includes('%') ? String(source.hitRatio).trim() : `${String(source.hitRatio).trim()}%`)) : defStats.hitRatio,
         savedGB: formatSavedGB(source && source.savedGB, defStats.savedGB),
         uniqueVisitors: (source && source.uniqueVisitors !== undefined && source.uniqueVisitors !== null) ? (typeof source.uniqueVisitors === 'number' ? source.uniqueVisitors.toLocaleString() : source.uniqueVisitors) : defStats.uniqueVisitors,
         topPop: (source && source.topPop) ? (String(source.topPop).includes('Top PoP') ? source.topPop : `Top PoP: ${source.topPop}`) : defStats.topPop,
@@ -6265,8 +6271,9 @@
       const edgeCache = document.getElementById('edge-cache-val');
       if (edgeCache) edgeCache.textContent = cur.hitRatio === '--' ? '--' : `${cur.hitRatio} (${cleanSaved})`;
       const edgeBar = document.getElementById('edge-cache-bar');
-      if (edgeBar && cur.hitRatio !== undefined && cur.hitRatio !== null) {
-        edgeBar.style.width = cur.hitRatio === '--' ? '0%' : (String(cur.hitRatio).includes('%') ? cur.hitRatio : `${cur.hitRatio}%`);
+      if (edgeBar) {
+        const hrStr = (cur.hitRatio !== undefined && cur.hitRatio !== null) ? String(cur.hitRatio).trim() : '';
+        edgeBar.style.width = (!hrStr || hrStr === '--') ? '0%' : (hrStr.includes('%') ? hrStr : `${hrStr}%`);
       }
 
       const edgeThreats = document.getElementById('edge-threats-val');
