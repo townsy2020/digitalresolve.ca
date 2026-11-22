@@ -163,16 +163,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.62';
+          const activeVer = match ? match[0] : 'v2.8.63';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 16013;
+      const baseHtmlLines = 16104;
       const baseCssLines = 6349;
-      const baseJsLines = 6820;
+      const baseJsLines = 6831;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
@@ -1352,7 +1352,7 @@
         const metaTorrents = document.getElementById('meta-watch-torrents');
         if (metaTorrents) {
           metaTorrents.style.color = isOnline ? '#34d399' : '#94a3b8';
-          metaTorrents.innerHTML = isOnline ? `${dLatS ? dLatS + ' ms' : '< 1 ms'} &bull; Interactive Node Active` : 'Standby &bull; Sleeping (WoL Ready)';
+          metaTorrents.innerHTML = isOnline ? `${dLatS !== null ? dLatS + ' ms' : 'Online'} &bull; Interactive Node Active` : 'Standby &bull; Sleeping (WoL Ready)';
         }
         const stDesk = document.getElementById('status-tag-desktop');
         if (stDesk) { stDesk.textContent = isOnline ? 'Active' : 'Standby'; stDesk.className = 'item-tag ' + (isOnline ? 'online' : 'offline'); }
@@ -1668,6 +1668,7 @@
         if (document.hidden || !hasTermDom()) return;
         if (currentLogTab && isSSOAuthenticated()) {
           fetch(`${GATEWAY}/api/logs?name=${encodeURIComponent(currentLogTab)}`, {
+            credentials: 'include',
             headers: getAdminAuthHeaders(),
             signal: _fetchSig(8000)
           })
@@ -2096,6 +2097,7 @@
       if (cid) payload.conversationId = cid;
       fetch(`${GATEWAY}/api/agy/send`, {
         method: 'POST',
+        credentials: 'include',
         headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(payload),
         signal: _fetchSig(15000)
@@ -2271,6 +2273,7 @@
       // 1. Dispatch daemon trigger via gateway
       fetch(`${GATEWAY}/api/agy/launch`, {
         method: 'POST',
+        credentials: 'include',
         headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ target: 'desktop', action: 'resume', workspace: window.AGY_WORKSPACE || 'C:\\Users\\CoryTownsend\\Projects\\website' }),
         signal: _fetchSig(12000)
@@ -2318,6 +2321,7 @@
 
       fetch(`${GATEWAY}/api/agy/launch`, {
         method: 'POST',
+        credentials: 'include',
         headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ target: target, action: 'new-session' }),
         signal: _fetchSig(12000)
@@ -3077,6 +3081,7 @@
       if (body) body.textContent = `Streaming ${name} log entries...`;
 
       fetch(`${GATEWAY}/api/logs?name=${encodeURIComponent(name)}`, {
+        credentials: 'include',
         headers: getAdminAuthHeaders(),
         signal: _fetchSig(8000)
       })
@@ -3390,6 +3395,7 @@
 
       fetch(`${GATEWAY}/add`, {
         method: 'POST',
+        credentials: 'include',
         headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ url: val, target: target }),
         signal: _fetchSig(8000)
@@ -3449,6 +3455,7 @@
 
       fetch(`${GATEWAY}/add`, {
         method: 'POST',
+        credentials: 'include',
         headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ url: val, target: target }),
         signal: _fetchSig(8000)
@@ -3764,6 +3771,7 @@
       const timeoutId = setTimeout(() => controller.abort(), 6000);
       fetch(`${GATEWAY}/api/control?action=maintenance&target=nuc&enable=true&duration=${durationMinutes}`, {
         method: 'POST',
+        credentials: 'include',
         headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ enable: true, duration: durationMinutes, reason: reason }),
         signal: controller.signal
@@ -3808,6 +3816,7 @@
       const timeoutId = setTimeout(() => controller.abort(), 6000);
       fetch(`${GATEWAY}/api/control?action=maintenance&target=nuc&enable=false`, {
         method: 'POST',
+        credentials: 'include',
         headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ enable: false }),
         signal: controller.signal
@@ -4653,6 +4662,7 @@
       if (!isSilent && statusTag) statusTag.textContent = 'STREAMING...';
 
       fetch(`${GATEWAY}/api/logs?name=agy`, {
+        credentials: 'include',
         headers: getAdminAuthHeaders(),
         signal: _fetchSig(8000)
       })
@@ -4765,6 +4775,7 @@
       if (cid) payload.conversationId = cid;
       fetch(`${GATEWAY}/api/agy/send`, {
         method: 'POST',
+        credentials: 'include',
         headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(payload),
         signal: _fetchSig(15000)

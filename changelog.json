@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-22T04:55:00Z",
-    "currentVersion":  "v2.8.62",
+    "updatedAt":  "2026-11-22T05:35:00Z",
+    "currentVersion":  "v2.8.63",
     "releases":  [
+                     {
+                         "version":  "v2.8.63",
+                         "date":  "November 22, 2026",
+                         "title":  "SSO Gateway Fetch Credentials \u0026 Torrent Node Latency Guard",
+                         "changes":  [
+                                         {
+                                             "label":  "SSO Cookie Credentials on Gateway Fetches",
+                                             "text":  "Added credentials: \u0027include\u0027 to all 11 authenticated cross-origin GATEWAY fetch() calls in app.js (/api/logs, /api/agy/send, /api/agy/launch, /add, and /api/control maintenance actions) so Microsoft 365 SSO session cookies are consistently forwarded."
+                                         },
+                                         {
+                                             "label":  "Honest Null-State Torrent Node Latency",
+                                             "text":  "Updated meta-watch-torrents in app.js to render Online when latencyMs is null and 0 ms when latencyMs is 0 instead of falling back to \u003c 1 ms."
+                                         },
+                                         {
+                                             "label":  "Cache-Busters \u0026 Codebase Scale Sync",
+                                             "text":  "Bumped styles.css?v=2.8.63 and app.js?v=2.8.63, synchronized footer/menu version badges across all 7 dashboard pages, and recalculated exact codebase Lines of Code."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.62",
                          "date":  "November 21, 2026",
