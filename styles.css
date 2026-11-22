@@ -154,6 +154,8 @@ section[id], div[id], #deck, #ops, #fleet, #uptime, #camera-feed-card {
 
 /* Buttons */
 .btn {
+  position: relative;
+  z-index: 2;
   display: inline-block;
   padding: 10px 22px;
   border-radius: 8px;
@@ -378,8 +380,8 @@ button.dropdown-item,
   color: #93c5fd !important;
   border: 1px solid rgba(96, 165, 250, 0.35) !important;
   border-radius: 8px !important;
-  padding: 8px 12px !important;
-  margin-bottom: 5px !important;
+  padding: 6px 11px !important;
+  margin-bottom: 4px !important;
   font-weight: 600 !important;
   display: flex !important;
   align-items: center !important;
@@ -593,6 +595,11 @@ button.dropdown-item:active,
   left: 0;
   margin-top: 2px;
   min-width: 260px;
+  max-height: min(74vh, calc(100vh - 118px));
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
   background: rgba(13, 19, 33, 0.97);
   backdrop-filter: blur(16px);
   border: 1px solid rgba(59, 130, 246, 0.35);

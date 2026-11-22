@@ -456,6 +456,8 @@
     let ms = null;
     let sourceBuffer = null;
     let bufferQueue = [];
+    let mseAppendLock = false;
+    let frameTimeout = null;
     let streamConnected = false;
     let currentObjectUrl = null;
 
@@ -464,16 +466,25 @@
         clearTimeout(reconnectTimeout);
         reconnectTimeout = null;
       }
+      if (frameTimeout) {
+        clearTimeout(frameTimeout);
+        frameTimeout = null;
+      }
       if (ws) {
         try { ws.close(); } catch (e) {}
         ws = null;
       }
       if (pc) {
-        try { pc.close(); } catch (e) {}
+        try {
+          pc.ontrack = null;
+          pc.onconnectionstatechange = null;
+          pc.close();
+        } catch (e) {}
         pc = null;
       }
       sourceBuffer = null;
       bufferQueue = [];
+      mseAppendLock = false;
       if (ms) {
         if (ms.readyState === 'open') {
           try { ms.endOfStream(); } catch (e) {}
@@ -484,8 +495,16 @@
         try { URL.revokeObjectURL(currentObjectUrl); } catch (e) {}
         currentObjectUrl = null;
       }
+      try {
+        video.removeAttribute('src');
+        video.srcObject = null;
+        video.load();
+      } catch (e) {}
       streamConnected = false;
     }
+    window.cleanupStream = cleanupStream;
+    window.addEventListener('pagehide', cleanupStream);
+    window.addEventListener('beforeunload', cleanupStream);
 
     function getStreamEndpoints(src) {
       const endpoints = [];
@@ -544,12 +563,20 @@
         try { URL.revokeObjectURL(currentObjectUrl); } catch (e) {}
         currentObjectUrl = null;
       }
+      if (frameTimeout) {
+        clearTimeout(frameTimeout);
+        frameTimeout = null;
+      }
+      bufferQueue = [];
+      mseAppendLock = false;
       ms = new MediaSource();
+      const activeMs = ms;
       currentObjectUrl = URL.createObjectURL(ms);
       video.src = currentObjectUrl;
       video.srcObject = null;
 
       ms.addEventListener('sourceopen', () => {
+        if (ms !== activeMs) return;
         if (currentObjectUrl) {
           try { URL.revokeObjectURL(currentObjectUrl); } catch (e) {}
           currentObjectUrl = null;
@@ -565,21 +592,57 @@
 
         let hasOpened = false;
         let handled = false;
+        const fallbackToWebRTC = (reason) => {
+          if (handled || ws !== sock) return;
+          handled = true;
+          clearTimeout(connTimeout);
+          if (frameTimeout) { clearTimeout(frameTimeout); frameTimeout = null; }
+          try { sock.close(); } catch (e) {}
+          if (reason) console.warn(reason);
+          startWebRTC(wsUrl, endpoints, idx);
+        };
+
         const connTimeout = setTimeout(() => {
           if (ws !== sock) return;
           if (!hasOpened && sock.readyState !== WebSocket.OPEN) {
-            if (handled) return;
-            handled = true;
-            try { sock.close(); } catch (e) {}
-            startWebRTC(wsUrl, endpoints, idx);
+            fallbackToWebRTC('MSE WebSocket connect timeout, falling back to WebRTC');
           }
         }, 3500);
+
+        const flushMseQueue = () => {
+          if (ws !== sock || ms !== activeMs || !sourceBuffer || mseAppendLock || sourceBuffer.updating || activeMs.readyState !== 'open') return;
+          if (bufferQueue.length === 0) return;
+          const chunk = bufferQueue[0];
+          try {
+            mseAppendLock = true;
+            sourceBuffer.appendBuffer(chunk);
+            bufferQueue.shift();
+          } catch (e) {
+            mseAppendLock = false;
+            if (e && e.name === 'QuotaExceededError' && sourceBuffer.buffered && sourceBuffer.buffered.length > 0) {
+              try {
+                const start0 = sourceBuffer.buffered.start(0);
+                const end = sourceBuffer.buffered.end(sourceBuffer.buffered.length - 1);
+                if (end - start0 > 1.5) {
+                  sourceBuffer.remove(start0, Math.max(start0 + 0.5, end - 3));
+                  return;
+                }
+              } catch (remErr) {}
+            }
+            fallbackToWebRTC('MSE append failed, falling back to WebRTC: ' + (e && e.message ? e.message : e));
+          }
+        };
 
         sock.addEventListener('open', () => {
           if (ws !== sock) return;
           hasOpened = true;
           clearTimeout(connTimeout);
           reconnectAttempts = 0;
+          frameTimeout = setTimeout(() => {
+            if (!streamConnected && ws === sock && !handled) {
+              fallbackToWebRTC('MSE first-frame timeout (10s), falling back to WebRTC');
+            }
+          }, 10000);
 
           const supportedCodecs = [
             'avc1.640029', 'avc1.64002A', 'avc1.640033', 'avc1.42001F',
@@ -595,31 +658,22 @@
             try {
               const msg = JSON.parse(ev.data);
               if (msg.type === 'mse') {
-                if (ms && ms.readyState === 'open') {
+                if (ms === activeMs && activeMs.readyState === 'open' && !sourceBuffer) {
                   try {
-                    sourceBuffer = ms.addSourceBuffer(msg.value);
+                    sourceBuffer = activeMs.addSourceBuffer(msg.value);
                   } catch (sbErr) {
-                    console.warn('MSE addSourceBuffer failed, falling back to WebRTC:', sbErr);
-                    if (!handled) {
-                      handled = true;
-                      clearTimeout(connTimeout);
-                      startWebRTC(wsUrl, endpoints, idx);
-                    }
+                    fallbackToWebRTC('MSE addSourceBuffer failed, falling back to WebRTC: ' + (sbErr && sbErr.message ? sbErr.message : sbErr));
                     return;
                   }
                   sourceBuffer.mode = 'segments';
-
+                  sourceBuffer.addEventListener('error', () => {
+                    fallbackToWebRTC('MSE SourceBuffer error, falling back to WebRTC');
+                  });
                   sourceBuffer.addEventListener('updateend', () => {
-                    if (sourceBuffer && !sourceBuffer.updating && bufferQueue.length > 0) {
-                      try {
-                        const chunk = bufferQueue.shift();
-                        sourceBuffer.appendBuffer(chunk);
-                      } catch (e) {
-                        console.warn('MSE append error:', e);
-                      }
-                    }
+                    if (ws !== sock || ms !== activeMs || !sourceBuffer) return;
+                    mseAppendLock = false;
 
-                    if (sourceBuffer && !sourceBuffer.updating && sourceBuffer.buffered && sourceBuffer.buffered.length > 0) {
+                    if (!sourceBuffer.updating && sourceBuffer.buffered && sourceBuffer.buffered.length > 0) {
                       const end = sourceBuffer.buffered.end(sourceBuffer.buffered.length - 1);
                       const start0 = sourceBuffer.buffered.start(0);
                       if (video.paused) {
@@ -631,59 +685,52 @@
                         video.currentTime = end - 0.5;
                       }
                       if (end - start0 > 12) {
-                        try { sourceBuffer.remove(start0, end - 8); } catch (e) {}
+                        try {
+                          sourceBuffer.remove(start0, end - 8);
+                          return;
+                        } catch (e) {}
                       }
                     }
+                    flushMseQueue();
                   });
 
                   video.play().catch(() => {
                     video.muted = true;
                     video.play().catch(er => console.warn(er));
                   });
+                  flushMseQueue();
                 }
               } else if (msg.type === 'error') {
-                if (handled) return;
-                handled = true;
-                clearTimeout(connTimeout);
-                startWebRTC(wsUrl, endpoints, idx);
+                fallbackToWebRTC('go2rtc MSE error: ' + msg.value);
               }
             } catch (e) {
               console.warn('MSE message error:', e);
             }
           } else {
-            if (sourceBuffer) {
-              if (sourceBuffer.updating || bufferQueue.length > 0) {
-                bufferQueue.push(ev.data);
-                if (bufferQueue.length > 50) bufferQueue.shift();
-              } else {
-                try {
-                  sourceBuffer.appendBuffer(ev.data);
-                } catch (e) {
-                  bufferQueue.push(ev.data);
-                }
-              }
+            bufferQueue.push(ev.data);
+            if (bufferQueue.length > 60) {
+              bufferQueue.shift();
             }
+            flushMseQueue();
           }
         });
 
         sock.addEventListener('error', () => {
           if (ws !== sock || streamConnected || handled) return;
-          handled = true;
-          clearTimeout(connTimeout);
           if (!hasOpened) {
+            handled = true;
+            clearTimeout(connTimeout);
+            if (frameTimeout) { clearTimeout(frameTimeout); frameTimeout = null; }
             connectEndpoint(endpoints, idx + 1);
           } else {
-            startWebRTC(wsUrl, endpoints, idx);
+            fallbackToWebRTC('MSE WebSocket error, falling back to WebRTC');
           }
         });
 
         sock.addEventListener('close', () => {
           if (ws !== sock) return;
           if (!streamConnected) {
-            if (handled) return;
-            handled = true;
-            clearTimeout(connTimeout);
-            startWebRTC(wsUrl, endpoints, idx);
+            fallbackToWebRTC('MSE WebSocket closed before first frame');
           } else {
             if (handled) return;
             handled = true;
@@ -697,17 +744,23 @@
       ms = null;
       sourceBuffer = null;
       bufferQueue = [];
+      mseAppendLock = false;
+      if (frameTimeout) { clearTimeout(frameTimeout); frameTimeout = null; }
       if (currentObjectUrl) { try { URL.revokeObjectURL(currentObjectUrl); } catch (e) {} currentObjectUrl = null; }
       if (ws) { try { ws.close(); } catch (e) {} ws = null; }
       if (pc) { try { pc.close(); } catch (e) {} pc = null; }
 
       try { video.removeAttribute('src'); video.srcObject = null; video.load(); } catch (e) {}
 
-      pc = new RTCPeerConnection({
+      const activePc = new RTCPeerConnection({
         iceServers: [{ urls: ['stun:stun.cloudflare.com:3478', 'stun:stun.l.google.com:19302'] }]
       });
+      pc = activePc;
+      let remoteDescSet = false;
+      const pendingCandidates = [];
 
-      pc.ontrack = ev => {
+      activePc.ontrack = ev => {
+        if (pc !== activePc) return;
         if (ev.streams && ev.streams[0]) {
           video.srcObject = ev.streams[0];
         } else {
@@ -718,17 +771,18 @@
         }
       };
 
-      pc.addTransceiver('video', { direction: 'recvonly' });
-      pc.addTransceiver('audio', { direction: 'recvonly' });
+      activePc.addTransceiver('video', { direction: 'recvonly' });
+      activePc.addTransceiver('audio', { direction: 'recvonly' });
 
-      pc.addEventListener('connectionstatechange', () => {
-        if (pc.connectionState === 'connected') {
+      activePc.addEventListener('connectionstatechange', () => {
+        if (pc !== activePc) return;
+        if (activePc.connectionState === 'connected') {
           video.play().catch(e => {
             video.muted = true;
             video.play().catch(er => console.warn(er));
           });
         }
-        if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
+        if (activePc.connectionState === 'failed' || activePc.connectionState === 'disconnected') {
           scheduleReconnect();
         }
       });
@@ -743,13 +797,19 @@
         return connectEndpoint(endpoints, idx + 1);
       }
 
+      const advanceEndpoint = () => {
+        if (handled || ws !== sock) return;
+        handled = true;
+        clearTimeout(timeout);
+        if (frameTimeout) { clearTimeout(frameTimeout); frameTimeout = null; }
+        try { sock.close(); } catch (e) {}
+        connectEndpoint(endpoints, idx + 1);
+      };
+
       const timeout = setTimeout(() => {
         if (ws !== sock) return;
         if (!hasOpened && sock.readyState !== WebSocket.OPEN) {
-          if (handled) return;
-          handled = true;
-          try { sock.close(); } catch (e) {}
-          connectEndpoint(endpoints, idx + 1);
+          advanceEndpoint();
         }
       }, 3000);
 
@@ -758,27 +818,42 @@
         hasOpened = true;
         clearTimeout(timeout);
         reconnectAttempts = 0;
+        frameTimeout = setTimeout(() => {
+          if (!streamConnected && ws === sock && !handled) {
+            advanceEndpoint();
+          }
+        }, 10000);
 
-        pc.addEventListener('icecandidate', ev => {
+        activePc.addEventListener('icecandidate', ev => {
           if (!ev.candidate || sock.readyState !== WebSocket.OPEN || ws !== sock) return;
           sock.send(JSON.stringify({ type: 'webrtc/candidate', value: ev.candidate.candidate }));
         });
 
-        pc.createOffer().then(offer => pc.setLocalDescription(offer)).then(() => {
+        activePc.createOffer().then(offer => activePc.setLocalDescription(offer)).then(() => {
           if (sock.readyState === WebSocket.OPEN && ws === sock) {
-            sock.send(JSON.stringify({ type: 'webrtc/offer', value: pc.localDescription.sdp }));
+            sock.send(JSON.stringify({ type: 'webrtc/offer', value: activePc.localDescription.sdp }));
           }
         });
       });
 
       sock.addEventListener('message', ev => {
-        if (ws !== sock) return;
+        if (ws !== sock || pc !== activePc) return;
         try {
           const msg = JSON.parse(ev.data);
           if (msg.type === 'webrtc/candidate') {
-            pc.addIceCandidate({ candidate: msg.value, sdpMid: '0' }).catch(() => {});
+            if (!remoteDescSet) {
+              pendingCandidates.push(msg.value);
+            } else {
+              activePc.addIceCandidate({ candidate: msg.value, sdpMid: '0' }).catch(() => {});
+            }
           } else if (msg.type === 'webrtc/answer') {
-            pc.setRemoteDescription({ type: 'answer', sdp: msg.value }).catch(() => {});
+            activePc.setRemoteDescription({ type: 'answer', sdp: msg.value }).then(() => {
+              remoteDescSet = true;
+              while (pendingCandidates.length > 0) {
+                const c = pendingCandidates.shift();
+                activePc.addIceCandidate({ candidate: c, sdpMid: '0' }).catch(() => {});
+              }
+            }).catch(() => {});
           }
         } catch (e) {
           console.warn('WS parse error:', e);
@@ -787,19 +862,17 @@
 
       sock.addEventListener('close', () => {
         if (ws !== sock || handled) return;
-        handled = true;
-        clearTimeout(timeout);
         if (!streamConnected) {
-          connectEndpoint(endpoints, idx + 1);
+          advanceEndpoint();
         } else {
+          handled = true;
+          clearTimeout(timeout);
           scheduleReconnect();
         }
       });
       sock.addEventListener('error', () => {
         if (ws !== sock || handled || hasOpened) return;
-        handled = true;
-        clearTimeout(timeout);
-        connectEndpoint(endpoints, idx + 1);
+        advanceEndpoint();
       });
     }
 
@@ -810,6 +883,10 @@
     function markStreamOnline() {
       if (streamConnected) return;
       streamConnected = true;
+      if (frameTimeout) {
+        clearTimeout(frameTimeout);
+        frameTimeout = null;
+      }
       hideSpinner();
       streamResEl.textContent = `${video.videoWidth}x${video.videoHeight}`;
       syncCanvasDimensions();

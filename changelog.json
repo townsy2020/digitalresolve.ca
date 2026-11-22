@@ -1,7 +1,30 @@
 {
-    "updatedAt":  "2026-11-22T14:24:00Z",
-    "currentVersion":  "v2.8.71",
+    "updatedAt":  "2026-11-22T14:45:00Z",
+    "currentVersion":  "v2.8.72",
     "releases":  [
+                     {
+                         "version":  "v2.8.72",
+                         "date":  "November 22, 2026",
+                         "title":  "Bedroom Camera MSE/WebRTC Reliability, In-Place Switching & NUC Gateway Player Sync",
+                         "changes":  [
+                                         {
+                                             "label":  "MSE Init Queue & First-Frame Fallback",
+                                             "text":  "Buffered binary fMP4 chunks before SourceBuffer readiness so init segments are preserved, separated buffer eviction from append cycles, fixed QuotaExceededError stalls, and added a 10s first-frame watchdog and Video/SourceBuffer error fallback to WebRTC in webrtc.html and ai.html."
+                                         },
+                                         {
+                                             "label":  "In-Place Camera Switching & WebRTC ICE Queue",
+                                             "text":  "Added remote-description ICE candidate queueing and pagehide/beforeunload cleanup in webrtc.html and ai.html, updated app.js updateCamFeed() to switch Bedroom/Feeder/HD/SD streams in-place via selectCamera() without stale iframe reloads, removed lazy/strict iframe throttling, and updated Bedroom Cam 2 labels."
+                                         },
+                                         {
+                                             "label":  "NUC Static Player Parity & CORS Suppression",
+                                             "text":  "Skipped cross-origin wake.digitalresolve.ca cam status polls when hosted directly on cam.digitalresolve.ca, synced webrtc.html and ai.html to NUC go2rtc static www directory, and bumped assets to v2.8.72."
+                                         },
+                                         {
+                                             "label":  "Navbar Overflow, HTTPS qBittorrent & Zero-Placeholder Telemetry",
+                                             "text":  "Added viewport-clamped scrollable dropdown menus, preserved HTTPS torrents.digitalresolve.ca routing, standardized Cloudflare Dashboard links with z-index layering, and hydrated Cloudflare tunnel egress, Health Radar bars, and topology inspector states with zero placeholder values."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.71",
                          "date":  "November 22, 2026",

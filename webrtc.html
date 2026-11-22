@@ -34,7 +34,10 @@
       height: 100%;
       object-fit: contain;
       background: #000;
-      display: none;
+      display: block;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
       z-index: 5;
     }
     /* Hardware Terminal HUD Overlay (shown when connecting / standby / error) */
@@ -471,23 +474,27 @@
     let ms = null;
     let sourceBuffer = null;
     let bufferQueue = [];
+    let mseAppendLock = false;
     let reconnectTimeout = null;
+    let frameTimeout = null;
     let streamConnected = false;
+
+    function getCamMeta(targetSrc) {
+      const p = (targetSrc || 'pennys_feeder').toLowerCase();
+      const isCam2 = p.includes('bedroom') || p.includes('cam2');
+      const isSd = p.includes('sd');
+      return {
+        id: isCam2 ? 'cam2' : 'cam1',
+        stream: isCam2 ? (isSd ? 'bedroom_sd' : 'bedroom') : (isSd ? 'pennys_feeder_sd' : 'pennys_feeder'),
+        title: isCam2 ? "Bedroom &bull; Cat Cam 2" : "Penny's Feeder &bull; Cat Cam 1",
+        targetText: isCam2 ? "CAM 2: BEDROOM / PERCH" : "CAM 1: LIVING ROOM TOWER",
+        ip: isCam2 ? '192.168.2.25' : '192.168.2.24'
+      };
+    }
 
     // Detect target camera from URL
     const params = new URLSearchParams(window.location.search);
-    const srcParam = (params.get('src') || 'pennys_feeder').toLowerCase();
-    const isCam2 = srcParam.includes('bedroom') || srcParam.includes('cam2');
-    const isSd = srcParam.includes('sd');
-    let streamName = isCam2 ? (isSd ? 'bedroom_sd' : 'bedroom') : (isSd ? 'pennys_feeder_sd' : 'pennys_feeder');
-
-    const activeCam = {
-      id: isCam2 ? 'cam2' : 'cam1',
-      stream: streamName,
-      title: isCam2 ? "Penny's Perch &bull; Cat Cam 2" : "Penny's Feeder &bull; Cat Cam 1",
-      targetText: isCam2 ? "CAM 2: PERCH / FOOD STATION" : "CAM 1: LIVING ROOM TOWER",
-      ip: isCam2 ? '192.168.2.25' : '192.168.2.24'
-    };
+    const activeCam = getCamMeta(params.get('src') || 'pennys_feeder');
 
     function applyActiveCamUI() {
       camTitle.innerHTML = activeCam.title;
@@ -556,16 +563,25 @@
         clearTimeout(reconnectTimeout);
         reconnectTimeout = null;
       }
+      if (frameTimeout) {
+        clearTimeout(frameTimeout);
+        frameTimeout = null;
+      }
       if (ws) {
         try { ws.close(); } catch (e) {}
         ws = null;
       }
       if (pc) {
-        try { pc.close(); } catch (e) {}
+        try {
+          pc.ontrack = null;
+          pc.onconnectionstatechange = null;
+          pc.close();
+        } catch (e) {}
         pc = null;
       }
       sourceBuffer = null;
       bufferQueue = [];
+      mseAppendLock = false;
       if (ms) {
         if (ms.readyState === 'open') {
           try { ms.endOfStream(); } catch (e) {}
@@ -577,12 +593,16 @@
         currentObjectUrl = null;
       }
       try {
+        video.style.opacity = '0';
         video.removeAttribute('src');
         video.srcObject = null;
         video.load();
       } catch (e) {}
       streamConnected = false;
     }
+    window.cleanupStream = cleanupStream;
+    window.addEventListener('pagehide', cleanupStream);
+    window.addEventListener('beforeunload', cleanupStream);
 
     function reconnect() {
       showSpinner('Connecting Live Stream...');
@@ -617,9 +637,14 @@
     function markStreamOnline(modeLabel) {
       if (streamConnected) return;
       streamConnected = true;
+      if (frameTimeout) {
+        clearTimeout(frameTimeout);
+        frameTimeout = null;
+      }
       hideSpinner();
       hud.style.display = 'none';
       video.style.display = 'block';
+      video.style.opacity = '1';
       statusBadge.classList.add('online');
       statusBadge.classList.remove('standby');
       statusText.innerHTML = `${modeLabel} &bull; ${activeCam.ip}`;
@@ -674,12 +699,20 @@
         try { URL.revokeObjectURL(currentObjectUrl); } catch (e) {}
         currentObjectUrl = null;
       }
+      if (frameTimeout) {
+        clearTimeout(frameTimeout);
+        frameTimeout = null;
+      }
+      bufferQueue = [];
+      mseAppendLock = false;
       ms = new MediaSource();
+      const activeMs = ms;
       currentObjectUrl = URL.createObjectURL(ms);
       video.src = currentObjectUrl;
       video.srcObject = null;
 
       ms.addEventListener('sourceopen', () => {
+        if (ms !== activeMs) return;
         if (currentObjectUrl) {
           try { URL.revokeObjectURL(currentObjectUrl); } catch (e) {}
           currentObjectUrl = null;
@@ -695,20 +728,56 @@
 
         let hasOpened = false;
         let handled = false;
+        const fallbackToWebRTC = (reason) => {
+          if (handled || ws !== sock) return;
+          handled = true;
+          clearTimeout(connTimeout);
+          if (frameTimeout) { clearTimeout(frameTimeout); frameTimeout = null; }
+          try { sock.close(); } catch (e) {}
+          if (reason) console.warn(reason);
+          startWebRTC(wsUrl, endpoints, idx);
+        };
+
         const connTimeout = setTimeout(() => {
           if (ws !== sock) return;
           if (!hasOpened && sock.readyState !== WebSocket.OPEN) {
-            if (handled) return;
-            handled = true;
-            try { sock.close(); } catch (e) {}
-            startWebRTC(wsUrl, endpoints, idx);
+            fallbackToWebRTC('MSE WebSocket connect timeout, falling back to WebRTC');
           }
         }, 4000);
+
+        const flushMseQueue = () => {
+          if (ws !== sock || ms !== activeMs || !sourceBuffer || mseAppendLock || sourceBuffer.updating || activeMs.readyState !== 'open') return;
+          if (bufferQueue.length === 0) return;
+          const chunk = bufferQueue[0];
+          try {
+            mseAppendLock = true;
+            sourceBuffer.appendBuffer(chunk);
+            bufferQueue.shift();
+          } catch (e) {
+            mseAppendLock = false;
+            if (e && e.name === 'QuotaExceededError' && sourceBuffer.buffered && sourceBuffer.buffered.length > 0) {
+              try {
+                const start0 = sourceBuffer.buffered.start(0);
+                const end = sourceBuffer.buffered.end(sourceBuffer.buffered.length - 1);
+                if (end - start0 > 1.5) {
+                  sourceBuffer.remove(start0, Math.max(start0 + 0.5, end - 3));
+                  return;
+                }
+              } catch (remErr) {}
+            }
+            fallbackToWebRTC('MSE buffer append failed, falling back to WebRTC: ' + (e && e.message ? e.message : e));
+          }
+        };
 
         sock.addEventListener('open', () => {
           if (ws !== sock) return;
           hasOpened = true;
           clearTimeout(connTimeout);
+          frameTimeout = setTimeout(() => {
+            if (!streamConnected && ws === sock && !handled) {
+              fallbackToWebRTC('MSE first-frame timeout (10s), falling back to WebRTC');
+            }
+          }, 10000);
 
           // Negotiate codecs with go2rtc
           const supportedCodecs = [
@@ -725,35 +794,25 @@
             try {
               const msg = JSON.parse(ev.data);
               if (msg.type === 'mse') {
-                if (ms && ms.readyState === 'open') {
+                if (ms === activeMs && activeMs.readyState === 'open' && !sourceBuffer) {
                   try {
-                    sourceBuffer = ms.addSourceBuffer(msg.value);
+                    sourceBuffer = activeMs.addSourceBuffer(msg.value);
                   } catch (sbErr) {
-                    console.warn('MSE addSourceBuffer failed, falling back to WebRTC:', sbErr);
-                    if (!handled) {
-                      handled = true;
-                      clearTimeout(connTimeout);
-                      startWebRTC(wsUrl, endpoints, idx);
-                    }
+                    fallbackToWebRTC('MSE addSourceBuffer failed, falling back to WebRTC: ' + (sbErr && sbErr.message ? sbErr.message : sbErr));
                     return;
                   }
                   sourceBuffer.mode = 'segments';
-
+                  sourceBuffer.addEventListener('error', () => {
+                    fallbackToWebRTC('MSE SourceBuffer error, falling back to WebRTC');
+                  });
                   sourceBuffer.addEventListener('updateend', () => {
-                    if (sourceBuffer && !sourceBuffer.updating && bufferQueue.length > 0) {
-                      try {
-                        const chunk = bufferQueue.shift();
-                        sourceBuffer.appendBuffer(chunk);
-                      } catch (e) {
-                        console.warn('MSE buffer append error:', e);
-                      }
-                    }
+                    if (ws !== sock || ms !== activeMs || !sourceBuffer) return;
+                    mseAppendLock = false;
 
-                    if (sourceBuffer && !sourceBuffer.updating && sourceBuffer.buffered && sourceBuffer.buffered.length > 0) {
+                    if (!sourceBuffer.updating && sourceBuffer.buffered && sourceBuffer.buffered.length > 0) {
                       const end = sourceBuffer.buffered.end(sourceBuffer.buffered.length - 1);
                       const start0 = sourceBuffer.buffered.start(0);
 
-                      // Ensure playback triggers as soon as initial buffer is queued
                       if (video.paused) {
                         if (video.currentTime < start0) {
                           video.currentTime = start0;
@@ -764,64 +823,55 @@
                         });
                       }
 
-                      // Only jump forward if severely lagging behind (> 5.0s)
                       const latency = end - video.currentTime;
                       if (latency > 5.0) {
                         video.currentTime = end - 0.5;
                       }
 
-                      // Prune older buffers to preserve memory
+                      // Prune older buffers on its own cycle; next updateend flushes queue
                       if (end - start0 > 12) {
-                        try { sourceBuffer.remove(start0, end - 8); } catch (e) {}
+                        try {
+                          sourceBuffer.remove(start0, end - 8);
+                          return;
+                        } catch (e) {}
                       }
                     }
+                    flushMseQueue();
                   });
+                  flushMseQueue();
                 }
               } else if (msg.type === 'error') {
-                console.warn('go2rtc MSE error:', msg.value);
-                if (handled) return;
-                handled = true;
-                clearTimeout(connTimeout);
-                startWebRTC(wsUrl, endpoints, idx);
+                fallbackToWebRTC('go2rtc MSE error: ' + msg.value);
               }
             } catch (e) {
               console.warn('MSE message parse error:', e);
             }
           } else {
-            // Binary fMP4 chunk
-            if (sourceBuffer) {
-              if (sourceBuffer.updating || bufferQueue.length > 0) {
-                bufferQueue.push(ev.data);
-                if (bufferQueue.length > 50) bufferQueue.shift();
-              } else {
-                try {
-                  sourceBuffer.appendBuffer(ev.data);
-                } catch (e) {
-                  bufferQueue.push(ev.data);
-                }
-              }
+            // Queue binary fMP4 chunks even if they arrive before sourceBuffer initializes (preserves init segment)
+            bufferQueue.push(ev.data);
+            if (bufferQueue.length > 60) {
+              bufferQueue.shift();
             }
+            flushMseQueue();
           }
         });
 
         sock.addEventListener('error', () => {
           if (ws !== sock || streamConnected || handled) return;
-          handled = true;
-          clearTimeout(connTimeout);
           if (!hasOpened) {
+            handled = true;
+            clearTimeout(connTimeout);
+            if (frameTimeout) { clearTimeout(frameTimeout); frameTimeout = null; }
             connectEndpoint(endpoints, idx + 1);
           } else {
-            startWebRTC(wsUrl, endpoints, idx);
+            fallbackToWebRTC('MSE WebSocket error, falling back to WebRTC');
           }
         });
 
         sock.addEventListener('close', () => {
           if (ws !== sock) return;
           if (!streamConnected) {
-            if (handled) return;
-            handled = true;
-            clearTimeout(connTimeout);
-            startWebRTC(wsUrl, endpoints, idx);
+            fallbackToWebRTC('MSE WebSocket closed before first frame');
           } else {
             if (handled) return;
             handled = true;
@@ -836,22 +886,29 @@
       ms = null;
       sourceBuffer = null;
       bufferQueue = [];
+      mseAppendLock = false;
+      if (frameTimeout) { clearTimeout(frameTimeout); frameTimeout = null; }
       if (currentObjectUrl) { try { URL.revokeObjectURL(currentObjectUrl); } catch (e) {} currentObjectUrl = null; }
       if (ws) { try { ws.close(); } catch (e) {} ws = null; }
       if (pc) { try { pc.close(); } catch (e) {} pc = null; }
 
       try {
+        video.style.opacity = '0';
         video.removeAttribute('src');
         video.srcObject = null;
         video.load();
       } catch (e) {}
 
-      pc = new RTCPeerConnection({
+      const activePc = new RTCPeerConnection({
         iceServers: [{ urls: ['stun:stun.cloudflare.com:3478', 'stun:stun.l.google.com:19302'] }]
       });
+      pc = activePc;
+      let remoteDescSet = false;
+      const pendingCandidates = [];
 
       // Pure dynamic track assignment: never pre-allocate dummy audio tracks that stall HTML5 clock
-      pc.ontrack = ev => {
+      activePc.ontrack = ev => {
+        if (pc !== activePc) return;
         if (ev.streams && ev.streams[0]) {
           video.srcObject = ev.streams[0];
         } else {
@@ -866,16 +923,17 @@
         });
       };
 
-      pc.addTransceiver('video', { direction: 'recvonly' });
-      pc.addTransceiver('audio', { direction: 'recvonly' });
+      activePc.addTransceiver('video', { direction: 'recvonly' });
+      activePc.addTransceiver('audio', { direction: 'recvonly' });
 
-      pc.addEventListener('connectionstatechange', () => {
-        if (pc.connectionState === 'connected') {
+      activePc.addEventListener('connectionstatechange', () => {
+        if (pc !== activePc) return;
+        if (activePc.connectionState === 'connected') {
           video.play().catch(() => {
             video.muted = true;
             video.play().catch(er => console.warn('Autoplay error:', er));
           });
-        } else if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
+        } else if (activePc.connectionState === 'failed' || activePc.connectionState === 'disconnected') {
           if (reconnectTimeout) clearTimeout(reconnectTimeout);
           reconnectTimeout = setTimeout(initStream, 4000);
         }
@@ -891,13 +949,19 @@
         return connectEndpoint(endpoints, idx + 1);
       }
 
+      const advanceEndpoint = () => {
+        if (handled || ws !== sock) return;
+        handled = true;
+        clearTimeout(timeout);
+        if (frameTimeout) { clearTimeout(frameTimeout); frameTimeout = null; }
+        try { sock.close(); } catch (e) {}
+        connectEndpoint(endpoints, idx + 1);
+      };
+
       const timeout = setTimeout(() => {
         if (ws !== sock) return;
         if (!hasOpened && sock.readyState !== WebSocket.OPEN) {
-          if (handled) return;
-          handled = true;
-          try { sock.close(); } catch (e) {}
-          connectEndpoint(endpoints, idx + 1);
+          advanceEndpoint();
         }
       }, 3000);
 
@@ -905,15 +969,20 @@
         if (ws !== sock) return;
         hasOpened = true;
         clearTimeout(timeout);
+        frameTimeout = setTimeout(() => {
+          if (!streamConnected && ws === sock && !handled) {
+            advanceEndpoint();
+          }
+        }, 10000);
 
-        pc.addEventListener('icecandidate', ev => {
+        activePc.addEventListener('icecandidate', ev => {
           if (!ev.candidate || sock.readyState !== WebSocket.OPEN || ws !== sock) return;
           sock.send(JSON.stringify({ type: 'webrtc/candidate', value: ev.candidate.candidate }));
         });
 
-        pc.createOffer().then(offer => pc.setLocalDescription(offer)).then(() => {
+        activePc.createOffer().then(offer => activePc.setLocalDescription(offer)).then(() => {
           if (sock.readyState === WebSocket.OPEN && ws === sock) {
-            sock.send(JSON.stringify({ type: 'webrtc/offer', value: pc.localDescription.sdp }));
+            sock.send(JSON.stringify({ type: 'webrtc/offer', value: activePc.localDescription.sdp }));
           }
         }).catch(err => {
           console.warn('Offer creation failed:', err);
@@ -921,46 +990,43 @@
       });
 
       sock.addEventListener('message', ev => {
-        if (ws !== sock) return;
+        if (ws !== sock || pc !== activePc) return;
         try {
           const msg = JSON.parse(ev.data);
           if (msg.type === 'webrtc/candidate') {
-            pc.addIceCandidate({ candidate: msg.value, sdpMid: '0' }).catch(e => {});
+            if (!remoteDescSet) {
+              pendingCandidates.push(msg.value);
+            } else {
+              activePc.addIceCandidate({ candidate: msg.value, sdpMid: '0' }).catch(() => {});
+            }
           } else if (msg.type === 'webrtc/answer') {
-            pc.setRemoteDescription({ type: 'answer', sdp: msg.value }).catch(e => {});
+            activePc.setRemoteDescription({ type: 'answer', sdp: msg.value }).then(() => {
+              remoteDescSet = true;
+              while (pendingCandidates.length > 0) {
+                const c = pendingCandidates.shift();
+                activePc.addIceCandidate({ candidate: c, sdpMid: '0' }).catch(() => {});
+              }
+            }).catch(() => {});
           }
         } catch (e) {}
       });
 
       sock.addEventListener('error', () => {
         if (ws !== sock || handled || hasOpened) return;
-        handled = true;
-        clearTimeout(timeout);
-        connectEndpoint(endpoints, idx + 1);
+        advanceEndpoint();
       });
 
       sock.addEventListener('close', () => {
         if (ws !== sock || handled) return;
-        if (pc.connectionState !== 'connected' && !streamConnected) {
-          handled = true;
-          clearTimeout(timeout);
-          connectEndpoint(endpoints, idx + 1);
+        if (activePc.connectionState !== 'connected' && !streamConnected) {
+          advanceEndpoint();
         }
       });
     }
 
     // Dynamic Camera Switcher API
     function selectCam(targetSrc) {
-      const p = (targetSrc || 'pennys_feeder').toLowerCase();
-      const isC2 = p.includes('bedroom') || p.includes('cam2');
-      const isS = p.includes('sd');
-
-      activeCam.id = isC2 ? 'cam2' : 'cam1';
-      activeCam.stream = isC2 ? (isS ? 'bedroom_sd' : 'bedroom') : (isS ? 'pennys_feeder_sd' : 'pennys_feeder');
-      activeCam.title = isC2 ? "Penny's Perch &bull; Cat Cam 2" : "Penny's Feeder &bull; Cat Cam 1";
-      activeCam.targetText = isC2 ? "CAM 2: PERCH / FOOD STATION" : "CAM 1: LIVING ROOM TOWER";
-      activeCam.ip = isC2 ? '192.168.2.25' : '192.168.2.24';
-
+      Object.assign(activeCam, getCamMeta(targetSrc));
       applyActiveCamUI();
       reconnect();
     }
@@ -973,6 +1039,8 @@
 
     // Active Camera Ping Telemetry
     async function pollStatus() {
+      const hostname = window.location.hostname;
+      if (hostname === 'cam.digitalresolve.ca') return;
       const isHttps = (window.location.protocol === 'https:');
       const endpoints = isHttps
         ? ['https://wake.digitalresolve.ca/api/cam/status']
@@ -1014,7 +1082,16 @@
     setInterval(pollStatus, 5000);
 
     video.addEventListener('loadeddata', () => {
-      markStreamOnline(ms ? 'LIVE MSE' : 'LIVE WEBRTC');
+      if (video.videoWidth > 0 || video.readyState >= 2) {
+        markStreamOnline(ms ? 'LIVE MSE' : 'LIVE WEBRTC');
+      }
+    });
+
+    video.addEventListener('error', () => {
+      if (!streamConnected && ws) {
+        console.warn('Video element error before first frame, resetting stream');
+        reconnect();
+      }
     });
 
     video.addEventListener('playing', () => {
