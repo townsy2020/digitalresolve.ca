@@ -1003,7 +1003,7 @@
           // Notify gateway if confirmed
           if (now - lastHopperWebhookNotify > 60000) {
             lastHopperWebhookNotify = now;
-            fetch('https://wake.digitalresolve.ca/api/feeder/beacon-alert?state=low&optical=true', { method: 'POST', credentials: 'include', headers: { 'X-Requested-With': 'fetch' }, signal: (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') ? AbortSignal.timeout(5000) : undefined }).catch(() => {});
+            fetch('https://wake.digitalresolve.ca/api/feeder/beacon-alert?state=low&optical=true', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: '{}', signal: (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') ? AbortSignal.timeout(5000) : undefined }).catch(() => {});
           }
         } else {
           if (redBlinkSamples.length > 10 && transitions === 0 && !hasRedPulse) {

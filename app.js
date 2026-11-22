@@ -163,16 +163,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.58';
+          const activeVer = match ? match[0] : 'v2.8.59';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 15642;
+      const baseHtmlLines = 15733;
       const baseCssLines = 6349;
-      const baseJsLines = 6851;
+      const baseJsLines = 6836;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
@@ -902,7 +902,7 @@
       const dnsBlock = document.getElementById('dns-kpi-blocklists');
       if (dnsBlock) dnsBlock.textContent = '412,850';
       const dnsRoutes = document.getElementById('dns-kpi-routes');
-      if (dnsRoutes) dnsRoutes.textContent = '6 LAN Routes';
+      if (dnsRoutes) dnsRoutes.textContent = '7 LAN Routes';
       const dnsDaemon = document.getElementById('dns-kpi-daemon');
       if (dnsDaemon) dnsDaemon.textContent = 'Awaiting Install';
       document.querySelectorAll('#schematic-cf-throughput').forEach(el => el.textContent = '100% Shield');
@@ -929,8 +929,10 @@
       });
 
       // 3. Uptime Kuma Heartbeat Table Latencies
-      const nucLat = (window.LAST_NUC_LATENCY !== undefined && window.LAST_NUC_LATENCY !== null) ? Number(window.LAST_NUC_LATENCY) : null;
-      const ispLat = (window.ISP_LATEST && window.ISP_LATEST.pingAvgMs !== undefined) ? Number(window.ISP_LATEST.pingAvgMs) : null;
+      const rawNucLat = (window.LAST_NUC_LATENCY !== undefined && window.LAST_NUC_LATENCY !== null && window.LAST_NUC_LATENCY !== '') ? Number(window.LAST_NUC_LATENCY) : NaN;
+      const nucLat = Number.isFinite(rawNucLat) ? rawNucLat : null;
+      const rawIspLat = (window.ISP_LATEST && window.ISP_LATEST.pingAvgMs !== undefined && window.ISP_LATEST.pingAvgMs !== null && window.ISP_LATEST.pingAvgMs !== '') ? Number(window.ISP_LATEST.pingAvgMs) : NaN;
+      const ispLat = Number.isFinite(rawIspLat) ? rawIspLat : null;
       const nucOnline = (window.NUC_IS_ONLINE !== false);
       const svcs = (window.LAST_SERVICES_HEALTH && window.LAST_SERVICES_HEALTH.services) ? window.LAST_SERVICES_HEALTH.services : null;
 
@@ -969,6 +971,7 @@
       setKuma('kuma-lat-cf', sCf.lat, 'kuma-status-cf', sCf.ok, 'Shield Active', 'Degraded', 'kuma-uptime-cf');
 
       document.querySelectorAll('#spark-leg-nuc').forEach(el => el.textContent = nucLat !== null ? `${nucLat.toFixed(1)} ms` : '--');
+      if (typeof initSparklineHeartbeat === 'function') initSparklineHeartbeat();
     }
     window.updateClusterPowerAndThermalsUI = updateClusterPowerAndThermalsUI;
 
@@ -1077,7 +1080,7 @@
         // Update NUC Storage Segments Bar (media.html & index.html)
         const nSegWrap = document.querySelector('.node-deck-card.nuc-deck .storage-segments-bar');
         if (nSegWrap && disk) {
-          const freePct = disk.usedPercent ? (100 - disk.usedPercent).toFixed(1) : 26.6;
+          const freePct = (disk.usedPercent !== null && disk.usedPercent !== undefined && Number.isFinite(Number(disk.usedPercent))) ? Math.max(0, 100 - Number(disk.usedPercent)).toFixed(1) : '26.6';
           const segFree = nSegWrap.querySelector('.seg-free');
           if (segFree) {
             segFree.style.width = `${freePct}%`;
@@ -1308,11 +1311,12 @@
             const dUsed = disk.dTotalGB ? Math.round(disk.dTotalGB - disk.dFreeGB) : 213;
             const dFree = disk.dFreeGB ? Math.round(disk.dFreeGB) : 5376;
             const total = (disk.totalGB || 6054);
+            const safeTot = (Number.isFinite(Number(total)) && Number(total) > 0) ? Number(total) : 1;
 
-            const cUsedPct = ((cUsed / total) * 100).toFixed(1);
-            const cFreePct = ((cFree / total) * 100).toFixed(1);
-            const dUsedPct = ((dUsed / total) * 100).toFixed(1);
-            const dFreePct = ((dFree / total) * 100).toFixed(1);
+            const cUsedPct = ((cUsed / safeTot) * 100).toFixed(1);
+            const cFreePct = ((cFree / safeTot) * 100).toFixed(1);
+            const dUsedPct = ((dUsed / safeTot) * 100).toFixed(1);
+            const dFreePct = ((dFree / safeTot) * 100).toFixed(1);
 
             segs[0].style.width = `${cUsedPct}%`;
             segs[0].title = `C: NVMe Used: ${cUsed} GB`;
@@ -1738,7 +1742,7 @@
     }
 
     function getAdminAuthHeaders(extra = {}) {
-      const headers = Object.assign({ 'X-Requested-With': 'XMLHttpRequest' }, extra);
+      const headers = Object.assign({}, extra);
       const k = getAdminKey();
       if (k) headers['X-Admin-Key'] = k;
       return headers;
@@ -2510,10 +2514,6 @@
       document.querySelectorAll('.dropdown').forEach(dd => dd.classList.remove('is-open'));
     }
 
-    function onControlNodeChange(val) {
-      selectControlNode(val);
-    }
-
     function executeNodeAction(action) {
       if (!isSSOAuthenticated()) {
         openGlobalSSOModal(`Remote Action: ${action.toUpperCase()}`, () => executeNodeAction(action));
@@ -3120,10 +3120,6 @@
         .catch(() => {
           if (body) body.textContent = `[Failed to fetch ${name} log from ${GATEWAY}]`;
         });
-    }
-
-    function reloadCurrentLog() {
-      loadLog(currentLogTab);
     }
 
     // ISP Diagnostics & History Poller
@@ -4144,7 +4140,6 @@
     }
 
     let sparklineAnimId = null;
-    let sparklinePhase = 0;
 
     function renderSparklineFrame() {
       sparklineAnimId = null;
@@ -4194,6 +4189,9 @@
       if (window.ISP_HISTORY_PINGS && window.ISP_HISTORY_PINGS.length > 0) {
         maxObserved = Math.max(maxObserved, ...window.ISP_HISTORY_PINGS);
       }
+      if (window.ISP_EDGE_PINGS && window.ISP_EDGE_PINGS.length > 0) {
+        maxObserved = Math.max(maxObserved, ...window.ISP_EDGE_PINGS);
+      }
       let scaleMax = 20;
       if (maxObserved > 18) {
         scaleMax = Math.ceil((maxObserved + 2) / 10) * 10;
@@ -4239,8 +4237,6 @@
         ctx.setLineDash([]);
       });
 
-      sparklinePhase += 0.032;
-
       const toY = (valMs) => {
         const clamped = Math.max(0, Math.min(scaleMax, valMs));
         return yZero - (clamped / scaleMax) * (yZero - yTop);
@@ -4283,7 +4279,7 @@
           const i0 = Math.floor(idx);
           const i1 = Math.min(histEdge.length - 1, Math.ceil(idx));
           const frac = idx - i0;
-          val = 1.1 + ((histEdge[i0] * (1 - frac) + histEdge[i1] * frac) % 1.5) * 0.5;
+          val = histEdge[i0] * (1 - frac) + histEdge[i1] * frac;
         } else {
           val = 1.1;
         }
@@ -4304,10 +4300,6 @@
         if (x === axisX) ctx.moveTo(x, y); else ctx.lineTo(x, y);
       }
       ctx.stroke();
-
-      if (!document.hidden) {
-        sparklineAnimId = requestAnimationFrame(renderSparklineFrame);
-      }
     }
 
     function initSparklineHeartbeat() {
@@ -4737,14 +4729,6 @@
             statusTag.className = 'item-tag';
           }
         });
-    }
-
-    function setConsolePrompt(text) {
-      const input = document.getElementById('agy-modal-input');
-      if (input) {
-        input.value = text;
-        input.focus();
-      }
     }
 
     function triggerQuickChip(btn, text) {
@@ -5839,7 +5823,8 @@
       setTimeout(() => {
         Promise.resolve(typeof fetchISPHistory === 'function' ? fetchISPHistory() : null).finally(() => {
           const latest = window.ISP_LATEST || {};
-          const pingStr = (latest.pingAvgMs !== undefined && latest.pingAvgMs !== null) ? Number(latest.pingAvgMs).toFixed(1) : '--';
+          const rawPing = (latest.pingAvgMs !== undefined && latest.pingAvgMs !== null && latest.pingAvgMs !== '') ? Number(latest.pingAvgMs) : NaN;
+          const pingStr = Number.isFinite(rawPing) ? rawPing.toFixed(1) : '--';
           const rawDown = (latest.downloadMbps !== undefined && latest.downloadMbps !== null) ? Number(latest.downloadMbps) : ((latest.downMbps !== undefined && latest.downMbps !== null) ? Number(latest.downMbps) : null);
           const rawUp = (latest.uploadMbps !== undefined && latest.uploadMbps !== null) ? Number(latest.uploadMbps) : ((latest.upMbps !== undefined && latest.upMbps !== null) ? Number(latest.upMbps) : null);
           const downStr = (rawDown !== null && Number.isFinite(rawDown)) ? String(rawDown) : '--';
@@ -5870,7 +5855,7 @@
 
     // --- 2. Edge AI (Ollama Local) ---
     const edgeAiPresetPrompts = {
-      summarize: "Explain the Digital Resolve homelab architecture (Intel i5 NUC 24/7 core, Ryzen 9 workstation, Cloudflare Zero Trust tunnels, Mullvad WireGuard, StreamHub, and WebRTC Cat Cam).",
+      summarize: "Explain the Digital Resolve homelab architecture (Intel i5 NUC 24/7 core, AMD Ryzen 7 workstation, Cloudflare Zero Trust tunnels, Mullvad WireGuard, StreamHub, and WebRTC Cat Cam).",
       bufferbloat: "Explain why Bell Gigabit Fiber paired with Qbit-DynamicThrottle and 2.5 GbE LAN keeps bufferbloat at Grade A+.",
       catcam: "Explain how the Cat Cam live pipeline works using go2rtc on port 8089 and WebSocket WebRTC signaling.",
       security: "Summarize the Zero Trust security posture with Cloudflare Access Microsoft 365 Entra ID SSO and zero open inbound WAN ports."

@@ -916,7 +916,7 @@
               valState.textContent = c.online ? 'ONLINE' : 'UNREACHABLE';
               valState.style.color = c.online ? '#10b981' : '#f87171';
               valIp.textContent = c.ip;
-              const lat = c.latencyMs ? c.latencyMs + ' ms' : '2.4 ms';
+              const lat = (c.latencyMs !== null && c.latencyMs !== undefined && Number.isFinite(Number(c.latencyMs))) ? c.latencyMs + ' ms' : '--';
               valLatency.textContent = lat;
               if (!streamConnected) {
                 statusText.textContent = `HARDWARE ONLINE \u2022 ${lat}`;

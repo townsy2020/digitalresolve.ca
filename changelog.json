@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-22T01:15:00Z",
-    "currentVersion":  "v2.8.58",
+    "updatedAt":  "2026-11-22T01:40:00Z",
+    "currentVersion":  "v2.8.59",
     "releases":  [
+                     {
+                         "version":  "v2.8.59",
+                         "date":  "November 21, 2026",
+                         "title":  "Sparkline \u0026 Telemetry Accuracy Fixes, Zero-Falsy Guards \u0026 Dead Wrapper Cleanup",
+                         "changes":  [
+                                         {
+                                             "label":  "Cloudflare Access CORS Preflight Fix",
+                                             "text":  "Removed X-Requested-With custom header blocking wake.digitalresolve.ca CORS preflight, restoring /api/logs, /api/agy/send, power, AI chat, and feeder controls."
+                                         },
+                                         {
+                                             "label":  "Sparkline \u0026 Latency Telemetry Accuracy",
+                                             "text":  "Removed continuous 60fps requestAnimationFrame spinning in renderSparklineFrame, fixed Edge latency modulo distortion and scale ceiling calculation, triggered sparkline re-renders on live telemetry updates, and made NUC/ISP/speedprobe/WebRTC latency formatting finite-safe and zero-safe."
+                                         },
+                                         {
+                                             "label":  "Disk \u0026 Route Accuracy + Dead Wrapper Cleanup",
+                                             "text":  "Updated DNS KPI routes to 7 LAN Routes, fixed zero-falsy disk.usedPercent and zero-total Desktop segment bar guards, corrected the Edge AI summary prompt to AMD Ryzen 7 workstation, and removed unused onControlNodeChange, reloadCurrentLog, and setConsolePrompt wrappers."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.58",
                          "date":  "November 21, 2026",
