@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-21T23:12:00Z",
-    "currentVersion":  "v2.8.61",
+    "updatedAt":  "2026-11-22T04:55:00Z",
+    "currentVersion":  "v2.8.62",
     "releases":  [
+                     {
+                         "version":  "v2.8.62",
+                         "date":  "November 21, 2026",
+                         "title":  "Null-State Telemetry Integrity: Remove Residual Fake Latency, Disk & Climate Fallbacks",
+                         "changes":  [
+                                         {
+                                             "label":  "Honest Null-State UI Rendering",
+                                             "text":  "Replaced residual hardcoded climate (23.3\u00b0C / 43% RH), NUC/Edge/Cloudflare latency (0.8 ms / 0.9 ms / 1.1 ms / < 1 ms), Desktop latency (4 ms), and Desktop disk (6,054 GB / 5.0% used) fallbacks in app.js with honest Awaiting Telemetry, Online, Anycast OK, and guarded disk states."
+                                         },
+                                         {
+                                             "label":  "Cache-Busters & Codebase Scale Sync",
+                                             "text":  "Bumped styles.css?v=2.8.62 and app.js?v=2.8.62, synchronized footer/menu version badges across all 7 dashboard pages, and recalculated exact codebase Lines of Code."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.61",
                          "date":  "November 21, 2026",

@@ -163,16 +163,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.61';
+          const activeVer = match ? match[0] : 'v2.8.62';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 15929;
+      const baseHtmlLines = 16013;
       const baseCssLines = 6349;
-      const baseJsLines = 6828;
+      const baseJsLines = 6820;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
@@ -889,11 +889,11 @@
       }
       const ambTemp = document.getElementById('iot-ambient-temp');
       if (ambTemp) {
-        if (!window._hasLiveClimate) ambTemp.innerHTML = `23.3&deg;C <span style="font-size: 0.9rem; color: #94a3b8;">/ 43% RH (73.9&deg;F)</span>`;
+        if (!window._hasLiveClimate) ambTemp.innerHTML = '--&deg;C <span style="font-size: 0.9rem; color: #94a3b8;">Awaiting Telemetry</span>';
       }
       const roomThermo = document.getElementById('iot-room-thermostat');
       if (roomThermo) {
-        if (!window._hasLiveClimate) roomThermo.innerHTML = '73.9&deg;F (23.3&deg;C)';
+        if (!window._hasLiveClimate) roomThermo.innerHTML = 'Awaiting Telemetry';
       }
       const storageThroughput = document.getElementById('schematic-storage-throughput');
       if (storageThroughput) {
@@ -1203,17 +1203,17 @@
 
         const latS = safeNum(latencyMs, null);
         const mStream = document.getElementById('meta-watch-streamhub');
-        if (mStream) mStream.innerHTML = isOnline ? `${latS !== null ? latS : 0.8} ms &bull; Sentinel Armed (3m)` : 'Unreachable &bull; Offline';
+        if (mStream) mStream.innerHTML = isOnline ? `${latS !== null ? latS + ' ms' : 'Online'} &bull; Sentinel Armed (3m)` : 'Unreachable &bull; Offline';
         const mFiles = document.getElementById('meta-watch-files');
-        if (mFiles) mFiles.innerHTML = isOnline ? `${latS !== null ? latS : 0.9} ms &bull; Auto-Mount Active` : 'Unreachable &bull; Offline';
+        if (mFiles) mFiles.innerHTML = isOnline ? `${latS !== null ? latS + ' ms' : 'Online'} &bull; Auto-Mount Active` : 'Unreachable &bull; Offline';
         const mCam = document.getElementById('meta-watch-cam');
         if (mCam) mCam.innerHTML = isOnline ? '&lt;50ms Low-Latency WebRTC' : 'Unreachable &bull; Offline';
         const mWol = document.getElementById('meta-watch-wol');
-        if (mWol) mWol.innerHTML = isOnline ? `${latS !== null ? latS + ' ms' : '< 1 ms'} &bull; Fast-Path` : 'Unreachable &bull; Offline';
+        if (mWol) mWol.innerHTML = isOnline ? `${latS !== null ? latS + ' ms' : 'Online'} &bull; Fast-Path` : 'Unreachable &bull; Offline';
         const mTorrents2 = document.getElementById('meta-watch-torrents2');
-        if (mTorrents2) mTorrents2.innerHTML = isOnline ? `${latS !== null ? latS : 0.8} ms &bull; Swarm Active` : 'Unreachable &bull; Offline';
+        if (mTorrents2) mTorrents2.innerHTML = isOnline ? `${latS !== null ? latS + ' ms' : 'Online'} &bull; Swarm Active` : 'Unreachable &bull; Offline';
         const mCf = document.getElementById('meta-watch-cf');
-        if (mCf) mCf.innerHTML = isOnline ? '1.1 ms &bull; Global Anycast Resilient' : 'Standby &bull; Ingress Suspended';
+        if (mCf) mCf.innerHTML = isOnline ? 'Anycast OK &bull; Global Anycast Resilient' : 'Standby &bull; Ingress Suspended';
         if (vitals) {
           const fVitals = document.getElementById('fleet-vitals-nuc');
           const fVpn = document.getElementById('fleet-vpn-nuc');
@@ -1357,13 +1357,13 @@
         const stDesk = document.getElementById('status-tag-desktop');
         if (stDesk) { stDesk.textContent = isOnline ? 'Active' : 'Standby'; stDesk.className = 'item-tag ' + (isOnline ? 'online' : 'offline'); }
         const latDesk = document.getElementById('latency-desktop');
-        if (latDesk) { latDesk.textContent = isOnline ? (latencyMs !== null ? `${latencyMs} ms (8.8.8.8)` : '4 ms (8.8.8.8)') : 'Standby'; latDesk.className = 'item-tag ' + (isOnline ? 'online' : 'offline'); }
+        if (latDesk) { latDesk.textContent = isOnline ? (latencyMs !== null ? `${latencyMs} ms (8.8.8.8)` : 'Online') : 'Standby'; latDesk.className = 'item-tag ' + (isOnline ? 'online' : 'offline'); }
         const fBadgeDesk = document.getElementById('fleet-badge-desktop');
         if (fBadgeDesk) { fBadgeDesk.className = `item-tag ${isOnline ? 'online' : 'offline'}`; fBadgeDesk.textContent = isOnline ? 'Online • Active' : 'Standby • Sleeping'; }
         const fLatDesk = document.getElementById('fleet-latency-desktop');
         if (fLatDesk) {
           fLatDesk.textContent = isOnline
-            ? `192.168.2.62 • ${latencyMs !== null ? latencyMs : 4} ms (8.8.8.8)`
+            ? `192.168.2.62 • ${latencyMs !== null ? `${latencyMs} ms (8.8.8.8)` : 'Online'}`
             : '192.168.2.62 • Standby (WoL Ready)';
         }
         const schDesk = document.getElementById('schematic-desktop-throughput');
@@ -1379,44 +1379,36 @@
           rDesk.innerHTML = `<span class="dropdown-dot dot-1"></span> Bell Fiber | ${isOnline ? 'Online' : 'Standby'}`;
         }
         if (isOnline) {
-          const effectiveDisk = disk || {
-            totalGB: 6054,
-            usedPercent: 5.0,
-            usedGB: 303,
-            freeGB: 5751,
-            cFreeGB: 375,
-            cTotalGB: 465,
-            dFreeGB: 5376,
-            dTotalGB: 5589
-          };
-          const totalGB = safeNum(effectiveDisk.totalGB, 6054);
-          const usedPercent = safeNum(effectiveDisk.usedPercent, 5.0);
-          const usedGB = safeNum(effectiveDisk.usedGB, 303);
-          const freeGB = safeNum(effectiveDisk.freeGB, 5751);
-          const cFree = (effectiveDisk.cFreeGB !== undefined && effectiveDisk.cFreeGB !== null) ? Math.round(safeNum(effectiveDisk.cFreeGB, 375)) : 375;
-          const dFree = (effectiveDisk.dFreeGB !== undefined && effectiveDisk.dFreeGB !== null) ? (safeNum(effectiveDisk.dFreeGB, 5400) / 1000).toFixed(1) : '5.4';
+          if (disk) {
+            const totalGB = safeNum(disk.totalGB, 0);
+            const usedPercent = safeNum(disk.usedPercent, 0);
+            const usedGB = safeNum(disk.usedGB, 0);
+            const freeGB = safeNum(disk.freeGB, 0);
+            const cFree = (disk.cFreeGB !== undefined && disk.cFreeGB !== null) ? Math.round(safeNum(disk.cFreeGB, 0)) : '--';
+            const dFree = (disk.dFreeGB !== undefined && disk.dFreeGB !== null) ? (safeNum(disk.dFreeGB, 0) / 1000).toFixed(1) : '--';
 
-          const fStorage = document.getElementById('fleet-storage-desktop');
-          const fBar = document.getElementById('fleet-bar-desktop');
-          const freePct = Math.round(100 - usedPercent); if (fStorage) fStorage.innerHTML = `${freeGB.toLocaleString()} GB Free (${freePct}% free) &bull; C: ${cFree}G | D: ${dFree}T`;
-          if (fBar) fBar.style.width = `${usedPercent}%`;
-          
-          const dTag = document.getElementById('desktop-disk-tag');
-          const dVal = document.getElementById('desktop-disk-val');
-          const dBar = document.getElementById('desktop-disk-bar');
-          const dSub = document.getElementById('desktop-disk-sub');
-          if (dTag) dTag.innerHTML = `C: ${cFree}G &bull; D: ${dFree}T`;
-          if (dVal) dVal.textContent = `${freeGB.toLocaleString()} GB Free`;
-          if (dBar) dBar.style.width = `${usedPercent}%`;
-          if (dSub) dSub.innerHTML = `${usedGB} GB used of ${totalGB.toLocaleString()} GB (${usedPercent}% used &bull; ${freePct}% free) &bull; C: ${cFree}G | D: ${dFree}T`;
-          
-          const sDeskFree = document.getElementById('stat-desktop-disk-free');
-          const sDeskSub = document.getElementById('stat-desktop-disk-sub');
-          if (sDeskFree) sDeskFree.innerHTML = `${freeGB.toLocaleString()} GB <span style="font-size: 0.9rem; color: #8b949e;">Free</span>`;
-          if (sDeskSub) sDeskSub.innerHTML = `<span>Total ${totalGB.toLocaleString()} GB (${freePct}% Free &bull; ${usedPercent}% Used &bull; ${usedGB} GB)</span>`;
+            const fStorage = document.getElementById('fleet-storage-desktop');
+            const fBar = document.getElementById('fleet-bar-desktop');
+            const freePct = Math.round(100 - usedPercent); if (fStorage) fStorage.innerHTML = `${freeGB.toLocaleString()} GB Free (${freePct}% free) &bull; C: ${cFree}G | D: ${dFree}T`;
+            if (fBar) fBar.style.width = `${usedPercent}%`;
+            
+            const dTag = document.getElementById('desktop-disk-tag');
+            const dVal = document.getElementById('desktop-disk-val');
+            const dBar = document.getElementById('desktop-disk-bar');
+            const dSub = document.getElementById('desktop-disk-sub');
+            if (dTag) dTag.innerHTML = `C: ${cFree}G &bull; D: ${dFree}T`;
+            if (dVal) dVal.textContent = `${freeGB.toLocaleString()} GB Free`;
+            if (dBar) dBar.style.width = `${usedPercent}%`;
+            if (dSub) dSub.innerHTML = `${usedGB} GB used of ${totalGB.toLocaleString()} GB (${usedPercent}% used &bull; ${freePct}% free) &bull; C: ${cFree}G | D: ${dFree}T`;
+            
+            const sDeskFree = document.getElementById('stat-desktop-disk-free');
+            const sDeskSub = document.getElementById('stat-desktop-disk-sub');
+            if (sDeskFree) sDeskFree.innerHTML = `${freeGB.toLocaleString()} GB <span style="font-size: 0.9rem; color: #8b949e;">Free</span>`;
+            if (sDeskSub) sDeskSub.innerHTML = `<span>Total ${totalGB.toLocaleString()} GB (${freePct}% Free &bull; ${usedPercent}% Used &bull; ${usedGB} GB)</span>`;
 
-          const rDeskStorage = document.getElementById('ribbon-desktop-storage');
-          if (rDeskStorage) rDeskStorage.textContent = `${(freeGB / 1000).toFixed(2)} TB Free (${freePct}% free \u2022 C: ${cFree}G | D: ${dFree}T)`;
+            const rDeskStorage = document.getElementById('ribbon-desktop-storage');
+            if (rDeskStorage) rDeskStorage.textContent = `${(freeGB / 1000).toFixed(2)} TB Free (${freePct}% free \u2022 C: ${cFree}G | D: ${dFree}T)`;
+          }
 
           const fVitals = document.getElementById('fleet-vitals-desktop');
           const fCpu = document.getElementById('fleet-cpu-desktop');
