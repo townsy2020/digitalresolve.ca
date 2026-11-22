@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-22T03:20:00Z",
-    "currentVersion":  "v2.8.60",
+    "updatedAt":  "2026-11-21T23:12:00Z",
+    "currentVersion":  "v2.8.61",
     "releases":  [
+                     {
+                         "version":  "v2.8.61",
+                         "date":  "November 21, 2026",
+                         "title":  "Wave 10 Runtime Recovery: deskCpu Fix, V8 TDZ Bootstrap \u0026 Live DOM Polling Guards",
+                         "changes":  [
+                                         {
+                                             "label":  "Critical Runtime & Bootstrap Fixes",
+                                             "text":  "Restored deskCpu declaration in applyClusterStatsPayload (eliminating ReferenceError aborting live token, camera, and climate updates) and moved initApp() bootstrap to the bottom of app.js to eliminate V8 TDZ ReferenceErrors when readyState !== loading."
+                                         },
+                                         {
+                                             "label":  "DOM Presence Guards & Honest Telemetry",
+                                             "text":  "Aligned hasClimateDom, hasIspDom, hasUptimeDom, and hasServicesDom with real HTML element IDs (restoring Kuma and climate polling on ops.html), removed stale localStorage online overrides and offline 0% CPU / 5.0% Used fallbacks, and refreshed Kuma health rows on /services-health updates."
+                                         },
+                                         {
+                                             "label":  "Cache-Busters & UI Label Accuracy",
+                                             "text":  "Bumped styles.css and app.js cache-busters to ?v=2.8.61 across all 7 pages, cleared static Kuma latency placeholders, and replaced stale Kavita / D:\\Media labels with FileBrowser and live D:\\Torrents & E:\\Audiobooks paths."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.60",
                          "date":  "November 21, 2026",

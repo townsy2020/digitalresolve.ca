@@ -163,16 +163,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.60';
+          const activeVer = match ? match[0] : 'v2.8.61';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 15838;
+      const baseHtmlLines = 15929;
       const baseCssLines = 6349;
-      const baseJsLines = 6855;
+      const baseJsLines = 6828;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
@@ -1445,10 +1445,18 @@
           if (fCpu) fCpu.textContent = 'AMD Ryzen 7 | Offline';
           const sDeskCpu = document.getElementById('stat-desktop-cpu-val');
           const sDeskRam = document.getElementById('stat-desktop-ram-sub');
-          if (sDeskCpu) sDeskCpu.innerHTML = `0% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>`;
+          if (sDeskCpu) sDeskCpu.innerHTML = `--% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>`;
           if (sDeskRam) sDeskRam.textContent = 'Memory: Standby / Sleep';
           const sDeskSub = document.getElementById('stat-desktop-disk-sub');
-          if (sDeskSub) sDeskSub.innerHTML = '<span>Total 6,054 GB (5.0% Used &bull; Standby)</span>';
+          if (sDeskSub) {
+            if (disk && Number.isFinite(Number(disk.totalGB)) && Number(disk.totalGB) > 0) {
+              const totFmt = Math.round(Number(disk.totalGB)).toLocaleString();
+              const pctTxt = (disk.usedPercent !== undefined && disk.usedPercent !== null) ? `${disk.usedPercent}% Used` : 'Standby';
+              sDeskSub.innerHTML = `<span>Total ${totFmt} GB (${pctTxt} &bull; Standby)</span>`;
+            } else {
+              sDeskSub.innerHTML = '<span>Storage Standby &bull; Sleep Mode</span>';
+            }
+          }
           const dTag = document.getElementById('desktop-speed-tag');
           if (dTag) { dTag.textContent = 'Offline'; dTag.className = 'item-tag offline'; }
         }
@@ -1548,26 +1556,10 @@
           if (d && d.online !== false) {
             updateStatusUI('nuc', true, d.latencyMs, d.disk, d.torrent, d.vitals);
           } else {
-            try {
-              const raw = localStorage.getItem('dr_telemetry_cache');
-              const cached = raw ? JSON.parse(raw) : null;
-              if (cached && cached.nuc && cached.nuc.online !== false) {
-                updateStatusUI('nuc', true, cached.nuc.latencyMs || 0.2, cached.nuc.disk, cached.nuc.torrent, cached.nuc.vitals);
-                return;
-              }
-            } catch (e) {}
             updateStatusUI('nuc', false);
           }
         })
         .catch(() => {
-          try {
-            const raw = localStorage.getItem('dr_telemetry_cache');
-            const cached = raw ? JSON.parse(raw) : null;
-            if (cached && cached.nuc && cached.nuc.online !== false) {
-              updateStatusUI('nuc', true, cached.nuc.latencyMs || 0.2, cached.nuc.disk, cached.nuc.torrent, cached.nuc.vitals);
-              return;
-            }
-          } catch (e) {}
           updateStatusUI('nuc', false);
         });
 
@@ -1576,34 +1568,10 @@
           if (d && d.online !== false) {
             updateStatusUI('desktop', true, d.latencyMs, d.disk, d.torrent, d.vitals);
           } else {
-            try {
-              const raw = localStorage.getItem('dr_telemetry_cache');
-              const cached = raw ? JSON.parse(raw) : null;
-              if (cached && cached.desktop && cached.desktop.online !== false) {
-                updateStatusUI('desktop', true, cached.desktop.latencyMs || 0.4, cached.desktop.disk, cached.desktop.torrent, cached.desktop.vitals);
-                return;
-              }
-            } catch (e) {}
-            if (window.DESKTOP_IS_ONLINE === true) {
-              updateStatusUI('desktop', true, 0.4);
-              return;
-            }
             updateStatusUI('desktop', false);
           }
         })
         .catch(() => {
-          try {
-            const raw = localStorage.getItem('dr_telemetry_cache');
-            const cached = raw ? JSON.parse(raw) : null;
-            if (cached && cached.desktop && cached.desktop.online !== false) {
-              updateStatusUI('desktop', true, cached.desktop.latencyMs || 0.4, cached.desktop.disk, cached.desktop.torrent, cached.desktop.vitals);
-              return;
-            }
-          } catch (e) {}
-          if (window.DESKTOP_IS_ONLINE === true) {
-            updateStatusUI('desktop', true, 0.4);
-            return;
-          }
           updateStatusUI('desktop', false);
         });
 
@@ -1661,10 +1629,10 @@
         }
       });
 
-      const hasClimateDom = () => Boolean(document.getElementById('climate-temp-val') || document.getElementById('climate-temp') || document.querySelector('[id*="climate-"]'));
-      const hasIspDom = () => Boolean(document.getElementById('isp-ping-val') || document.getElementById('isp-history-body') || document.getElementById('latency-sparkline-canvas'));
-      const hasUptimeDom = () => Boolean(document.getElementById('uptime-matrix-grid') || document.getElementById('uptime-sla-val') || document.querySelector('[id*="uptime-"]'));
-      const hasServicesDom = () => Boolean(document.getElementById('dash-service-grid') || document.getElementById('dash-global-status') || document.querySelector('[id^="svc-"]'));
+      const hasClimateDom = () => Boolean(document.getElementById('iot-ambient-temp') || document.getElementById('ribbon-climate') || document.getElementById('climate-temp-val') || document.getElementById('climate-temp') || document.querySelector('[id*="climate-"]'));
+      const hasIspDom = () => Boolean(document.getElementById('isp-ping-val') || document.getElementById('isp-history-tbody') || document.getElementById('uptimeSparkline'));
+      const hasUptimeDom = () => Boolean(document.getElementById('uptimeMatrix') || document.getElementById('uptime-sla-val') || document.getElementById('uptime-desktop-status'));
+      const hasServicesDom = () => Boolean(document.getElementById('dashServiceGrid') || document.getElementById('dash-global-status') || document.querySelector('[id^="kuma-lat-"]'));
       const hasTermDom = () => Boolean(document.getElementById('terminal-content'));
 
       // Start live stats & terminal stream with Page Visibility + DOM presence throttling
@@ -1722,11 +1690,6 @@
             }).catch(() => {});
         }
       }, 3000);
-    }
-    if (document.readyState === "loading") {
-      window.addEventListener("DOMContentLoaded", initApp);
-    } else {
-      initApp();
     }
 
     // Remote Control Matrix Handler
@@ -2965,6 +2928,7 @@
       }
       if (data.desktop) {
         updateStatusUI('desktop', data.desktop.online, data.desktop.latencyMs, data.desktop.disk, data.desktop.torrent, data.desktop.vitals);
+        const deskCpu = safeNum(data.desktop.cpuLoad, null);
         const sDeskCpu = document.getElementById('stat-desktop-cpu-val');
         const fCpu = document.getElementById('fleet-cpu-desktop');
         if (deskCpu !== null && data.desktop.online) {
@@ -4488,6 +4452,9 @@
           if (data && (data.services || data.status === 'success')) {
             window.LAST_SERVICES_HEALTH = data;
             updateServiceDashboardUI(data);
+            if (typeof updateClusterPowerAndThermalsUI === 'function') {
+              try { updateClusterPowerAndThermalsUI(Boolean(window.DESKTOP_IS_ONLINE)); } catch (e) {}
+            }
           }
           return data;
         })
@@ -5023,13 +4990,13 @@
         icon: '[STORAGE]',
         title: 'Media Storage & NVMe Pools',
         subtitle: 'High-Speed Local Storage & Network Shares',
-        status: 'Healthy (496 GB Free)',
+        status: 'Awaiting Telemetry',
         statusClass: 'online',
         net: 'D:\\Torrents & Z:\\Media  -  SMB 3.1.1',
         sec: 'BitLocker Protected  -  SMART Monitored',
         speed: 'NVMe 3,500 MB/s  -  SMB LAN 280 MB/s',
         role: '4K Stream Staging & Torrent Auto-Unpack',
-        services: 'Local Drive D: (73.4% Full)  -  Desktop NVMe Backup Pool',
+        services: 'Local Drive D:  -  Desktop NVMe Backup Pool',
         btnText: 'Quick Drop Magnet  ->',
         action: () => { openMagnetModal(); }
       }
@@ -6853,3 +6820,9 @@
         document.documentElement.style.overflow = '';
       }
     });
+
+    if (document.readyState === "loading") {
+      window.addEventListener("DOMContentLoaded", initApp);
+    } else {
+      initApp();
+    }
