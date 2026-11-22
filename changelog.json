@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-21T23:46:17Z",
-    "currentVersion":  "v2.8.55",
+    "updatedAt":  "2026-11-22T00:15:50Z",
+    "currentVersion":  "v2.8.56",
     "releases":  [
+                     {
+                         "version":  "v2.8.56",
+                         "date":  "November 21, 2026",
+                         "title":  "Tailscale \u0026 SSO Callback Fixes, Mobile Panning, Telemetry Accuracy \u0026 Camera Recovery",
+                         "changes":  [
+                                         {
+                                             "label":  "Tailscale Routing, SSO Host Matching \u0026 Mobile View Panning",
+                                             "text":  "Routed Tailscale torrents2.digitalresolve.ca traffic to http://100.68.136.76:8081, enabled Microsoft 365 SSO redirects on www./subdomain origins with post-auth callback execution, and updated html overflow to clip with html.desktop-layout { overflow-x: auto; }."
+                                         },
+                                         {
+                                             "label":  "Accurate Offline Status, Sleep Polling \u0026 ISP Baseline Order",
+                                             "text":  "Gated NUC latency text cleanly when offline, required consecutive transient probe misses before declaring sleep completion, and sorted the offline ISP fallback history chronologically so the newest sample drives headline gauges."
+                                         },
+                                         {
+                                             "label":  "Instant Camera WebRTC Fallback \u0026 AdGuard Upgrade Hygiene",
+                                             "text":  "Triggered immediate WebRTC handoff on unsupported MSE codecs, reset MSE state so active WebRTC streams report LIVE WEBRTC, added 10s standby reconnect retries in webrtc.html, and skipped redundant service registration in deploy/adguard/deploy.ps1."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.55",
                          "date":  "November 21, 2026",

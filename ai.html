@@ -556,7 +556,17 @@
               const msg = JSON.parse(ev.data);
               if (msg.type === 'mse') {
                 if (ms && ms.readyState === 'open') {
-                  sourceBuffer = ms.addSourceBuffer(msg.value);
+                  try {
+                    sourceBuffer = ms.addSourceBuffer(msg.value);
+                  } catch (sbErr) {
+                    console.warn('MSE addSourceBuffer failed, falling back to WebRTC:', sbErr);
+                    if (!handled) {
+                      handled = true;
+                      clearTimeout(connTimeout);
+                      startWebRTC(wsUrl, endpoints, idx);
+                    }
+                    return;
+                  }
                   sourceBuffer.mode = 'segments';
 
                   sourceBuffer.addEventListener('updateend', () => {
@@ -644,6 +654,10 @@
     }
 
     function startWebRTC(wsUrl, endpoints, idx) {
+      ms = null;
+      sourceBuffer = null;
+      bufferQueue = [];
+      if (currentObjectUrl) { try { URL.revokeObjectURL(currentObjectUrl); } catch (e) {} currentObjectUrl = null; }
       if (ws) { try { ws.close(); } catch (e) {} ws = null; }
       if (pc) { try { pc.close(); } catch (e) {} pc = null; }
 

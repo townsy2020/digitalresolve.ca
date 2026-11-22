@@ -77,10 +77,14 @@ if (Test-Path $sourceYaml) {
 # 5. Register and Start Windows Service
 Push-Location $InstallDir
 try {
-    Write-Host "[*] Registering AdGuard Home Windows Service..." -ForegroundColor Cyan
-    & .\AdGuardHome.exe -s install -c "$destYaml" 2>&1 | Out-Null
-    if ($LASTEXITCODE -ne 0) {
-        Write-Warning "AdGuardHome.exe -s install returned exit code $LASTEXITCODE"
+    if (-not $existingService) {
+        Write-Host "[*] Registering AdGuard Home Windows Service..." -ForegroundColor Cyan
+        & .\AdGuardHome.exe -s install -c "$destYaml" 2>&1 | Out-Null
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "AdGuardHome.exe -s install returned exit code $LASTEXITCODE"
+        }
+    } else {
+        Write-Host "[i] AdGuardHome service already registered; skipping -s install." -ForegroundColor Gray
     }
     Write-Host "[*] Starting AdGuard Home Service..." -ForegroundColor Cyan
     & .\AdGuardHome.exe -s start 2>&1 | Out-Null

@@ -163,16 +163,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.55';
+          const activeVer = match ? match[0] : 'v2.8.56';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 15346;
-      const baseCssLines = 6345;
-      const baseJsLines = 6759;
+      const baseHtmlLines = 15467;
+      const baseCssLines = 6349;
+      const baseJsLines = 6771;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
@@ -716,12 +716,14 @@
           showToast('loading', `Sleep Signal Dispatched`, `Waiting for ${dev.name} to enter standby...`, 0);
 
           let attempts = 0;
+          let consecutiveErrors = 0;
           const maxAttempts = 10;
           pollInterval = setInterval(() => {
             attempts++;
             fetch(`${GATEWAY}/status?target=${target}`, { signal: _fetchSig(5000) })
               .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
               .then(data => {
+                consecutiveErrors = 0;
                 if (!data.online) {
                   clearInterval(pollInterval);
                   showToast('success', `${dev.name} is now Asleep`, 'System in low-power standby mode.', 6000);
@@ -732,9 +734,12 @@
                 }
               })
               .catch(() => {
-                clearInterval(pollInterval);
-                showToast('success', `${dev.name} is now Asleep`, 'Device offline / in standby.', 6000);
-                updateStatusUI(target, false);
+                consecutiveErrors++;
+                if (consecutiveErrors >= 2 || attempts >= maxAttempts) {
+                  clearInterval(pollInterval);
+                  showToast('success', `${dev.name} is now Asleep`, 'Device offline / in standby.', 6000);
+                  updateStatusUI(target, false);
+                }
               });
           }, 2500);
         })
@@ -1175,7 +1180,7 @@
         const fBadgeNuc = document.getElementById('fleet-badge-nuc');
         if (fBadgeNuc) { fBadgeNuc.className = `item-tag ${isOnline ? 'online' : 'offline'}`; fBadgeNuc.textContent = isOnline ? 'Online • 24/7 Core' : 'Offline • Unreachable'; }
         const fLatNuc = document.getElementById('fleet-latency-nuc');
-        if (fLatNuc) { fLatNuc.textContent = `192.168.2.35 • ${latencyMs !== null ? latencyMs : 14} ms (8.8.8.8)`; }
+        if (fLatNuc) { fLatNuc.textContent = isOnline ? `192.168.2.35 • ${latencyMs !== null ? latencyMs : 14} ms (8.8.8.8)` : `192.168.2.35 • Unreachable`; }
 
         const latS = safeNum(latencyMs, null);
         const mStream = document.getElementById('meta-watch-streamhub');
@@ -2000,7 +2005,7 @@
         try { fetchISPHistory(); } catch(e) {}
         return;
       }
-      if (window.location.hostname === 'digitalresolve.ca') {
+      if (/(^|\.)digitalresolve\.ca$/i.test(window.location.hostname)) {
         try { sessionStorage.removeItem('dr_sso_sync_attempted'); } catch(e) {}
         window.location.href = GATEWAY + '/api/sso/login?return=' + encodeURIComponent(window.location.href);
         return;
@@ -3266,11 +3271,11 @@
 
                 if (!cList || cList.length === 0) {
                   cList = [
-                    { timeShort: '14:30', isp: 'Bell Canada', pingAvgMs: 3.6, pingMinMs: 3, pingMaxMs: 4, jitterMs: 0.71, packetLoss: 0, grade: 'A+' },
-                    { timeShort: '14:00', isp: 'Bell Canada', pingAvgMs: 3.8, pingMinMs: 3, pingMaxMs: 5, jitterMs: 0.45, packetLoss: 0, grade: 'A+' },
-                    { timeShort: '13:30', isp: 'Bell Canada', pingAvgMs: 4.1, pingMinMs: 3, pingMaxMs: 5, jitterMs: 0.38, packetLoss: 0, grade: 'A+' },
+                    { timeShort: '12:30', isp: 'Bell Canada', pingAvgMs: 4.0, pingMinMs: 3, pingMaxMs: 5, jitterMs: 0.40, packetLoss: 0, grade: 'A+' },
                     { timeShort: '13:00', isp: 'Bell Canada', pingAvgMs: 3.9, pingMinMs: 3, pingMaxMs: 4, jitterMs: 0.52, packetLoss: 0, grade: 'A+' },
-                    { timeShort: '12:30', isp: 'Bell Canada', pingAvgMs: 4.0, pingMinMs: 3, pingMaxMs: 5, jitterMs: 0.40, packetLoss: 0, grade: 'A+' }
+                    { timeShort: '13:30', isp: 'Bell Canada', pingAvgMs: 4.1, pingMinMs: 3, pingMaxMs: 5, jitterMs: 0.38, packetLoss: 0, grade: 'A+' },
+                    { timeShort: '14:00', isp: 'Bell Canada', pingAvgMs: 3.8, pingMinMs: 3, pingMaxMs: 5, jitterMs: 0.45, packetLoss: 0, grade: 'A+' },
+                    { timeShort: '14:30', isp: 'Bell Canada', pingAvgMs: 3.6, pingMinMs: 3, pingMaxMs: 4, jitterMs: 0.71, packetLoss: 0, grade: 'A+' }
                   ];
                 }
 
@@ -5519,7 +5524,7 @@
           return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?readarr\.digitalresolve\.ca(?::\d+)?/i, 'http://100.68.136.76:8787');
         }
         if (/^(?:https?:)?(?:\/\/)?(?:www\.)?torrents2\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
-          return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?torrents2\.digitalresolve\.ca(?::\d+)?/i, 'https://torrents-lan.digitalresolve.ca');
+          return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?torrents2\.digitalresolve\.ca(?::\d+)?/i, 'http://100.68.136.76:8081');
         }
         if (/^(?:https?:)?(?:\/\/)?(?:www\.)?torrents\.digitalresolve\.ca(?::\d+)?(?=[\/?#]|$)/i.test(url)) {
           return url.replace(/^(?:https?:)?(?:\/\/)?(?:www\.)?torrents\.digitalresolve\.ca(?::\d+)?/i, `http://${deskHost}:8080`);
@@ -5710,11 +5715,18 @@
     async function verifySpeedtestSSO() {
       closeSpeedtestSSOModal();
       try { sessionStorage.removeItem('dr_sso_sync_attempted'); } catch(e) {}
-      if (window.location.hostname === 'digitalresolve.ca') {
+      if (/(^|\.)digitalresolve\.ca$/i.test(window.location.hostname)) {
         window.location.href = GATEWAY + '/api/sso/login?return=' + encodeURIComponent(window.location.href);
         return;
       }
-      await syncCloudflareAccessSession(false);
+      const ok = await syncCloudflareAccessSession(false);
+      if (ok) {
+        const cb = window.pendingSSOCallback;
+        window.pendingSSOCallback = null;
+        if (typeof cb === 'function') cb();
+      } else if (typeof showToast === 'function') {
+        showToast('error', 'SSO Session Not Verified', 'Open https://digitalresolve.ca over HTTPS to sign in with Microsoft 365 Entra ID.', 5000);
+      }
     }
     window.verifySpeedtestSSO = verifySpeedtestSSO;
     window.verifySpeedtestPin = verifySpeedtestSSO;
