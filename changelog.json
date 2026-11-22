@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-22T07:00:00Z",
-    "currentVersion":  "v2.8.66",
+    "updatedAt":  "2026-11-22T07:30:00Z",
+    "currentVersion":  "v2.8.67",
     "releases":  [
+                     {
+                         "version":  "v2.8.67",
+                         "date":  "November 22, 2026",
+                         "title":  "Accessibility Hardening, 375px Mobile Overflow Fix, CSS Cleanup & WebRTC/AI Landmarks",
+                         "changes":  [
+                                         {
+                                             "label":  "Keyboard & ARIA Accessibility",
+                                             "text":  "Added role=\"button\", tabindex=\"0\", and Enter/Space keyboard handlers to all 7 .schematic-node-card elements on index.html and fleet.html and the .book-card template in app.js, added aria-label=\"Close Tailscale modal\" to ensureTailscaleModalDOM, and added skip-to-content links across all 7 dashboard pages."
+                                         },
+                                         {
+                                             "label":  "375px Mobile Overflow & CSS Cleanup",
+                                             "text":  "Fixed 375px horizontal overflow in styles.css (nav-mobile-actions wrapping/compact sizing, scrollable .nuc-tabs/.nuc-tabs-bar, responsive tables, and clipped mobile body), raised .magnet-modal-overlay z-index to 10002, consolidated duplicate .nav-links rules, and added base rules for referenced utility classes."
+                                         },
+                                         {
+                                             "label":  "WebRTC/AI Landmarks, Changelog Sync & Exact LOC",
+                                             "text":  "Added @media (max-width: 680px) responsive rules to webrtc.html, added semantic header/footer landmarks to webrtc.html and ai.html with NUC mirror parity, fixed the stale v2.8.64 changelog modal fallback across all 7 pages, and synced exact codebase LOC to v2.8.67."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.66",
                          "date":  "November 22, 2026",

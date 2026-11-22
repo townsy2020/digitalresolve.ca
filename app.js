@@ -163,15 +163,15 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.66';
+          const activeVer = match ? match[0] : 'v2.8.67';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 15927;
-      const baseCssLines = 6349;
+      const baseHtmlLines = 16073;
+      const baseCssLines = 6516;
       const baseJsLines = 6957;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
@@ -2856,7 +2856,7 @@
           const rawUrl = item && item.url ? String(item.url) : 'https://audiobooks.digitalresolve.ca';
           const safeUrl = /^https?:\/\//i.test(rawUrl) ? rawUrl : 'https://audiobooks.digitalresolve.ca';
           const safeTitle = title || 'Audiobookshelf';
-          return `<div class="book-card" style="cursor: pointer;" onclick="launchProtectedService('${escapeHtml(safeUrl)}', '${escapeHtml(safeTitle)}')">
+          return `<div class="book-card" role="button" tabindex="0" style="cursor: pointer;" onclick="launchProtectedService('${escapeHtml(safeUrl)}', '${escapeHtml(safeTitle)}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
                 <div class="book-cover" style="background: ${pal.cover};"></div>
                 <div class="book-body">
                   <div style="font-size: 0.72rem; color: ${pal.accent}; font-weight: 700; text-transform: uppercase;">${escapeHtml(status)} &bull; ${escapeHtml(author)}</div>
@@ -6468,7 +6468,7 @@
             <span style="font-size: 0.75rem; color: #94a3b8;">Zero-Config WireGuard Mesh &bull; Direct Secure LAN Routing</span>
           </div>
         </div>
-        <button type="button" class="btn btn-secondary" onclick="closeTailscaleModal()" style="font-size: 0.85rem; padding: 4px 10px; cursor: pointer;">&times;</button>
+        <button type="button" class="btn btn-secondary" aria-label="Close Tailscale modal" onclick="closeTailscaleModal()" style="font-size: 0.85rem; padding: 4px 10px; cursor: pointer;">&times;</button>
       </div>
 
       <div class="health-modal-body" style="padding: 18px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; max-height: calc(85vh - 120px);">
