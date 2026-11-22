@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-22T06:05:00Z",
-    "currentVersion":  "v2.8.64",
+    "updatedAt":  "2026-11-22T06:27:23Z",
+    "currentVersion":  "v2.8.65",
     "releases":  [
+                     {
+                         "version":  "v2.8.65",
+                         "date":  "November 22, 2026",
+                         "title":  "Null-State Telemetry Hardening, Verified Port Alignment \u0026 ISP Snapshot Refresh",
+                         "changes":  [
+                                         {
+                                             "label":  "Shared Header, Cloudflare Modal \u0026 Chaos Lab Honesty",
+                                             "text":  "Replaced static nav disk/SLA/Claude/account placeholders with -- across all 7 pages, cleared hardcoded Cloudflare subdomain request counts and fake cache/latency cells, updated Chaos Lab watchdog schedule to 3m with a [SIMULATION MODE] badge, and added id=\"top\" to body."
+                                         },
+                                         {
+                                             "label":  "Verified Port Claims \u0026 Page Telemetry Null-States",
+                                             "text":  "Aligned services.html and index.html cards to verified NUC ports (Audiobookshelf 3333, Gateway 8082, AdGuard Staged Port 3000, Gateway Health Probes 8082), emptied 90-day static uptime bars, and purged static feeder, thermal, power, speedtest, Kuma, and media storage defaults."
+                                         },
+                                         {
+                                             "label":  "ISP Health Snapshot \u0026 Version Sync",
+                                             "text":  "Refreshed isp-health.json from live history with IPv4 scrubbing and bumped styles.css, app.js, meta tags, and version badges to v2.8.65 across all 7 dashboard pages."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.64",
                          "date":  "November 22, 2026",
@@ -43,14 +62,14 @@
                      {
                          "version":  "v2.8.62",
                          "date":  "November 21, 2026",
-                         "title":  "Null-State Telemetry Integrity: Remove Residual Fake Latency, Disk & Climate Fallbacks",
+                         "title":  "Null-State Telemetry Integrity: Remove Residual Fake Latency, Disk \u0026 Climate Fallbacks",
                          "changes":  [
                                          {
                                              "label":  "Honest Null-State UI Rendering",
-                                             "text":  "Replaced residual hardcoded climate (23.3\u00b0C / 43% RH), NUC/Edge/Cloudflare latency (0.8 ms / 0.9 ms / 1.1 ms / < 1 ms), Desktop latency (4 ms), and Desktop disk (6,054 GB / 5.0% used) fallbacks in app.js with honest Awaiting Telemetry, Online, Anycast OK, and guarded disk states."
+                                             "text":  "Replaced residual hardcoded climate (23.3°C / 43% RH), NUC/Edge/Cloudflare latency (0.8 ms / 0.9 ms / 1.1 ms / \u003c 1 ms), Desktop latency (4 ms), and Desktop disk (6,054 GB / 5.0% used) fallbacks in app.js with honest Awaiting Telemetry, Online, Anycast OK, and guarded disk states."
                                          },
                                          {
-                                             "label":  "Cache-Busters & Codebase Scale Sync",
+                                             "label":  "Cache-Busters \u0026 Codebase Scale Sync",
                                              "text":  "Bumped styles.css?v=2.8.62 and app.js?v=2.8.62, synchronized footer/menu version badges across all 7 dashboard pages, and recalculated exact codebase Lines of Code."
                                          }
                                      ]
@@ -61,16 +80,16 @@
                          "title":  "Wave 10 Runtime Recovery: deskCpu Fix, V8 TDZ Bootstrap \u0026 Live DOM Polling Guards",
                          "changes":  [
                                          {
-                                             "label":  "Critical Runtime & Bootstrap Fixes",
+                                             "label":  "Critical Runtime \u0026 Bootstrap Fixes",
                                              "text":  "Restored deskCpu declaration in applyClusterStatsPayload (eliminating ReferenceError aborting live token, camera, and climate updates) and moved initApp() bootstrap to the bottom of app.js to eliminate V8 TDZ ReferenceErrors when readyState !== loading."
                                          },
                                          {
-                                             "label":  "DOM Presence Guards & Honest Telemetry",
+                                             "label":  "DOM Presence Guards \u0026 Honest Telemetry",
                                              "text":  "Aligned hasClimateDom, hasIspDom, hasUptimeDom, and hasServicesDom with real HTML element IDs (restoring Kuma and climate polling on ops.html), removed stale localStorage online overrides and offline 0% CPU / 5.0% Used fallbacks, and refreshed Kuma health rows on /services-health updates."
                                          },
                                          {
-                                             "label":  "Cache-Busters & UI Label Accuracy",
-                                             "text":  "Bumped styles.css and app.js cache-busters to ?v=2.8.61 across all 7 pages, cleared static Kuma latency placeholders, and replaced stale Kavita / D:\\Media labels with FileBrowser and live D:\\Torrents & E:\\Audiobooks paths."
+                                             "label":  "Cache-Busters \u0026 UI Label Accuracy",
+                                             "text":  "Bumped styles.css and app.js cache-busters to ?v=2.8.61 across all 7 pages, cleared static Kuma latency placeholders, and replaced stale Kavita / D:\\Media labels with FileBrowser and live D:\\Torrents \u0026 E:\\Audiobooks paths."
                                          }
                                      ]
                      },

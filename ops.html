@@ -7,8 +7,8 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Operations & Local AI - Homelab</title>
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.64 - Operations & Local AI - Homelab">
-  <link rel="stylesheet" href="styles.css?v=2.8.64">
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.65 - Operations & Local AI - Homelab">
+  <link rel="stylesheet" href="styles.css?v=2.8.65">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -39,7 +39,7 @@
     })();
   </script>
 </head>
-<body>
+<body id="top">
   <header class="header" id="site-header">
     <div class="container nav-container">
       <a href="index.html#deck" class="logo" title="DigitalResolve Homelab Deck">
@@ -71,7 +71,7 @@
             <a href="uptime.html#service-status" class="btn-action-item" title="Open Live Homelab Service Status Dashboard">
               <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
               <span>Live Service Status Dashboard</span>
-              <span class="item-tag online">8 Online</span>
+              <span class="item-tag online">--</span>
             </a>
             <a href="ops.html#nuc-services" class="btn-action-item" title="Open NUC 24/7 Telemetry &amp; Microservices Suite">
               <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
@@ -113,12 +113,12 @@
             <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents.digitalresolve.ca', 'qBittorrent Workstation (torrents.digitalresolve.ca)')" class="btn-action-item" title="Open Workstation qBittorrent">
               <span class="dropdown-dot dot-1"></span>
               <span>Torrents (Desktop qBit)</span>
-              <span class="item-tag" id="desktop-disk-tag">C: 375G &bull; D: 5.4T</span>
+              <span class="item-tag" id="desktop-disk-tag">--</span>
             </a>
             <a href="javascript:void(0)" onclick="launchProtectedService('https://torrents2.digitalresolve.ca', 'qBittorrent NUC (torrents2.digitalresolve.ca)')" class="btn-action-item" title="Open NUC qBittorrent">
               <span class="dropdown-dot dot-2"></span>
               <span>Torrents (NUC qBit)</span>
-              <span class="item-tag" id="nuc-disk-tag">D: 489 GB free</span>
+              <span class="item-tag" id="nuc-disk-tag">--</span>
             </a>
             <a href="javascript:void(0)" onclick="openMagnetModal()" class="btn-action-item" title="Open Rapid Torrent &amp; Magnet Ingestion Console">
               <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
@@ -150,22 +150,22 @@
             <div class="disk-widget" id="nuc-disk-widget">
               <div class="disk-widget-header">
                 <span class="disk-label">NUC Storage (D:)</span>
-                <span class="disk-val" id="nuc-disk-val">489.2 GB Free</span>
+                <span class="disk-val" id="nuc-disk-val">--</span>
               </div>
               <div class="disk-bar-bg">
-                <div class="disk-bar-fill" id="nuc-disk-bar" style="width: 73.7%;"></div>
+                <div class="disk-bar-fill" id="nuc-disk-bar" style="width: 0%;"></div>
               </div>
-              <div class="disk-subtext" id="nuc-disk-sub">1,373.8 GB used of 1,863 GB (73.7%)</div>
+              <div class="disk-subtext" id="nuc-disk-sub">Awaiting telemetry...</div>
             </div>
             <div class="disk-widget" id="desktop-disk-widget" style="margin-top: 10px;">
               <div class="disk-widget-header">
                 <span class="disk-label">Desktop Storage (C: + D:)</span>
-                <span class="disk-val" id="desktop-disk-val">5,751 GB Free</span>
+                <span class="disk-val" id="desktop-disk-val">--</span>
               </div>
               <div class="disk-bar-bg">
-                <div class="disk-bar-fill" id="desktop-disk-bar" style="width: 5.0%; background: linear-gradient(90deg, #38bdf8, #10b981);"></div>
+                <div class="disk-bar-fill" id="desktop-disk-bar" style="width: 0%; background: linear-gradient(90deg, #38bdf8, #10b981);"></div>
               </div>
-              <div class="disk-subtext" id="desktop-disk-sub">303 GB used of 6,054 GB (5.0%) &bull; C: 375G | D: 5.4T</div>
+              <div class="disk-subtext" id="desktop-disk-sub">Awaiting telemetry...</div>
             </div>
           </div>
         </div>
@@ -204,7 +204,7 @@
             <a href="uptime.html#uptime" class="btn-action-item" title="Jump to Cluster Availability &amp; 90-Day SLA History">
               <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
               <span>90-Day SLA &amp; Uptime History</span>
-              <span class="item-tag online nav-sla-tag">99.98%</span>
+              <span class="item-tag online nav-sla-tag">--</span>
             </a>
             <button type="button" class="btn-action-item" onclick="openCloudflareStatsModal()" title="View Cloudflare Edge Traffic, Cache &amp; Security Statistics">
               <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
@@ -254,7 +254,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.64</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.65</span>)</span>
             </button>
             <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO(true, event)" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -286,8 +286,8 @@
                 <div class="model-segment" id="menu-bar-5h" style="width: 100%; background: #f59e0b;"></div>
               </div>
               <div style="margin-top: 6px; font-size: 0.68rem; color: #64748b; display: flex; justify-content: space-between;">
-                <span>Account: <span id="menu-account-user" style="color: #cbd5e1;">coryrobertleetownsend</span></span>
-                <span>Claude/GPT: <span id="menu-claude-pct" style="color: #34d399; font-weight: 700;">100%</span></span>
+                <span>Account: <span id="menu-account-user" style="color: #cbd5e1;">--</span></span>
+                <span>Claude/GPT: <span id="menu-claude-pct" style="color: #34d399; font-weight: 700;">--</span></span>
               </div>
             </div>
           </div>
@@ -665,17 +665,17 @@
             <div class="kpi-row-4">
               <div class="kpi-mini-card success">
                 <div class="kpi-label">Download Speed <span>&#9660;</span></div>
-                <div class="kpi-val" id="st-val-down" style="color: #34d399;">942.4 <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span></div>
+                <div class="kpi-val" id="st-val-down" style="color: #34d399;">-- <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span></div>
                 <div class="kpi-sub"><span class="dropdown-dot dot-1" style="background:#10b981;"></span> Direct Bell WAN Interface</div>
               </div>
               <div class="kpi-mini-card">
                 <div class="kpi-label">Upload Speed <span>&#9650;</span></div>
-                <div class="kpi-val" id="st-val-up" style="color: #38bdf8;">884.1 <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span></div>
+                <div class="kpi-val" id="st-val-up" style="color: #38bdf8;">-- <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span></div>
                 <div class="kpi-sub"><span class="dropdown-dot dot-1" style="background:#38bdf8;"></span> Symmetric Symmetrical Fiber</div>
               </div>
               <div class="kpi-mini-card purple">
                 <div class="kpi-label">Latency &amp; Jitter <span>&#8644;</span></div>
-                <div class="kpi-val" id="st-val-ping" style="color: #c084fc;">4.0 <span style="font-size: 0.85rem; color: #94a3b8;">ms</span></div>
+                <div class="kpi-val" id="st-val-ping" style="color: #c084fc;">-- <span style="font-size: 0.85rem; color: #94a3b8;">ms</span></div>
                 <div class="kpi-sub" id="st-sub-jitter">&plusmn; 0.3 ms Jitter &bull; Cloudflare YYZ</div>
               </div>
               <div class="kpi-mini-card amber">
@@ -701,12 +701,12 @@
                   <div class="speed-dial-bg" id="speed-dial-needle" style="transform: rotate(105deg);"></div>
                   <div class="speed-dial-center">
                     <div style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Current Test</div>
-                    <div id="gauge-live-num" style="font-size: 1.6rem; font-weight: 900; color: #38bdf8; font-family: 'JetBrains Mono', monospace;">942.4</div>
+                    <div id="gauge-live-num" style="font-size: 1.6rem; font-weight: 900; color: #38bdf8; font-family: 'JetBrains Mono', monospace;">--</div>
                     <div style="font-size: 0.7rem; color: #94a3b8;">Mbps Throughput</div>
                   </div>
                 </div>
                 <div id="st-stage-indicator" style="font-size: 0.8rem; color: #94a3b8; margin-top: 10px; font-family: monospace;">
-                  Last Tested: 14 mins ago &bull; Target: Cloudflare Edge (Toronto, ON) &bull; Zero Packet Loss
+                  Ready &bull; Target: Cloudflare Edge (Toronto, ON)
                 </div>
               </div>
 
@@ -743,7 +743,7 @@
               </div>
               <div class="kpi-mini-card purple">
                 <div class="kpi-label">Curated Blocklists</div>
-                <div class="kpi-val" id="dns-kpi-blocklists" style="color: #c084fc;">412,850</div>
+                <div class="kpi-val" id="dns-kpi-blocklists" style="color: #c084fc;">--</div>
                 <div class="kpi-sub">OISD Full + HaGeZi Multi PRO</div>
               </div>
               <div class="kpi-mini-card amber">
@@ -843,12 +843,12 @@
                   <span class="item-tag online" id="iot-power-tag" style="background: rgba(34, 197, 94, 0.2); color: #4ade80;">Energy Star</span>
                 </div>
                 <div id="iot-total-watts" style="font-size: 1.8rem; font-weight: 800; color: #34d399; font-family: 'JetBrains Mono', monospace;">
-                  68 <span style="font-size: 0.9rem; color: #94a3b8;">Watts</span>
+                  -- <span style="font-size: 0.9rem; color: #94a3b8;">Watts</span>
                 </div>
                 <div style="font-size: 0.78rem; color: #94a3b8; line-height: 1.5;">
-                  &bull; NUC 24/7 Server: <strong id="iot-nuc-watts">18 Watts</strong><br>
-                  &bull; Desktop Active Workstation: <strong id="iot-desk-watts">50 Watts</strong><br>
-                  &bull; Estimated Monthly Grid Cost: <strong id="iot-grid-cost">~$5.88 CAD</strong>
+                  &bull; NUC 24/7 Server: <strong id="iot-nuc-watts">--</strong><br>
+                  &bull; Desktop Active Workstation: <strong id="iot-desk-watts">--</strong><br>
+                  &bull; Estimated Monthly Grid Cost: <strong id="iot-grid-cost">Unmetered</strong>
                 </div>
               </div>
 
@@ -858,13 +858,13 @@
                   <span class="item-tag online" id="iot-thermal-tag" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8;">Nominal</span>
                 </div>
                 <div id="iot-ambient-temp" style="font-size: 1.8rem; font-weight: 800; color: #38bdf8; font-family: 'JetBrains Mono', monospace;">
-                  23.3&deg;C <span style="font-size: 0.9rem; color: #94a3b8;">/ 43% RH (73.9&deg;F)</span>
+                  Awaiting telemetry
                 </div>
                 <div style="font-size: 0.78rem; color: #94a3b8; line-height: 1.5;">
-                  &bull; NUC Core CPU: <strong id="iot-nuc-cpu-temp">42&deg;C</strong> (Fan 1200 RPM)<br>
-                  &bull; Desktop Ryzen CPU: <strong id="iot-desk-cpu-temp">46&deg;C</strong> (AIO Liquid Cooled)<br>
-                  &bull; NUC Room Climate: <strong id="iot-room-thermostat">73.9&deg;F (23.3&deg;C)</strong> (YoLink YS8003-UC)<br>
-                  &bull; Server Room Water Leak Sensor: <strong id="iot-leak-sensor-status" style="color: #34d399;">Normal (Dry)</strong> (YS7903-UC)
+                  &bull; NUC Core CPU: <strong id="iot-nuc-cpu-temp">--</strong> (Fan -- RPM)<br>
+                  &bull; Desktop Ryzen CPU: <strong id="iot-desk-cpu-temp">--</strong> (AIO Liquid Cooled)<br>
+                  &bull; NUC Room Climate: <strong id="iot-room-thermostat">Awaiting telemetry</strong> (YoLink YS8003-UC)<br>
+                  &bull; Server Room Water Leak Sensor: <strong id="iot-leak-sensor-status" style="color: #34d399;">Awaiting telemetry</strong> (YS7903-UC)
                 </div>
               </div>
 
@@ -874,7 +874,7 @@
                   <span class="item-tag online" style="background: rgba(16, 185, 129, 0.2); color: #34d399;"><span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10b981; margin-right: 4px; box-shadow: 0 0 6px #10b981;"></span>192.168.2.22 &bull; Connected &amp; Armed</span>
                 </div>
                 <div style="font-size: 1.8rem; font-weight: 800; color: #f472b6; font-family: 'JetBrains Mono', monospace; margin: 4px 0;">
-                  <span id="feeder-nuc-hopper-pct">85%</span> <span id="feeder-nuc-hopper-sub" style="font-size: 0.85rem; color: #94a3b8; font-weight: 600;">(1,275g - ~16 Days)</span>
+                  <span id="feeder-nuc-hopper-pct">--%</span> <span id="feeder-nuc-hopper-sub" style="font-size: 0.85rem; color: #94a3b8; font-weight: 600;">(Awaiting telemetry)</span>
                 </div>
                 <div class="disk-bar-bg" style="margin-bottom: 8px;">
                   <div class="disk-bar-fill" id="feeder-nuc-hopper-bar" style="width: 0%; background: linear-gradient(90deg, #ef4444, #f87171); transition: width 0.4s ease;"></div>
@@ -913,42 +913,42 @@
                     <td><strong>Review &amp; Watch Library</strong> (StreamHub :8088)</td>
                     <td>NUC (192.168.2.35)</td>
                     <td><span class="mono" id="kuma-lat-stream" style="color: #34d399;">-- ms</span></td>
-                    <td id="kuma-uptime-stream">100.0%</td>
-                    <td><span class="item-tag online" id="kuma-status-stream">Healthy</span></td>
+                    <td id="kuma-uptime-stream">--</td>
+                    <td><span class="item-tag online" id="kuma-status-stream">Probing...</span></td>
                   </tr>
                   <tr>
                     <td><strong>FileBrowser Media Cloud</strong> (:8085)</td>
                     <td>NUC (192.168.2.35)</td>
                     <td><span class="mono" id="kuma-lat-files" style="color: #34d399;">-- ms</span></td>
-                    <td id="kuma-uptime-files">100.0%</td>
-                    <td><span class="item-tag online" id="kuma-status-files">Healthy</span></td>
+                    <td id="kuma-uptime-files">--</td>
+                    <td><span class="item-tag online" id="kuma-status-files">Probing...</span></td>
                   </tr>
                   <tr>
                     <td><strong>qBittorrent VPN Daemon</strong> (:8081)</td>
                     <td>NUC (WireGuard Mullvad)</td>
                     <td><span class="mono" id="kuma-lat-qbit" style="color: #34d399;">-- ms</span></td>
-                    <td id="kuma-uptime-qbit">100.0%</td>
-                    <td><span class="item-tag online" id="kuma-status-qbit">Healthy</span></td>
+                    <td id="kuma-uptime-qbit">--</td>
+                    <td><span class="item-tag online" id="kuma-status-qbit">Probing...</span></td>
                   </tr>
                   <tr>
                     <td><strong>WoL &amp; Power Orchestration Gateway</strong> (:8082)</td>
                     <td>NUC / Desktop Cluster</td>
                     <td><span class="mono" id="kuma-lat-wol" style="color: #34d399;">-- ms</span></td>
-                    <td id="kuma-uptime-wol">100.0%</td>
-                    <td><span class="item-tag online" id="kuma-status-wol">Healthy</span></td>
+                    <td id="kuma-uptime-wol">--</td>
+                    <td><span class="item-tag online" id="kuma-status-wol">Probing...</span></td>
                   </tr>
                   <tr>
                     <td><strong>Optical Cat Cam WebRTC Engine</strong> (:8089)</td>
                     <td>NUC (Hardware go2rtc)</td>
                     <td><span class="mono" id="kuma-lat-catcam" style="color: #34d399;">-- ms</span></td>
-                    <td id="kuma-uptime-catcam">100.0%</td>
-                    <td><span class="item-tag online" id="kuma-status-catcam">Healthy</span></td>
+                    <td id="kuma-uptime-catcam">--</td>
+                    <td><span class="item-tag online" id="kuma-status-catcam">Probing...</span></td>
                   </tr>
                   <tr>
                     <td><strong>Cloudflare Zero Trust Edge Mesh</strong> (Tunnel)</td>
                     <td>Global Edge Anycast</td>
                     <td><span class="mono" id="kuma-lat-cf" style="color: #38bdf8;">-- ms</span></td>
-                    <td id="kuma-uptime-cf">100.0%</td>
+                    <td id="kuma-uptime-cf">--</td>
                     <td><span class="item-tag online" id="kuma-status-cf">Shield Active</span></td>
                   </tr>
                 </tbody>
@@ -975,12 +975,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.64</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.65</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 29,244 Lines of Code (HTML: 15,979 lines | CSS: 6,349 lines | JS: 6,915 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 29,279 Lines of Code (HTML: 15,979 lines | CSS: 6,349 lines | JS: 6,950 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">29,244</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">29,279</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1279,50 +1279,50 @@
                 <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
                   <td style="padding: 8px;"><strong style="color: #38bdf8;">digitalresolve.ca</strong> (Apex)</td>
                   <td style="padding: 8px; font-family: monospace;">GitHub Pages (Cloudflare Edge Proxy)</td>
-                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-apex">21,450</td>
-                  <td style="padding: 10px 14px;"><span class="item-tag online" style="font-size: 0.72rem; padding: 5px 12px; border-radius: 6px; display: inline-flex; align-items: center; white-space: nowrap;">94.6% Cache Hit &bull; 12 ms</span></td>
+                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-apex">--</td>
+                  <td style="padding: 10px 14px;"><span class="item-tag online" style="font-size: 0.72rem; padding: 5px 12px; border-radius: 6px; display: inline-flex; align-items: center; white-space: nowrap;">GitHub Pages Edge</span></td>
                   <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
                 </tr>
                 <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
                   <td style="padding: 8px;"><strong style="color: #38bdf8;">wake.digitalresolve.ca</strong></td>
                   <td style="padding: 8px; font-family: monospace;">NUC (192.168.2.35:8082 &bull; API Gateway &amp; Telemetry)</td>
-                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-wake">12,680</td>
-                  <td style="padding: 8px; color: #34d399;">Dynamic Edge &bull; 14 ms</td>
+                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-wake">--</td>
+                  <td style="padding: 8px; color: #34d399;">Tunnel Proxy</td>
                   <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
                 </tr>
                 <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
                   <td style="padding: 8px;"><strong style="color: #38bdf8;">cam.digitalresolve.ca</strong></td>
                   <td style="padding: 8px; font-family: monospace;">NUC (:8089 CatCam / WebRTC)</td>
-                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-cam">8,920</td>
-                  <td style="padding: 8px; color: #34d399;">WebRTC Stream &bull; &lt;50 ms</td>
+                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-cam">--</td>
+                  <td style="padding: 8px; color: #34d399;">WebRTC Tunnel</td>
                   <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
                 </tr>
                 <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
                   <td style="padding: 8px;"><strong style="color: #38bdf8;">torrents.digitalresolve.ca</strong></td>
                   <td style="padding: 8px; font-family: monospace;">Desktop (192.168.2.62:8080 &bull; M365 SSO)</td>
-                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-torrents">6,340</td>
-                  <td style="padding: 8px; color: #38bdf8;">Edge Dynamic &bull; 4 ms</td>
+                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-torrents">--</td>
+                  <td style="padding: 8px; color: #38bdf8;">Protected Tunnel</td>
                   <td style="padding: 8px;"><span class="item-tag online cf-sub-torrents-badge" id="cf-sub-torrents-badge" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
                 </tr>
                 <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
                   <td style="padding: 8px;"><strong style="color: #38bdf8;">torrents2.digitalresolve.ca</strong></td>
                   <td style="padding: 8px; font-family: monospace;">NUC (192.168.2.35:8081 &bull; M365 SSO)</td>
-                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-torrents2">5,110</td>
-                  <td style="padding: 8px; color: #38bdf8;">Edge Dynamic &bull; 14 ms</td>
+                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-torrents2">--</td>
+                  <td style="padding: 8px; color: #38bdf8;">Protected Tunnel</td>
                   <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
                 </tr>
                 <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
                   <td style="padding: 8px;"><strong style="color: #38bdf8;">stream.digitalresolve.ca</strong></td>
                   <td style="padding: 8px; font-family: monospace;">NUC (:8088 / :3333)</td>
-                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-stream">4,280</td>
-                  <td style="padding: 8px; color: #c4b5fd;">88.4% Hit &bull; 16 ms</td>
+                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-stream">--</td>
+                  <td style="padding: 8px; color: #c4b5fd;">Protected Tunnel</td>
                   <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
                 </tr>
                 <tr>
                   <td style="padding: 8px;"><strong style="color: #38bdf8;">files.digitalresolve.ca</strong></td>
                   <td style="padding: 8px; font-family: monospace;">NUC (:8085 File Vault)</td>
-                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-files">2,190</td>
-                  <td style="padding: 8px; color: #94a3b8;">Dynamic Edge &bull; 14 ms</td>
+                  <td style="padding: 8px; font-family: monospace; color: #60a5fa;" class="cf-row-req-files">--</td>
+                  <td style="padding: 8px; color: #94a3b8;">Tunnel Proxy</td>
                   <td style="padding: 8px;"><span class="item-tag online" style="font-size: 0.68rem; padding: 2px 6px;">Active</span></td>
                 </tr>
               </tbody>
@@ -1367,7 +1367,7 @@
         <div style="display: flex; align-items: center; gap: 10px;">
           <span style="font-size: 1.35rem;"></span>
           <div>
-            <div style="font-weight: 800; color: #f8fafc; font-size: 1.05rem; letter-spacing: -0.3px;">Disaster Recovery Test &bull; Homelab Resilience Lab</div>
+            <div style="font-weight: 800; color: #f8fafc; font-size: 1.05rem; letter-spacing: -0.3px;">Disaster Recovery Test &bull; Homelab Resilience Lab <span class="item-tag" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; margin-left: 8px; font-size: 0.68rem;">[SIMULATION MODE]</span></div>
             <div style="font-size: 0.74rem; color: #94a3b8;">Simulate real-world outages &amp; verify autonomous self-healing sentinel failover.</div>
           </div>
         </div>
@@ -1398,7 +1398,7 @@
         <div class="chaos-topology-box">
           <div class="chaos-topology-header">
             <span style="font-size: 0.78rem; font-weight: 700; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px;">Live Topology Schematic</span>
-            <span style="font-size: 0.72rem; color: #64748b;">Autonomous Sentinel Watchdog: Active (0.4s heartbeat)</span>
+            <span style="font-size: 0.72rem; color: #64748b;">Autonomous Sentinel Watchdog: Active (3m schedule)</span>
           </div>
 
           <div class="chaos-grid-nodes">
@@ -1585,7 +1585,7 @@
           <ul class="ver-list">
             <li><strong>Live Audiobookshelf Library Grid:</strong> Removed all 4 hardcoded placeholder books from <code>index.html</code>, <code>media.html</code>, and <code>ops.html</code> and wired <code>renderAudiobookshelfGrid()</code> in <code>app.js</code> to hydrate real NUC Audiobookshelf items from <code>/stats</code> (with <code>/api/audiobooks</code> fallback and honest unavailable notice).</li>
             <li><strong>Honest Storage Legend Placeholders:</strong> Replaced stale static storage legend GB strings on <code>index.html</code> and <code>media.html</code> with <code>-- GB</code> until live <code>/stats</code> telemetry hydrates them.</li>
-            <li><strong>Cache-Busters &amp; Codebase Scale Sync:</strong> Updated <code>styles.css?v=2.8.64</code> and <code>app.js?v=2.8.64</code>, synchronized footer/menu version badges across all 7 dashboard pages, and recalculated exact codebase Lines of Code.</li>
+            <li><strong>Cache-Busters &amp; Codebase Scale Sync:</strong> Updated <code>styles.css?v=2.8.65</code> and <code>app.js?v=2.8.65</code>, synchronized footer/menu version badges across all 7 dashboard pages, and recalculated exact codebase Lines of Code.</li>
           </ul>
         </div>
         <!-- Version v2.8.63 -->
@@ -1598,7 +1598,7 @@
           <ul class="ver-list">
             <li><strong>SSO Cookie Credentials on Gateway Fetches:</strong> Added <code>credentials: 'include'</code> to all 11 authenticated cross-origin <code>GATEWAY</code> <code>fetch()</code> calls in <code>app.js</code> (<code>/api/logs</code>, <code>/api/agy/send</code>, <code>/api/agy/launch</code>, <code>/add</code>, and <code>/api/control</code> maintenance actions) so Microsoft 365 SSO session cookies are consistently forwarded.</li>
             <li><strong>Honest Null-State Torrent Node Latency:</strong> Updated <code>meta-watch-torrents</code> in <code>app.js</code> to render <code>Online</code> when <code>latencyMs</code> is <code>null</code> and <code>0 ms</code> when <code>0</code> instead of falling back to <code>&lt; 1 ms</code>.</li>
-            <li><strong>Cache-Busters &amp; Codebase Scale Sync:</strong> Updated <code>styles.css?v=2.8.64</code> and <code>app.js?v=2.8.64</code>, synchronized footer/menu version badges across all 7 dashboard pages, and recalculated exact codebase Lines of Code.</li>
+            <li><strong>Cache-Busters &amp; Codebase Scale Sync:</strong> Updated <code>styles.css?v=2.8.65</code> and <code>app.js?v=2.8.65</code>, synchronized footer/menu version badges across all 7 dashboard pages, and recalculated exact codebase Lines of Code.</li>
           </ul>
         </div>
         <!-- Version v2.8.62 -->
@@ -1839,7 +1839,7 @@
           <h4 class="ver-title">NUC Scheduled Maintenance Mode & Zero-Penalty SLA Shield</h4>
           <ul class="ver-list">
             <li><strong>NUC Server Maintenance Window Engine:</strong> Introduced dedicated scheduled maintenance mode controller in the Control Matrix and SLA Telemetry ribbon to protect 90-Day SLA metrics during Windows Updates, driver installs, and reboots.</li>
-            <li><strong>Zero-Penalty SLA Protection:</strong> Planned maintenance windows are mathematically exempt from unplanned outage incidents, preserving 99.985% Grade A+ uptime compliance.</li>
+            <li><strong>Zero-Penalty SLA Protection:</strong> Planned maintenance windows are mathematically exempt from unplanned outage incidents, preserving live Grade A+ uptime compliance.</li>
           </ul>
         </div>
         <!-- Version v2.8.2 -->
@@ -1901,7 +1901,7 @@
           <div style="display: flex; align-items: center; gap: 10px;">
             <span class="pulse-dot" id="maint-banner-dot" style="background: #10b981; box-shadow: 0 0 8px #10b981; width: 10px; height: 10px;"></span>
             <div>
-              <div style="font-weight: 700; color: #f0fdf4; font-size: 0.88rem;" id="maint-banner-title">Normal 24/7 Operations &mdash; 90-Day SLA: 99.985%</div>
+              <div style="font-weight: 700; color: #f0fdf4; font-size: 0.88rem;" id="maint-banner-title">Normal 24/7 Operations &mdash; 90-Day SLA: --</div>
               <div style="font-size: 0.76rem; color: #94a3b8;" id="maint-banner-sub">Planned maintenance windows are excluded from outage penalties.</div>
             </div>
           </div>
@@ -1960,6 +1960,6 @@
       </div>
     </div>
   </div>
-  <script src="app.js?v=2.8.64"></script>
+  <script src="app.js?v=2.8.65"></script>
 </body>
 </html>

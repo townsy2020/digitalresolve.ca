@@ -163,7 +163,7 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.64';
+          const activeVer = match ? match[0] : 'v2.8.65';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
@@ -172,7 +172,7 @@
 
       const baseHtmlLines = 15979;
       const baseCssLines = 6349;
-      const baseJsLines = 6915;
+      const baseJsLines = 6950;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
@@ -868,12 +868,12 @@
       const costEl = document.getElementById('iot-grid-cost');
       const pwrTag = document.getElementById('iot-power-tag');
 
-      if (nucW) nucW.textContent = '18 Watts';
-      if (deskW) deskW.textContent = isDeskOnline ? '50 Watts' : '1.5 Watts (Standby)';
-      if (totalW) totalW.innerHTML = `${isDeskOnline ? '68' : '19.5'} <span style="font-size: 0.9rem; color: #94a3b8;">Watts</span>`;
-      if (costEl) costEl.textContent = isDeskOnline ? '~$5.88 CAD' : '~$1.85 CAD';
+      if (nucW) nucW.textContent = 'Unmetered';
+      if (deskW) deskW.textContent = isDeskOnline ? 'Unmetered' : 'Standby (Unmetered)';
+      if (totalW) totalW.innerHTML = `-- <span style="font-size: 0.9rem; color: #94a3b8;">Unmetered</span>`;
+      if (costEl) costEl.textContent = '--';
       if (pwrTag) {
-        pwrTag.textContent = isDeskOnline ? 'Energy Star' : 'Eco Standby (19.5W)';
+        pwrTag.textContent = 'Unmetered';
         pwrTag.className = 'item-tag online';
       }
 
@@ -882,10 +882,10 @@
       const nCpuTemp = document.getElementById('iot-nuc-cpu-temp');
       const thTag = document.getElementById('iot-thermal-tag');
 
-      if (nCpuTemp) nCpuTemp.textContent = '42°C';
-      if (dCpuTemp) dCpuTemp.textContent = isDeskOnline ? '46°C (AIO Liquid Cooled)' : 'Ambient / Sleep (Zero Thermal Draw)';
+      if (nCpuTemp) nCpuTemp.textContent = 'No Sensor';
+      if (dCpuTemp) dCpuTemp.textContent = isDeskOnline ? 'No Sensor' : 'Standby (No Sensor)';
       if (thTag) {
-        thTag.textContent = isDeskOnline ? 'Nominal' : 'Eco Cool';
+        thTag.textContent = 'No Sensor';
       }
       const ambTemp = document.getElementById('iot-ambient-temp');
       if (ambTemp) {
@@ -897,25 +897,31 @@
       }
       const storageThroughput = document.getElementById('schematic-storage-throughput');
       if (storageThroughput) {
-        storageThroughput.textContent = '3500 MB/s';
+        storageThroughput.textContent = 'NVMe';
       }
       const dnsBlock = document.getElementById('dns-kpi-blocklists');
-      if (dnsBlock) dnsBlock.textContent = '412,850';
+      if (dnsBlock) dnsBlock.textContent = 'Not Installed';
       const dnsRoutes = document.getElementById('dns-kpi-routes');
       if (dnsRoutes) dnsRoutes.textContent = '7 LAN Routes';
       const dnsDaemon = document.getElementById('dns-kpi-daemon');
       if (dnsDaemon) dnsDaemon.textContent = 'Awaiting Install';
-      document.querySelectorAll('#schematic-cf-throughput').forEach(el => el.textContent = '100% Shield');
-      document.querySelectorAll('#schematic-bell-throughput').forEach(el => el.textContent = '1.5G / 940M');
+      document.querySelectorAll('#schematic-cf-throughput').forEach(el => el.textContent = 'Cloudflare Edge');
+      document.querySelectorAll('#schematic-bell-throughput').forEach(el => el.textContent = 'Bell Fiber');
       document.querySelectorAll('#schematic-vpn-throughput').forEach(el => {
         if (!el.textContent || el.textContent.includes('--') || el.textContent === 'NYC Relay') el.textContent = 'WireGuard';
       });
       document.querySelectorAll('#schematic-tunnel-throughput').forEach(el => el.textContent = 'Tunnel OK');
-      document.querySelectorAll('#ai-model-footprint').forEach(el => el.textContent = '2.0 GB');
-      document.querySelectorAll('#nuc-hw-ram').forEach(el => el.textContent = '32 GB');
+      document.querySelectorAll('#ai-model-footprint').forEach(el => el.textContent = (window.LAST_AI_MODEL_FOOTPRINT || '--'));
+      document.querySelectorAll('#nuc-hw-ram').forEach(el => {
+        const ramVal = Number(window.LAST_NUC_RAM_GB);
+        el.textContent = (window.LAST_NUC_RAM_GB !== undefined && window.LAST_NUC_RAM_GB !== null && window.LAST_NUC_RAM_GB !== '' && Number.isFinite(ramVal) && ramVal > 0)
+          ? `${ramVal} GB`
+          : '--';
+      });
       // Dynamic scale range managed by renderSparklineFrame
+      const hasNucLatGlobal = window.LAST_NUC_LATENCY !== undefined && window.LAST_NUC_LATENCY !== null && window.LAST_NUC_LATENCY !== '' && Number.isFinite(Number(window.LAST_NUC_LATENCY));
       document.querySelectorAll('#schematic-nuc-throughput').forEach(el => {
-        if (!el.textContent || el.textContent.includes('--')) el.textContent = `${window.LAST_NUC_LATENCY || 0.2} ms`;
+        if (!el.textContent || el.textContent.includes('--')) el.textContent = hasNucLatGlobal ? `${window.LAST_NUC_LATENCY} ms` : '-- ms';
       });
       document.querySelectorAll('#schematic-desktop-throughput').forEach(el => {
         if (!el.textContent || el.textContent.includes('--')) el.textContent = (window.DESKTOP_IS_ONLINE !== false) ? '2.5 Gbps' : 'Standby';
@@ -938,39 +944,41 @@
       const nucOnline = (window.NUC_IS_ONLINE !== false);
       const svcs = (window.LAST_SERVICES_HEALTH && window.LAST_SERVICES_HEALTH.services) ? window.LAST_SERVICES_HEALTH.services : null;
 
-      const svcState = (key, fallbackLat) => {
+      const svcState = (key) => {
         const entry = svcs && svcs[key];
         const ok = entry ? !!entry.online : nucOnline;
-        const lat = (entry && typeof entry.latencyMs === 'number')
+        const lat = (entry && typeof entry.latencyMs === 'number' && Number.isFinite(entry.latencyMs))
           ? entry.latencyMs.toFixed(1)
-          : (ok && fallbackLat !== null ? fallbackLat : '--');
-        return { ok, lat };
+          : '--';
+        const uptimePct = (entry && entry.uptimePct) ? entry.uptimePct : (ok ? 'Online' : 'Offline');
+        return { ok, lat, uptimePct };
       };
 
-      const setKuma = (id, ms, statusId, isGood, goodTxt = 'Healthy', badTxt = 'Degraded', uptimeId = null, uptimePct = '100.0%') => {
+      const setKuma = (id, ms, statusId, isGood, goodTxt = 'Healthy', badTxt = 'Degraded', uptimeId = null, uptimePct = null) => {
         document.querySelectorAll('#' + id + ', .' + id).forEach(el => el.textContent = ms === '--' ? '--' : `${ms} ms`);
         document.querySelectorAll('#' + statusId + ', .' + statusId).forEach(st => {
           st.textContent = isGood ? goodTxt : badTxt;
           st.className = `item-tag ${isGood ? 'online' : 'offline'}`;
         });
         if (uptimeId) {
-          document.querySelectorAll('#' + uptimeId).forEach(u => u.textContent = isGood ? uptimePct : 'Offline');
+          const resolvedUptime = uptimePct || (isGood ? 'Online' : 'Offline');
+          document.querySelectorAll('#' + uptimeId).forEach(u => u.textContent = isGood ? resolvedUptime : 'Offline');
         }
       };
 
-      const sStream = svcState('streamhub', nucLat !== null ? (nucLat + 0.1).toFixed(1) : null);
-      const sFiles = svcState('filebrowser', nucLat !== null ? (nucLat + 0.1).toFixed(1) : null);
-      const sQbit = svcState('torrents2', nucLat !== null ? (nucLat + 0.2).toFixed(1) : null);
-      const sWol = svcState('wol', nucLat !== null ? nucLat.toFixed(1) : null);
-      const sCam = svcState('cam', nucLat !== null ? (nucLat + 1.7).toFixed(1) : null);
-      const sCf = svcState('cf', ispLat !== null ? ispLat.toFixed(1) : null);
+      const sStream = svcState('streamhub');
+      const sFiles = svcState('filebrowser');
+      const sQbit = svcState('torrents2');
+      const sWol = svcState('wol');
+      const sCam = svcState('cam');
+      const sCf = svcState('cf');
 
-      setKuma('kuma-lat-stream', sStream.lat, 'kuma-status-stream', sStream.ok, 'Healthy', 'Degraded', 'kuma-uptime-stream');
-      setKuma('kuma-lat-files', sFiles.lat, 'kuma-status-files', sFiles.ok, 'Healthy', 'Degraded', 'kuma-uptime-files');
-      setKuma('kuma-lat-qbit', sQbit.lat, 'kuma-status-qbit', sQbit.ok, 'Healthy', 'Degraded', 'kuma-uptime-qbit');
-      setKuma('kuma-lat-wol', sWol.lat, 'kuma-status-wol', sWol.ok, 'Healthy', 'Degraded', 'kuma-uptime-wol');
-      setKuma('kuma-lat-catcam', sCam.lat, 'kuma-status-catcam', sCam.ok, 'Healthy', 'Degraded', 'kuma-uptime-catcam');
-      setKuma('kuma-lat-cf', sCf.lat, 'kuma-status-cf', sCf.ok, 'Shield Active', 'Degraded', 'kuma-uptime-cf');
+      setKuma('kuma-lat-stream', sStream.lat, 'kuma-status-stream', sStream.ok, 'Healthy', 'Degraded', 'kuma-uptime-stream', sStream.uptimePct);
+      setKuma('kuma-lat-files', sFiles.lat, 'kuma-status-files', sFiles.ok, 'Healthy', 'Degraded', 'kuma-uptime-files', sFiles.uptimePct);
+      setKuma('kuma-lat-qbit', sQbit.lat, 'kuma-status-qbit', sQbit.ok, 'Healthy', 'Degraded', 'kuma-uptime-qbit', sQbit.uptimePct);
+      setKuma('kuma-lat-wol', sWol.lat, 'kuma-status-wol', sWol.ok, 'Healthy', 'Degraded', 'kuma-uptime-wol', sWol.uptimePct);
+      setKuma('kuma-lat-catcam', sCam.lat, 'kuma-status-catcam', sCam.ok, 'Healthy', 'Degraded', 'kuma-uptime-catcam', sCam.uptimePct);
+      setKuma('kuma-lat-cf', sCf.lat, 'kuma-status-cf', sCf.ok, 'Shield Active', 'Degraded', 'kuma-uptime-cf', sCf.uptimePct);
 
       document.querySelectorAll('#spark-leg-nuc').forEach(el => el.textContent = nucLat !== null ? `${nucLat.toFixed(1)} ms` : '--');
       if (typeof initSparklineHeartbeat === 'function') initSparklineHeartbeat();
@@ -979,18 +987,8 @@
 
     // Dynamic SSL Certificate Expiry Calculator (Cloudflare ECC CA-3)
     function updateSslCertExpiryUI() {
-      const expiry = new Date('2027-01-23T16:16:35Z');
-      const now = new Date();
-      const diffMs = expiry - now;
-      const daysLeft = Math.max(1, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
       document.querySelectorAll('.ssl-cert-days').forEach(el => {
-        if (el.textContent.includes('Remaining')) {
-          el.textContent = `${daysLeft} Days Remaining`;
-        } else if (el.textContent.includes('Left')) {
-          el.textContent = `Cloudflare Universal SSL (Let's Encrypt ECDSA) (${daysLeft} Days Left)`;
-        } else {
-          el.textContent = `${daysLeft} Days Left`;
-        }
+        el.textContent = 'Cloudflare Auto-Renew (Universal SSL)';
       });
     }
     window.updateSslCertExpiryUI = updateSslCertExpiryUI;
@@ -1053,7 +1051,7 @@
           const cache = raw ? JSON.parse(raw) : {};
           cache[target] = {
             online: true,
-            latencyMs: latencyMs !== null ? latencyMs : (target === 'nuc' ? 0.2 : 0.4),
+            latencyMs: (latencyMs !== null && latencyMs !== undefined && Number.isFinite(Number(latencyMs))) ? Number(latencyMs) : null,
             disk: disk || (cache[target] && cache[target].disk),
             torrent: torrent || (cache[target] && cache[target].torrent),
             vitals: vitals || (cache[target] && cache[target].vitals)
@@ -1174,10 +1172,10 @@
           if (schCap) schCap.textContent = `Capacity: ${disk.freeGB} GB Free (${disk.usedPercent}% Used)`;
         }
         const schNuc = document.getElementById('schematic-nuc-throughput');
-        if (schNuc) schNuc.textContent = `${latencyMs !== null ? latencyMs : 0.2} ms`;
+        if (schNuc) schNuc.textContent = (latencyMs !== null && latencyMs !== undefined) ? `${latencyMs} ms` : '-- ms';
         try {
           if (typeof schematicNodesData !== 'undefined' && schematicNodesData.nuc) {
-            schematicNodesData.nuc.status = isOnline ? `Online (${latencyMs !== null ? latencyMs : 0.2} ms LAN)` : 'Offline (Unreachable)';
+            schematicNodesData.nuc.status = isOnline ? (latencyMs !== null && latencyMs !== undefined ? `Online (${latencyMs} ms LAN)` : 'Online (LAN)') : 'Offline (Unreachable)';
             schematicNodesData.nuc.statusClass = isOnline ? 'online' : 'offline';
           }
           if (typeof schematicNodesData !== 'undefined' && schematicNodesData.storage && disk) {
@@ -1227,9 +1225,9 @@
         const fCpuNuc = document.getElementById('fleet-cpu-nuc');
         const sCpu = document.getElementById('stat-cpu-val');
         if (isOnline) {
-          const cLoad = (vitals && vitals.cpuLoad !== undefined) ? safeNum(vitals.cpuLoad, 5) : 5;
-          if (fCpuNuc) fCpuNuc.textContent = `Intel Core i5 \u2022 ${cLoad}% Load (4C / 8T)`;
-          if (sCpu && vitals && vitals.cpuLoad !== undefined) sCpu.innerHTML = `${cLoad}% <span style="font-size: 0.9rem; color: #8b949e;">CPU</span>`;
+          const cLoad = (vitals && vitals.cpuLoad !== undefined) ? safeNum(vitals.cpuLoad, null) : null;
+          if (fCpuNuc) fCpuNuc.textContent = cLoad !== null ? `Intel Core i5 \u2022 ${cLoad}% Load (4C / 8T)` : `Intel Core i5 \u2022 Online (4C / 8T)`;
+          if (sCpu) sCpu.innerHTML = cLoad !== null ? `${cLoad}% <span style="font-size: 0.9rem; color: #8b949e;">CPU</span>` : `-- <span style="font-size: 0.9rem; color: #8b949e;">CPU</span>`;
         }
         if (!isOnline) {
           const sHw = document.getElementById('stat-hw-tag');
@@ -2591,9 +2589,10 @@
       const proEquiv = ((inTok * 2.50) + (outTok * 10.00)) / 1000000;
       const actualCost = ((inTok * 0.075) + (outTok * 0.30)) / 1000000;
       const savedCost = Math.max(0, proEquiv - actualCost);
-      const savingsPctNum = proEquiv > 0 ? ((savedCost / proEquiv) * 100) : 97.00;
+      const savingsPctNum = proEquiv > 0 ? ((savedCost / proEquiv) * 100) : 0;
       const savingsPct = savingsPctNum.toFixed(2);
-      const savedFmt = '$' + savedCost.toFixed(2);
+      const savedFmt = proEquiv > 0 ? ('Est. $' + savedCost.toFixed(2)) : '--';
+      const savingsLabel = proEquiv > 0 ? `${savedFmt} (${savingsPct}% Eco Savings)` : '--';
 
       // Update Header Button
       const headerCount = document.getElementById('header-token-count');
@@ -2601,7 +2600,7 @@
 
       const headerBtn = document.getElementById('header-token-btn');
       if (headerBtn) {
-        headerBtn.title = `Live AI Token Consumption: ${totalFmt} Tokens (Prompt In: ${flashPct}% | Output: ${proPct}% | ${cacheFmt} Context Cache Reused) | Saved ~${savedFmt} (${savingsPct}% Eco Savings)`;
+        headerBtn.title = `Live AI Token Consumption: ${totalFmt} Tokens (Prompt In: ${flashPct}% | Output: ${proPct}% | ${cacheFmt} Context Cache Reused) | ${savingsLabel}`;
       }
 
       const hFlash = document.getElementById('header-tag-flash');
@@ -2688,34 +2687,34 @@
 
       // Update Header Dropdown Progress Bar
       const menuVal = document.getElementById('menu-token-val');
-      const clampPct = (v, fb) => { const n = Number(v); return (v != null && !isNaN(n)) ? Math.max(0, Math.min(100, n)) : fb; };
-      const weeklyLimit = clampPct(metrics.weeklyLimitRemaining, 100);
-      const fiveHourLimit = clampPct(metrics.fiveHourLimitRemaining, 100);
+      const clampPct = (v) => { const n = Number(v); return (v != null && v !== '' && !isNaN(n)) ? Math.max(0, Math.min(100, n)) : null; };
+      const weeklyLimit = clampPct(metrics.weeklyLimitRemaining);
+      const fiveHourLimit = clampPct(metrics.fiveHourLimitRemaining);
       const weeklyRef = metrics.weeklyRefresh || "--";
       const fiveHourRef = metrics.fiveHourRefresh || "--";
       const fmtLocalReset = (iso) => {
         if (!iso) return '';
         try { const d = new Date(iso); return isNaN(d) ? '' : ` • Resets ${d.toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}`; } catch { return ''; }
       };
-      if (menuVal) menuVal.textContent = `${weeklyLimit}% Weekly`;
+      if (menuVal) menuVal.textContent = weeklyLimit !== null ? `${weeklyLimit}% Weekly` : '-- Weekly';
       const barFlash = document.getElementById('menu-bar-flash');
-      if (barFlash) barFlash.style.width = `${weeklyLimit}%`;
+      if (barFlash) barFlash.style.width = weeklyLimit !== null ? `${weeklyLimit}%` : '0%';
       const barPro = document.getElementById('menu-bar-pro');
-      if (barPro) barPro.style.width = `${(100 - weeklyLimit).toFixed(2)}%`;
+      if (barPro) barPro.style.width = weeklyLimit !== null ? `${(100 - weeklyLimit).toFixed(2)}%` : '0%';
       const mFlash = document.getElementById('menu-pct-flash');
-      if (mFlash) mFlash.textContent = `${weeklyLimit}% Remaining`;
+      if (mFlash) mFlash.textContent = weeklyLimit !== null ? `${weeklyLimit}% Remaining` : '--';
       const m5h = document.getElementById('menu-pct-5h');
-      if (m5h) m5h.textContent = `${fiveHourLimit}% (${fiveHourRef})`;
+      if (m5h) m5h.textContent = fiveHourLimit !== null ? `${fiveHourLimit}% (${fiveHourRef})` : `-- (${fiveHourRef})`;
       const bar5h = document.getElementById('menu-bar-5h');
-      if (bar5h) bar5h.style.width = `${fiveHourLimit}%`;
+      if (bar5h) bar5h.style.width = fiveHourLimit !== null ? `${fiveHourLimit}%` : '0%';
       const pBar5h = document.getElementById('menu-progress-bar-5h');
-      if (pBar5h) pBar5h.title = `5-Hour Limit: ${fiveHourLimit}% Remaining (Refresh in ${fiveHourRef}${fmtLocalReset(metrics.fiveHourResetTime)})`;
+      if (pBar5h) pBar5h.title = `5-Hour Limit: ${fiveHourLimit !== null ? fiveHourLimit + '% Remaining' : '--'} (Refresh in ${fiveHourRef}${fmtLocalReset(metrics.fiveHourResetTime)})`;
       const mPro = document.getElementById('menu-pct-pro');
       if (mPro) mPro.innerHTML = `<strong style="font-weight:700; color: #c084fc;">${proPct}%</strong> Output`;
       const mCache = document.getElementById('menu-pct-cache');
       if (mCache) mCache.innerHTML = `<strong style="font-weight:700;">${cacheFmt}</strong> Cache`;
       const pBar = document.getElementById('menu-progress-bar');
-      if (pBar) pBar.title = `Gemini Weekly: ${weeklyLimit}% Remaining (Refresh in ${weeklyRef}${fmtLocalReset(metrics.weeklyResetTime)})`;
+      if (pBar) pBar.title = `Gemini Weekly: ${weeklyLimit !== null ? weeklyLimit + '% Remaining' : '--'} (Refresh in ${weeklyRef}${fmtLocalReset(metrics.weeklyResetTime)})`;
 
       // Decouple model bars: wire model breakdown bars explicitly to breakdown percentages
       document.querySelectorAll('.model-bar-flash, #model-bar-flash, [data-model="flash"]').forEach(el => {
@@ -2729,14 +2728,16 @@
       });
 
       document.querySelectorAll('#menu-claude-pct').forEach(el => {
-        const claudePct = clampPct(metrics.claudeWeeklyRemaining != null ? metrics.claudeWeeklyRemaining : metrics.claudeLimitRemaining, 100);
-        const claude5h = clampPct(metrics.claudeFiveHourRemaining, 100);
-        el.textContent = `${claudePct}%`;
-        el.title = `Claude/3p Weekly: ${claudePct}%${fmtLocalReset(metrics.claudeWeeklyResetTime)} | 5-Hour: ${claude5h}%${fmtLocalReset(metrics.claudeFiveHourResetTime)}`;
+        const claudePct = clampPct(metrics.claudeWeeklyRemaining != null ? metrics.claudeWeeklyRemaining : metrics.claudeLimitRemaining);
+        const claude5h = clampPct(metrics.claudeFiveHourRemaining);
+        el.textContent = claudePct !== null ? `${claudePct}%` : '--';
+        el.title = `Claude/3p Weekly: ${claudePct !== null ? claudePct + '%' : '--'}${fmtLocalReset(metrics.claudeWeeklyResetTime)} | 5-Hour: ${claude5h !== null ? claude5h + '%' : '--'}${fmtLocalReset(metrics.claudeFiveHourResetTime)}`;
       });
       document.querySelectorAll('#menu-account-user').forEach(el => {
         if (metrics.account) {
           el.textContent = metrics.account.includes('@') ? metrics.account.split('@')[0] : metrics.account;
+        } else {
+          el.textContent = '';
         }
       });
       const metaBarEl = document.getElementById('agy-session-meta-bar');
@@ -3337,29 +3338,35 @@
             .then(sData => {
               if (sData && sData.status === 'success') {
                 const sList = sortIspChrono(Array.isArray(sData.history) ? sData.history : []);
-                renderIspRows(document.getElementById('isp-history-tbody'), sList, { avg: 3.6, min: 3, max: 4, jitter: 0.71 });
+                renderIspRows(document.getElementById('isp-history-tbody'), sList, { avg: '--', min: '--', max: '--', jitter: '--' });
                 const sLat = (sData.latest && sData.latest.pingAvgMs !== undefined) ? sData.latest : (sList.length > 0 ? sList[sList.length - 1] : null);
                 if (sLat) {
+                  const snapTsRaw = sLat.timestamp || sData.timestamp || null;
+                  const snapTs = snapTsRaw ? Date.parse(snapTsRaw) : NaN;
+                  const isStaleSnap = !Number.isFinite(snapTs) || (Date.now() - snapTs) > (2 * 60 * 60 * 1000);
+                  const snapDateLabel = Number.isFinite(snapTs) ? new Date(snapTs).toISOString().slice(0, 10) : 'Unknown';
+                  const snapTag = isStaleSnap ? ` [Snapshot: ${snapDateLabel}]` : '';
+
                   const pVal = document.getElementById('isp-ping-val');
                   const pSub = document.getElementById('isp-ping-sub');
                   const jVal = document.getElementById('isp-jitter-val');
                   const pTag = document.getElementById('isp-ping-tag');
-                  const sPingAvg = numField(sLat.pingAvgMs, 3.6);
-                  const sPingMin = numField(sLat.pingMinMs, 3);
-                  const sPingMax = numField(sLat.pingMaxMs, 4);
-                  const sGdns = numField(sLat.googleDnsMs, 4);
-                  const sJitter = numField(sLat.jitterMs, 0.71);
+                  const sPingAvg = numField(sLat.pingAvgMs, null);
+                  const sPingMin = numField(sLat.pingMinMs, '--');
+                  const sPingMax = numField(sLat.pingMaxMs, '--');
+                  const sGdns = numField(sLat.googleDnsMs, '--');
+                  const sJitter = numField(sLat.jitterMs, null);
                   const sDown = numField(sLat.downloadMbps != null ? sLat.downloadMbps : sLat.downMbps, null);
                   const sUp = numField(sLat.uploadMbps != null ? sLat.uploadMbps : sLat.upMbps, null);
-                  if (pVal) pVal.innerHTML = `${sPingAvg} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>`;
-                  if (pSub) pSub.textContent = `Min: ${sPingMin} ms | Max: ${sPingMax} ms | Google: ${sGdns} ms`;
-                  if (jVal) jVal.innerHTML = `&plusmn; ${sJitter} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>`;
-                  if (pTag) pTag.textContent = `${sPingAvg} ms`;
+                  if (pVal) pVal.innerHTML = sPingAvg !== null ? `${sPingAvg} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>` : '--';
+                  if (pSub) pSub.textContent = `Min: ${sPingMin} ms | Max: ${sPingMax} ms | Google: ${sGdns} ms${snapTag}`;
+                  if (jVal) jVal.innerHTML = sJitter !== null ? `&plusmn; ${sJitter} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>` : '--';
+                  if (pTag) pTag.textContent = sPingAvg !== null ? `${sPingAvg} ms` : '--';
                   const stPing = document.getElementById('st-val-ping');
                   const stDown = document.getElementById('st-val-down');
                   const stUp = document.getElementById('st-val-up');
                   const gaugeNum = document.getElementById('gauge-live-num');
-                  if (stPing && sLat.pingAvgMs !== undefined) stPing.innerHTML = `${sPingAvg} <span style="font-size: 0.85rem; color: #94a3b8;">ms</span>`;
+                  if (stPing) stPing.innerHTML = sPingAvg !== null ? `${sPingAvg} <span style="font-size: 0.85rem; color: #94a3b8;">ms</span>` : '--';
                   if (stDown) stDown.innerHTML = sDown !== null ? `${sDown} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>` : '--';
                   if (stUp) stUp.innerHTML = sUp !== null ? `${sUp} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>` : '--';
                   if (gaugeNum) gaugeNum.textContent = sDown !== null ? `${sDown}` : '--';
@@ -3386,28 +3393,7 @@
                   }
                 } catch (e) {}
 
-                if (!cList || cList.length === 0) {
-                  cList = [
-                    { timeShort: '12:30', isp: 'Bell Canada', pingAvgMs: 4.0, pingMinMs: 3, pingMaxMs: 5, jitterMs: 0.40, packetLoss: 0, grade: 'A+' },
-                    { timeShort: '13:00', isp: 'Bell Canada', pingAvgMs: 3.9, pingMinMs: 3, pingMaxMs: 4, jitterMs: 0.52, packetLoss: 0, grade: 'A+' },
-                    { timeShort: '13:30', isp: 'Bell Canada', pingAvgMs: 4.1, pingMinMs: 3, pingMaxMs: 5, jitterMs: 0.38, packetLoss: 0, grade: 'A+' },
-                    { timeShort: '14:00', isp: 'Bell Canada', pingAvgMs: 3.8, pingMinMs: 3, pingMaxMs: 5, jitterMs: 0.45, packetLoss: 0, grade: 'A+' },
-                    { timeShort: '14:30', isp: 'Bell Canada', pingAvgMs: 3.6, pingMinMs: 3, pingMaxMs: 4, jitterMs: 0.71, packetLoss: 0, grade: 'A+' }
-                  ];
-                }
-                cList = sortIspChrono(cList);
-
-                renderIspRows(document.getElementById('isp-history-tbody'), cList, { avg: 3.6, min: 3, max: 4, jitter: 0.71 });
-
-                const cLat = cList.length > 0 ? cList[cList.length - 1] : null;
-                const cPing = cLat ? numField(cLat.pingAvgMs, 3.6) : 3.6;
-                const cMin = cLat ? numField(cLat.pingMinMs, 3) : 3;
-                const cMax = cLat ? numField(cLat.pingMaxMs, 4) : 4;
-                const cGdns = cLat ? numField(cLat.googleDnsMs, 4.0) : 4.0;
-                const cJitter = cLat ? numField(cLat.jitterMs, 0.71) : 0.71;
-                const cDown = cLat ? numField(cLat.downloadMbps != null ? cLat.downloadMbps : cLat.downMbps, null) : null;
-                const cUp = cLat ? numField(cLat.uploadMbps != null ? cLat.uploadMbps : cLat.upMbps, null) : null;
-
+                const tbody = document.getElementById('isp-history-tbody');
                 const pingVal = document.getElementById('isp-ping-val');
                 const pingSub = document.getElementById('isp-ping-sub');
                 const jitterVal = document.getElementById('isp-jitter-val');
@@ -3418,12 +3404,42 @@
                 const stUp = document.getElementById('st-val-up');
                 const gaugeNum = document.getElementById('gauge-live-num');
                 const cGaugeNeedle = document.getElementById('speed-dial-needle');
-                if (pingVal) pingVal.innerHTML = `${cPing} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>`;
+
+                if (!cList || cList.length === 0) {
+                  if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="padding: 12px 8px; text-align: center; color: #94a3b8;">Awaiting live ISP telemetry...</td></tr>';
+                  }
+                  if (pingVal) pingVal.textContent = '--';
+                  if (pingSub) pingSub.textContent = 'Awaiting live ISP telemetry...';
+                  if (jitterVal) jitterVal.textContent = '--';
+                  if (uptimeVal) uptimeVal.textContent = '--';
+                  if (pingTag) pingTag.textContent = '--';
+                  if (stPing) stPing.textContent = '--';
+                  if (stDown) stDown.textContent = '--';
+                  if (stUp) stUp.textContent = '--';
+                  if (gaugeNum) gaugeNum.textContent = '--';
+                  if (cGaugeNeedle) cGaugeNeedle.style.transform = 'rotate(-45deg)';
+                  return;
+                }
+
+                cList = sortIspChrono(cList);
+                renderIspRows(tbody, cList, { avg: '--', min: '--', max: '--', jitter: '--' });
+
+                const cLat = cList[cList.length - 1];
+                const cPing = cLat ? numField(cLat.pingAvgMs, null) : null;
+                const cMin = cLat ? numField(cLat.pingMinMs, '--') : '--';
+                const cMax = cLat ? numField(cLat.pingMaxMs, '--') : '--';
+                const cGdns = cLat ? numField(cLat.googleDnsMs, '--') : '--';
+                const cJitter = cLat ? numField(cLat.jitterMs, null) : null;
+                const cDown = cLat ? numField(cLat.downloadMbps != null ? cLat.downloadMbps : cLat.downMbps, null) : null;
+                const cUp = cLat ? numField(cLat.uploadMbps != null ? cLat.uploadMbps : cLat.upMbps, null) : null;
+
+                if (pingVal) pingVal.innerHTML = cPing !== null ? `${cPing} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>` : '--';
                 if (pingSub) pingSub.textContent = `Min: ${cMin} ms | Max: ${cMax} ms | Google: ${cGdns} ms`;
-                if (jitterVal) jitterVal.innerHTML = `&plusmn; ${cJitter} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>`;
-                if (uptimeVal) uptimeVal.textContent = '99.98%';
-                if (pingTag) pingTag.textContent = `${cPing} ms`;
-                if (stPing) stPing.innerHTML = `${cPing} <span style="font-size: 0.85rem; color: #94a3b8;">ms</span>`;
+                if (jitterVal) jitterVal.innerHTML = cJitter !== null ? `&plusmn; ${cJitter} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>` : '--';
+                if (uptimeVal) uptimeVal.textContent = '--';
+                if (pingTag) pingTag.textContent = cPing !== null ? `${cPing} ms` : '--';
+                if (stPing) stPing.innerHTML = cPing !== null ? `${cPing} <span style="font-size: 0.85rem; color: #94a3b8;">ms</span>` : '--';
                 if (stDown) stDown.innerHTML = cDown !== null ? `${cDown} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>` : '--';
                 if (stUp) stUp.innerHTML = cUp !== null ? `${cUp} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>` : '--';
                 if (gaugeNum) gaugeNum.textContent = cDown !== null ? `${cDown}` : '--';
@@ -3816,7 +3832,7 @@
       } else {
         if (banner) { banner.style.background = 'rgba(16, 185, 129, 0.1)'; banner.style.borderColor = 'rgba(16, 185, 129, 0.3)'; }
         if (dot) { dot.style.background = '#10b981'; dot.style.boxShadow = '0 0 8px #10b981'; }
-        if (title) title.textContent = 'Normal 24/7 Operations \u2014 90-Day SLA: 99.985%';
+        if (title) title.textContent = 'Normal 24/7 Operations \u2014 SLA Protection Ready';
         if (sub) sub.textContent = 'Planned maintenance windows are excluded from outage penalties.';
         if (tag) { tag.textContent = 'SLA Protected'; tag.className = 'item-tag online'; tag.style.background = ''; tag.style.color = ''; }
         if (actionBtn) {
@@ -4035,6 +4051,7 @@
             if (!dateStr) return;
             const it = incidents.find(item => item.node === node.type && item.date === dateStr);
             if (it) {
+              bar.style.background = '';
               bar.classList.remove('edge', 'isp', 'maintenance', 'standby', 'down', 'warn');
               const c = ['down', 'warn', 'maintenance', 'standby'].includes(it.type)
                 ? it.type
@@ -4050,6 +4067,42 @@
       window.applyUptimeIncidentsToBars = applyUptimeIncidentsToBars;
 
       const now = new Date();
+      const applyBarState = (bar, node, i, dateStr) => {
+        bar.style.background = '';
+        bar.classList.remove('edge', 'isp', 'maintenance', 'standby', 'down', 'warn');
+        bar.setAttribute('data-date', dateStr);
+        bar.setAttribute('data-node', node.type);
+
+        const inc = (window.UPTIME_INCIDENTS || []).find(it => it.node === node.type && it.date === dateStr);
+        if (inc) {
+          const c = ['down', 'warn', 'maintenance', 'standby'].includes(inc.type)
+            ? inc.type
+            : ['down', 'warn', 'maintenance', 'standby'].includes(inc.impact)
+              ? inc.impact
+              : (inc.type === 'outage' ? 'down' : 'warn');
+          bar.classList.add(c);
+          bar.title = `${dateStr} | ${node.title}\nStatus: ${inc.title || 'Incident'}\nImpact: ${inc.impact || inc.type || 'Notice'}`;
+        } else if (i === 0) {
+          if (node.id === 'bars-nuc' && isNucMaintenanceActive()) {
+            bar.classList.add('maintenance');
+            const mData = getNucMaintenanceData();
+            const reason = (mData && mData.reason) ? mData.reason : 'Windows Updates & Optimization';
+            bar.title = `${dateStr} | ${node.title}\nStatus: Scheduled Maintenance (SLA Protected)\nReason: ${reason}`;
+          } else if (node.id === 'bars-nuc' && window.NUC_IS_ONLINE === false) {
+            bar.classList.add('down');
+            bar.title = `${dateStr} | ${node.title}\nStatus: Offline / Unreachable`;
+          } else if (node.id === 'bars-desktop' && window.DESKTOP_IS_ONLINE === false) {
+            bar.classList.add('standby');
+            bar.title = `${dateStr} | ${node.title}\nStatus: Eco Standby / Sleeping (Wake-on-LAN Ready)`;
+          } else {
+            bar.title = `${dateStr} | ${node.title}\nStatus: Operational (Live)`;
+          }
+        } else {
+          bar.style.background = 'rgba(148, 163, 184, 0.22)';
+          bar.title = `${dateStr} | ${node.title}\nStatus: No Recorded History`;
+        }
+      };
+
       nodes.forEach(node => {
         const container = document.getElementById(node.id);
         if (!container) return;
@@ -4062,36 +4115,7 @@
             const d = new Date(now);
             d.setDate(d.getDate() - i);
             const dateStr = d.toISOString().split('T')[0];
-
-            bar.classList.remove('edge');
-            bar.classList.remove('isp');
-            bar.classList.remove('maintenance');
-            bar.classList.remove('standby');
-            bar.classList.remove('down');
-            bar.classList.remove('warn');
-            bar.setAttribute('data-date', dateStr);
-            bar.setAttribute('data-node', node.type);
-
-            const inc = (window.UPTIME_INCIDENTS || []).find(it => it.node === node.type && it.date === dateStr);
-            if (inc) {
-              const c = ['down', 'warn', 'maintenance', 'standby'].includes(inc.type)
-                ? inc.type
-                : ['down', 'warn', 'maintenance', 'standby'].includes(inc.impact)
-                  ? inc.impact
-                  : (inc.type === 'outage' ? 'down' : 'warn');
-              bar.classList.add(c);
-              bar.title = `${dateStr} | ${node.title}\nStatus: ${inc.title || 'Incident'}\nImpact: ${inc.impact || inc.type || 'Notice'}`;
-            } else if (node.id === 'bars-nuc' && isNucMaintenanceActive() && i === 0) {
-              bar.classList.add('maintenance');
-              const mData = getNucMaintenanceData();
-              const reason = (mData && mData.reason) ? mData.reason : 'Windows Updates & Optimization';
-              bar.title = `${dateStr} | ${node.title}\nStatus: Scheduled Maintenance (SLA Protected)\nAvailability: 100.0% Compliant (Zero Outage Penalty)\nReason: ${reason}`;
-            } else if (node.id === 'bars-desktop' && i === 0 && window.DESKTOP_IS_ONLINE === false) {
-              bar.classList.add('standby');
-              bar.title = `${dateStr} | ${node.title}\nStatus: Eco Standby / Sleeping (Zero Power Draw)\nAvailability: Standby Mode (Wake-on-LAN Ready)`;
-            } else {
-              bar.title = `${dateStr} | ${node.title}\nStatus: 100.0% Operational & Active\nAvailability: 100.0%\nSession: Interactive`;
-            }
+            applyBarState(bar, node, i, dateStr);
           }
         } else {
           container.innerHTML = '';
@@ -4102,30 +4126,7 @@
 
             const bar = document.createElement('div');
             bar.className = 'uptime-bar';
-            bar.setAttribute('data-date', dateStr);
-            bar.setAttribute('data-node', node.type);
-
-            const inc = (window.UPTIME_INCIDENTS || []).find(it => it.node === node.type && it.date === dateStr);
-            if (inc) {
-              const c = ['down', 'warn', 'maintenance', 'standby'].includes(inc.type)
-                ? inc.type
-                : ['down', 'warn', 'maintenance', 'standby'].includes(inc.impact)
-                  ? inc.impact
-                  : (inc.type === 'outage' ? 'down' : 'warn');
-              bar.classList.add(c);
-              bar.title = `${dateStr} | ${node.title}\nStatus: ${inc.title || 'Incident'}\nImpact: ${inc.impact || inc.type || 'Notice'}`;
-            } else if (node.id === 'bars-nuc' && isNucMaintenanceActive() && i === 0) {
-              bar.classList.add('maintenance');
-              const mData = getNucMaintenanceData();
-              const reason = (mData && mData.reason) ? mData.reason : 'Windows Updates & Optimization';
-              bar.title = `${dateStr} | ${node.title}\nStatus: Scheduled Maintenance (SLA Protected)\nAvailability: 100.0% Compliant (Zero Outage Penalty)\nReason: ${reason}`;
-            } else if (node.id === 'bars-desktop' && i === 0 && window.DESKTOP_IS_ONLINE === false) {
-              bar.classList.add('standby');
-              bar.title = `${dateStr} | ${node.title}\nStatus: Eco Standby / Sleeping (Zero Power Draw)\nAvailability: Standby Mode (Wake-on-LAN Ready)`;
-            } else {
-              bar.title = `${dateStr} | ${node.title}\nStatus: 100.0% Operational & Active\nAvailability: 100.0%\nSession: Interactive`;
-            }
-
+            applyBarState(bar, node, i, dateStr);
             container.appendChild(bar);
           }
         }
@@ -4133,7 +4134,7 @@
 
       const nucScale = document.getElementById('uptime-nuc-scale-today');
       if (nucScale) {
-        nucScale.textContent = isNucMaintenanceActive() ? 'Today (Scheduled Maintenance)' : 'Today (100% operational)';
+        nucScale.textContent = isNucMaintenanceActive() ? 'Today (Scheduled Maintenance)' : (window.NUC_IS_ONLINE === false ? 'Today (Offline)' : 'Today (Operational)');
       }
       const edgeScale = document.getElementById('uptime-edge-scale-today');
       if (edgeScale) {
@@ -4143,7 +4144,7 @@
       if (deskScale) {
         deskScale.textContent = window.DESKTOP_IS_ONLINE === false
           ? 'Today (Desktop Eco Standby • WoL Ready)'
-          : 'Today (Active Interactive Session • 100% Operational)';
+          : 'Today (Active Interactive Session)';
       }
 
       // Initialize real-time animated sparkline heartbeat if not already running
@@ -4159,40 +4160,47 @@
               applyUptimeIncidentsToBars(data.incidents);
               try { localStorage.setItem('dr_uptime_cache', JSON.stringify(data)); } catch (e) {}
               document.querySelectorAll('#uptime-sla-val').forEach(el => {
-                if (data.overallSla) el.textContent = data.overallSla;
+                el.textContent = data.overallSla || '--';
               });
               document.querySelectorAll('#uptime-hours-val').forEach(el => {
-                if (data.monitoredHours) el.innerHTML = `${Number(data.monitoredHours).toLocaleString()} <span style="font-size: 0.9rem; color: #8b949e;">Hours</span>`;
+                el.innerHTML = (data.monitoredHours !== undefined && data.monitoredHours !== null)
+                  ? `${Number(data.monitoredHours).toLocaleString()} <span style="font-size: 0.9rem; color: #8b949e;">Hours</span>`
+                  : '--';
               });
               const outCnt = safeNum(data.outages, null);
               document.querySelectorAll('#uptime-outages-val').forEach(el => {
-                if (outCnt !== null) el.innerHTML = `${outCnt} <span style="font-size: 0.9rem; color: #8b949e;">Incidents</span>`;
+                el.innerHTML = outCnt !== null
+                  ? `${outCnt} <span style="font-size: 0.9rem; color: #8b949e;">Incidents</span>`
+                  : '--';
+              });
+              document.querySelectorAll('#uptime-mttr-val').forEach(el => {
+                el.textContent = (data.mttr !== undefined && data.mttr !== null && data.mttr !== '') ? data.mttr : '--';
               });
               document.querySelectorAll('.nav-sla-tag').forEach(tag => {
-                if (data.overallSla) tag.textContent = data.overallSla;
+                tag.textContent = data.overallSla || '--';
               });
               const ispOverall = document.getElementById('isp-uptime-val');
-              if (ispOverall && data.overallSla) ispOverall.textContent = data.overallSla;
+              if (ispOverall) ispOverall.textContent = data.overallSla || '--';
 
               if (Array.isArray(data.nodes)) {
                 data.nodes.forEach(n => {
                   if (n.id === 'desktop') {
                     document.querySelectorAll('#uptime-desktop-sla-val').forEach(el => {
-                      if (n.uptime) el.textContent = `${n.uptime} SLA`;
+                      el.textContent = n.uptime ? `${n.uptime} SLA` : '--';
                     });
                   } else if (n.id === 'nuc') {
                     document.querySelectorAll('#uptime-nuc-sla-val').forEach(el => {
-                      if (n.uptime) el.textContent = `${n.uptime} Uptime`;
+                      el.textContent = n.uptime ? `${n.uptime} Uptime` : '--';
                     });
                   } else if (n.id === 'isp') {
                     document.querySelectorAll('#uptime-isp-sla-val').forEach(el => {
-                      if (n.uptime) el.textContent = `${n.uptime} Uptime`;
+                      el.textContent = n.uptime ? `${n.uptime} Uptime` : '--';
                     });
                     const ispValNode = document.getElementById('isp-uptime-val');
-                    if (ispValNode && n.uptime) ispValNode.textContent = n.uptime;
+                    if (ispValNode) ispValNode.textContent = n.uptime || '--';
                   } else if (n.id === 'edge') {
                     document.querySelectorAll('#uptime-edge-sla-val').forEach(el => {
-                      if (n.uptime) el.textContent = `${n.uptime} Uptime`;
+                      el.textContent = n.uptime ? `${n.uptime} Uptime` : '--';
                     });
                   }
                 });
@@ -4310,64 +4318,82 @@
         return yZero - (clamped / scaleMax) * (yZero - yTop);
       };
 
-      const histBell = (window.ISP_HISTORY_PINGS && window.ISP_HISTORY_PINGS.length > 0) ? window.ISP_HISTORY_PINGS : null;
-      const histEdge = (window.ISP_EDGE_PINGS && window.ISP_EDGE_PINGS.length > 0) ? window.ISP_EDGE_PINGS : null;
+      const histBell = Array.isArray(window.ISP_HISTORY_PINGS)
+        ? window.ISP_HISTORY_PINGS.filter(v => typeof v === 'number' && isFinite(v))
+        : [];
+      const histEdge = Array.isArray(window.ISP_EDGE_PINGS)
+        ? window.ISP_EDGE_PINGS.filter(v => typeof v === 'number' && isFinite(v))
+        : [];
+      const hasNucLat = (window.LAST_NUC_LATENCY !== undefined && window.LAST_NUC_LATENCY !== null && window.LAST_NUC_LATENCY !== '' && isFinite(Number(window.LAST_NUC_LATENCY)));
+      const nucLat = hasNucLat ? Number(window.LAST_NUC_LATENCY) : null;
       const graphW = Math.max(10, (w - 6) - axisX);
 
-      // Draw Bell Fiber Line (Royal Blue ~3.5ms - 5.0ms measured)
-      ctx.beginPath();
-      ctx.strokeStyle = '#3b82f6';
-      ctx.lineWidth = 2.2;
-      for (let x = axisX; x <= w - 6; x += 8) {
-        let val;
-        const t = (x - axisX) / graphW;
-        if (histBell && histBell.length > 1) {
-          const idx = t * (histBell.length - 1);
-          const i0 = Math.floor(idx);
-          const i1 = Math.min(histBell.length - 1, Math.ceil(idx));
-          const frac = idx - i0;
-          val = histBell[i0] * (1 - frac) + histBell[i1] * frac;
-        } else {
-          val = 4.2;
-        }
-        const y = toY(val);
-        if (x === axisX) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      if (histBell.length === 0 && histEdge.length === 0 && !hasNucLat) {
+        ctx.font = '11px "JetBrains Mono", Consolas, monospace';
+        ctx.fillStyle = '#94a3b8';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('Awaiting live latency telemetry...', axisX + graphW / 2, (yTop + yZero) / 2);
+        return;
       }
-      ctx.stroke();
 
-      // Draw Cloudflare Edge Line (Cloudflare Orange ~1.1ms)
-      ctx.beginPath();
-      ctx.strokeStyle = '#f97316';
-      ctx.lineWidth = 2.2;
-      for (let x = axisX; x <= w - 6; x += 8) {
-        let val;
-        const t = (x - axisX) / graphW;
-        if (histEdge && histEdge.length > 1) {
-          const idx = t * (histEdge.length - 1);
-          const i0 = Math.floor(idx);
-          const i1 = Math.min(histEdge.length - 1, Math.ceil(idx));
-          const frac = idx - i0;
-          val = histEdge[i0] * (1 - frac) + histEdge[i1] * frac;
-        } else {
-          val = 1.1;
+      // Draw Bell Fiber Line (only when real finite values exist)
+      if (histBell.length > 0) {
+        ctx.beginPath();
+        ctx.strokeStyle = '#3b82f6';
+        ctx.lineWidth = 2.2;
+        for (let x = axisX; x <= w - 6; x += 8) {
+          let val;
+          const t = (x - axisX) / graphW;
+          if (histBell.length > 1) {
+            const idx = t * (histBell.length - 1);
+            const i0 = Math.floor(idx);
+            const i1 = Math.min(histBell.length - 1, Math.ceil(idx));
+            const frac = idx - i0;
+            val = histBell[i0] * (1 - frac) + histBell[i1] * frac;
+          } else {
+            val = histBell[0];
+          }
+          const y = toY(val);
+          if (x === axisX) ctx.moveTo(x, y); else ctx.lineTo(x, y);
         }
-        const y = toY(val);
-        if (x === axisX) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        ctx.stroke();
       }
-      ctx.stroke();
 
-      // Draw NUC Server Line (Emerald Green ~0.2ms LAN)
-      const nucLat = (window.LAST_NUC_LATENCY !== undefined && window.LAST_NUC_LATENCY !== null)
-        ? window.LAST_NUC_LATENCY
-        : 0.22;
-      ctx.beginPath();
-      ctx.strokeStyle = '#10b981';
-      ctx.lineWidth = 2.2;
-      for (let x = axisX; x <= w - 6; x += 8) {
-        const y = toY(nucLat);
-        if (x === axisX) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      // Draw Cloudflare Edge Line (only when real finite values exist)
+      if (histEdge.length > 0) {
+        ctx.beginPath();
+        ctx.strokeStyle = '#f97316';
+        ctx.lineWidth = 2.2;
+        for (let x = axisX; x <= w - 6; x += 8) {
+          let val;
+          const t = (x - axisX) / graphW;
+          if (histEdge.length > 1) {
+            const idx = t * (histEdge.length - 1);
+            const i0 = Math.floor(idx);
+            const i1 = Math.min(histEdge.length - 1, Math.ceil(idx));
+            const frac = idx - i0;
+            val = histEdge[i0] * (1 - frac) + histEdge[i1] * frac;
+          } else {
+            val = histEdge[0];
+          }
+          const y = toY(val);
+          if (x === axisX) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
       }
-      ctx.stroke();
+
+      // Draw NUC Server Line (only when real finite value exists)
+      if (hasNucLat) {
+        ctx.beginPath();
+        ctx.strokeStyle = '#10b981';
+        ctx.lineWidth = 2.2;
+        for (let x = axisX; x <= w - 6; x += 8) {
+          const y = toY(nucLat);
+          if (x === axisX) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
     }
 
     function initSparklineHeartbeat() {
@@ -4993,7 +5019,7 @@
         icon: '[EDGE]',
         title: 'Cloudflare Zero Trust Edge Network',
         subtitle: 'Global Ingress & Anycast Edge Tunnels',
-        status: '100% SLA Green',
+        status: 'Edge Active',
         statusClass: 'online',
         net: 'Montreal (YUL) & Toronto (YYZ)',
         sec: 'TLS 1.3  -  Automated DDoS Shield',
@@ -5025,7 +5051,7 @@
         statusClass: 'online',
         net: 'wg0  -  UDP:51820  -  Mullvad Exit',
         sec: 'ChaCha20-Poly1305  -  Killswitch Active',
-        speed: 'WireGuard Tunnel (<28ms latency)',
+        speed: 'WireGuard Tunnel (Encrypted)',
         role: 'High-Speed Torrent & Stream Privacy',
         services: 'qBittorrent SOCKS5/Tun Ingestion  -  DNS Leak Shield',
         btnText: 'Inspect VPN Health  ->',
@@ -5146,7 +5172,7 @@
       const btn = document.getElementById('btn-pulse-traces');
       if (btn) btn.classList.add('pulse-active');
       playChaosTone(440, 1100, 'triangle', 0.25);
-      showToast('info', 'Schematic Pulse Dispatched', 'ICMP trace signal propagated across all 7 hardware nodes.');
+      showToast('info', 'Schematic Pulse Dispatched', 'Visual topology pulse triggered (display animation).');
 
       setTimeout(() => {
         wires.forEach(w => w.classList.remove('pulsing'));
@@ -5273,7 +5299,7 @@
       const timeStr = new Date().toTimeString().split(' ')[0];
       const div = document.createElement('div');
       div.className = `chaos-line ${type}`;
-      div.textContent = `[${timeStr}] ${msg}`;
+      div.textContent = `[${timeStr}] [SIMULATED] ${msg}`;
       feed.appendChild(div);
       feed.scrollTop = feed.scrollHeight;
     }
@@ -5302,7 +5328,7 @@
       }
 
       if (scoreEl) {
-        scoreEl.textContent = label;
+        scoreEl.textContent = `[SIMULATED] ${label}`;
         scoreEl.className = `chaos-score-val ${stateClass}`;
       }
       if (badgeEl) {
@@ -6015,12 +6041,21 @@
         if (i >= responseText.length) {
           clearInterval(window._edgeAiTyper);
           window._edgeAiTyper = null;
-          const durationSec = Math.max(0.1, (Date.now() - startTime) / 1000);
-          const tokenEstimate = (metricEvalCount && Number(metricEvalCount) > 0) ? Number(metricEvalCount) : Math.max(1, Math.round(responseText.length / 4));
-          const speed = (metricTokPerSec && Number(metricTokPerSec) > 0) ? Number(metricTokPerSec).toFixed(1) : (tokenEstimate / durationSec).toFixed(1);
-          if (stats) stats.textContent = `Complete (${tokenEstimate} tokens • ${speed} tok/s)`;
+          const hasEval = (metricEvalCount !== null && metricEvalCount !== undefined && Number(metricEvalCount) > 0);
+          const hasTps = (metricTokPerSec !== null && metricTokPerSec !== undefined && Number(metricTokPerSec) > 0);
+          const tokenCount = hasEval ? Number(metricEvalCount) : null;
+          const speed = hasTps ? Number(metricTokPerSec).toFixed(1) : null;
+          if (stats) {
+            if (tokenCount !== null && speed !== null) {
+              stats.textContent = `Complete (${tokenCount} tokens • ${speed} tok/s)`;
+            } else if (tokenCount !== null) {
+              stats.textContent = `Complete (${tokenCount} tokens)`;
+            } else {
+              stats.textContent = 'Complete (Offline Summary)';
+            }
+          }
           if (footerHtml) feed.insertAdjacentHTML('beforeend', footerHtml);
-          if (metricTokPerSec && Number(metricTokPerSec) > 0) {
+          if (hasTps) {
             document.querySelectorAll('.ai-kpi-speed').forEach(el => el.innerHTML = `${speed} <span style="font-size: 0.85rem; color: #94a3b8;">tok/s</span>`);
             document.querySelectorAll('.ai-kpi-speed-short').forEach(el => el.textContent = speed);
           }
@@ -6102,12 +6137,12 @@
         hitRatio: '--',
         savedGB: 'Awaiting telemetry',
         uniqueVisitors: '--',
-        topPop: 'Top PoP: YUL (Montreal)',
+        topPop: '--',
         threatsBlocked: '--',
-        geoShield: 'CA/US Geo-Shield',
-        edgeThreats: 'Awaiting telemetry • CA/US Shield',
-        edgeIngress: 'Active • 4 HA Connections',
-        edgePops: 'YUL (Montreal) • YYZ (Toronto)',
+        geoShield: '--',
+        edgeThreats: 'Awaiting telemetry',
+        edgeIngress: 'Awaiting telemetry',
+        edgePops: '--',
         subRequests: {
           apex: '--',
           wake: '--',
@@ -6120,7 +6155,7 @@
       };
 
       let source = cfData;
-      if (!source || typeof source !== 'object') {
+      if (source === undefined || source === null) {
         try {
           const raw = localStorage.getItem('dr_cloudflare_cache');
           if (raw) {
@@ -6128,10 +6163,12 @@
             if (parsed && typeof parsed === 'object') source = parsed;
           }
         } catch (e) {}
-      } else {
-        try {
-          localStorage.setItem('dr_cloudflare_cache', JSON.stringify(source));
-        } catch (e) {}
+      } else if (typeof source === 'object') {
+        if (source.totalRequests !== null && source.totalRequests !== undefined) {
+          try {
+            localStorage.setItem('dr_cloudflare_cache', JSON.stringify(source));
+          } catch (e) {}
+        }
       }
 
       const formatSavedGB = (val, defVal) => {
@@ -6148,19 +6185,19 @@
         }
         if (src && src.threatsBlocked !== undefined && src.threatsBlocked !== null) {
           const num = typeof src.threatsBlocked === 'number' ? src.threatsBlocked.toLocaleString() : src.threatsBlocked;
-          return `${num} Threats Neutralized • CA/US Shield`;
+          return `${num} Threats Neutralized`;
         }
         return defVal;
       };
 
       const cur = {
-        totalRequests: (source && source.totalRequests !== undefined) ? (typeof source.totalRequests === 'number' ? source.totalRequests.toLocaleString() : source.totalRequests) : defStats.totalRequests,
+        totalRequests: (source && source.totalRequests !== undefined && source.totalRequests !== null) ? (typeof source.totalRequests === 'number' ? source.totalRequests.toLocaleString() : source.totalRequests) : defStats.totalRequests,
         ingressSla: (source && source.ingressSla) ? source.ingressSla : defStats.ingressSla,
         hitRatio: (source && source.hitRatio !== undefined && source.hitRatio !== null) ? (typeof source.hitRatio === 'number' ? `${source.hitRatio}%` : (String(source.hitRatio).includes('%') ? source.hitRatio : `${source.hitRatio}%`)) : defStats.hitRatio,
         savedGB: formatSavedGB(source && source.savedGB, defStats.savedGB),
-        uniqueVisitors: (source && source.uniqueVisitors !== undefined) ? (typeof source.uniqueVisitors === 'number' ? source.uniqueVisitors.toLocaleString() : source.uniqueVisitors) : defStats.uniqueVisitors,
+        uniqueVisitors: (source && source.uniqueVisitors !== undefined && source.uniqueVisitors !== null) ? (typeof source.uniqueVisitors === 'number' ? source.uniqueVisitors.toLocaleString() : source.uniqueVisitors) : defStats.uniqueVisitors,
         topPop: (source && source.topPop) ? (String(source.topPop).includes('Top PoP') ? source.topPop : `Top PoP: ${source.topPop}`) : defStats.topPop,
-        threatsBlocked: (source && source.threatsBlocked !== undefined) ? (typeof source.threatsBlocked === 'number' ? source.threatsBlocked.toLocaleString() : source.threatsBlocked) : defStats.threatsBlocked,
+        threatsBlocked: (source && source.threatsBlocked !== undefined && source.threatsBlocked !== null) ? (typeof source.threatsBlocked === 'number' ? source.threatsBlocked.toLocaleString() : source.threatsBlocked) : defStats.threatsBlocked,
         geoShield: (source && source.geoShield) ? source.geoShield : defStats.geoShield,
         edgeThreats: formatEdgeThreats(source, defStats.edgeThreats),
         edgeIngress: (source && (source.edgeIngress || source.ingressTag)) ? (source.edgeIngress || source.ingressTag) : defStats.edgeIngress,
@@ -6169,7 +6206,7 @@
       };
 
       const formatBullet = (str) => {
-        if (!str) return '';
+        if (!str || str === '--') return str || '--';
         const clean = String(str).replace(/^(&bull;|•|\s)+/, '').trim();
         return `• ${clean}`;
       };
@@ -6217,12 +6254,10 @@
         const reqStr = String(cur.totalRequests);
         if (reqStr === '--') {
           edgeTraffic.textContent = '--';
-        } else if (reqStr.includes('•')) {
+        } else if (reqStr.includes('•') || reqStr.includes('Requests')) {
           edgeTraffic.textContent = reqStr;
-        } else if (reqStr.includes('Requests')) {
-          edgeTraffic.textContent = `${reqStr} • 0 Errors`;
         } else {
-          edgeTraffic.textContent = `${reqStr} Requests • 0 Errors`;
+          edgeTraffic.textContent = `${reqStr} Requests`;
         }
       }
 
