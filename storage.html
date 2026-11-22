@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Tiered Storage &amp; Live Data Flow - DigitalResolve</title>
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.74 - Tiered Storage &amp; Live Data Flow">
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.75 - Tiered Storage &amp; Live Data Flow">
   <link rel="stylesheet" href="styles.css?v=2.8.74">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -261,7 +261,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.74</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.75</span>)</span>
             </button>
             <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO(true, event)" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -292,9 +292,9 @@
               <div class="model-progress-bar" id="menu-progress-bar-5h" title="5-Hour Rolling Limit">
                 <div class="model-segment" id="menu-bar-5h" style="width: 0%; background: #f59e0b;"></div>
               </div>
-              <div style="margin-top: 6px; font-size: 0.68rem; color: #64748b; display: flex; justify-content: space-between;">
+              <div style="margin-top: 6px; font-size: 0.68rem; color: #64748b; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 10px;">
                 <span>Account: <span id="menu-account-user" style="color: #cbd5e1;">--</span></span>
-                <span>Claude/GPT: <span id="menu-claude-pct" style="color: #34d399; font-weight: 700;">--</span></span>
+                <span style="white-space: nowrap;">Claude/GPT: <span id="menu-claude-pct" style="color: #34d399; font-weight: 700;">--</span></span>
               </div>
             </div>
           </div>
@@ -697,12 +697,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.74</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.75</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 34,164 Lines of Code (HTML: 18,806 lines | CSS: 7,267 lines | JS: 8,090 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 34,260 Lines of Code (HTML: 18,902 lines | CSS: 7,267 lines | JS: 8,090 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">34,164</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">34,260</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -793,7 +793,7 @@
       <div class="agy-session-meta-bar" id="agy-session-meta-bar" style="display: none;">
         <div class="meta-item"><span class="meta-lbl">Session:</span> <span class="meta-val"><strong style="color: #60a5fa;" id="agy-meta-name">Detecting...</strong></span></div>
         <div class="meta-item"><span class="meta-lbl">Session ID:</span> <span id="agy-meta-cid" class="meta-val mono">--</span></div>
-        <div class="meta-item"><span class="meta-lbl">Session Tokens:</span> <span class="meta-val mono" id="modal-token-count">-- (Syncing...)</span></div>
+        <div class="meta-item"><span class="meta-lbl">AGY All-Time Tokens:</span> <span class="meta-val mono" id="modal-token-count">-- (Syncing...)</span></div>
         <div class="meta-item"><span class="meta-lbl">Model Tier:</span> <span class="meta-val" id="modal-model-val" style="color: #34d399;">Detecting model...</span></div>
         <div class="meta-item"><span class="meta-lbl">Model Breakdown:</span> <span class="meta-val" id="modal-model-breakdown">Calculating breakdown...</span></div>
         <div class="meta-item"><span class="meta-lbl">Cost Efficiency:</span> <span class="meta-val" id="modal-savings-val" style="color: #34d399;">Calculating savings...</span></div>
@@ -1298,10 +1298,22 @@
       </div>
 
             <div class="changelog-body">
-        <!-- Version v2.8.74 (Current) -->
+                <!-- Version v2.8.75 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.74 | Current</span>
+            <span class="ver-tag current">v2.8.75 | Current</span>
+            <span class="ver-date">November 22, 2026</span>
+          </div>
+          <h4 class="ver-title">3-Minute AGY Quota Sync, Clear All-Time Token Labels &amp; Dropdown Wrap Fix</h4>
+          <ul class="ver-list">
+            <li><strong>Live /usage Sync Parity:</strong> Reduced <code>Export-AgyQuota.ps1</code> <code>/usage</code> cooldown from 15m to 2.5m so every 3-minute <code>AGY-Quota-Sync</code> run refreshes Weekly &amp; 5-Hour limits without 18m lag.</li>
+            <li><strong>Clearer Scope Labels &amp; Dropdown Wrap Fix:</strong> Relabeled ribbon, card, and modal token readouts to <code>AGY Tokens (All-Time)</code> / <code>All-Time AGY Tokens</code> and prevented <code>Claude/GPT:</code> footer wrapping in the quota dropdown.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.74 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.74</span>
             <span class="ver-date">November 22, 2026</span>
           </div>
           <h4 class="ver-title">Accurate Additive AI Token Telemetry, Billions Formatting &amp; Planner-Only Transcript Sums</h4>
@@ -1789,7 +1801,7 @@
       </div>
     </div>
   </div>
-  <script src="app.js?v=2.8.74"></script>
+  <script src="app.js?v=2.8.75"></script>
   <script src="storage-flow.js?v=2.8.74"></script>
 </body>
 </html>

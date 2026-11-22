@@ -1,7 +1,22 @@
 ﻿{
-    "updatedAt":  "2026-11-22T16:22:00Z",
-    "currentVersion":  "v2.8.74",
+    "updatedAt":  "2026-11-22T16:38:00Z",
+    "currentVersion":  "v2.8.75",
     "releases":  [
+                     {
+                         "version":  "v2.8.75",
+                         "date":  "November 22, 2026",
+                         "title":  "3-Minute AGY Quota Sync, Clear All-Time Token Labels & Dropdown Wrap Fix",
+                         "changes":  [
+                                         {
+                                             "label":  "Live /usage Sync Parity",
+                                             "text":  "Reduced Export-AgyQuota.ps1 /usage cache cooldown from 15m to 2.5m so every 3-minute AGY-Quota-Sync task updates Weekly and 5-Hour limits promptly without 18-minute lag."
+                                         },
+                                         {
+                                             "label":  "Clearer All-Time Scope Labels & Dropdown Wrap Fix",
+                                             "text":  "Relabeled ribbon, card, and modal token readouts to AGY Tokens (All-Time) / All-Time AGY Tokens and added flex-wrap and nowrap styling to prevent Claude/GPT footer wrapping in the quota dropdown."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.74",
                          "date":  "November 22, 2026",
