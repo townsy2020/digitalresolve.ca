@@ -111,6 +111,12 @@
       gap: 3px;
       font-size: 0.68rem;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      background: rgba(15, 23, 42, 0.78);
+      padding: 5px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       z-index: 10;
       pointer-events: none;
     }
@@ -230,8 +236,10 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
       z-index: 10;
-      opacity: 0;
+      opacity: 0.9;
       transition: opacity 0.2s ease;
     }
     #player-wrap:hover .hud-bottom-bar,

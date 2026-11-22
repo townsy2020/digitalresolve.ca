@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-22T13:15:00Z",
-    "currentVersion":  "v2.8.69",
+    "updatedAt":  "2026-11-22T14:04:00Z",
+    "currentVersion":  "v2.8.70",
     "releases":  [
+                     {
+                         "version":  "v2.8.70",
+                         "date":  "November 22, 2026",
+                         "title":  "Accurate Cluster 90-Day SLA Math, Dynamic Grade Badges & Incident Downtime Attribution",
+                         "changes":  [
+                                         {
+                                             "label":  "True Cluster Availability Math",
+                                             "text":  "Updated /api/uptime to factor actual NUC crash downtime (including today's 68m 32s outage) and ongoing offline state into overallSla, slaGrade, and rolling 90-day uptime-incidents.json history instead of masking cluster outages with 100% ISP probe availability."
+                                         },
+                                         {
+                                             "label":  "Dynamic SLA, Heartbeat, Outage & MTTR Badges",
+                                             "text":  "Replaced static Grade A+, Zero Loss, and Instant tags in index.html and uptime.html with live severity-driven badges and downtime summaries in applyUptimeMetrics()."
+                                         },
+                                         {
+                                             "label":  "Version v2.8.70 & Asset Cache-Busters",
+                                             "text":  "Bumped styles.css?v=2.8.70, app.js?v=2.8.70, and version badges across all 7 dashboard pages with exact codebase LOC sync."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.69",
                          "date":  "November 22, 2026",

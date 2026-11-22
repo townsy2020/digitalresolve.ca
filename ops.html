@@ -7,8 +7,8 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Operations & Local AI - Homelab</title>
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.69 - Operations & Local AI - Homelab">
-  <link rel="stylesheet" href="styles.css?v=2.8.69">
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.70 - Operations & Local AI - Homelab">
+  <link rel="stylesheet" href="styles.css?v=2.8.70">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -72,7 +72,7 @@
             <a href="uptime.html#service-status" class="btn-action-item" title="Open Live Homelab Service Status Dashboard">
               <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
               <span>Live Service Status Dashboard</span>
-              <span class="item-tag online">--</span>
+              <span class="item-tag online">Live</span>
             </a>
             <a href="ops.html#nuc-services" class="btn-action-item" title="Open NUC 24/7 Telemetry &amp; Microservices Suite">
               <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 8px #10b981;"></span>
@@ -255,7 +255,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.69</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.70</span>)</span>
             </button>
             <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO(true, event)" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -425,13 +425,13 @@
               </div>
               <div class="control-group-grid">
                 <button type="button" class="btn-control" onclick="executeNodeAction('run-update-computer')" title="Execute Update-Computer.exe Optimization on Selected Target">
-                  Run Update-Computer
+                  <span>UPD</span> Run Update-Computer
                 </button>
                 <button type="button" class="btn-control" onclick="executeNodeAction('clean-junk')" title="Clean Temp Files &amp; Storage Cache on Selected Target">
-                  Clean Temp &amp; Junk
+                  <span>CLN</span> Clean Temp &amp; Junk
                 </button>
                 <button type="button" class="btn-control active-maint" id="btn-nuc-maintenance" onclick="openMaintenanceModal()" title="Toggle NUC Scheduled Maintenance Mode (Protects 90-Day SLA &amp; Uptime Statistics during updates and reboots)">
-                  <span id="btn-maint-label">Maintenance Window</span>
+                  <span>MNT</span> <span id="btn-maint-label">Maintenance Window</span>
                 </button>
                 <button type="button" class="btn-control" onclick="executeNodeAction('run-backup')" title="Trigger Cloud Disaster Recovery Backup to OneDrive">
                   <span>BAK</span> Cloud Backup (OneDrive)
@@ -585,7 +585,7 @@
               <div style="display: flex; align-items: center; gap: 10px;">
                 <span class="pulse-dot" id="edge-ai-pulse" style="background:#f59e0b;"></span>
                 <span style="font-weight: 700; color: #f8fafc; font-size: 0.88rem;">Ollama Local Inference Playground</span>
-                <span class="item-tag" id="edge-ai-badge" style="background: rgba(245, 158, 11, 0.2); color: #fde68a; margin-left: 6px;">Port 11434</span>
+                <span class="item-tag" id="edge-ai-badge" style="background: rgba(245, 158, 11, 0.2); color: #fde68a; margin-left: 6px; white-space: nowrap; flex-shrink: 0;">Port 11434</span>
               </div>
               <div style="display: flex; align-items: center; gap: 12px;">
                 <span id="ai-infer-stats" style="font-size: 0.74rem; color: #94a3b8; font-family: monospace;">Intel Core i5 &bull; Local Compute</span>
@@ -672,7 +672,7 @@
               <div class="kpi-mini-card">
                 <div class="kpi-label">Upload Speed <span>&#9650;</span></div>
                 <div class="kpi-val" id="st-val-up" style="color: #38bdf8;">-- <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span></div>
-                <div class="kpi-sub"><span class="dropdown-dot dot-1" style="background:#38bdf8;"></span> Symmetric Symmetrical Fiber</div>
+                <div class="kpi-sub"><span class="dropdown-dot dot-1" style="background:#38bdf8;"></span> Symmetrical Fiber</div>
               </div>
               <div class="kpi-mini-card purple">
                 <div class="kpi-label">Latency &amp; Jitter <span>&#8644;</span></div>
@@ -976,12 +976,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.69</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.70</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 29,234 Lines of Code (HTML: 15,927 lines | CSS: 6,349 lines | JS: 6,957 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 30,035 Lines of Code (HTML: 16,451 lines | CSS: 6,546 lines | JS: 7,037 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">29,684</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">30,035</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1576,10 +1576,24 @@
       </div>
 
             <div class="changelog-body">
-        <!-- Version v2.8.69 (Current) -->
+        <!-- Version v2.8.70 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.69 | Current</span>
+            <span class="ver-tag current">v2.8.70 | Current</span>
+            <span class="ver-date">November 22, 2026</span>
+          </div>
+          <h4 class="ver-title">Accurate Cluster 90-Day SLA Math, Dynamic Grade Badges &amp; Incident Downtime Attribution</h4>
+          <ul class="ver-list">
+            <li><strong>True Cluster Availability Math:</strong> Updated <code>/api/uptime</code> to factor actual NUC crash downtime (including today's <code>68m 32s</code> outage) and ongoing offline state into <code>overallSla</code>, <code>slaGrade</code>, and rolling 90-day <code>uptime-incidents.json</code> history instead of masking cluster outages with 100% ISP probe availability.</li>
+            <li><strong>Dynamic SLA, Heartbeat, Outage &amp; MTTR Badges:</strong> Replaced static <code>Grade A+</code>, <code>Zero Loss</code>, and <code>Instant</code> tags in <code>index.html</code> and <code>uptime.html</code> with live severity-driven badges and downtime summaries in <code>applyUptimeMetrics()</code>.</li>
+            <li><strong>Version v2.8.70 &amp; Asset Cache-Busters:</strong> Bumped <code>styles.css?v=2.8.70</code>, <code>app.js?v=2.8.70</code>, and version badges across all 7 dashboard pages with exact codebase LOC sync.</li>
+          </ul>
+        </div>
+
+        <!-- Version v2.8.69 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.69</span>
             <span class="ver-date">November 22, 2026</span>
           </div>
           <h4 class="ver-title">Cloudflare Access Credentials, ISP Telemetry Helper, Uptime dailyHistory &amp; HiDPI Ping Sparkline</h4>
@@ -2001,6 +2015,6 @@
       </div>
     </div>
   </div>
-  <script src="app.js?v=2.8.69"></script>
+  <script src="app.js?v=2.8.70"></script>
 </body>
 </html>

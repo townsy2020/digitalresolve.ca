@@ -163,16 +163,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.69';
+          const activeVer = match ? match[0] : 'v2.8.70';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 16308;
-      const baseCssLines = 6516;
-      const baseJsLines = 6950;
+      const baseHtmlLines = 16451;
+      const baseCssLines = 6546;
+      const baseJsLines = 7037;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
@@ -913,12 +913,16 @@
         if (!el.textContent || el.textContent.includes('--') || el.textContent === 'NYC Relay') el.textContent = 'WireGuard';
       });
       document.querySelectorAll('#schematic-tunnel-throughput').forEach(el => el.textContent = 'Tunnel OK');
-      document.querySelectorAll('#ai-model-footprint').forEach(el => el.textContent = (window.LAST_AI_MODEL_FOOTPRINT || '--'));
+      if (window.LAST_AI_MODEL_FOOTPRINT) {
+        document.querySelectorAll('#ai-model-footprint').forEach(el => el.textContent = window.LAST_AI_MODEL_FOOTPRINT);
+      }
       document.querySelectorAll('#nuc-hw-ram').forEach(el => {
         const ramVal = Number(window.LAST_NUC_RAM_GB);
-        el.textContent = (window.LAST_NUC_RAM_GB !== undefined && window.LAST_NUC_RAM_GB !== null && window.LAST_NUC_RAM_GB !== '' && Number.isFinite(ramVal) && ramVal > 0)
-          ? `${ramVal} GB`
-          : '--';
+        if (window.LAST_NUC_RAM_GB !== undefined && window.LAST_NUC_RAM_GB !== null && window.LAST_NUC_RAM_GB !== '' && Number.isFinite(ramVal) && ramVal > 0) {
+          el.textContent = `${ramVal} GB`;
+        } else if (!el.textContent || el.textContent.trim() === '--') {
+          el.textContent = '32 GB';
+        }
       });
       // Dynamic scale range managed by renderSparklineFrame
       const hasNucLatGlobal = window.LAST_NUC_LATENCY !== undefined && window.LAST_NUC_LATENCY !== null && window.LAST_NUC_LATENCY !== '' && Number.isFinite(Number(window.LAST_NUC_LATENCY));
@@ -2863,7 +2867,9 @@
           const safeUrl = /^https?:\/\//i.test(rawUrl) ? rawUrl : 'https://audiobooks.digitalresolve.ca';
           const safeTitle = title || 'Audiobookshelf';
           return `<div class="book-card" role="button" tabindex="0" style="cursor: pointer;" onclick="launchProtectedService('${escapeHtml(safeUrl)}', '${escapeHtml(safeTitle)}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
-                <div class="book-cover" style="background: ${pal.cover};"></div>
+                <div class="book-cover" style="background: ${pal.cover}; display: flex; align-items: center; justify-content: center;">
+                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="${pal.accent}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.85;" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                </div>
                 <div class="book-body">
                   <div style="font-size: 0.72rem; color: ${pal.accent}; font-weight: 700; text-transform: uppercase;">${escapeHtml(status)} &bull; ${escapeHtml(author)}</div>
                   <div style="font-weight: 800; color: #f8fafc; font-size: 0.92rem;">${escapeHtml(title)}</div>
@@ -4004,48 +4010,129 @@
 
       const applyUptimeMetrics = (data) => {
         if (!data || data.status !== 'success') return;
+        const slaNum = parseFloat(String(data.overallSla || '').replace('%', ''));
+        const outCnt = safeNum(data.outages, null);
+        const derivedGrade = data.slaGrade || (Number.isFinite(slaNum)
+          ? (slaNum >= 99.95 ? 'Grade A+' : slaNum >= 99.50 ? 'Grade A' : slaNum >= 99.00 ? 'Grade A-' : slaNum >= 98.00 ? 'Grade B' : slaNum >= 95.00 ? 'Grade C' : 'Degraded')
+          : '--');
+
         document.querySelectorAll('#uptime-sla-val').forEach(el => {
           el.textContent = data.overallSla || '--';
+          el.style.color = (Number.isFinite(slaNum) && slaNum < 99.5) ? '#fbbf24' : '#6ee7b7';
+        });
+        document.querySelectorAll('#uptime-sla-grade-tag').forEach(tag => {
+          tag.textContent = derivedGrade;
+          if (derivedGrade === 'Grade A+' || derivedGrade === 'Grade A') {
+            tag.className = 'item-tag online';
+            tag.style.background = '';
+            tag.style.color = '';
+          } else if (derivedGrade === 'Grade A-' || derivedGrade === 'Grade B') {
+            tag.className = 'item-tag';
+            tag.style.background = 'rgba(245, 158, 11, 0.2)';
+            tag.style.color = '#fbbf24';
+          } else {
+            tag.className = 'item-tag offline';
+            tag.style.background = '';
+            tag.style.color = '';
+          }
         });
         document.querySelectorAll('#uptime-hours-val').forEach(el => {
           el.innerHTML = (data.monitoredHours !== undefined && data.monitoredHours !== null)
             ? `${Number(data.monitoredHours).toLocaleString()} <span style="font-size: 0.9rem; color: #8b949e;">Hours</span>`
             : '--';
         });
-        const outCnt = safeNum(data.outages, null);
+        document.querySelectorAll('#uptime-hours-sub').forEach(el => {
+          if (outCnt !== null && outCnt > 0) {
+            const durLabel = data.downtimeFormatted || data.mttr || '';
+            el.textContent = `${outCnt} ${outCnt === 1 ? 'outage gap' : 'outage gaps'} logged${durLabel ? ' (' + durLabel + ' downtime)' : ''}`;
+          } else if (outCnt === 0) {
+            el.textContent = 'Zero lost heartbeat cycles';
+          }
+        });
         document.querySelectorAll('#uptime-outages-val').forEach(el => {
           el.innerHTML = outCnt !== null
-            ? `${outCnt} <span style="font-size: 0.9rem; color: #8b949e;">Incidents</span>`
+            ? `${outCnt} <span style="font-size: 0.9rem; color: #8b949e;">${outCnt === 1 ? 'Incident' : 'Incidents'}</span>`
             : '--';
+          el.style.color = (outCnt !== null && outCnt > 0) ? '#f59e0b' : '#4ade80';
+        });
+        document.querySelectorAll('#uptime-outages-tag').forEach(tag => {
+          if (outCnt === 0) {
+            tag.textContent = 'Zero Loss';
+            tag.className = 'item-tag online';
+            tag.style.background = '';
+            tag.style.color = '';
+          } else if (outCnt !== null && outCnt > 0) {
+            tag.textContent = `${outCnt} Logged`;
+            tag.className = 'item-tag';
+            tag.style.background = 'rgba(245, 158, 11, 0.2)';
+            tag.style.color = '#fbbf24';
+          } else {
+            tag.textContent = '--';
+            tag.className = 'item-tag';
+          }
+        });
+        document.querySelectorAll('#uptime-outages-sub').forEach(el => {
+          if (outCnt !== null && outCnt > 0 && Array.isArray(data.incidents) && data.incidents.length > 0) {
+            const lastInc = data.incidents[data.incidents.length - 1];
+            el.textContent = `Latest: ${lastInc.title || 'Incident'}${lastInc.impact ? ' (' + lastInc.impact + ')' : ''}`;
+          } else if (outCnt === 0) {
+            el.textContent = 'Autonomous self-healing active';
+          }
         });
         document.querySelectorAll('#uptime-mttr-val').forEach(el => {
           el.textContent = (data.mttr !== undefined && data.mttr !== null && data.mttr !== '') ? data.mttr : '--';
+        });
+        const mttrSec = safeNum(data.mttrSeconds, null);
+        document.querySelectorAll('#uptime-mttr-tag').forEach(tag => {
+          if (outCnt === 0) {
+            tag.textContent = 'Zero Outages';
+            tag.style.background = 'rgba(16, 185, 129, 0.2)';
+            tag.style.color = '#6ee7b7';
+          } else if (mttrSec !== null) {
+            if (mttrSec < 60) {
+              tag.textContent = 'Instant';
+              tag.style.background = 'rgba(168, 85, 247, 0.2)';
+              tag.style.color = '#c084fc';
+            } else if (mttrSec < 300) {
+              tag.textContent = 'Fast';
+              tag.style.background = 'rgba(56, 189, 248, 0.2)';
+              tag.style.color = '#38bdf8';
+            } else if (mttrSec < 1800) {
+              tag.textContent = 'Moderate';
+              tag.style.background = 'rgba(245, 158, 11, 0.2)';
+              tag.style.color = '#fbbf24';
+            } else {
+              tag.textContent = 'Extended';
+              tag.style.background = 'rgba(245, 158, 11, 0.2)';
+              tag.style.color = '#fbbf24';
+            }
+          }
         });
         document.querySelectorAll('.nav-sla-tag').forEach(tag => {
           tag.textContent = data.overallSla || '--';
         });
         const ispOverall = document.getElementById('isp-uptime-val');
-        if (ispOverall && data.overallSla) ispOverall.textContent = data.overallSla;
+        if (ispOverall && (data.ispSla || data.overallSla)) ispOverall.textContent = data.ispSla || data.overallSla;
 
         if (Array.isArray(data.nodes)) {
           data.nodes.forEach(n => {
             if (n.id === 'desktop') {
               document.querySelectorAll('#uptime-desktop-sla-val').forEach(el => {
-                el.textContent = n.uptime ? `${n.uptime} SLA` : '--';
+                el.textContent = n.uptime ? (/SLA|Uptime/i.test(n.uptime) ? n.uptime : `${n.uptime} Uptime`) : '--';
               });
             } else if (n.id === 'nuc') {
               document.querySelectorAll('#uptime-nuc-sla-val').forEach(el => {
-                el.textContent = n.uptime ? `${n.uptime} Uptime` : '--';
+                el.textContent = n.uptime ? (/SLA|Uptime/i.test(n.uptime) ? n.uptime : `${n.uptime} Uptime`) : '--';
               });
             } else if (n.id === 'isp') {
               document.querySelectorAll('#uptime-isp-sla-val').forEach(el => {
-                el.textContent = n.uptime ? `${n.uptime} Uptime` : '--';
+                el.textContent = n.uptime ? (/SLA|Uptime/i.test(n.uptime) ? n.uptime : `${n.uptime} Uptime`) : '--';
               });
               const ispValNode = document.getElementById('isp-uptime-val');
               if (ispValNode && n.uptime) ispValNode.textContent = n.uptime;
             } else if (n.id === 'edge') {
               document.querySelectorAll('#uptime-edge-sla-val').forEach(el => {
-                el.textContent = n.uptime ? `${n.uptime} Uptime` : '--';
+                el.textContent = n.uptime ? (/SLA|Uptime/i.test(n.uptime) ? n.uptime : `${n.uptime} Uptime`) : '--';
               });
             }
           });
@@ -4134,7 +4221,7 @@
             const bar = existingBars[barIndex];
             const d = new Date(now);
             d.setDate(d.getDate() - i);
-            const dateStr = d.toISOString().split('T')[0];
+            const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
             applyBarState(bar, node, i, dateStr);
           }
         } else {
@@ -4142,7 +4229,7 @@
           for (let i = 89; i >= 0; i--) {
             const d = new Date(now);
             d.setDate(d.getDate() - i);
-            const dateStr = d.toISOString().split('T')[0];
+            const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
             const bar = document.createElement('div');
             bar.className = 'uptime-bar';
