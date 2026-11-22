@@ -163,16 +163,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.73';
+          const activeVer = match ? match[0] : 'v2.8.74';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 18718;
+      const baseHtmlLines = 18806;
       const baseCssLines = 7267;
-      const baseJsLines = 8067;
+      const baseJsLines = 8090;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
@@ -183,7 +183,7 @@
         fetch('storage-flow.js?_t=' + Date.now(), { signal: _fetchSig(6000) }).then(r => r.ok ? r.text() : null).catch(() => null)
       ]).then(([cssSrc, jsSrc, sfSrc]) => {
         const cLines = cssSrc ? cssSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : baseCssLines;
-        const jLines = (jsSrc ? jsSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : 7178) + (sfSrc ? sfSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : 889);
+        const jLines = (jsSrc ? jsSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : 7201) + (sfSrc ? sfSrc.replace(/\r?\n$/, '').split(/\r?\n/).length : 889);
         const total = baseHtmlLines + cLines + jLines + baseCnameLines;
         const totalFormatted = total.toLocaleString();
 
@@ -2598,6 +2598,7 @@
     }
     function formatTokenNumber(num) {
       if (!num || isNaN(num)) return '0';
+      if (num >= 1000000000) return (num / 1000000000).toFixed(2) + 'B';
       if (num >= 1000000) return (num / 1000000).toFixed(2) + 'M';
       if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
       return Number(num).toLocaleString();
@@ -2609,11 +2610,16 @@
         metrics = getLiveTokenMetrics();
       } else {
         const defMetrics = getLiveTokenMetrics() || {};
+        const inResolved = Number(metrics.input !== undefined ? metrics.input : (metrics.inputTokens || defMetrics.inputTokens)) || 0;
+        const outResolved = Number(metrics.output !== undefined ? metrics.output : (metrics.outputTokens || defMetrics.outputTokens)) || 0;
+        const cacheResolved = Number(metrics.cache !== undefined ? metrics.cache : (metrics.cacheTokens || defMetrics.cacheTokens)) || 0;
         const parsed = {
-          inputTokens: metrics.input !== undefined ? metrics.input : (metrics.inputTokens || defMetrics.inputTokens),
-          outputTokens: metrics.output !== undefined ? metrics.output : (metrics.outputTokens || defMetrics.outputTokens),
-          cacheTokens: metrics.cache !== undefined ? metrics.cache : (metrics.cacheTokens || defMetrics.cacheTokens),
-          totalTokens: metrics.total !== undefined ? metrics.total : (metrics.totalTokens || ((metrics.input || defMetrics.inputTokens || 0) + (metrics.output || defMetrics.outputTokens || 0))),
+          inputTokens: inResolved,
+          outputTokens: outResolved,
+          cacheTokens: cacheResolved,
+          uncachedTokens: metrics.uncachedTotal !== undefined ? Number(metrics.uncachedTotal) : (inResolved + outResolved),
+          grandTotalTokens: metrics.grandTotal !== undefined ? Number(metrics.grandTotal) : (inResolved + outResolved + cacheResolved),
+          totalTokens: metrics.grandTotal !== undefined ? Number(metrics.grandTotal) : (inResolved + outResolved + cacheResolved),
           model: metrics.model || defMetrics.model,
           efficiency: metrics.efficiency || defMetrics.efficiency,
           breakdown: metrics.breakdown || defMetrics.breakdown,
@@ -2635,37 +2641,31 @@
       }
       if (!metrics) return;
 
-      const totalFmt = formatTokenNumber(metrics.totalTokens);
-      const inFmt = formatTokenNumber(metrics.inputTokens);
-      const outFmt = formatTokenNumber(metrics.outputTokens);
-      const cacheFmt = formatTokenNumber(metrics.cacheTokens);
-      const totalTokRaw = metrics.totalTokens;
-      const fullTotalStr = (totalTokRaw !== null && totalTokRaw !== undefined && totalTokRaw !== '' && Number.isFinite(Number(totalTokRaw))) ? Number(totalTokRaw).toLocaleString() : '--';
-
-      // Dynamic live breakdown calculation to 2 decimal places (Real-time Transcript Ingestion)
+      // Dynamic live breakdown calculation (Fresh uncached vs Context Cache Reused, additive headline = grandTotal)
       const inTok = Number(metrics.inputTokens) || 0;
       const outTok = Number(metrics.outputTokens) || 0;
       const cacheTok = Number(metrics.cacheTokens) || 0;
-      const totalTokens = Number(metrics.totalTokens) || (inTok + outTok);
+      const uncachedTok = inTok + outTok;
+      const grandTotalTok = (inTok + outTok + cacheTok) > 0
+        ? (inTok + outTok + cacheTok)
+        : (Number(metrics.grandTotalTokens || metrics.totalTokens) || 0);
 
-      let flashPctNum = (totalTokens > 0) ? ((inTok / totalTokens) * 100) : 0;
-      let proPctNum = (totalTokens > 0) ? ((outTok / totalTokens) * 100) : 0;
+      const totalFmt = formatTokenNumber(grandTotalTok);
+      const uncachedFmt = formatTokenNumber(uncachedTok);
+      const inFmt = formatTokenNumber(inTok);
+      const outFmt = formatTokenNumber(outTok);
+      const cacheFmt = formatTokenNumber(cacheTok);
+      const fullTotalStr = (Number.isFinite(grandTotalTok) && grandTotalTok > 0) ? grandTotalTok.toLocaleString() : '--';
+      const breakdownTip = `Total Processed: ${fullTotalStr} = ${uncachedFmt} Fresh (${inFmt} New In + ${outFmt} Out) + ${cacheFmt} Cached`;
+
+      const flashPctNum = (uncachedTok > 0) ? ((inTok / uncachedTok) * 100) : 0;
+      const proPctNum = (uncachedTok > 0) ? ((outTok / uncachedTok) * 100) : 0;
       const contextTotal = cacheTok + inTok;
-      let cachePctNum = (contextTotal > 0) ? ((cacheTok / contextTotal) * 100) : 0;
+      const cachePctNum = (contextTotal > 0) ? ((cacheTok / contextTotal) * 100) : 0;
 
-      if (metrics.breakdown && metrics.breakdown.flash && metrics.breakdown.flash.percent !== undefined) {
-        flashPctNum = Number(metrics.breakdown.flash.percent);
-      }
-      if (metrics.breakdown && metrics.breakdown.pro && metrics.breakdown.pro.percent !== undefined) {
-        proPctNum = Number(metrics.breakdown.pro.percent);
-      }
-      if (metrics.breakdown && metrics.breakdown.cache && metrics.breakdown.cache.percent !== undefined) {
-        cachePctNum = Number(metrics.breakdown.cache.percent);
-      }
-
-      const flashPct = flashPctNum.toFixed(2);
-      const proPct = proPctNum.toFixed(2);
-      const cachePct = cachePctNum.toFixed(2);
+      const flashPct = flashPctNum.toFixed(1);
+      const proPct = proPctNum.toFixed(1);
+      const cachePct = cachePctNum.toFixed(1);
 
       // Cost Efficiency Calculation (Frontier Pro Rates vs Flash Rates + Context Cache Savings)
       const proEquiv = ((inTok * 2.50) + (outTok * 10.00)) / 1000000;
@@ -2678,17 +2678,20 @@
 
       // Update Header Button
       const headerCount = document.getElementById('header-token-count');
-      if (headerCount) headerCount.textContent = totalFmt;
+      if (headerCount) {
+        headerCount.textContent = totalFmt;
+        headerCount.title = breakdownTip;
+      }
 
       const headerBtn = document.getElementById('header-token-btn');
       if (headerBtn) {
-        headerBtn.title = `Live AI Token Consumption: ${totalFmt} Tokens (Prompt In: ${flashPct}% | Output: ${proPct}% | ${cacheFmt} Context Cache Reused) | ${savingsLabel}`;
+        headerBtn.title = `${breakdownTip} • ${cachePct}% Cache Hit | ${savingsLabel}`;
       }
 
       const hFlash = document.getElementById('header-tag-flash');
       if (hFlash) {
-        hFlash.textContent = `In: ${inFmt}`;
-        hFlash.title = `Prompt Input: ${inFmt} tokens (${flashPct}%)`;
+        hFlash.textContent = `New In: ${inFmt}`;
+        hFlash.title = `Uncached Input: ${inFmt} tokens (${flashPct}% of fresh tokens)`;
       }
       const hArgon = document.getElementById('header-tag-argon');
       if (hArgon) {
@@ -2698,70 +2701,90 @@
       if (hPro) {
         hPro.style.display = 'inline-flex';
         hPro.textContent = `Out: ${outFmt}`;
-        hPro.title = `Completion Output: ${outFmt} tokens (${proPct}%)`;
+        hPro.title = `Completion Output: ${outFmt} tokens (${proPct}% of fresh tokens)`;
       }
 
       // Update Status Ribbon
       const ribbonVal = document.getElementById('ribbon-token-val');
-      if (ribbonVal) ribbonVal.textContent = totalFmt;
+      if (ribbonVal) {
+        ribbonVal.textContent = totalFmt;
+        ribbonVal.title = breakdownTip;
+      }
 
       const rFlash = document.getElementById('ribbon-flash');
-      if (rFlash) rFlash.textContent = `${inFmt} In (${flashPct}%)`;
+      if (rFlash) {
+        rFlash.textContent = `${inFmt} New In`;
+        rFlash.title = `Uncached New Input: ${inFmt} (${flashPct}% of ${uncachedFmt} fresh)`;
+      }
       const rArgon = document.getElementById('ribbon-argon');
       if (rArgon) rArgon.style.display = 'none';
       const rCache = document.getElementById('ribbon-cache');
-      if (rCache) rCache.textContent = `${cacheFmt} Cached`;
+      if (rCache) {
+        rCache.textContent = `${cacheFmt} Cached`;
+        rCache.title = `Context Cache Reused: ${cacheTok.toLocaleString()} tokens (${cachePct}% cache hit)`;
+      }
       const rPro = document.getElementById('ribbon-pro');
       if (rPro) {
         rPro.style.display = 'inline';
         rPro.style.color = '#c084fc';
         rPro.style.fontWeight = '600';
-        rPro.textContent = `${outFmt} Out (${proPct}%)`;
+        rPro.textContent = `${outFmt} Out`;
+        rPro.title = `Completion Output: ${outFmt} (${proPct}% of ${uncachedFmt} fresh)`;
       }
 
       const rSavings = document.getElementById('ribbon-token-savings');
-      if (rSavings) { rSavings.textContent = `${cachePct}% Cache Hit`; rSavings.title = `Context Cache Hit Rate: ${cacheFmt} tokens reused from prompt cache (${cachePct}%)`; }
+      if (rSavings) { rSavings.textContent = `${cachePct}% Cache Hit`; rSavings.title = breakdownTip; }
 
       // Update Terminal Deck
       const termVal = document.getElementById('term-token-val');
-      if (termVal) termVal.textContent = fullTotalStr;
+      if (termVal) {
+        termVal.textContent = fullTotalStr;
+        termVal.title = breakdownTip;
+      }
 
       const tFlash = document.getElementById('term-tag-flash');
-      if (tFlash) tFlash.textContent = `In: ${inFmt} (${flashPct}%)`;
+      if (tFlash) tFlash.textContent = `New In: ${inFmt}`;
       const tPro = document.getElementById('term-tag-pro');
       if (tPro) {
         tPro.style.display = 'inline-flex';
-        tPro.textContent = `Out: ${outFmt} (${proPct}%)`;
+        tPro.textContent = `Out: ${outFmt}`;
       }
       const tArgon = document.getElementById('term-tag-argon');
       if (tArgon) tArgon.style.display = 'none';
       const tCache = document.getElementById('term-tag-cache');
-      if (tCache) tCache.textContent = `Cache: ${cacheFmt}`;
+      if (tCache) tCache.textContent = `Cached: ${cacheFmt}`;
 
       // Update Modal
       const modalVal = document.getElementById('modal-token-count');
-      if (modalVal) modalVal.textContent = `${fullTotalStr} (In: ${inFmt} | Out: ${outFmt})`;
+      if (modalVal) {
+        modalVal.textContent = `${fullTotalStr} (Fresh: ${uncachedFmt} | Cached: ${cacheFmt})`;
+        modalVal.title = breakdownTip;
+      }
 
       const modalBreakdown = document.getElementById('modal-model-breakdown');
       if (modalBreakdown) {
-        modalBreakdown.innerHTML = `<span style="color: #38bdf8; font-weight: 600;">Prompt In: ${flashPct}% (${formatTokenNumber(inTok)})</span> &bull; <span style="color: #c084fc; font-weight: 600;">Output: ${proPct}% (${formatTokenNumber(outTok)})</span> &bull; <span style="color: #34d399; font-weight: 600;">Cache: ${cacheFmt} Reused (${cachePct}%)</span>`;
+        modalBreakdown.innerHTML = `<span style="color: #38bdf8; font-weight: 600;">${inFmt} New In</span> &bull; <span style="color: #c084fc; font-weight: 600;">${outFmt} Out</span> &bull; <span style="color: #34d399; font-weight: 600;">${cacheFmt} Cached (${cachePct}% Hit)</span>`;
       }
 
       const modalSavings = document.getElementById('modal-savings-val');
       if (modalSavings) {
-        modalSavings.innerHTML = `<strong style="color: #4ade80;">${cachePct}% Cache Hit Rate</strong> (${cacheFmt} tokens reused from prompt cache)`;
+        modalSavings.innerHTML = `<strong style="color: #4ade80;">${cachePct}% Cache Hit Rate</strong> (${cacheFmt} cached of ${totalFmt} total; ${uncachedFmt} fresh)`;
       }
 
       // Update App Card
       const appTokens = document.getElementById('app-card-tokens');
-      if (appTokens) appTokens.textContent = fullTotalStr;
+      if (appTokens) {
+        appTokens.textContent = fullTotalStr;
+        appTokens.title = breakdownTip;
+      }
 
       const appModels = document.getElementById('app-card-models');
       if (appModels) {
-        appModels.innerHTML = `<span style="color: #38bdf8; font-weight: 600;">${inFmt} Prompt In (${flashPct}%)</span> &bull; <span style="color: #c084fc; font-weight: 600;">${outFmt} Output (${proPct}%)</span> &bull; <span style="color: #34d399; font-weight: 600;">${cacheFmt} Cached</span>`;
+        appModels.innerHTML = `<span style="color: #38bdf8; font-weight: 600;">${inFmt} New In</span> &bull; <span style="color: #c084fc; font-weight: 600;">${outFmt} Out</span> &bull; <span style="color: #34d399; font-weight: 600;">${cacheFmt} Cached (${cachePct}% Hit)</span>`;
       }
       document.querySelectorAll('#app-card-tokens-port').forEach(el => {
         el.textContent = totalFmt;
+        el.title = breakdownTip;
       });
       document.querySelectorAll('#modal-model-val').forEach(el => {
         if (metrics.model) el.textContent = metrics.model;

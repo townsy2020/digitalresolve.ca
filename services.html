@@ -7,8 +7,8 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Services - Self-Hosted Homelab Portfolio</title>
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.73 - Services - Self-Hosted Homelab Portfolio">
-  <link rel="stylesheet" href="styles.css?v=2.8.73">
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.74 - Services - Self-Hosted Homelab Portfolio">
+  <link rel="stylesheet" href="styles.css?v=2.8.74">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -261,7 +261,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.73</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.74</span>)</span>
             </button>
             <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO(true, event)" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -467,7 +467,7 @@
               </div>
             </div>
             <div class="app-card-footer">
-              <span class="app-port">Gateway: <span id="app-card-tokens-port">8082</span></span>
+              <span class="app-port">Processed: <span id="app-card-tokens-port">Syncing</span></span>
               <span class="app-btn-launch" style="color: #fbbf24;">View Session &rarr;</span>
             </div>
           </div>
@@ -577,12 +577,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.73</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.74</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 34,053 Lines of Code (HTML: 18,718 lines | CSS: 7,267 lines | JS: 8,067 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 34,164 Lines of Code (HTML: 18,806 lines | CSS: 7,267 lines | JS: 8,090 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">34,053</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">34,164</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1178,11 +1178,22 @@
       </div>
 
             <div class="changelog-body">
-                                                <!-- Version v2.8.73 (Current) -->
+        <!-- Version v2.8.74 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.73 | Current</span>
+            <span class="ver-tag current">v2.8.74 | Current</span>
             <span class="ver-date">November 22, 2026</span>
+          </div>
+          <h4 class="ver-title">Accurate Additive AI Token Telemetry, Billions Formatting &amp; Planner-Only Transcript Sums</h4>
+          <ul class="ver-list">
+            <li><strong>Planner-Only Transcript Aggregation &amp; Additive Headline:</strong> Filtered <code>Export-AgyQuota.ps1</code> to sum only model <code>PLANNER_RESPONSE</code> turns (removing phantom tool-output counts) and emit additive <code>grandTotal</code> alongside <code>uncachedTotal</code>.</li>
+            <li><strong>Billions Formatting &amp; Clear Cache Math:</strong> Updated <code>formatTokenNumber()</code> in <code>app.js</code> for <code>B</code>-scale counts (<code>1.20B</code> instead of <code>1206.89M</code>), aligned <code>updateTokenCounterUI()</code> to show additive <code>New In</code> + <code>Out</code> + <code>Cached</code> = total, and replaced <code>Gateway: 8082</code> on the AGY card with <code>Processed:</code>.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.73 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.73</span>            <span class="ver-date">November 22, 2026</span>
           </div>
           <h4 class="ver-title">Tiered Storage &amp; Live Data Flow Schematic, 8-Tab Navbar &amp; Pipeline Inspector</h4>
           <ul class="ver-list">
@@ -1658,6 +1669,6 @@
       </div>
     </div>
   </div>
-  <script src="app.js?v=2.8.73"></script>
+  <script src="app.js?v=2.8.74"></script>
 </body>
 </html>
