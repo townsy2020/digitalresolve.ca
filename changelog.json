@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-22T07:30:00Z",
-    "currentVersion":  "v2.8.67",
+    "updatedAt":  "2026-11-22T07:45:00Z",
+    "currentVersion":  "v2.8.68",
     "releases":  [
+                     {
+                         "version":  "v2.8.68",
+                         "date":  "November 22, 2026",
+                         "title":  "Form Control Accessibility, Standalone Camera Focus/Skip Links & Exact LOC Sync",
+                         "changes":  [
+                                         {
+                                             "label":  "Form Control ARIA & Focus Ring Fixes",
+                                             "text":  "Added aria-label=\"Ask Edge AI a question\" to #edge-ai-input on index.html and ops.html, removed inline outline: none from #quick-magnet-target on index.html, and added aria-label=\"Target node for magnet download\" so unlabelled form controls across all 9 pages = 0."
+                                         },
+                                         {
+                                             "label":  "Standalone WebRTC/AI Focus & Skip Links",
+                                             "text":  "Added :focus-visible outline rules, .skip-to-content styling, skip-to-content links, and id=\"main-content\" landmarks to webrtc.html and ai.html with 100% SHA-256 NUC mirror parity."
+                                         },
+                                         {
+                                             "label":  "Version v2.8.68 & Exact LOC Sync",
+                                             "text":  "Bumped styles.css?v=2.8.68, app.js?v=2.8.68, meta descriptions, menu/footer version badges, and static changelog fallback to v2.8.68 across all 7 dashboard pages with recalculated exact codebase LOC."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.67",
                          "date":  "November 22, 2026",
