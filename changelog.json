@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-22T00:15:50Z",
-    "currentVersion":  "v2.8.56",
+    "updatedAt":  "2026-11-22T00:50:00Z",
+    "currentVersion":  "v2.8.57",
     "releases":  [
+                     {
+                         "version":  "v2.8.57",
+                         "date":  "November 21, 2026",
+                         "title":  "Live NUC Ollama Edge AI, Real WAN Probes, Honest Telemetry Fallbacks \u0026 Operations Hardening",
+                         "changes":  [
+                                         {
+                                             "label":  "Live NUC Ollama Chat \u0026 Real WAN Speedprobe",
+                                             "text":  "Added an SSO/admin-gated POST /api/ai/chat gateway proxy backed by llama3.2:3b on NUC port 11434 and wired the Edge AI console and Gigabit WAN test to real backend execution and chronological ISP telemetry."
+                                         },
+                                         {
+                                             "label":  "Honest Fallbacks \u0026 UI Bug Fixes",
+                                             "text":  "Replaced stale disk, swarm, Cloudflare, feeder, and sparkline placeholders with explicit telemetry-pending states, wired hero status pill updates and reboot confirmation prompts, fixed the Chaos Lab Desktop MAC and split-horizon StreamHub label, and filtered bird/sheep pet boxes in ai.html."
+                                         },
+                                         {
+                                             "label":  "NUC Media, Prowlarr \u0026 Ops Reliability",
+                                             "text":  "Resolved active Audiobookshelf library UUIDs dynamically, excluded slow/failing indexers cleanly from RSS generators, preserved torrent piece files in post-processing, and tightened atomic temp writes and cross-host watchdogs."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.56",
                          "date":  "November 21, 2026",

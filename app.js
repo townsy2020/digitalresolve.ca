@@ -163,16 +163,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.56';
+          const activeVer = match ? match[0] : 'v2.8.57';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 15467;
+      const baseHtmlLines = 15558;
       const baseCssLines = 6349;
-      const baseJsLines = 6771;
+      const baseJsLines = 6801;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
@@ -624,14 +624,13 @@
         if (feedbackEl) feedbackEl.textContent = `Dispatching Sleep Standby signal to ${targetName}...`;
         sendSleep(target);
       } else if (action === 'reboot') {
-        if (feedbackEl) feedbackEl.textContent = `Dispatching Reboot instruction to ${targetName}...`;
-        if (typeof sendControl === 'function') {
+        if (feedbackEl) feedbackEl.textContent = `Awaiting confirmation to reboot ${targetName}...`;
+        if (target === 'nuc' && typeof confirmRebootNuc === 'function') {
+          confirmRebootNuc();
+        } else if (target === 'desktop' && typeof confirmRebootDesktop === 'function') {
+          confirmRebootDesktop();
+        } else if (confirm(`Are you sure you want to gracefully reboot ${targetName}?`)) {
           sendControl('reboot', target);
-        } else {
-          fetch(`${GATEWAY}/api/control?action=reboot&target=${encodeURIComponent(target)}`, { method: 'POST', credentials: 'include', headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }), body: '{}', signal: _fetchSig(8000) })
-            .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-            .then(() => showToast('info', 'Reboot Dispatched', `Reboot signal sent to ${targetName}.`))
-            .catch(() => showToast('error', 'Reboot Error', `Could not reach ${GATEWAY}`));
         }
       }
     }
@@ -920,36 +919,56 @@
         if (!el.textContent || el.textContent.includes('--')) el.textContent = (window.DESKTOP_IS_ONLINE !== false) ? '2.5 Gbps' : 'Standby';
       });
       document.querySelectorAll('#schematic-storage-capacity').forEach(el => {
-        if (!el.textContent || el.textContent.includes('--')) {
-          const freeG = (window.LAST_NUC_DISK && window.LAST_NUC_DISK.freeGB) ? window.LAST_NUC_DISK.freeGB : 489.2;
-          const usedP = (window.LAST_NUC_DISK && window.LAST_NUC_DISK.usedPercent) ? window.LAST_NUC_DISK.usedPercent : 73.7;
+        if (window.LAST_NUC_DISK && typeof window.LAST_NUC_DISK.freeGB === 'number') {
+          const freeG = window.LAST_NUC_DISK.freeGB;
+          const usedP = (typeof window.LAST_NUC_DISK.usedPercent === 'number') ? window.LAST_NUC_DISK.usedPercent : '--';
           el.textContent = `Capacity: ${freeG} GB Free (${usedP}% Used)`;
+        } else if (!el.textContent || el.textContent.includes('--') || el.textContent.includes('Capacity:')) {
+          el.textContent = 'Awaiting telemetry...';
         }
       });
 
       // 3. Uptime Kuma Heartbeat Table Latencies
-      const nucLat = (window.LAST_NUC_LATENCY !== undefined && window.LAST_NUC_LATENCY !== null) ? window.LAST_NUC_LATENCY : 0.2;
-      const ispLat = (window.ISP_LATEST && window.ISP_LATEST.pingAvgMs !== undefined) ? window.ISP_LATEST.pingAvgMs : 4.0;
+      const nucLat = (window.LAST_NUC_LATENCY !== undefined && window.LAST_NUC_LATENCY !== null) ? Number(window.LAST_NUC_LATENCY) : null;
+      const ispLat = (window.ISP_LATEST && window.ISP_LATEST.pingAvgMs !== undefined) ? Number(window.ISP_LATEST.pingAvgMs) : null;
+      const nucOnline = (window.NUC_IS_ONLINE !== false);
+      const svcs = (window.LAST_SERVICES_HEALTH && window.LAST_SERVICES_HEALTH.services) ? window.LAST_SERVICES_HEALTH.services : null;
+
+      const svcState = (key, fallbackLat) => {
+        const entry = svcs && svcs[key];
+        const ok = entry ? !!entry.online : nucOnline;
+        const lat = (entry && typeof entry.latencyMs === 'number')
+          ? entry.latencyMs.toFixed(1)
+          : (ok && fallbackLat !== null ? fallbackLat : '--');
+        return { ok, lat };
+      };
 
       const setKuma = (id, ms, statusId, isGood, goodTxt = 'Healthy', badTxt = 'Degraded', uptimeId = null, uptimePct = '100.0%') => {
-        document.querySelectorAll('#' + id + ', .' + id).forEach(el => el.textContent = `${ms} ms`);
+        document.querySelectorAll('#' + id + ', .' + id).forEach(el => el.textContent = ms === '--' ? '--' : `${ms} ms`);
         document.querySelectorAll('#' + statusId + ', .' + statusId).forEach(st => {
           st.textContent = isGood ? goodTxt : badTxt;
           st.className = `item-tag ${isGood ? 'online' : 'offline'}`;
         });
         if (uptimeId) {
-          document.querySelectorAll('#' + uptimeId).forEach(u => u.textContent = isGood ? uptimePct : '98.5%');
+          document.querySelectorAll('#' + uptimeId).forEach(u => u.textContent = isGood ? uptimePct : 'Offline');
         }
       };
 
-      setKuma('kuma-lat-stream', (nucLat + 0.1).toFixed(1), 'kuma-status-stream', true, 'Healthy', 'Degraded', 'kuma-uptime-stream');
-      setKuma('kuma-lat-files', (nucLat + 0.1).toFixed(1), 'kuma-status-files', true, 'Healthy', 'Degraded', 'kuma-uptime-files');
-      setKuma('kuma-lat-qbit', (nucLat + 0.2).toFixed(1), 'kuma-status-qbit', true, 'Healthy', 'Degraded', 'kuma-uptime-qbit');
-      setKuma('kuma-lat-wol', nucLat.toFixed(1), 'kuma-status-wol', true, 'Healthy', 'Degraded', 'kuma-uptime-wol');
-      setKuma('kuma-lat-catcam', (nucLat + 1.7).toFixed(1), 'kuma-status-catcam', true, 'Healthy', 'Degraded', 'kuma-uptime-catcam');
-      setKuma('kuma-lat-cf', ispLat.toFixed(1), 'kuma-status-cf', true, 'Shield Active', 'Degraded', 'kuma-uptime-cf');
+      const sStream = svcState('streamhub', nucLat !== null ? (nucLat + 0.1).toFixed(1) : null);
+      const sFiles = svcState('filebrowser', nucLat !== null ? (nucLat + 0.1).toFixed(1) : null);
+      const sQbit = svcState('torrents2', nucLat !== null ? (nucLat + 0.2).toFixed(1) : null);
+      const sWol = svcState('wol', nucLat !== null ? nucLat.toFixed(1) : null);
+      const sCam = svcState('cam', nucLat !== null ? (nucLat + 1.7).toFixed(1) : null);
+      const sCf = svcState('cf', ispLat !== null ? ispLat.toFixed(1) : null);
 
-      document.querySelectorAll('#spark-leg-nuc').forEach(el => el.textContent = `${nucLat.toFixed(1)} ms`);
+      setKuma('kuma-lat-stream', sStream.lat, 'kuma-status-stream', sStream.ok, 'Healthy', 'Degraded', 'kuma-uptime-stream');
+      setKuma('kuma-lat-files', sFiles.lat, 'kuma-status-files', sFiles.ok, 'Healthy', 'Degraded', 'kuma-uptime-files');
+      setKuma('kuma-lat-qbit', sQbit.lat, 'kuma-status-qbit', sQbit.ok, 'Healthy', 'Degraded', 'kuma-uptime-qbit');
+      setKuma('kuma-lat-wol', sWol.lat, 'kuma-status-wol', sWol.ok, 'Healthy', 'Degraded', 'kuma-uptime-wol');
+      setKuma('kuma-lat-catcam', sCam.lat, 'kuma-status-catcam', sCam.ok, 'Healthy', 'Degraded', 'kuma-uptime-catcam');
+      setKuma('kuma-lat-cf', sCf.lat, 'kuma-status-cf', sCf.ok, 'Shield Active', 'Degraded', 'kuma-uptime-cf');
+
+      document.querySelectorAll('#spark-leg-nuc').forEach(el => el.textContent = nucLat !== null ? `${nucLat.toFixed(1)} ms` : '--');
     }
     window.updateClusterPowerAndThermalsUI = updateClusterPowerAndThermalsUI;
 
@@ -984,15 +1003,10 @@
         tag.textContent = isOnline ? 'Online' : (target === 'desktop' ? 'Standby' : 'Offline');
         tag.className = `item-tag ${isOnline ? 'online' : 'offline'}`;
       }
-      if (lat) {
-        const valLat = latencyMs !== null ? latencyMs : (target === 'nuc' ? 0.2 : 0.4);
-        if (target === 'nuc') {
-          const freeG = (disk && disk.freeGB) ? Math.round(disk.freeGB) : 489;
-          lat.textContent = `${valLat} ms | D: ${freeG} GB`;
-          window.LAST_NUC_LATENCY = valLat;
-        } else {
-          lat.textContent = `${valLat} ms`;
-        }
+      if (target === 'nuc') {
+        if (latencyMs !== null) window.LAST_NUC_LATENCY = latencyMs;
+      } else if (lat) {
+        lat.textContent = latencyMs !== null ? `${latencyMs} ms` : (isOnline ? 'Online' : 'Standby');
         lat.className = `item-tag ${isOnline ? 'online' : 'offline'}`;
       }
       // Update Node Deck Hardware Tags (index.html, media.html)
@@ -1045,7 +1059,7 @@
 
       // Update NUC D: drive widgets
       if (target === 'nuc' && !disk && isOnline) {
-        disk = window.LAST_NUC_DISK || { freeGB: 489.2, totalGB: 1863, usedGB: 1373.8, usedPercent: 73.7 };
+        disk = window.LAST_NUC_DISK || null;
       }
       if (target === 'nuc' && disk) {
         const diskTag = document.getElementById('nuc-disk-tag');
@@ -1176,11 +1190,11 @@
         const stNuc = document.getElementById('status-tag-nuc');
         if (stNuc) { stNuc.textContent = isOnline ? '24/7 Core' : 'Offline'; stNuc.className = 'item-tag ' + (isOnline ? 'online' : 'offline'); }
         const latNuc = document.getElementById('latency-nuc');
-        if (latNuc) { latNuc.textContent = isOnline ? (latencyMs !== null ? `${latencyMs} ms (8.8.8.8)` : '14 ms (8.8.8.8)') : 'Offline'; latNuc.className = 'item-tag ' + (isOnline ? 'online' : 'offline'); }
+        if (latNuc) { latNuc.textContent = isOnline ? (latencyMs !== null ? `${latencyMs} ms (8.8.8.8)` : 'Online') : 'Offline'; latNuc.className = 'item-tag ' + (isOnline ? 'online' : 'offline'); }
         const fBadgeNuc = document.getElementById('fleet-badge-nuc');
         if (fBadgeNuc) { fBadgeNuc.className = `item-tag ${isOnline ? 'online' : 'offline'}`; fBadgeNuc.textContent = isOnline ? 'Online • 24/7 Core' : 'Offline • Unreachable'; }
         const fLatNuc = document.getElementById('fleet-latency-nuc');
-        if (fLatNuc) { fLatNuc.textContent = isOnline ? `192.168.2.35 • ${latencyMs !== null ? latencyMs : 14} ms (8.8.8.8)` : `192.168.2.35 • Unreachable`; }
+        if (fLatNuc) { fLatNuc.textContent = isOnline ? `192.168.2.35 • ${latencyMs !== null ? `${latencyMs} ms (8.8.8.8)` : 'Online'}` : `192.168.2.35 • Unreachable`; }
 
         const latS = safeNum(latencyMs, null);
         const mStream = document.getElementById('meta-watch-streamhub');
@@ -2813,12 +2827,12 @@
           const swTag = document.getElementById('swarm-tag');
 
           const safeActiveDl = (sw.activeDl !== null && sw.activeDl !== undefined && !isNaN(sw.activeDl)) ? Number(sw.activeDl) : 0;
-          const safeTotalTorrents = (sw.totalTorrents !== null && sw.totalTorrents !== undefined && !isNaN(sw.totalTorrents)) ? Number(sw.totalTorrents) : 216;
-          const safeSeed = Math.max(0, safeTotalTorrents - safeActiveDl);
-          if (swAct) swAct.textContent = `${safeActiveDl} Active | ${safeSeed} Seed`;
-          if (swTag) swTag.textContent = `${safeTotalTorrents} Managed`;
-          if (dht) dht.textContent = `DHT: ${sw.dhtNodes} Nodes`;
-          if (vpnIp && sw.vpnExitIp) vpnIp.textContent = `VPN: ${sw.vpnExitIp}`;
+          const safeTotalTorrents = (sw.totalTorrents !== null && sw.totalTorrents !== undefined && !isNaN(sw.totalTorrents)) ? Number(sw.totalTorrents) : null;
+          const safeSeed = safeTotalTorrents !== null ? Math.max(0, safeTotalTorrents - safeActiveDl) : null;
+          if (swAct) swAct.textContent = safeTotalTorrents !== null ? `${safeActiveDl} Active | ${safeSeed} Seed` : `${safeActiveDl} Active | -- Seed`;
+          if (swTag) swTag.textContent = safeTotalTorrents !== null ? `${safeTotalTorrents} Managed` : '-- Managed';
+          if (dht) dht.textContent = (sw.dhtNodes !== null && sw.dhtNodes !== undefined && !isNaN(sw.dhtNodes)) ? `DHT: ${sw.dhtNodes} Nodes` : 'DHT: --';
+          if (vpnIp) vpnIp.textContent = sw.vpnExitIp ? `VPN: ${sw.vpnExitIp}` : 'VPN: --';
           
           const dlText = sw.dlSpeed >= 1048576 ? `${(sw.dlSpeed / 1048576).toFixed(1)} MB/s` : `${Math.round(sw.dlSpeed / 1024)} KB/s`;
           const upText = sw.upSpeed >= 1048576 ? `${(sw.upSpeed / 1048576).toFixed(1)} MB/s` : `${Math.round(sw.upSpeed / 1024)} KB/s`;
@@ -3091,14 +3105,25 @@
                 </tr>
               `).join('');
       };
+      const sortIspChrono = (list) => {
+        if (!Array.isArray(list) || list.length <= 1) return Array.isArray(list) ? list : [];
+        return list.map((item, idx) => ({ item, idx, ts: Date.parse((item && (item.timestamp || item.time)) || '') }))
+          .sort((a, b) => {
+            const aOk = Number.isFinite(a.ts);
+            const bOk = Number.isFinite(b.ts);
+            if (aOk && bOk && a.ts !== b.ts) return a.ts - b.ts;
+            return a.idx - b.idx;
+          })
+          .map(x => x.item);
+      };
       return fetch(`${GATEWAY}/api/isp-health`, { signal: _fetchSig(6000) })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(data => {
           if (data && data.status === 'success') {
             try { localStorage.setItem('dr_isp_history', JSON.stringify(data)); } catch (e) {}
-            const rawList = Array.isArray(data.history) 
+            const rawList = sortIspChrono(Array.isArray(data.history) 
               ? data.history 
-              : (data.history && Array.isArray(data.history.value) ? data.history.value : []);
+              : (data.history && Array.isArray(data.history.value) ? data.history.value : []));
             const latest = (data.latest && data.latest.pingAvgMs !== undefined) 
               ? data.latest 
               : (rawList.length > 0 ? rawList[rawList.length - 1] : null);
@@ -3193,19 +3218,17 @@
 
             const stPing = document.getElementById('st-val-ping');
             if (stPing) stPing.innerHTML = `${pingAvg} <span style="font-size: 0.85rem; color: #94a3b8;">ms</span>`;
-            const downFallback = Math.max(850, Math.min(960, parseFloat((945.5 - (jitter * 2.5)).toFixed(1))));
-            const upFallback = Math.max(800, Math.min(940, parseFloat((890.0 - (jitter * 2.2)).toFixed(1))));
-            const downMbps = latest ? numField(latest.downloadMbps != null ? latest.downloadMbps : latest.downMbps, downFallback) : downFallback;
-            const upMbps = latest ? numField(latest.uploadMbps != null ? latest.uploadMbps : latest.upMbps, upFallback) : upFallback;
+            const downMbps = latest ? numField(latest.downloadMbps != null ? latest.downloadMbps : latest.downMbps, null) : null;
+            const upMbps = latest ? numField(latest.uploadMbps != null ? latest.uploadMbps : latest.upMbps, null) : null;
             const stDown = document.getElementById('st-val-down');
-            if (stDown) stDown.innerHTML = `${downMbps} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
+            if (stDown) stDown.innerHTML = downMbps !== null ? `${downMbps} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>` : '--';
             const stUp = document.getElementById('st-val-up');
-            if (stUp) stUp.innerHTML = `${upMbps} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
+            if (stUp) stUp.innerHTML = upMbps !== null ? `${upMbps} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>` : '--';
             const gaugeNum = document.getElementById('gauge-live-num');
-            if (gaugeNum) gaugeNum.textContent = `${downMbps}`;
+            if (gaugeNum) gaugeNum.textContent = downMbps !== null ? `${downMbps}` : '--';
             const gaugeNeedle = document.getElementById('speed-dial-needle');
             if (gaugeNeedle) {
-              const angle = -45 + (Math.min(downMbps, 1000) / 1000) * 180;
+              const angle = downMbps !== null ? (-45 + (Math.min(downMbps, 1000) / 1000) * 180) : -45;
               gaugeNeedle.style.transform = `rotate(${angle}deg)`;
             }
           }
@@ -3217,7 +3240,7 @@
             .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(sData => {
               if (sData && sData.status === 'success') {
-                const sList = Array.isArray(sData.history) ? sData.history : [];
+                const sList = sortIspChrono(Array.isArray(sData.history) ? sData.history : []);
                 renderIspRows(document.getElementById('isp-history-tbody'), sList, { avg: 3.6, min: 3, max: 4, jitter: 0.71 });
                 const sLat = (sData.latest && sData.latest.pingAvgMs !== undefined) ? sData.latest : (sList.length > 0 ? sList[sList.length - 1] : null);
                 if (sLat) {
@@ -3230,10 +3253,8 @@
                   const sPingMax = numField(sLat.pingMaxMs, 4);
                   const sGdns = numField(sLat.googleDnsMs, 4);
                   const sJitter = numField(sLat.jitterMs, 0.71);
-                  const sDownFb = Math.max(850, Math.min(960, parseFloat((945.5 - (sJitter * 2.5)).toFixed(1))));
-                  const sUpFb = Math.max(800, Math.min(940, parseFloat((890.0 - (sJitter * 2.2)).toFixed(1))));
-                  const sDown = numField(sLat.downloadMbps != null ? sLat.downloadMbps : sLat.downMbps, sDownFb);
-                  const sUp = numField(sLat.uploadMbps != null ? sLat.uploadMbps : sLat.upMbps, sUpFb);
+                  const sDown = numField(sLat.downloadMbps != null ? sLat.downloadMbps : sLat.downMbps, null);
+                  const sUp = numField(sLat.uploadMbps != null ? sLat.uploadMbps : sLat.upMbps, null);
                   if (pVal) pVal.innerHTML = `${sPingAvg} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>`;
                   if (pSub) pSub.textContent = `Min: ${sPingMin} ms | Max: ${sPingMax} ms | Google: ${sGdns} ms`;
                   if (jVal) jVal.innerHTML = `&plusmn; ${sJitter} <span style="font-size: 0.9rem; color: #8b949e;">ms</span>`;
@@ -3243,12 +3264,12 @@
                   const stUp = document.getElementById('st-val-up');
                   const gaugeNum = document.getElementById('gauge-live-num');
                   if (stPing && sLat.pingAvgMs !== undefined) stPing.innerHTML = `${sPingAvg} <span style="font-size: 0.85rem; color: #94a3b8;">ms</span>`;
-                  if (stDown) stDown.innerHTML = `${sDown} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
-                  if (stUp) stUp.innerHTML = `${sUp} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
-                  if (gaugeNum) gaugeNum.textContent = `${sDown}`;
+                  if (stDown) stDown.innerHTML = sDown !== null ? `${sDown} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>` : '--';
+                  if (stUp) stUp.innerHTML = sUp !== null ? `${sUp} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>` : '--';
+                  if (gaugeNum) gaugeNum.textContent = sDown !== null ? `${sDown}` : '--';
                   const sGaugeNeedle = document.getElementById('speed-dial-needle');
                   if (sGaugeNeedle) {
-                    const sAngle = -45 + (Math.min(sDown, 1000) / 1000) * 180;
+                    const sAngle = sDown !== null ? (-45 + (Math.min(sDown, 1000) / 1000) * 180) : -45;
                     sGaugeNeedle.style.transform = `rotate(${sAngle}deg)`;
                   }
                 }
@@ -3278,6 +3299,7 @@
                     { timeShort: '14:30', isp: 'Bell Canada', pingAvgMs: 3.6, pingMinMs: 3, pingMaxMs: 4, jitterMs: 0.71, packetLoss: 0, grade: 'A+' }
                   ];
                 }
+                cList = sortIspChrono(cList);
 
                 renderIspRows(document.getElementById('isp-history-tbody'), cList, { avg: 3.6, min: 3, max: 4, jitter: 0.71 });
 
@@ -3287,10 +3309,8 @@
                 const cMax = cLat ? numField(cLat.pingMaxMs, 4) : 4;
                 const cGdns = cLat ? numField(cLat.googleDnsMs, 4.0) : 4.0;
                 const cJitter = cLat ? numField(cLat.jitterMs, 0.71) : 0.71;
-                const cDownFb = Math.max(850, Math.min(960, parseFloat((945.5 - (cJitter * 2.5)).toFixed(1))));
-                const cUpFb = Math.max(800, Math.min(940, parseFloat((890.0 - (cJitter * 2.2)).toFixed(1))));
-                const cDown = cLat ? numField(cLat.downloadMbps != null ? cLat.downloadMbps : cLat.downMbps, cDownFb) : cDownFb;
-                const cUp = cLat ? numField(cLat.uploadMbps != null ? cLat.uploadMbps : cLat.upMbps, cUpFb) : cUpFb;
+                const cDown = cLat ? numField(cLat.downloadMbps != null ? cLat.downloadMbps : cLat.downMbps, null) : null;
+                const cUp = cLat ? numField(cLat.uploadMbps != null ? cLat.uploadMbps : cLat.upMbps, null) : null;
 
                 const pingVal = document.getElementById('isp-ping-val');
                 const pingSub = document.getElementById('isp-ping-sub');
@@ -3308,11 +3328,11 @@
                 if (uptimeVal) uptimeVal.textContent = '99.98%';
                 if (pingTag) pingTag.textContent = `${cPing} ms`;
                 if (stPing) stPing.innerHTML = `${cPing} <span style="font-size: 0.85rem; color: #94a3b8;">ms</span>`;
-                if (stDown) stDown.innerHTML = `${cDown} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
-                if (stUp) stUp.innerHTML = `${cUp} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
-                if (gaugeNum) gaugeNum.textContent = `${cDown}`;
+                if (stDown) stDown.innerHTML = cDown !== null ? `${cDown} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>` : '--';
+                if (stUp) stUp.innerHTML = cUp !== null ? `${cUp} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>` : '--';
+                if (gaugeNum) gaugeNum.textContent = cDown !== null ? `${cDown}` : '--';
                 if (cGaugeNeedle) {
-                  const cAngle = -45 + (Math.min(cDown, 1000) / 1000) * 180;
+                  const cAngle = cDown !== null ? (-45 + (Math.min(cDown, 1000) / 1000) * 180) : -45;
                   cGaugeNeedle.style.transform = `rotate(${cAngle}deg)`;
                 }
               };
@@ -3506,7 +3526,6 @@
       const playerPage = currentCamAi ? 'ai.html' : 'webrtc.html';
       const frame = document.getElementById('camera-live-frame');
       const title = document.getElementById('cam-header-active-name');
-      const isLocalHost = (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
       const targetUrl = `${playerPage}?src=${src}`;
       if (frame && camFeedLoaded) {
         if (!frame.src.endsWith(targetUrl)) {
@@ -4209,8 +4228,7 @@
         } else {
           val = 4.2;
         }
-        const livePulse = Math.sin((t * 12) + sparklinePhase) * (0.35 * t);
-        const y = toY(val + livePulse);
+        const y = toY(val);
         if (x === axisX) ctx.moveTo(x, y); else ctx.lineTo(x, y);
       }
       ctx.stroke();
@@ -4231,8 +4249,7 @@
         } else {
           val = 1.1;
         }
-        const livePulse = Math.sin((t * 16) + sparklinePhase * 1.3) * (0.18 * t);
-        const y = toY(val + livePulse);
+        const y = toY(val);
         if (x === axisX) ctx.moveTo(x, y); else ctx.lineTo(x, y);
       }
       ctx.stroke();
@@ -4245,9 +4262,7 @@
       ctx.strokeStyle = '#10b981';
       ctx.lineWidth = 2.2;
       for (let x = axisX; x <= w - 6; x += 8) {
-        const t = (x - axisX) / graphW;
-        const livePulse = Math.sin((t * 8) + sparklinePhase * 0.8) * (0.05 * t);
-        const y = toY(nucLat + livePulse);
+        const y = toY(nucLat);
         if (x === axisX) ctx.moveTo(x, y); else ctx.lineTo(x, y);
       }
       ctx.stroke();
@@ -5279,7 +5294,7 @@
           nodeNuc.querySelector('.chaos-node-status').className = 'chaos-node-status ok';
           card.classList.remove('active-fault');
 
-          addChaosLog('heal', '[WOL SENT] Magic packet dispatched to MAC 70:85:C2:59:71:B8 via broadcast 192.168.2.255.');
+          addChaosLog('heal', '[WOL SENT] Magic packet dispatched to MAC 70:85:C2:84:62:65 via broadcast 192.168.2.255.');
           addChaosLog('heal', '[BOOT OK] Desktop workstation booted, NVMe pools mounted, AGY daemon online.');
         }
       } else if (type === 'ddosFlood') {
@@ -5752,88 +5767,65 @@
       const upEl = document.getElementById('st-val-up');
       const pingEl = document.getElementById('st-val-ping');
 
-      const isp = window.ISP_LATEST || {};
-      const realPing = (isp.pingAvgMs !== undefined) ? isp.pingAvgMs : 4.0;
-      const realJitter = (isp.jitterMs !== undefined) ? isp.jitterMs : 0.43;
-      const realLoss = (isp.packetLoss !== undefined) ? isp.packetLoss : 0;
-      const realCarrier = isp.isp || 'Bell Canada';
-      const realGrade = isp.grade || 'A+';
+      const ispBefore = window.ISP_LATEST || {};
+      const carrier = ispBefore.isp || 'Bell Canada';
 
-      if (btn) { btn.disabled = true; btn.innerHTML = 'Testing WAN...'; }
-      if (stageText) stageText.textContent = `Stage 1/3: Measuring Jitter & Ping to ${realCarrier} Gateway...`;
+      if (btn) { btn.disabled = true; btn.innerHTML = 'Probing WAN...'; }
+      if (stageText) stageText.textContent = `Stage 1/2: Dispatching live ${carrier} fiber probe on NUC gateway...`;
       playChaosTone(440, 880, 'sine', 0.15);
 
-      setTimeout(() => {
-        // Stage 1: Measured Ping
-        const testPing = realPing.toFixed(1);
-        if (pingEl) pingEl.innerHTML = `${testPing} <span style="font-size: 0.85rem; color: #94a3b8;">ms</span>`;
-        if (stageText) stageText.textContent = `Ping verified: ${testPing} ms (±${realJitter} ms Jitter). Stage 2/3: Benchmarking 1.0 Gbps Downlink...`;
-        playChaosTone(587, 880, 'sine', 0.2);
+      if (typeof sendControl === 'function') {
+        sendControl('run-speedtest', 'nuc');
+      }
 
-        // Stage 2: Download ramp up to actual line bandwidth
-        const targetDown = Math.max(915, Math.min(955, Math.round(945.5 - (realJitter * 2.5))));
-        let currentDown = 120;
-        const downInterval = setInterval(() => {
-          currentDown += Math.floor(Math.random() * 95) + 60;
-          if (currentDown >= targetDown) {
-            currentDown = targetDown + (Math.random() * 4 - 2);
-            currentDown = parseFloat(currentDown.toFixed(1));
-            clearInterval(downInterval);
-            finishDownload();
-          }
-          if (gaugeNum) gaugeNum.textContent = currentDown;
+      setTimeout(() => {
+        if (stageText) stageText.textContent = `Stage 2/2: Collecting fresh latency & throughput telemetry from gateway...`;
+        playChaosTone(587, 880, 'sine', 0.2);
+        if (typeof fetchISPHistory === 'function') fetchISPHistory();
+      }, 2500);
+
+      setTimeout(() => {
+        if (typeof fetchISPHistory === 'function') fetchISPHistory();
+      }, 5500);
+
+      setTimeout(() => {
+        Promise.resolve(typeof fetchISPHistory === 'function' ? fetchISPHistory() : null).finally(() => {
+          const latest = window.ISP_LATEST || {};
+          const pingStr = (latest.pingAvgMs !== undefined && latest.pingAvgMs !== null) ? Number(latest.pingAvgMs).toFixed(1) : '--';
+          const rawDown = (latest.downloadMbps !== undefined && latest.downloadMbps !== null) ? Number(latest.downloadMbps) : ((latest.downMbps !== undefined && latest.downMbps !== null) ? Number(latest.downMbps) : null);
+          const rawUp = (latest.uploadMbps !== undefined && latest.uploadMbps !== null) ? Number(latest.uploadMbps) : ((latest.upMbps !== undefined && latest.upMbps !== null) ? Number(latest.upMbps) : null);
+          const downStr = (rawDown !== null && Number.isFinite(rawDown)) ? String(rawDown) : '--';
+          const upStr = (rawUp !== null && Number.isFinite(rawUp)) ? String(rawUp) : '--';
+          const realCarrier = latest.isp || carrier;
+          const realGrade = latest.grade || '--';
+          const realLoss = (latest.packetLoss !== undefined && latest.packetLoss !== null) ? latest.packetLoss : 0;
+
+          if (pingEl) pingEl.innerHTML = `${pingStr} <span style="font-size: 0.85rem; color: #94a3b8;">ms</span>`;
+          if (downEl) downEl.innerHTML = downStr === '--' ? `--` : `${downStr} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
+          if (upEl) upEl.innerHTML = upStr === '--' ? `--` : `${upStr} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
+          if (gaugeNum) gaugeNum.textContent = downStr;
           if (gaugeNeedle) {
-            const angle = -45 + (Math.min(currentDown, 1000) / 1000) * 180;
+            const angle = (rawDown !== null && Number.isFinite(rawDown)) ? (-45 + (Math.min(rawDown, 1000) / 1000) * 180) : -45;
             gaugeNeedle.style.transform = `rotate(${angle}deg)`;
           }
-        }, 120);
-
-        function finishDownload() {
-          const downReading = gaugeNum ? gaugeNum.textContent : currentDown;
-          if (downEl) downEl.innerHTML = `${downReading} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
-          if (stageText) stageText.textContent = `Stage 3/3: Transmitting 1.0 Gbps Uplink stream to ${realCarrier} Fiber Gateway...`;
-          playChaosTone(880, 1320, 'sine', 0.25);
-
-          const targetUp = Math.max(860, Math.min(925, Math.round(888.0 - (realJitter * 2.0))));
-          let currentUp = 180;
-          const upInterval = setInterval(() => {
-            currentUp += Math.floor(Math.random() * 85) + 55;
-            if (currentUp >= targetUp) {
-              currentUp = targetUp + (Math.random() * 4 - 2);
-              currentUp = parseFloat(currentUp.toFixed(1));
-              clearInterval(upInterval);
-              finalizeBenchmark();
-            }
-            if (gaugeNum) gaugeNum.textContent = currentUp;
-            if (gaugeNeedle) {
-              const angle = -45 + (Math.min(currentUp, 1000) / 1000) * 180;
-              gaugeNeedle.style.transform = `rotate(${angle}deg)`;
-            }
-          }, 120);
-        }
-
-        function finalizeBenchmark() {
-          const upReading = gaugeNum ? gaugeNum.textContent : '0';
-          if (upEl) upEl.innerHTML = `${upReading} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
           if (btn) { btn.disabled = false; btn.innerHTML = 'Run Gigabit Speedtest'; }
-          const downSummary = downEl ? downEl.textContent.trim() : '--';
-          const upSummary = upEl ? upEl.textContent.trim() : '--';
-          if (stageText) stageText.textContent = `Benchmark Saved: ${downSummary} Down  -  ${upSummary} Up  -  ${testPing} ms  -  Grade ${realGrade} (${realCarrier})`;
+          if (stageText) {
+            stageText.textContent = `Probe Complete: ${pingStr} ms Ping  -  Packet Loss ${realLoss}%  -  Grade ${realGrade} (${realCarrier})`;
+          }
           playChaosTone(523, 1046, 'triangle', 0.35);
-          showToast('success', `${realCarrier} Gigabit Telemetry Complete`, `${downSummary} Down  -  ${upSummary} Up  -  Packet Loss: ${realLoss}%`);
+          showToast('success', `${realCarrier} Probe Complete`, `Ping: ${pingStr} ms  -  Loss: ${realLoss}%  -  Grade: ${realGrade}`);
           isSpeedtesting = false;
-        }
-      }, 800);
+        });
+      }, 8500);
     }
     window.runLiveSpeedtestBenchmark = runLiveSpeedtestBenchmark;
 
     // --- 2. Edge AI (Ollama Local) ---
-    const edgeAiResponses = {
-      summarize: "The Digital Resolve homelab is a zero-trust, local-first private cloud running on an Intel Core i5 NUC (32 GB RAM) paired with a high-performance AMD Ryzen 9 workstation. It utilizes Cloudflare Zero Trust dual edge tunnels (0 open inbound ports), Microsoft 365 Entra ID SSO identity gating, Mullvad WireGuard privacy routing, and hardware-accelerated H.264 WebRTC video pipelines.",
-      bufferbloat: "Bell Gigabit Fiber achieves Grade A+ bufferbloat due to symmetrical GPON low-latency fiber transport combined with active queue management (FQ-CoDel/CAKE) and dedicated 2.5 GbE Intel LAN controllers, preventing buffer packet buildup during simultaneous 4K streams and high-bandwidth swarm downloads.",
-      catcam: "Cat Cam leverages go2rtc compiled directly for Windows x64 on the NUC, binding to Tuya WebRTC H.264 feeds over local UDP. The stream is signaled via WebSocket (/api/ws) directly to the browser's hardware video decoder, resulting in <50ms glass-to-glass latency with 0% browser GPU/CPU strain.",
-      security: "Perimeter audit verified 0 listening WAN ports. Inbound ingress is exclusively brokered via Cloudflare Edge Tunnels with CA/US geo-shielding, encrypted TLS 1.3 0-RTT handshakes, and strict Microsoft 365 Entra ID SAML authentication before any cluster service can be addressed.",
-      default: "Inference executed on-premise on NUC Intel Core i5 via Ollama (Llama 3.2 3B Instruct). Model generation completed in 320ms at 28.4 tokens/sec with 0% external cloud exfiltration."
+    const edgeAiPresetPrompts = {
+      summarize: "Explain the Digital Resolve homelab architecture (Intel i5 NUC 24/7 core, Ryzen 9 workstation, Cloudflare Zero Trust tunnels, Mullvad WireGuard, StreamHub, and WebRTC Cat Cam).",
+      bufferbloat: "Explain why Bell Gigabit Fiber paired with Qbit-DynamicThrottle and 2.5 GbE LAN keeps bufferbloat at Grade A+.",
+      catcam: "Explain how the Cat Cam live pipeline works using go2rtc on port 8089 and WebSocket WebRTC signaling.",
+      security: "Summarize the Zero Trust security posture with Cloudflare Access Microsoft 365 Entra ID SSO and zero open inbound WAN ports."
     };
 
     function askEdgeAiPreset(presetKey) {
@@ -5841,35 +5833,8 @@
         openGlobalSSOModal('Ollama 24/7 Local Inference (Port 11434)', () => askEdgeAiPreset(presetKey));
         return;
       }
-      const feed = document.getElementById('edge-ai-output-feed');
-      const stats = document.getElementById('ai-infer-stats');
-      const response = edgeAiResponses[presetKey] || edgeAiResponses.default;
-      if (stats) stats.textContent = 'Generating local tokens...';
-      playChaosTone(659, 880, 'sine', 0.1);
-
-      if (feed) {
-        if (window._edgeAiTyper) clearInterval(window._edgeAiTyper);
-        feed.innerHTML = `<span style="color: #a855f7;">dr-ollama [Llama-3.2-3B]&gt;</span> `;
-        const textNode = document.createTextNode('');
-        feed.appendChild(textNode);
-        let i = 0;
-        const startTime = Date.now();
-        window._edgeAiTyper = setInterval(() => {
-          textNode.nodeValue += response.charAt(i);
-          i++;
-          if (i >= response.length) {
-            clearInterval(window._edgeAiTyper);
-            window._edgeAiTyper = null;
-            const durationSec = Math.max(0.1, (Date.now() - startTime) / 1000);
-            const tokenEstimate = Math.max(1, Math.round(response.length / 4));
-            const speed = (tokenEstimate / durationSec).toFixed(1);
-            if (stats) stats.textContent = `Complete (${tokenEstimate} tokens • ${speed} tok/s)`;
-            feed.insertAdjacentHTML('beforeend', `<br><span style="color: #34d399; font-size: 0.72rem;">Verified On-Premise Execution</span>`);
-            document.querySelectorAll('.ai-kpi-speed').forEach(el => el.innerHTML = `${speed} <span style="font-size: 0.85rem; color: #94a3b8;">tok/s</span>`);
-            document.querySelectorAll('.ai-kpi-speed-short').forEach(el => el.textContent = speed);
-          }
-        }, 12);
-      }
+      const promptText = edgeAiPresetPrompts[presetKey] || edgeAiPresetPrompts.summarize;
+      runLiveEdgeAiQuery(promptText, null);
     }
     window.askEdgeAiPreset = askEdgeAiPreset;
 
@@ -5882,52 +5847,131 @@
         const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
         const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         const tz = (typeof Intl !== 'undefined' && Intl.DateTimeFormat) ? (Intl.DateTimeFormat().resolvedOptions().timeZone || 'EDT') : 'EDT';
-        return `The current time is ${timeStr} (${tz}) on ${dateStr}. System clock is synchronized via NTP with sub-millisecond precision.`;
+        return `The current time is ${timeStr} (${tz}) on ${dateStr}.`;
       }
 
       // 2. System / Health / Cluster / Nodes / Status
       if (q.match(/\b(status|cluster|nodes?|system|vitals|health|uptime|load|nuc|desktop)\b/)) {
         const deskState = window.DESKTOP_IS_ONLINE ? 'Online (Active)' : 'Standby (Eco Mode)';
         const nucState = (window.NUC_IS_ONLINE !== false) ? 'Online' : 'Offline';
-        const healthScore = window.DESKTOP_IS_ONLINE ? '100% Optimal' : '98% Optimal (Eco)';
-        return `Cluster Status Report: Health Index is ${healthScore}. 24/7 Intel NUC (192.168.2.35) is ${nucState} with 31.8 GB RAM and Mullvad WireGuard privacy tunnel. Workstation (192.168.2.62) is in ${deskState}. All ingress is gated behind Cloudflare Zero Trust with 0 open WAN ports.`;
+        return `Cluster Status: 24/7 Intel NUC (192.168.2.35) is ${nucState}; Workstation (192.168.2.62) is in ${deskState}. All public ingress is gated via Cloudflare Zero Trust Access.`;
       }
 
       // 3. Storage / Disk / Torrents / Downloads
       if (q.match(/\b(storage|disk|space|torrent|torrents|download|seed|qbittorrent)\b/)) {
-        const freeG = window.LAST_NUC_DISK ? Math.round(window.LAST_NUC_DISK.freeGB) : 489;
-        const usedP = window.LAST_NUC_DISK ? Math.round(window.LAST_NUC_DISK.usedPercent) : 74;
-        return `Storage & Ingestion Telemetry: NUC (D:\\Torrents) has ~${freeG} GB free of 1.8 TB (${usedP}% used). Workstation has 5.75 TB high-speed NVMe/HDD storage. P2P swarm traffic is protected through an isolated Mullvad WireGuard VPN interface.`;
+        const freeG = (window.LAST_NUC_DISK && typeof window.LAST_NUC_DISK.freeGB === 'number') ? `${Math.round(window.LAST_NUC_DISK.freeGB)} GB` : '--';
+        const usedP = (window.LAST_NUC_DISK && typeof window.LAST_NUC_DISK.usedPercent === 'number') ? `${Math.round(window.LAST_NUC_DISK.usedPercent)}%` : '--';
+        return `Storage & Ingestion Telemetry: NUC (D:\\Torrents) reports ${freeG} free (${usedP} used). P2P swarm traffic routes through Mullvad WireGuard.`;
       }
 
       // 4. Cat Feeder / Penny / Camera
       if (q.match(/\b(cat|penny|feeder|kibble|food|snack|feed|cam|camera)\b/)) {
         const f = window.LAST_FEEDER_STATE;
-        const fill = f ? f.fillPercent : 81;
-        const remG = f ? f.remainingGrams : 1220;
-        const days = f ? f.estimatedDaysLeft : 15.2;
-        return `Penny's Cat Hub: Smart Feeder (192.168.2.22) is Online. Live state: Hopper is ${fill}% full (${remG}g remaining - ~${days} days). Optical camera watchdog is active on the NUC at <50ms latency.`;
+        const fill = (f && typeof f.fillPercent === 'number') ? `${f.fillPercent}%` : '--';
+        const remG = (f && typeof f.remainingGrams === 'number') ? `${f.remainingGrams}g` : '--';
+        const days = (f && typeof f.estimatedDaysLeft === 'number') ? `${f.estimatedDaysLeft} days` : '--';
+        return `Penny's Cat Hub: Feeder state is ${fill} full (${remG} remaining, ~${days}). Live cameras stream from the NUC via go2rtc WebRTC.`;
       }
 
       // 5. DNS / AdGuard / Threat Shield
       if (q.match(/\b(dns|adguard|block|tracker|sinkhole|filter|quad9|cloudflare)\b/)) {
-        return `DNS Threat Shield: Pre-configured for DNS-over-TLS (Cloudflare 1.1.1.1 & Quad9 9.9.9.9) with HaGeZi Multi PRO + OISD blocklists (412,850 staged filters) and 6 split-horizon local LAN rewrites for direct gigabit routing.`;
+        return `DNS Threat Shield: Staged for DNS-over-TLS (Cloudflare 1.1.1.1 & Quad9 9.9.9.9) with split-horizon local LAN rewrites.`;
       }
 
       // 6. Network / Speed / Fiber / Latency / Bell
       if (q.match(/\b(speed|internet|fiber|bandwidth|bell|ping|latency|jitter)\b/)) {
-        return `Network Telemetry: Bell Gigabit Fiber operates with Grade A+ bufferbloat (<2ms jitter). Edge latency to nearest Cloudflare PoPs (YUL/YYZ) is ~1.1 ms via HTTP/3 QUIC transport.`;
+        const ping = (window.ISP_LATEST && window.ISP_LATEST.pingAvgMs !== undefined) ? `${window.ISP_LATEST.pingAvgMs} ms` : '--';
+        return `Network Telemetry: Bell Gigabit Fiber gateway latest measured ping is ${ping}.`;
       }
 
       // 7. Identity / Help / Capabilities
       if (q.match(/\b(who are you|what can you do|help|capabilities|info|command)\b/)) {
-        return `I am dr-ollama, your private homelab operations assistant. You can ask me for current time/date, cluster node vitals, storage and download telemetry, Penny's feeder status, network benchmarks, or DNS security configurations.`;
+        return `I am dr-ollama, your private homelab operations assistant backed by Ollama on the NUC (:11434). Ask about architecture, cluster vitals, storage, Penny's feeder, or network latency.`;
       }
 
       // 8. Default context-aware answer
-      return `Homelab query received: "${text}". The cluster is fully operational across NUC (192.168.2.35) and Desktop (192.168.2.62). For specific telemetry, ask about system time, cluster status, storage space, Penny's feeder, or network latency.`;
+      return `Gateway AI endpoint unavailable; cluster nodes NUC (192.168.2.35) and Desktop (192.168.2.62) status is shown above.`;
     }
     window.generateClusterAiResponse = generateClusterAiResponse;
+
+    function typeEdgeAiResponse(feed, stats, promptPrefixHtml, responseText, footerHtml, metricEvalCount, metricTokPerSec) {
+      if (!feed) return;
+      if (window._edgeAiTyper) clearInterval(window._edgeAiTyper);
+      feed.innerHTML = promptPrefixHtml;
+      const textNode = document.createTextNode('');
+      feed.appendChild(textNode);
+      let i = 0;
+      const startTime = Date.now();
+      window._edgeAiTyper = setInterval(() => {
+        const chunk = responseText.slice(i, i + 3);
+        textNode.nodeValue += chunk;
+        i += chunk.length;
+        if (i >= responseText.length) {
+          clearInterval(window._edgeAiTyper);
+          window._edgeAiTyper = null;
+          const durationSec = Math.max(0.1, (Date.now() - startTime) / 1000);
+          const tokenEstimate = (metricEvalCount && Number(metricEvalCount) > 0) ? Number(metricEvalCount) : Math.max(1, Math.round(responseText.length / 4));
+          const speed = (metricTokPerSec && Number(metricTokPerSec) > 0) ? Number(metricTokPerSec).toFixed(1) : (tokenEstimate / durationSec).toFixed(1);
+          if (stats) stats.textContent = `Complete (${tokenEstimate} tokens • ${speed} tok/s)`;
+          if (footerHtml) feed.insertAdjacentHTML('beforeend', footerHtml);
+          if (metricTokPerSec && Number(metricTokPerSec) > 0) {
+            document.querySelectorAll('.ai-kpi-speed').forEach(el => el.innerHTML = `${speed} <span style="font-size: 0.85rem; color: #94a3b8;">tok/s</span>`);
+            document.querySelectorAll('.ai-kpi-speed-short').forEach(el => el.textContent = speed);
+          }
+        }
+      }, 16);
+    }
+
+    function runLiveEdgeAiQuery(promptText, userEchoText) {
+      const feed = document.getElementById('edge-ai-output-feed');
+      const stats = document.getElementById('ai-infer-stats');
+      if (window._edgeAiAbortCtrl) {
+        try { window._edgeAiAbortCtrl.abort(); } catch (e) {}
+      }
+      if (window._edgeAiTyper) {
+        clearInterval(window._edgeAiTyper);
+        window._edgeAiTyper = null;
+      }
+      const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      window._edgeAiAbortCtrl = ctrl;
+      let timerId = null;
+      if (ctrl) timerId = setTimeout(() => ctrl.abort(), 65000);
+
+      if (stats) stats.textContent = 'Querying NUC Ollama (:11434)...';
+      playChaosTone(659, 880, 'sine', 0.1);
+
+      const safeEcho = userEchoText ? userEchoText.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') : null;
+      const userLine = safeEcho ? `<span style="color: #60a5fa;">user&gt;</span> ${safeEcho}<br>` : '';
+      if (feed) {
+        feed.innerHTML = `${userLine}<span style="color: #a855f7;">dr-ollama&gt;</span> <span style="color: #94a3b8;">Running on-premise inference on NUC...</span>`;
+      }
+
+      return fetch(`${GATEWAY}/api/ai/chat`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ prompt: promptText }),
+        signal: ctrl ? ctrl.signal : _fetchSig(65000)
+      })
+        .then(r => r.json().then(d => ({ ok: r.ok, status: r.status, data: d })).catch(() => { throw new Error('HTTP ' + r.status); }))
+        .then(({ ok, status, data }) => {
+          if (timerId) clearTimeout(timerId);
+          if (!ok || !data || data.status !== 'success' || !data.response) {
+            throw new Error((data && data.message) ? data.message : ('HTTP ' + status));
+          }
+          const modelName = escapeHtml(String(data.model || 'llama3.2:3b'));
+          const prefix = `${userLine}<span style="color: #a855f7;">dr-ollama [${modelName}]&gt;</span> `;
+          const badge = `<br><span style="color: #34d399; font-size: 0.72rem;">Verified On-Premise Ollama (${modelName})</span>`;
+          typeEdgeAiResponse(feed, stats, prefix, String(data.response), badge, data.evalCount, data.tokensPerSec);
+        })
+        .catch(() => {
+          if (timerId) clearTimeout(timerId);
+          const fallback = `[Offline Local Summary] ${generateClusterAiResponse(promptText)}`;
+          const prefix = `${userLine}<span style="color: #f59e0b;">dr-ollama [Offline Fallback]&gt;</span> `;
+          const badge = `<br><span style="color: #f59e0b; font-size: 0.72rem;">Gateway/Ollama offline - showing local summary</span>`;
+          typeEdgeAiResponse(feed, stats, prefix, fallback, badge, null, null);
+        });
+    }
 
     function submitEdgeAiPrompt() {
       if (!isSSOAuthenticated()) {
@@ -5938,60 +5982,32 @@
       const text = input ? input.value.trim() : '';
       if (!text) return;
       if (input) input.value = '';
-      const feed = document.getElementById('edge-ai-output-feed');
-      const stats = document.getElementById('ai-infer-stats');
-      if (stats) stats.textContent = 'Processing query...';
-      playChaosTone(659, 880, 'sine', 0.1);
-
-      const resp = generateClusterAiResponse(text);
-      if (feed) {
-        if (window._edgeAiTyper) clearInterval(window._edgeAiTyper);
-        const safeText = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        feed.innerHTML = `<span style="color: #60a5fa;">user&gt;</span> ${safeText}<br><span style="color: #a855f7;">dr-ollama&gt;</span> `;
-        const textNode = document.createTextNode('');
-        feed.appendChild(textNode);
-        let i = 0;
-        const startTime = Date.now();
-        window._edgeAiTyper = setInterval(() => {
-          textNode.nodeValue += resp.charAt(i);
-          i++;
-          if (i >= resp.length) {
-            clearInterval(window._edgeAiTyper);
-            window._edgeAiTyper = null;
-            const durationSec = Math.max(0.1, (Date.now() - startTime) / 1000);
-            const tokenEstimate = Math.max(1, Math.round(resp.length / 4));
-            const speed = (tokenEstimate / durationSec).toFixed(1);
-            if (stats) stats.textContent = `Complete (${tokenEstimate} tokens • ${speed} tok/s)`;
-            document.querySelectorAll('.ai-kpi-speed').forEach(el => el.innerHTML = `${speed} <span style="font-size: 0.85rem; color: #94a3b8;">tok/s</span>`);
-            document.querySelectorAll('.ai-kpi-speed-short').forEach(el => el.textContent = speed);
-          }
-        }, 12);
-      }
+      runLiveEdgeAiQuery(text, text);
     }
     window.submitEdgeAiPrompt = submitEdgeAiPrompt;
 
     // Dynamic Cloudflare Edge KPI Updater
     function updateCloudflareStatsUI(cfData) {
       const defStats = {
-        totalRequests: '568,400',
-        ingressSla: '99.98% Ingress SLA',
-        hitRatio: '89.8%',
-        savedGB: '3.42 GB Saved from Origin',
-        uniqueVisitors: '152',
+        totalRequests: '--',
+        ingressSla: 'Awaiting telemetry',
+        hitRatio: '--',
+        savedGB: 'Awaiting telemetry',
+        uniqueVisitors: '--',
         topPop: 'Top PoP: YUL (Montreal)',
-        threatsBlocked: '156',
-        geoShield: '0 Breaches • CA/US Geo-Shield',
-        edgeThreats: '156 Threats Neutralized • CA/US Shield',
+        threatsBlocked: '--',
+        geoShield: 'CA/US Geo-Shield',
+        edgeThreats: 'Awaiting telemetry • CA/US Shield',
         edgeIngress: 'Active • 4 HA Connections',
         edgePops: 'YUL (Montreal) • YYZ (Toronto)',
         subRequests: {
-          apex: '21,450',
-          wake: '238,700',
-          cam: '125,000',
-          torrents: '79,500',
-          torrents2: '68,200',
-          stream: '34,100',
-          files: '22,700'
+          apex: '--',
+          wake: '--',
+          cam: '--',
+          torrents: '--',
+          torrents2: '--',
+          stream: '--',
+          files: '--'
         }
       };
 
@@ -6091,7 +6107,9 @@
       const edgeTraffic = document.getElementById('edge-traffic-val');
       if (edgeTraffic) {
         const reqStr = String(cur.totalRequests);
-        if (reqStr.includes('•')) {
+        if (reqStr === '--') {
+          edgeTraffic.textContent = '--';
+        } else if (reqStr.includes('•')) {
           edgeTraffic.textContent = reqStr;
         } else if (reqStr.includes('Requests')) {
           edgeTraffic.textContent = `${reqStr} • 0 Errors`;
@@ -6102,10 +6120,10 @@
 
       const cleanSaved = String(cur.savedGB).replace(/^(&bull;|•|\s)+/, '').trim();
       const edgeCache = document.getElementById('edge-cache-val');
-      if (edgeCache) edgeCache.textContent = `${cur.hitRatio} (${cleanSaved})`;
+      if (edgeCache) edgeCache.textContent = cur.hitRatio === '--' ? '--' : `${cur.hitRatio} (${cleanSaved})`;
       const edgeBar = document.getElementById('edge-cache-bar');
       if (edgeBar && cur.hitRatio !== undefined && cur.hitRatio !== null) {
-        edgeBar.style.width = String(cur.hitRatio).includes('%') ? cur.hitRatio : `${cur.hitRatio}%`;
+        edgeBar.style.width = cur.hitRatio === '--' ? '0%' : (String(cur.hitRatio).includes('%') ? cur.hitRatio : `${cur.hitRatio}%`);
       }
 
       const edgeThreats = document.getElementById('edge-threats-val');
@@ -6515,32 +6533,39 @@
       const dishEl = document.getElementById('feeder-dish-status');
       const timeEl = document.getElementById('feeder-last-time');
 
-      const pct = typeof state.fillPercent === 'number' ? state.fillPercent : (typeof state.hopperPercent === 'number' ? state.hopperPercent : 85);
-      const rem = state.remainingGrams || 1275;
-      const days = state.estimatedDaysLeft || 16.0;
+      const pct = (typeof state.fillPercent === 'number' && Number.isFinite(state.fillPercent)) ? state.fillPercent : ((typeof state.hopperPercent === 'number' && Number.isFinite(state.hopperPercent)) ? state.hopperPercent : null);
+      const rem = (typeof state.remainingGrams === 'number' && Number.isFinite(state.remainingGrams)) ? state.remainingGrams : null;
+      const days = (typeof state.estimatedDaysLeft === 'number' && Number.isFinite(state.estimatedDaysLeft)) ? state.estimatedDaysLeft : null;
+      const remText = rem !== null ? `${rem}g` : '--';
+      const daysText = days !== null ? `~${days} Days` : '-- Days';
 
-      if (pctEl) pctEl.textContent = `${pct}%`;
-      if (subEl) subEl.textContent = pct === 0 ? "(0g - EMPTY - Refill Needed)" : `(${rem}g - ~${days} Days)`;
+      if (pctEl) pctEl.textContent = pct !== null ? `${pct}%` : '--';
+      if (subEl) subEl.textContent = pct === null ? "(Awaiting telemetry)" : (pct === 0 ? "(0g - EMPTY - Refill Needed)" : `(${remText} - ${daysText})`);
       if (barEl) {
-        barEl.style.width = `${pct}%`;
-        if (pct <= 15) {
-          barEl.style.background = 'linear-gradient(90deg, #ef4444, #f87171)';
-        } else if (pct <= 30) {
-          barEl.style.background = 'linear-gradient(90deg, #f59e0b, #fbbf24)';
+        if (pct === null) {
+          barEl.style.width = '0%';
+          barEl.style.background = 'linear-gradient(90deg, #475569, #64748b)';
         } else {
-          barEl.style.background = 'linear-gradient(90deg, #ec4899, #f472b6)';
+          barEl.style.width = `${pct}%`;
+          if (pct <= 15) {
+            barEl.style.background = 'linear-gradient(90deg, #ef4444, #f87171)';
+          } else if (pct <= 30) {
+            barEl.style.background = 'linear-gradient(90deg, #f59e0b, #fbbf24)';
+          } else {
+            barEl.style.background = 'linear-gradient(90deg, #ec4899, #f472b6)';
+          }
         }
       }
       if (warnEl) {
-        warnEl.style.display = pct <= 20 ? 'flex' : 'none';
+        warnEl.style.display = (pct !== null && pct <= 20) ? 'flex' : 'none';
       }
       if (watchEl) {
-        watchEl.textContent = pct === 0 ? "Alert - Empty Hopper Detected" : (state.opticalWatchdog || "Armed & Active");
-        watchEl.style.color = pct <= 20 ? '#f87171' : '#34d399';
+        watchEl.textContent = pct === 0 ? "Alert - Empty Hopper Detected" : (state.opticalWatchdog || "Unknown");
+        watchEl.style.color = (pct !== null && pct <= 20) ? '#f87171' : (pct === null ? '#94a3b8' : '#34d399');
       }
       if (dishEl) {
-        dishEl.textContent = pct === 0 ? "Empty - Refill Required" : (state.bowlStatus || "Kibble Present (Verified)");
-        dishEl.style.color = pct <= 20 ? '#f87171' : '#34d399';
+        dishEl.textContent = pct === 0 ? "Empty - Refill Required" : (state.bowlStatus || "Unknown");
+        dishEl.style.color = (pct !== null && pct <= 20) ? '#f87171' : (pct === null ? '#94a3b8' : '#34d399');
       }
 
       // Pane-IoT elements (index.html & ops.html)
@@ -6549,21 +6574,26 @@
       const nucBarEl = document.getElementById('feeder-nuc-hopper-bar');
       const nucWatchEl = document.getElementById('feeder-nuc-watchdog');
       const iotTimeEl = document.getElementById('feeder-iot-last-time');
-      if (nucPctEl) nucPctEl.textContent = `${pct}%`;
-      if (nucSubEl) nucSubEl.textContent = pct === 0 ? "(0g - EMPTY - Refill Needed)" : `(${rem}g - ~${days} Days)`;
+      if (nucPctEl) nucPctEl.textContent = pct !== null ? `${pct}%` : '--';
+      if (nucSubEl) nucSubEl.textContent = pct === null ? "(Awaiting telemetry)" : (pct === 0 ? "(0g - EMPTY - Refill Needed)" : `(${remText} - ${daysText})`);
       if (nucBarEl) {
-        nucBarEl.style.width = `${pct}%`;
-        nucBarEl.style.background = pct <= 15 ? 'linear-gradient(90deg, #ef4444, #f87171)' : (pct <= 30 ? 'linear-gradient(90deg, #f59e0b, #fbbf24)' : 'linear-gradient(90deg, #ec4899, #f472b6)');
+        nucBarEl.style.width = pct !== null ? `${pct}%` : '0%';
+        nucBarEl.style.background = pct === null ? 'linear-gradient(90deg, #475569, #64748b)' : (pct <= 15 ? 'linear-gradient(90deg, #ef4444, #f87171)' : (pct <= 30 ? 'linear-gradient(90deg, #f59e0b, #fbbf24)' : 'linear-gradient(90deg, #ec4899, #f472b6)'));
       }
       if (nucWatchEl) {
-        nucWatchEl.textContent = pct === 0 ? "Alert - Empty Hopper Detected" : (state.opticalWatchdog || "Armed & Active");
-        nucWatchEl.style.color = pct <= 20 ? '#f87171' : '#34d399';
+        nucWatchEl.textContent = pct === 0 ? "Alert - Empty Hopper Detected" : (state.opticalWatchdog || "Unknown");
+        nucWatchEl.style.color = (pct !== null && pct <= 20) ? '#f87171' : (pct === null ? '#94a3b8' : '#34d399');
       }
 
       // Live Homelab Service Dashboard Card (index.html & uptime.html)
       const stagFeeder = document.getElementById('stag-feeder');
       if (stagFeeder) {
-        if (pct > 20) {
+        if (pct === null) {
+          stagFeeder.className = 'item-tag';
+          stagFeeder.textContent = 'Awaiting Telemetry';
+          stagFeeder.style.background = 'rgba(148, 163, 184, 0.15)';
+          stagFeeder.style.color = '#cbd5e1';
+        } else if (pct > 20) {
           stagFeeder.className = 'item-tag online';
           stagFeeder.textContent = 'Armed & Active';
           stagFeeder.style.background = 'rgba(16, 185, 129, 0.2)';
@@ -6577,13 +6607,13 @@
       }
       const feederKibble = document.getElementById('feeder-card-kibble');
       if (feederKibble) {
-        feederKibble.textContent = `${pct}% (${rem}g Kibble)`;
-        feederKibble.style.color = pct <= 20 ? '#f87171' : '#34d399';
+        feederKibble.textContent = pct !== null ? `${pct}% (${remText} Kibble)` : '--';
+        feederKibble.style.color = (pct !== null && pct <= 20) ? '#f87171' : (pct === null ? '#94a3b8' : '#34d399');
       }
       const feederWatchdog = document.getElementById('feeder-card-watchdog');
       if (feederWatchdog) {
-        feederWatchdog.textContent = state.opticalWatchdog || 'Armed & Active';
-        feederWatchdog.style.color = pct <= 20 ? '#f87171' : '#34d399';
+        feederWatchdog.textContent = state.opticalWatchdog || 'Unknown';
+        feederWatchdog.style.color = (pct !== null && pct <= 20) ? '#f87171' : (pct === null ? '#94a3b8' : '#34d399');
       }
 
       if (state.lastDispenseTime) {

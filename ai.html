@@ -1105,7 +1105,7 @@
 
         // 2. Draw Other Detections (e.g. Person)
         for (const p of predictions) {
-          if (p.class === 'cat' || p.class === 'dog' || p.class === 'teddy bear') continue;
+          if (p.class === 'cat' || p.class === 'dog' || p.class === 'teddy bear' || p.class === 'bird' || p.class === 'sheep') continue;
 
           const [rawX, rawY, rawW, rawH] = p.bbox;
           const isPerson = (p.class === 'person');
