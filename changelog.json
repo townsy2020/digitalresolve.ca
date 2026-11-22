@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-22T14:04:00Z",
-    "currentVersion":  "v2.8.70",
+    "updatedAt":  "2026-11-22T14:24:00Z",
+    "currentVersion":  "v2.8.71",
     "releases":  [
+                     {
+                         "version":  "v2.8.71",
+                         "date":  "November 22, 2026",
+                         "title":  "Ops Bell Speedtest Hydration, NUC Sparkline Latency Guard & Cloudflare Egress Fallback",
+                         "changes":  [
+                                         {
+                                             "label":  "Ops Bell Speedtest Telemetry",
+                                             "text":  "Extended hasIspDom() in app.js to detect #st-val-down and #gauge-live-num so ops.html hydrates live Bell Fiber throughput, ping, and jitter."
+                                         },
+                                         {
+                                             "label":  "NUC 0.0 ms Sparkline Race Fix",
+                                             "text":  "Guarded updateStatusUI() against overwriting valid >0 ms LAST_NUC_LATENCY with 0 ms from /status?target=nuc so index.html renders the live NUC latency curve."
+                                         },
+                                         {
+                                             "label":  "Cloudflare Tunnel Egress & Mobile Polish",
+                                             "text":  "Displayed tunnel egress in #edge-cache-val when hitRatio is unavailable, prevented Port 11434 badge wrapping on mobile, and bumped assets to v2.8.71."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.70",
                          "date":  "November 22, 2026",

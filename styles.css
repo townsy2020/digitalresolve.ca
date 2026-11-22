@@ -428,6 +428,13 @@ button.dropdown-item:active,
   border: 1px solid rgba(255, 255, 255, 0.08);
   font-family: monospace;
   letter-spacing: 0.3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+#app-card-tokens {
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
 }
 
 .item-tag.online {

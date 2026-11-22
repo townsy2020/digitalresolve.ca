@@ -7,8 +7,8 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Services - Self-Hosted Homelab Portfolio</title>
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.70 - Services - Self-Hosted Homelab Portfolio">
-  <link rel="stylesheet" href="styles.css?v=2.8.70">
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.71 - Services - Self-Hosted Homelab Portfolio">
+  <link rel="stylesheet" href="styles.css?v=2.8.71">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -255,7 +255,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.70</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.71</span>)</span>
             </button>
             <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO(true, event)" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -571,12 +571,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.70</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.71</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 30,035 Lines of Code (HTML: 16,451 lines | CSS: 6,546 lines | JS: 7,037 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 30,146 Lines of Code (HTML: 16,549 lines | CSS: 6,553 lines | JS: 7,043 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">30,035</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">30,146</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1172,17 +1172,31 @@
       </div>
 
             <div class="changelog-body">
-        <!-- Version v2.8.70 (Current) -->
+                <!-- Version v2.8.71 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.70 | Current</span>
+            <span class="ver-tag current">v2.8.71 | Current</span>
+            <span class="ver-date">November 22, 2026</span>
+          </div>
+          <h4 class="ver-title">Ops Bell Speedtest Hydration, NUC Sparkline Latency Guard &amp; Cloudflare Egress Fallback</h4>
+          <ul class="ver-list">
+            <li><strong>Ops Bell Speedtest Telemetry:</strong> Extended <code>hasIspDom()</code> in <code>app.js</code> to detect <code>#st-val-down</code> and <code>#gauge-live-num</code> so <code>ops.html</code> hydrates live Bell Fiber throughput, ping, and jitter.</li>
+            <li><strong>NUC 0.0 ms Sparkline Race Fix:</strong> Guarded <code>updateStatusUI()</code> against overwriting valid &gt;0 ms <code>LAST_NUC_LATENCY</code> with <code>0 ms</code> from <code>/status?target=nuc</code> so <code>index.html</code> renders the live NUC latency curve.</li>
+            <li><strong>Cloudflare Tunnel Egress &amp; Mobile Polish:</strong> Displayed tunnel egress in <code>#edge-cache-val</code> when <code>hitRatio</code> is unavailable, prevented <code>Port 11434</code> badge wrapping on mobile, and bumped assets to <code>v2.8.71</code>.</li>
+          </ul>
+        </div>
+
+        <!-- Version v2.8.70 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.70</span>
             <span class="ver-date">November 22, 2026</span>
           </div>
           <h4 class="ver-title">Accurate Cluster 90-Day SLA Math, Dynamic Grade Badges &amp; Incident Downtime Attribution</h4>
           <ul class="ver-list">
             <li><strong>True Cluster Availability Math:</strong> Updated <code>/api/uptime</code> to factor actual NUC crash downtime (including today's <code>68m 32s</code> outage) and ongoing offline state into <code>overallSla</code>, <code>slaGrade</code>, and rolling 90-day <code>uptime-incidents.json</code> history instead of masking cluster outages with 100% ISP probe availability.</li>
             <li><strong>Dynamic SLA, Heartbeat, Outage &amp; MTTR Badges:</strong> Replaced static <code>Grade A+</code>, <code>Zero Loss</code>, and <code>Instant</code> tags in <code>index.html</code> and <code>uptime.html</code> with live severity-driven badges and downtime summaries in <code>applyUptimeMetrics()</code>.</li>
-            <li><strong>Version v2.8.70 &amp; Asset Cache-Busters:</strong> Bumped <code>styles.css?v=2.8.70</code>, <code>app.js?v=2.8.70</code>, and version badges across all 7 dashboard pages with exact codebase LOC sync.</li>
+            <li><strong>Version v2.8.70 &amp; Asset Cache-Busters:</strong> Bumped <code>styles.css?v=2.8.71</code>, <code>app.js?v=2.8.71</code>, and version badges across all 7 dashboard pages with exact codebase LOC sync.</li>
           </ul>
         </div>
 
@@ -1611,6 +1625,6 @@
       </div>
     </div>
   </div>
-  <script src="app.js?v=2.8.70"></script>
+  <script src="app.js?v=2.8.71"></script>
 </body>
 </html>

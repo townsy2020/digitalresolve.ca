@@ -170,9 +170,9 @@
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 16451;
-      const baseCssLines = 6546;
-      const baseJsLines = 7037;
+      const baseHtmlLines = 16549;
+      const baseCssLines = 6553;
+      const baseJsLines = 7043;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
 
@@ -1013,7 +1013,7 @@
         tag.className = `item-tag ${isOnline ? 'online' : 'offline'}`;
       }
       if (target === 'nuc') {
-        if (latencyMs !== null && Number.isFinite(Number(latencyMs))) {
+        if (latencyMs !== null && Number.isFinite(Number(latencyMs)) && (Number(latencyMs) > 0 || !(Number(window.LAST_NUC_LATENCY) > 0))) {
           window.LAST_NUC_LATENCY = Number(latencyMs);
           document.querySelectorAll('#spark-leg-nuc').forEach(el => {
             el.textContent = `${Number(latencyMs).toFixed(1)} ms`;
@@ -1632,7 +1632,7 @@
       });
 
       const hasClimateDom = () => Boolean(document.getElementById('iot-ambient-temp') || document.getElementById('ribbon-climate') || document.getElementById('climate-temp-val') || document.getElementById('climate-temp') || document.querySelector('[id*="climate-"]'));
-      const hasIspDom = () => Boolean(document.getElementById('isp-ping-val') || document.getElementById('isp-history-tbody') || document.getElementById('uptimeSparkline'));
+      const hasIspDom = () => Boolean(document.getElementById('isp-ping-val') || document.getElementById('isp-history-tbody') || document.getElementById('uptimeSparkline') || document.getElementById('st-val-down') || document.getElementById('gauge-live-num'));
       const hasUptimeDom = () => Boolean(document.getElementById('uptimeMatrix') || document.getElementById('uptime-sla-val') || document.getElementById('uptime-desktop-status'));
       const hasServicesDom = () => Boolean(document.getElementById('dashServiceGrid') || document.getElementById('dash-global-status') || document.querySelector('[id^="kuma-lat-"]'));
       const hasTermDom = () => Boolean(document.getElementById('terminal-content'));
@@ -6349,7 +6349,13 @@
 
       const cleanSaved = String(cur.savedGB).replace(/^(&bull;|•|\s)+/, '').trim();
       const edgeCache = document.getElementById('edge-cache-val');
-      if (edgeCache) edgeCache.textContent = cur.hitRatio === '--' ? '--' : `${cur.hitRatio} (${cleanSaved})`;
+      if (edgeCache) {
+        if (cur.hitRatio === '--') {
+          edgeCache.textContent = (cleanSaved && cleanSaved !== '--') ? cleanSaved : '--';
+        } else {
+          edgeCache.textContent = (cleanSaved && cleanSaved !== '--') ? `${cur.hitRatio} (${cleanSaved})` : cur.hitRatio;
+        }
+      }
       const edgeBar = document.getElementById('edge-cache-bar');
       if (edgeBar) {
         const hrStr = (cur.hitRatio !== undefined && cur.hitRatio !== null) ? String(cur.hitRatio).trim() : '';
