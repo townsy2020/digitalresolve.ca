@@ -8,8 +8,8 @@
   <meta http-equiv="Expires" content="0">
   <title>Tiered Storage &amp; Live Data Flow - DigitalResolve</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b0f17'/%3E%3Cpath d='M8 22V10h7a6 6 0 0 1 0 12H8zm4-3.5h3a2.5 2.5 0 0 0 0-5h-3v5z' fill='%2338bdf8'/%3E%3C/svg%3E">
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.81 - Tiered Storage &amp; Live Data Flow">
-  <link rel="stylesheet" href="styles.css?v=2.8.81">
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.82 - Tiered Storage &amp; Live Data Flow">
+  <link rel="stylesheet" href="styles.css?v=2.8.82">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -262,7 +262,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.81</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.82</span>)</span>
             </button>
             <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO(true, event)" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -374,7 +374,7 @@
       <section class="storage-kpi-strip" aria-label="Storage Cluster KPIs">
         <div class="storage-kpi-card">
           <div class="storage-kpi-label">Total Cluster Capacity</div>
-          <div class="storage-kpi-value" id="kpi-total-capacity">15.1 TB+</div>
+          <div class="storage-kpi-value" id="kpi-total-capacity">--</div>
           <div class="storage-kpi-sub" id="kpi-total-capacity-sub">Desktop + NUC + QNAP SMB &amp; Dual iSCSI + OneDrive</div>
         </div>
         <div class="storage-kpi-card">
@@ -490,7 +490,7 @@
               <button type="button" class="storage-node-card" data-node-id="nuc-d" data-category="media,guardrail">
                 <div class="storage-node-top">
                   <span class="storage-node-name">NUC D: 1.86 TB FireCuda SSHD</span>
-                  <span class="storage-node-tag ok" id="node-tag-nuc-d">970 GB Free</span>
+                  <span class="storage-node-tag ok" id="node-tag-nuc-d">--</span>
                 </div>
                 <div class="storage-node-meta" id="node-meta-nuc-d">Hot Media Buffer &bull; 30% Offload Guardrail</div>
                 <div class="storage-threshold-track" title="30% Free Space Offload Threshold (70% Used)">
@@ -498,7 +498,7 @@
                   <div class="storage-threshold-marker" title="30% Free Offload Threshold"></div>
                 </div>
                 <div class="storage-threshold-label">
-                  <span id="nuc-d-used-lbl">48% Used</span>
+                  <span id="nuc-d-used-lbl">--</span>
                   <span style="color: #fbbf24;">30% Free Threshold</span>
                 </div>
                 <div class="storage-node-desc">Hot seeding &amp; streaming buffer; auto-tiers to QNAP SMB below 30% free.</div>
@@ -524,7 +524,7 @@
               <button type="button" class="storage-node-card" data-node-id="qnap-smb" data-category="media">
                 <div class="storage-node-top">
                   <span class="storage-node-name">SMB Cold Archive</span>
-                  <span class="storage-node-tag ok" id="node-tag-qnap-smb">9.16 TB</span>
+                  <span class="storage-node-tag ok" id="node-tag-qnap-smb">--</span>
                 </div>
                 <div class="storage-node-meta" id="node-meta-qnap-smb">\\192.168.2.125\Torrents / Q: &bull; 9.16 TB</div>
                 <div class="storage-node-desc">Primary cold media archive receiving automated NUC D: tiering offloads.</div>
@@ -533,7 +533,7 @@
               <button type="button" class="storage-node-card" data-node-id="qnap-iscsi-nuc" data-category="backup">
                 <div class="storage-node-top">
                   <span class="storage-node-name">NUC iSCSI LUN (E:)</span>
-                  <span class="storage-node-tag ok" id="node-tag-qnap-iscsi-nuc">2.05 TB</span>
+                  <span class="storage-node-tag ok" id="node-tag-qnap-iscsi-nuc">--</span>
                 </div>
                 <div class="storage-node-meta" id="node-meta-qnap-iscsi-nuc">E: &bull; 2.05 TB &bull; Homelab Resilience &amp; WindowsImageBackup</div>
                 <div class="storage-node-desc">Dedicated iSCSI block target for NUC bare-metal images &amp; state snapshots.</div>
@@ -542,7 +542,7 @@
               <button type="button" class="storage-node-card" data-node-id="qnap-iscsi-desktop" data-category="backup">
                 <div class="storage-node-top">
                   <span class="storage-node-name">Desktop iSCSI LUN (E:)</span>
-                  <span class="storage-node-tag ok" id="node-tag-qnap-iscsi-desktop">2.05 TB</span>
+                  <span class="storage-node-tag ok" id="node-tag-qnap-iscsi-desktop">--</span>
                 </div>
                 <div class="storage-node-meta" id="node-meta-qnap-iscsi-desktop">E: &bull; 2.05 TB &bull; Mirrored Snapshots &amp; Bare-Metal</div>
                 <div class="storage-node-desc">Dedicated iSCSI block target for Desktop mirrored snapshots &amp; bare-metal DR.</div>
@@ -595,7 +595,7 @@
               <h2 class="storage-panel-title">Tier Capacity Distribution &amp; Cold-Tier Headroom</h2>
               <div class="storage-panel-sub">Used vs. free allocation with NUC D: 30% offload threshold marker</div>
             </div>
-            <span class="storage-node-tag info" id="capacity-summary-badge">4 Tiers</span>
+            <span class="storage-node-tag info" id="capacity-summary-badge">--</span>
           </div>
           <div class="storage-capacity-stacked" id="storage-capacity-stacked"></div>
           <div class="storage-capacity-bars" id="storage-capacity-bars"></div>
@@ -698,12 +698,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.81</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.82</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 35,197 Lines of Code (HTML: 19,561 lines | CSS: 7,269 lines | JS: 8,366 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 35,370 Lines of Code (HTML: 19,665 lines | CSS: 7,269 lines | JS: 8,435 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">35,197</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">35,370</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1299,10 +1299,23 @@
       </div>
 
             <div class="changelog-body">
-                                                                <!-- Version v2.8.81 (Current) -->
+                                                                        <!-- Version v2.8.82 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.81 | Current</span>
+            <span class="ver-tag current">v2.8.82 | Current</span>
+            <span class="ver-date">November 23, 2026</span>
+          </div>
+          <h4 class="ver-title">Wave 10 Speedtest Race Fix &amp; Static Placeholder Elimination</h4>
+          <ul class="ver-list">
+            <li><strong>Speedtest Reliability:</strong> Fixed sendControl/pollIspSpeedtestUpdate overlap race and wired live ISP grade to #st-val-grade</li>
+            <li><strong>Live Badges:</strong> Made speedtest countdown (#st-next-probe-badge), smart feeder status badges, and storage tier drive count dynamic</li>
+            <li><strong>Zero Fake Placeholders:</strong> Replaced hardcoded pre-auth torrent, token, storage capacity, Cloudflare SLA, and 8/8 service defaults with honest --/Checking states</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.81 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.81</span>
             <span class="ver-date">November 22, 2026</span>
           </div>
           <h4 class="ver-title">Wave 9 AI Canvas, Speedtest Polling &amp; Placeholder Cleanup</h4>
@@ -1880,7 +1893,7 @@
       </div>
     </div>
   </div>
-  <script src="app.js?v=2.8.81"></script>
-  <script src="storage-flow.js?v=2.8.81"></script>
+  <script src="app.js?v=2.8.82"></script>
+  <script src="storage-flow.js?v=2.8.82"></script>
 </body>
 </html>

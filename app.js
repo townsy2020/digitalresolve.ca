@@ -164,16 +164,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.81';
+          const activeVer = match ? match[0] : 'v2.8.82';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 19561;
+      const baseHtmlLines = 19665;
       const baseCssLines = 7269;
-      const baseJsLines = 8366;
+      const baseJsLines = 8435;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -2528,35 +2528,36 @@
       });
     }
 
-    function sendControl(action, target = 'nuc') {
+    function setSpeedtestButtonsState(running) {
+      isSpeedtesting = Boolean(running);
+      const runBtn = document.getElementById('btn-run-speedtest');
+      const probeNowBtn = document.getElementById('btn-probe-now');
+      const speedBtn = document.getElementById('btn-probe-speed');
+      if (runBtn) {
+        runBtn.disabled = isSpeedtesting;
+        runBtn.innerHTML = isSpeedtesting ? 'Probing WAN...' : 'Run Gigabit Speedtest';
+      }
+      if (probeNowBtn) {
+        probeNowBtn.disabled = isSpeedtesting;
+        probeNowBtn.innerHTML = isSpeedtesting ? 'Probing...' : 'Probe Now';
+      }
+      if (speedBtn) {
+        speedBtn.disabled = isSpeedtesting;
+        speedBtn.innerHTML = isSpeedtesting ? 'Probing Bell Fiber...' : 'Probe Bell Speed';
+      }
+    }
+
+    function sendControl(action, target = 'nuc', opts = {}) {
       if (!isSSOAuthenticated()) {
-        openGlobalSSOModal(`Remote Command: ${action.toUpperCase()}`, () => sendControl(action, target));
+        openGlobalSSOModal(`Remote Command: ${action.toUpperCase()}`, () => sendControl(action, target, opts));
         return;
       }
       const isSpeed = (action === 'run-speedtest');
-      const speedBtn = document.getElementById('btn-probe-speed');
-      const probeNowBtn = document.getElementById('btn-probe-now');
-      if (isSpeed) {
-        if (speedBtn) {
-          speedBtn.disabled = true;
-          speedBtn.innerHTML = 'Probing Bell Fiber...';
-        }
-        if (probeNowBtn) {
-          probeNowBtn.disabled = true;
-          probeNowBtn.innerHTML = 'Probing...';
-        }
+      if (isSpeed && !(opts && opts.fromPoll)) {
+        if (isSpeedtesting) return;
+        testISPNow();
+        return;
       }
-
-      const resetSpeedBtns = () => {
-        if (speedBtn) {
-          speedBtn.disabled = false;
-          speedBtn.innerHTML = 'Probe Bell Speed';
-        }
-        if (probeNowBtn) {
-          probeNowBtn.disabled = false;
-          probeNowBtn.innerHTML = 'Probe Now';
-        }
-      };
 
       const targetLabel = (target === 'desktop') ? 'Desktop PC' : 'NUC Server';
       showToast('loading', `Executing [${targetLabel}]...`, isSpeed ? 'Probing Bell Gigabit connection & jitter...' : `Action: ${action.toUpperCase()}`, 0);
@@ -2573,22 +2574,14 @@
           if (data.status === 'success') {
             showToast('success', isSpeed ? 'Probe Initiated' : `Command Executed (${targetLabel})`, data.message || `Action ${action} succeeded.`);
             fetchClusterStats();
-            if (isSpeed) {
-              setTimeout(fetchISPHistory, 2500);
-              setTimeout(fetchISPHistory, 5500);
-              setTimeout(() => {
-                fetchISPHistory();
-                resetSpeedBtns();
-              }, 8500);
-            }
           } else {
             showToast('error', 'Execution Error', data.message || `Failed to run ${action}.`);
-            if (isSpeed) resetSpeedBtns();
+            if (opts && typeof opts.onError === 'function') opts.onError(new Error(data.message || 'Control error'));
           }
         })
         .catch(err => {
           showToast('error', 'Gateway Offline', `Could not reach ${GATEWAY}`);
-          if (isSpeed) resetSpeedBtns();
+          if (opts && typeof opts.onError === 'function') opts.onError(err);
         });
     }
 
@@ -3537,6 +3530,18 @@
           gradeTag.style.cssText = gradeMeta.style || '';
           gradeTag.title = gradeMeta.tooltip;
         }
+        const computedStGrade = evaluateIspGrade(pingAvg, jitter, loss, grade !== '--' ? grade : null).grade;
+        applyStValGrade(computedStGrade);
+        const latestTsRaw = getIspSampleTimestamp(latest);
+        const latestTsMs = latestTsRaw ? Date.parse(latestTsRaw) : NaN;
+        document.querySelectorAll('#st-next-probe-badge').forEach(el => {
+          if (Number.isFinite(latestTsMs)) {
+            const elapsedMin = Math.max(0, Math.floor((Date.now() - latestTsMs) / 60000));
+            el.textContent = elapsedMin >= 30 ? 'Automated: Due soon' : `Automated: Next in ${30 - elapsedMin}m`;
+          } else {
+            el.textContent = 'Automated: 30m Cadence';
+          }
+        });
         if (carrierVal) carrierVal.textContent = carrier;
         if (uptimeVal && uptimeStr && (!uptimeVal.textContent || uptimeVal.textContent.trim() === '--')) {
           uptimeVal.textContent = uptimeStr;
@@ -3684,73 +3689,95 @@
       return (obj && (obj.timestamp || obj.lastChecked || obj.time)) ? String(obj.timestamp || obj.lastChecked || obj.time) : '';
     }
 
+    function applyStValGrade(grade) {
+      const colorMap = { 'A+': '#10b981', 'A': '#10b981', 'B': '#38bdf8', 'C': '#fbbf24', 'D': '#f97316', 'F': '#ef4444' };
+      const gStr = (grade && grade !== '--') ? String(grade).trim() : '--';
+      const color = colorMap[gStr] || '#94a3b8';
+      document.querySelectorAll('#st-val-grade').forEach(el => {
+        el.textContent = gStr !== '--' ? `Grade ${gStr}` : '--';
+        el.style.color = color;
+      });
+    }
+
     async function pollIspSpeedtestUpdate(opts = {}) {
       clearIspSpeedtestPoll();
       const gen = ++_ispPollGen;
 
-      let prevTs = getIspSampleTimestamp(window.ISP_LATEST);
-      if (!prevTs && typeof fetchISPHistory === 'function') {
-        try { await fetchISPHistory(); } catch (e) {}
-        if (gen !== _ispPollGen) return;
-        prevTs = getIspSampleTimestamp(window.ISP_LATEST);
-      }
-
-      if (typeof sendControl === 'function') {
-        sendControl('run-speedtest', 'nuc');
-      }
-
-      let stage2Fired = false;
-      let pollInFlight = false;
-
-      _ispPollInterval = setInterval(() => {
-        if (gen !== _ispPollGen) { clearIspSpeedtestPoll(); return; }
-        if (!stage2Fired && typeof opts.onStage2 === 'function') {
-          stage2Fired = true;
-          opts.onStage2();
+      try {
+        let prevTs = getIspSampleTimestamp(window.ISP_LATEST);
+        if (!prevTs && typeof fetchISPHistory === 'function') {
+          try { await fetchISPHistory(); } catch (e) {}
+          if (gen !== _ispPollGen) return;
+          prevTs = getIspSampleTimestamp(window.ISP_LATEST);
         }
-        if (pollInFlight || typeof fetchISPHistory !== 'function') return;
-        pollInFlight = true;
-        Promise.resolve(fetchISPHistory()).then((data) => {
-          if (gen !== _ispPollGen) return;
-          const curTs = getIspSampleTimestamp((data && data.latest) || window.ISP_LATEST) || getIspSampleTimestamp(data);
-          if (curTs && curTs !== prevTs) {
-            clearIspSpeedtestPoll();
-            if (typeof opts.onComplete === 'function') opts.onComplete(window.ISP_LATEST || {});
-          }
-        }).finally(() => {
-          pollInFlight = false;
-        });
-      }, 2000);
 
-      _ispPollTimeout = setTimeout(() => {
-        if (gen !== _ispPollGen) return;
-        clearIspSpeedtestPoll();
-        Promise.resolve(typeof fetchISPHistory === 'function' ? fetchISPHistory() : null).finally(() => {
+        if (typeof sendControl === 'function') {
+          sendControl('run-speedtest', 'nuc', {
+            fromPoll: true,
+            onError: (err) => {
+              if (gen !== _ispPollGen) return;
+              clearIspSpeedtestPoll();
+              if (typeof opts.onError === 'function') opts.onError(err);
+            }
+          });
+        }
+
+        let stage2Fired = false;
+        let pollInFlight = false;
+
+        _ispPollInterval = setInterval(() => {
+          if (gen !== _ispPollGen) { clearIspSpeedtestPoll(); return; }
+          if (!stage2Fired && typeof opts.onStage2 === 'function') {
+            stage2Fired = true;
+            opts.onStage2();
+          }
+          if (pollInFlight || typeof fetchISPHistory !== 'function') return;
+          pollInFlight = true;
+          Promise.resolve(fetchISPHistory()).then((data) => {
+            if (gen !== _ispPollGen) return;
+            const curTs = getIspSampleTimestamp((data && data.latest) || window.ISP_LATEST) || getIspSampleTimestamp(data);
+            if (curTs && curTs !== prevTs) {
+              clearIspSpeedtestPoll();
+              if (typeof opts.onComplete === 'function') opts.onComplete(window.ISP_LATEST || {});
+            }
+          }).finally(() => {
+            pollInFlight = false;
+          });
+        }, 2000);
+
+        _ispPollTimeout = setTimeout(() => {
           if (gen !== _ispPollGen) return;
-          if (typeof opts.onTimeout === 'function') opts.onTimeout(window.ISP_LATEST || {});
-        });
-      }, 30000);
+          clearIspSpeedtestPoll();
+          Promise.resolve(typeof fetchISPHistory === 'function' ? fetchISPHistory() : null).finally(() => {
+            if (gen !== _ispPollGen) return;
+            if (typeof opts.onTimeout === 'function') opts.onTimeout(window.ISP_LATEST || {});
+          });
+        }, 30000);
+      } catch (err) {
+        clearIspSpeedtestPoll();
+        if (typeof opts.onError === 'function') opts.onError(err);
+      }
     }
 
     function testISPNow() {
+      if (isSpeedtesting) return;
       if (!isSSOAuthenticated()) {
         openGlobalSSOModal('Bell Gigabit Fiber Speedprobe', testISPNow);
         return;
       }
-      const probeBtn = document.getElementById('btn-probe-now');
-      if (probeBtn) {
-        probeBtn.disabled = true;
-        probeBtn.innerHTML = 'Probing...';
-      }
+      setSpeedtestButtonsState(true);
       pollIspSpeedtestUpdate({
         onComplete: (latest) => {
-          if (probeBtn) { probeBtn.disabled = false; probeBtn.innerHTML = 'Probe Now'; }
+          setSpeedtestButtonsState(false);
           const pingStr = (latest && latest.pingAvgMs != null && Number.isFinite(Number(latest.pingAvgMs))) ? Number(latest.pingAvgMs).toFixed(1) : '--';
           if (typeof showToast === 'function') showToast('success', 'Probe Complete', `Ping: ${pingStr} ms`);
         },
         onTimeout: () => {
-          if (probeBtn) { probeBtn.disabled = false; probeBtn.innerHTML = 'Probe Now'; }
+          setSpeedtestButtonsState(false);
           if (typeof showToast === 'function') showToast('warning', 'Probe Timed Out — Showing Latest', 'No new gateway sample arrived within 30s.');
+        },
+        onError: () => {
+          setSpeedtestButtonsState(false);
         }
       });
     }
@@ -4980,6 +5007,13 @@
         })
         .catch(err => {
           if (timeoutId) clearTimeout(timeoutId);
+          document.querySelectorAll('#dash-global-status').forEach(dashGlobal => {
+            dashGlobal.textContent = 'Telemetry Unavailable';
+            dashGlobal.className = 'item-tag offline';
+            dashGlobal.style.color = '#94a3b8';
+            dashGlobal.style.background = 'rgba(148, 163, 184, 0.15)';
+            dashGlobal.style.borderColor = 'rgba(148, 163, 184, 0.3)';
+          });
           return null;
         });
     }
@@ -6308,8 +6342,7 @@
 
     function runLiveSpeedtestBenchmark() {
       if (isSpeedtesting) return;
-      isSpeedtesting = true;
-      const btn = document.getElementById('btn-run-speedtest');
+      setSpeedtestButtonsState(true);
       const gaugeNum = document.getElementById('gauge-live-num');
       const gaugeNeedle = document.getElementById('speed-dial-needle');
       const stageText = document.getElementById('st-stage-indicator');
@@ -6320,7 +6353,6 @@
       const ispBefore = window.ISP_LATEST || {};
       const carrier = ispBefore.isp || 'Bell Canada';
 
-      if (btn) { btn.disabled = true; btn.innerHTML = 'Probing WAN...'; }
       if (stageText) stageText.textContent = `Stage 1/2: Dispatching live ${carrier} fiber probe on NUC gateway...`;
       playChaosTone(440, 880, 'sine', 0.15);
 
@@ -6338,12 +6370,13 @@
         if (pingEl) pingEl.innerHTML = `${pingStr} <span style="font-size: 0.85rem; color: #94a3b8;">ms</span>`;
         if (downEl) downEl.innerHTML = downStr === '--' ? `--` : `${downStr} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
         if (upEl) upEl.innerHTML = upStr === '--' ? `--` : `${upStr} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
+        applyStValGrade(realGrade);
         if (gaugeNum) gaugeNum.textContent = downStr;
         if (gaugeNeedle) {
           const angle = (rawDown !== null && Number.isFinite(rawDown)) ? (-135 + (Math.min(rawDown, 1000) / 1000) * 180) : -135;
           gaugeNeedle.style.transform = `rotate(${angle}deg)`;
         }
-        if (btn) { btn.disabled = false; btn.innerHTML = 'Run Gigabit Speedtest'; }
+        setSpeedtestButtonsState(false);
         const statusLabel = timedOut ? 'Probe Timed Out — Showing Latest' : 'Probe Complete';
         if (stageText) {
           stageText.textContent = `${statusLabel}: ${pingStr} ms Ping  -  Packet Loss ${realLoss}%  -  Grade ${realGrade} (${realCarrier})`;
@@ -6354,7 +6387,6 @@
         } else {
           showToast('warning', 'Probe Timed Out — Showing Latest', `Ping: ${pingStr} ms  -  Loss: ${realLoss}%  -  Grade: ${realGrade}`);
         }
-        isSpeedtesting = false;
       };
 
       pollIspSpeedtestUpdate({
@@ -6363,7 +6395,11 @@
           playChaosTone(587, 880, 'sine', 0.2);
         },
         onComplete: (latest) => renderSpeedtestResult(latest, false),
-        onTimeout: (latest) => renderSpeedtestResult(latest, true)
+        onTimeout: (latest) => renderSpeedtestResult(latest, true),
+        onError: () => {
+          setSpeedtestButtonsState(false);
+          if (stageText) stageText.textContent = 'Gateway offline or control rejected. Ready to retry.';
+        }
       });
     }
     window.runLiveSpeedtestBenchmark = runLiveSpeedtestBenchmark;
@@ -6550,17 +6586,17 @@
     function updateCloudflareStatsUI(cfData) {
       const defStats = {
         totalRequests: 'Tunnel Active',
-        ingressSla: '99.98% Edge SLA',
+        ingressSla: '--',
         hitRatio: null,
         savedGB: '0.0 GB',
-        haConnections: 4,
-        uniqueVisitors: '4 Active',
-        topPop: 'YUL (Montreal)',
+        haConnections: null,
+        uniqueVisitors: '--',
+        topPop: '--',
         threatsBlocked: 'Shield Active',
         geoShield: 'CA/US Geo-Shield',
         edgeThreats: 'WAF Active • CA/US Shield',
         edgeIngress: 'Argo Tunnel',
-        edgePops: 'YUL (Montreal) • YYZ (Toronto)',
+        edgePops: '--',
         subRequests: {
           apex: 'Edge Proxied',
           wake: 'Tunnel Proxy',
@@ -6616,7 +6652,7 @@
       };
 
       const isZoneScope = Boolean(source && source.analyticsScope === 'zone' && source.hitRatio !== undefined && source.hitRatio !== null && String(source.hitRatio).trim() !== '' && String(source.hitRatio).trim() !== '--');
-      const haCount = (source && source.haConnections) ? source.haConnections : defStats.haConnections;
+      const haCount = (source && source.haConnections !== undefined && source.haConnections !== null) ? source.haConnections : defStats.haConnections;
       const rawPop = (source && source.topPop) ? String(source.topPop).replace(/^Top PoP:\s*/i, '').trim() : defStats.topPop;
 
       const cur = {
@@ -6624,8 +6660,8 @@
         ingressSla: (source && source.ingressSla) ? source.ingressSla : defStats.ingressSla,
         hitRatio: isZoneScope ? (typeof source.hitRatio === 'number' ? `${source.hitRatio}%` : (String(source.hitRatio).includes('%') ? String(source.hitRatio).trim() : `${String(source.hitRatio).trim()}%`)) : formatShortGB(source && source.savedGB),
         savedGB: isZoneScope ? formatSavedGB(source && source.savedGB, 'Edge Cache Active') : 'Argo Tunnel Egress',
-        uniqueVisitors: isZoneScope ? ((source && source.uniqueVisitors !== undefined && source.uniqueVisitors !== null) ? (typeof source.uniqueVisitors === 'number' ? source.uniqueVisitors.toLocaleString() : source.uniqueVisitors) : 'Active') : `${haCount} Active`,
-        topPop: isZoneScope ? `Top PoP: ${rawPop}` : `PoP: ${rawPop} • Tunnel Mode`,
+        uniqueVisitors: isZoneScope ? ((source && source.uniqueVisitors !== undefined && source.uniqueVisitors !== null) ? (typeof source.uniqueVisitors === 'number' ? source.uniqueVisitors.toLocaleString() : source.uniqueVisitors) : 'Active') : (haCount !== null ? `${haCount} Active` : '--'),
+        topPop: (rawPop && rawPop !== '--') ? (isZoneScope ? `Top PoP: ${rawPop}` : `PoP: ${rawPop} • Tunnel Mode`) : '--',
         threatsBlocked: (source && source.threatsBlocked !== undefined && source.threatsBlocked !== null) ? (typeof source.threatsBlocked === 'number' ? source.threatsBlocked.toLocaleString() : source.threatsBlocked) : defStats.threatsBlocked,
         geoShield: (source && source.geoShield) ? source.geoShield : defStats.geoShield,
         edgeThreats: formatEdgeThreats(source, defStats.edgeThreats),
@@ -6635,7 +6671,7 @@
       };
 
       const formatBullet = (str) => {
-        if (!str || str === '--') return 'Active';
+        if (!str || str === '--') return '--';
         const clean = String(str).replace(/^(&bull;|•|\s)+/, '').trim();
         return `• ${clean}`;
       };
@@ -7173,6 +7209,24 @@
 
       // Live Homelab Service Dashboard Card (index.html & uptime.html)
       window._feederLowHopperAlert = (pct !== null && pct <= 20);
+      document.querySelectorAll('.feeder-live-status-badge').forEach(badge => {
+        if (state.online === false) {
+          badge.className = 'item-tag offline feeder-live-status-badge';
+          badge.style.background = 'rgba(239, 68, 68, 0.2)';
+          badge.style.color = '#fca5a5';
+          badge.innerHTML = '<span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #ef4444; margin-right: 4px; box-shadow: 0 0 6px #ef4444;"></span>192.168.2.22 &bull; Offline';
+        } else if (pct !== null && pct <= 20) {
+          badge.className = 'item-tag offline feeder-live-status-badge';
+          badge.style.background = 'rgba(245, 158, 11, 0.2)';
+          badge.style.color = '#fbbf24';
+          badge.innerHTML = '<span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #f59e0b; margin-right: 4px; box-shadow: 0 0 6px #f59e0b;"></span>192.168.2.22 &bull; Low Hopper';
+        } else {
+          badge.className = 'item-tag online feeder-live-status-badge';
+          badge.style.background = 'rgba(16, 185, 129, 0.2)';
+          badge.style.color = '#34d399';
+          badge.innerHTML = '<span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10b981; margin-right: 4px; box-shadow: 0 0 6px #10b981;"></span>192.168.2.22 &bull; Connected &amp; Armed';
+        }
+      });
       const stagFeeder = document.getElementById('stag-feeder');
       if (stagFeeder) {
         if (pct === null) {
@@ -7263,6 +7317,12 @@
               stagFeeder.style.background = 'rgba(148, 163, 184, 0.15)';
               stagFeeder.style.color = '#94a3b8';
             }
+            document.querySelectorAll('.feeder-live-status-badge').forEach(badge => {
+              badge.className = 'item-tag offline feeder-live-status-badge';
+              badge.style.background = 'rgba(239, 68, 68, 0.2)';
+              badge.style.color = '#fca5a5';
+              badge.innerHTML = '<span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #ef4444; margin-right: 4px; box-shadow: 0 0 6px #ef4444;"></span>192.168.2.22 &bull; Offline';
+            });
           };
 
           if (isHttps) {

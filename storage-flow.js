@@ -269,6 +269,12 @@
     }
   }
 
+  function resetCapacityFallbacks() {
+    ['kpi-total-capacity', 'node-tag-nuc-d', 'nuc-d-used-lbl', 'node-tag-qnap-smb', 'node-tag-qnap-iscsi-nuc', 'node-tag-qnap-iscsi-desktop', 'capacity-summary-badge'].forEach(id => {
+      setText(id, '--');
+    });
+  }
+
   function renderAuthFallback() {
     const banner = document.getElementById('storage-sso-banner');
     if (banner) banner.style.display = 'flex';
@@ -276,11 +282,13 @@
     setText('storage-updated-text', 'Sign in for Live Telemetry');
     setText('kpi-last-sync', 'M365 SSO');
     setText('kpi-last-sync-sub', 'Sign in for Live Telemetry');
+    resetCapacityFallbacks();
   }
 
   function renderOfflineFallback() {
     setText('storage-route-text', 'Gateway Standby');
     setText('storage-updated-text', 'Retrying Telemetry');
+    resetCapacityFallbacks();
   }
 
   function setText(id, val) {
@@ -659,6 +667,7 @@
     ];
 
     const totalCluster = rows.reduce((s, r) => s + r.total, 0) || 1;
+    setText('capacity-summary-badge', `${rows.length} Drives • 4 Tiers`);
     const stackedEl = document.getElementById('storage-capacity-stacked');
     if (stackedEl) {
       stackedEl.innerHTML = rows

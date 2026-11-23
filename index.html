@@ -8,8 +8,8 @@
   <meta http-equiv="Expires" content="0">
   <title>Digital Resolve - Homelab Operations Deck</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b0f17'/%3E%3Cpath d='M8 22V10h7a6 6 0 0 1 0 12H8zm4-3.5h3a2.5 2.5 0 0 0 0-5h-3v5z' fill='%2338bdf8'/%3E%3C/svg%3E">
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.81 - Digital Resolve - Homelab Operations Deck">
-  <link rel="stylesheet" href="styles.css?v=2.8.81">
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.82 - Digital Resolve - Homelab Operations Deck">
+  <link rel="stylesheet" href="styles.css?v=2.8.82">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -262,7 +262,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.81</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.82</span>)</span>
             </button>
             <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO(true, event)" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -856,7 +856,7 @@
                       <span style="font-size: 0.78rem; text-transform: uppercase; color: #f472b6; font-weight: 700; display: flex; align-items: center; gap: 6px;">
                         Penny's Smart Feeder IoT
                       </span>
-                      <span class="item-tag online" style="background: rgba(16, 185, 129, 0.2); color: #34d399;"><span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10b981; margin-right: 4px; box-shadow: 0 0 6px #10b981;"></span>192.168.2.22 &bull; Connected &amp; Armed</span>
+                      <span class="item-tag online feeder-live-status-badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399;"><span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10b981; margin-right: 4px; box-shadow: 0 0 6px #10b981;"></span>192.168.2.22 &bull; Checking...</span>
                     </div>
                     <!-- Live Dynamic Hopper Telemetry & Optical Watchdog -->
                     <div style="display: flex; justify-content: space-between; align-items: baseline; margin: 8px 0 4px 0;">
@@ -1108,7 +1108,7 @@
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap;">
                   <span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 10px #10b981; width: 10px; height: 10px;"></span>
                   <h3 style="font-size: 1.25rem; font-weight: 800; color: #f0f6fc; margin: 0;">Homelab Service Status Dashboard</h3>
-                  <span class="item-tag online" id="dash-global-status" style="font-size: 0.72rem; padding: 2px 8px;">8/8 Services Online</span>
+                  <span class="item-tag online" id="dash-global-status" style="font-size: 0.72rem; padding: 2px 8px;">Checking Services...</span>
                 </div>
                 <div style="font-size: 0.8rem; color: #94a3b8; max-width: 650px;">
                   Real-time health, active listener ports, zero-trust edge routing, and autonomous Sentinel watchdog status across all fleet microservices.
@@ -1858,8 +1858,8 @@
                   <span style="color: #94a3b8;">Tokens:</span>
                   <strong class="mono" id="term-token-val" style="color: #38bdf8;">--</strong>
                   <span class="token-breakdown-tags" id="term-token-breakdown">
-                    <span class="item-tag tag-flash" id="term-tag-flash" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-size: 0.68rem; padding: 1px 5px;">Flash 92.32%</span> <span class="item-tag tag-pro" id="term-tag-pro" style="background: rgba(168, 85, 247, 0.2); color: #c084fc; font-size: 0.68rem; padding: 1px 5px;">Pro 7.68%</span>
-                    <span class="item-tag" id="term-tag-cache" style="background: rgba(52, 211, 153, 0.2); color: #34d399; font-size: 0.68rem; padding: 1px 5px;">Cache: 318M</span>
+                    <span class="item-tag tag-flash" id="term-tag-flash" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-size: 0.68rem; padding: 1px 5px;">Flash --</span> <span class="item-tag tag-pro" id="term-tag-pro" style="background: rgba(168, 85, 247, 0.2); color: #c084fc; font-size: 0.68rem; padding: 1px 5px;">Pro --</span>
+                    <span class="item-tag" id="term-tag-cache" style="background: rgba(52, 211, 153, 0.2); color: #34d399; font-size: 0.68rem; padding: 1px 5px;">Cache: --</span>
                   </span>
                 </div>
               </div>
@@ -2013,7 +2013,7 @@
               </div>
               <div class="kpi-mini-card amber">
                 <div class="kpi-label">Bufferbloat Rating</div>
-                <div class="kpi-val" id="st-val-grade" style="color: #fbbf24;">Grade A+</div>
+                <div class="kpi-val" id="st-val-grade" style="color: #94a3b8;">--</div>
                 <div class="kpi-sub" id="st-sub-bloat">+0 ms latency under full saturation</div>
               </div>
             </div>
@@ -2025,7 +2025,7 @@
                   <h3 style="font-size: 1.15rem; font-weight: 800; color: #f8fafc; margin-bottom: 4px;">Automated Gigabit Benchmark Daemon</h3>
                   <div style="font-size: 0.8rem; color: #94a3b8;">Hourly scheduled testing daemon running on NUC via Ookla/Cloudflare Speedtest CLI.</div>
                 </div>
-                <span class="item-tag online" style="font-size: 0.76rem; padding: 4px 10px;">Automated: Next in 24m</span>
+                <span class="item-tag online" id="st-next-probe-badge" style="font-size: 0.76rem; padding: 4px 10px;">Automated: 30m Cadence</span>
               </div>
 
               <!-- Animated Speedometer Dial Display -->
@@ -2204,7 +2204,7 @@
               <div class="iot-card" style="border-color: rgba(244, 114, 182, 0.35);">
                 <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;">
                   <span style="font-size: 0.75rem; text-transform: uppercase; color: #f472b6; font-weight: 700;">Penny's Smart Feeder IoT</span>
-                  <span class="item-tag online" style="background: rgba(16, 185, 129, 0.2); color: #34d399;"><span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10b981; margin-right: 4px; box-shadow: 0 0 6px #10b981;"></span>192.168.2.22 &bull; Connected &amp; Armed</span>
+                  <span class="item-tag online feeder-live-status-badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399;"><span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10b981; margin-right: 4px; box-shadow: 0 0 6px #10b981;"></span>192.168.2.22 &bull; Checking...</span>
                 </div>
                 <div style="font-size: 1.8rem; font-weight: 800; color: #f472b6; font-family: 'JetBrains Mono', monospace; margin: 4px 0;">
                   <span id="feeder-nuc-hopper-pct">--%</span> <span id="feeder-nuc-hopper-sub" style="font-size: 0.85rem; color: #94a3b8; font-weight: 600;">(Awaiting telemetry)</span>
@@ -2535,12 +2535,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.81</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.82</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 35,197 Lines of Code (HTML: 19,561 lines | CSS: 7,269 lines | JS: 8,366 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 35,370 Lines of Code (HTML: 19,665 lines | CSS: 7,269 lines | JS: 8,435 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">35,197</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">35,370</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -3135,10 +3135,23 @@
       </div>
 
             <div class="changelog-body">
-                                                                <!-- Version v2.8.81 (Current) -->
+                                                                        <!-- Version v2.8.82 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.81 | Current</span>
+            <span class="ver-tag current">v2.8.82 | Current</span>
+            <span class="ver-date">November 23, 2026</span>
+          </div>
+          <h4 class="ver-title">Wave 10 Speedtest Race Fix &amp; Static Placeholder Elimination</h4>
+          <ul class="ver-list">
+            <li><strong>Speedtest Reliability:</strong> Fixed sendControl/pollIspSpeedtestUpdate overlap race and wired live ISP grade to #st-val-grade</li>
+            <li><strong>Live Badges:</strong> Made speedtest countdown (#st-next-probe-badge), smart feeder status badges, and storage tier drive count dynamic</li>
+            <li><strong>Zero Fake Placeholders:</strong> Replaced hardcoded pre-auth torrent, token, storage capacity, Cloudflare SLA, and 8/8 service defaults with honest --/Checking states</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.81 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.81</span>
             <span class="ver-date">November 22, 2026</span>
           </div>
           <h4 class="ver-title">Wave 9 AI Canvas, Speedtest Polling &amp; Placeholder Cleanup</h4>
@@ -3716,6 +3729,6 @@
       </div>
     </div>
   </div>
-  <script src="app.js?v=2.8.81"></script>
+  <script src="app.js?v=2.8.82"></script>
 </body>
 </html>

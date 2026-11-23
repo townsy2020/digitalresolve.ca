@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-23T04:58:27Z",
-    "currentVersion":  "v2.8.81",
+    "updatedAt":  "2026-11-23T12:04:44Z",
+    "currentVersion":  "v2.8.82",
     "releases":  [
+                     {
+                         "version":  "v2.8.82",
+                         "date":  "November 23, 2026",
+                         "title":  "Wave 10 Speedtest Race Fix \u0026 Static Placeholder Elimination",
+                         "changes":  [
+                                         {
+                                             "label":  "Speedtest Reliability",
+                                             "text":  "Fixed sendControl/pollIspSpeedtestUpdate overlap race and wired live ISP grade to #st-val-grade"
+                                         },
+                                         {
+                                             "label":  "Live Badges",
+                                             "text":  "Made speedtest countdown (#st-next-probe-badge), smart feeder status badges, and storage tier drive count dynamic"
+                                         },
+                                         {
+                                             "label":  "Zero Fake Placeholders",
+                                             "text":  "Replaced hardcoded pre-auth torrent, token, storage capacity, Cloudflare SLA, and 8/8 service defaults with honest --/Checking states"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.81",
                          "date":  "November 22, 2026",
