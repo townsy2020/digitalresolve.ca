@@ -164,16 +164,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.80';
+          const activeVer = match ? match[0] : 'v2.8.81';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 19457;
+      const baseHtmlLines = 19561;
       const baseCssLines = 7269;
-      const baseJsLines = 8339;
+      const baseJsLines = 8366;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -1010,7 +1010,7 @@
         if (window.LAST_NUC_RAM_GB !== undefined && window.LAST_NUC_RAM_GB !== null && window.LAST_NUC_RAM_GB !== '' && Number.isFinite(ramVal) && ramVal > 0) {
           el.textContent = `${ramVal} GB`;
         } else if (!el.textContent || el.textContent.trim() === '--') {
-          el.textContent = '32 GB';
+          el.textContent = '--';
         }
       });
       // Dynamic scale range managed by renderSparklineFrame
@@ -1150,13 +1150,7 @@
       if (torrent) {
         const dlNum = Number(torrent.dlSpeed) || 0;
         const dlTxt = torrent.dlSpeedText || (dlNum >= 1048576 ? `${(dlNum / 1048576).toFixed(1)} MB/s` : `${Math.round(dlNum / 1024)} KB/s`);
-        if (target === 'desktop') {
-          const dTag = document.getElementById('desktop-speed-tag');
-          if (dTag) {
-            dTag.textContent = dlNum > 0 ? `DL: ${dlTxt}` : 'Idle';
-            dTag.className = dlNum > 0 ? 'item-tag online' : 'item-tag';
-          }
-        } else if (target === 'nuc') {
+        if (target === 'nuc') {
           const nTag = document.getElementById('nuc-disk-tag');
           if (nTag && dlNum > 1024) {
             nTag.textContent = `DL: ${dlTxt}`;
@@ -1578,8 +1572,6 @@
               sDeskSub.innerHTML = '<span>Storage Standby &bull; Sleep Mode</span>';
             }
           }
-          const dTag = document.getElementById('desktop-speed-tag');
-          if (dTag) { dTag.textContent = 'Offline'; dTag.className = 'item-tag offline'; }
         }
       }
       updateHealthIndexScore();
@@ -2903,10 +2895,6 @@
       if (bar5h) bar5h.style.width = fiveHourLimit !== null ? `${fiveHourLimit}%` : '0%';
       const pBar5h = document.getElementById('menu-progress-bar-5h');
       if (pBar5h) pBar5h.title = `5-Hour Limit: ${fiveHourLimit !== null ? fiveHourLimit + '% Remaining' : '--'} (Refresh in ${fiveHourRef}${fmtLocalReset(metrics.fiveHourResetTime)})`;
-      const mPro = document.getElementById('menu-pct-pro');
-      if (mPro) mPro.innerHTML = `<strong style="font-weight:700; color: #c084fc;">${proPct}%</strong> Output`;
-      const mCache = document.getElementById('menu-pct-cache');
-      if (mCache) mCache.innerHTML = `<strong style="font-weight:700;">${cacheFmt}</strong> Cache`;
       const pBar = document.getElementById('menu-progress-bar');
       if (pBar) pBar.title = `Gemini Weekly: ${weeklyLimit !== null ? weeklyLimit + '% Remaining' : '--'} (Refresh in ${weeklyRef}${fmtLocalReset(metrics.weeklyResetTime)})`;
 
@@ -3683,6 +3671,67 @@
         });
     }
 
+    let _ispPollInterval = null;
+    let _ispPollTimeout = null;
+    let _ispPollGen = 0;
+
+    function clearIspSpeedtestPoll() {
+      if (_ispPollInterval) { clearInterval(_ispPollInterval); _ispPollInterval = null; }
+      if (_ispPollTimeout) { clearTimeout(_ispPollTimeout); _ispPollTimeout = null; }
+    }
+
+    function getIspSampleTimestamp(obj) {
+      return (obj && (obj.timestamp || obj.lastChecked || obj.time)) ? String(obj.timestamp || obj.lastChecked || obj.time) : '';
+    }
+
+    async function pollIspSpeedtestUpdate(opts = {}) {
+      clearIspSpeedtestPoll();
+      const gen = ++_ispPollGen;
+
+      let prevTs = getIspSampleTimestamp(window.ISP_LATEST);
+      if (!prevTs && typeof fetchISPHistory === 'function') {
+        try { await fetchISPHistory(); } catch (e) {}
+        if (gen !== _ispPollGen) return;
+        prevTs = getIspSampleTimestamp(window.ISP_LATEST);
+      }
+
+      if (typeof sendControl === 'function') {
+        sendControl('run-speedtest', 'nuc');
+      }
+
+      let stage2Fired = false;
+      let pollInFlight = false;
+
+      _ispPollInterval = setInterval(() => {
+        if (gen !== _ispPollGen) { clearIspSpeedtestPoll(); return; }
+        if (!stage2Fired && typeof opts.onStage2 === 'function') {
+          stage2Fired = true;
+          opts.onStage2();
+        }
+        if (pollInFlight || typeof fetchISPHistory !== 'function') return;
+        pollInFlight = true;
+        Promise.resolve(fetchISPHistory()).then((data) => {
+          if (gen !== _ispPollGen) return;
+          const curTs = getIspSampleTimestamp((data && data.latest) || window.ISP_LATEST) || getIspSampleTimestamp(data);
+          if (curTs && curTs !== prevTs) {
+            clearIspSpeedtestPoll();
+            if (typeof opts.onComplete === 'function') opts.onComplete(window.ISP_LATEST || {});
+          }
+        }).finally(() => {
+          pollInFlight = false;
+        });
+      }, 2000);
+
+      _ispPollTimeout = setTimeout(() => {
+        if (gen !== _ispPollGen) return;
+        clearIspSpeedtestPoll();
+        Promise.resolve(typeof fetchISPHistory === 'function' ? fetchISPHistory() : null).finally(() => {
+          if (gen !== _ispPollGen) return;
+          if (typeof opts.onTimeout === 'function') opts.onTimeout(window.ISP_LATEST || {});
+        });
+      }, 30000);
+    }
+
     function testISPNow() {
       if (!isSSOAuthenticated()) {
         openGlobalSSOModal('Bell Gigabit Fiber Speedprobe', testISPNow);
@@ -3693,14 +3742,17 @@
         probeBtn.disabled = true;
         probeBtn.innerHTML = 'Probing...';
       }
-      sendControl('run-speedtest');
-      setTimeout(() => {
-        fetchISPHistory();
-        if (probeBtn) {
-          probeBtn.disabled = false;
-          probeBtn.innerHTML = 'Probe Now';
+      pollIspSpeedtestUpdate({
+        onComplete: (latest) => {
+          if (probeBtn) { probeBtn.disabled = false; probeBtn.innerHTML = 'Probe Now'; }
+          const pingStr = (latest && latest.pingAvgMs != null && Number.isFinite(Number(latest.pingAvgMs))) ? Number(latest.pingAvgMs).toFixed(1) : '--';
+          if (typeof showToast === 'function') showToast('success', 'Probe Complete', `Ping: ${pingStr} ms`);
+        },
+        onTimeout: () => {
+          if (probeBtn) { probeBtn.disabled = false; probeBtn.innerHTML = 'Probe Now'; }
+          if (typeof showToast === 'function') showToast('warning', 'Probe Timed Out — Showing Latest', 'No new gateway sample arrived within 30s.');
         }
-      }, 9000);
+      });
     }
 
     // Inline Quick Magnet Submission Handler
@@ -3895,10 +3947,6 @@
       const lanLink = document.getElementById('cam-lan-link');
       if (lanLink) {
         lanLink.href = `http://192.168.2.35:8089/${targetUrl}`;
-      }
-      const helperLink = document.getElementById('cam-helper-link');
-      if (helperLink) {
-        helperLink.href = `https://cam.digitalresolve.ca/${targetUrl}`;
       }
       if (title) {
         title.innerText = currentCamTarget === 'bedroom' ? 'Bedroom Cam' : "Penny's Feeder Cam & Feeder IoT";
@@ -4212,41 +4260,7 @@
         }
       }
 
-      // 3. Dedicated Maintenance Card on Uptime Page
-      const uptBadge = document.getElementById('uptime-maint-badge');
-      const uptDesc = document.getElementById('uptime-maint-desc');
-      const uptCard = document.getElementById('uptime-maint-card');
-      if (uptBadge) {
-        if (active) {
-          uptBadge.textContent = 'Maintenance Active (SLA Shield)';
-          uptBadge.className = 'item-tag';
-          uptBadge.style.background = 'rgba(245, 158, 11, 0.25)';
-          uptBadge.style.color = '#fde047';
-          if (uptDesc && data && data.expiresAt) {
-            const diff = Math.max(0, data.expiresAt - Date.now());
-            const mins = Math.floor(diff / 60000);
-            uptDesc.textContent = `Scheduled maintenance active (${mins}m remaining). NUC updates and reboots are 100% exempt from SLA outage metrics.`;
-          }
-          if (uptCard) {
-            uptCard.style.borderColor = '#f59e0b';
-            uptCard.style.boxShadow = '0 0 16px rgba(245, 158, 11, 0.25)';
-          }
-        } else {
-          uptBadge.textContent = 'Normal Operations';
-          uptBadge.className = 'item-tag online';
-          uptBadge.style.background = '';
-          uptBadge.style.color = '';
-          if (uptDesc) {
-            uptDesc.textContent = 'Engage planned maintenance windows to protect 90-Day SLA metrics during Windows Updates, driver maintenance, and server reboots.';
-          }
-          if (uptCard) {
-            uptCard.style.borderColor = 'rgba(245, 158, 11, 0.4)';
-            uptCard.style.boxShadow = '';
-          }
-        }
-      }
-
-      // 4. NUC Tier Status in Uptime Matrix
+      // 3. NUC Tier Status in Uptime Matrix
       const nucTierStatus = document.getElementById('nuc-tier-status-badge');
       if (nucTierStatus) {
         if (active) {
@@ -6310,45 +6324,47 @@
       if (stageText) stageText.textContent = `Stage 1/2: Dispatching live ${carrier} fiber probe on NUC gateway...`;
       playChaosTone(440, 880, 'sine', 0.15);
 
-      if (typeof sendControl === 'function') {
-        sendControl('run-speedtest', 'nuc');
-      }
+      const renderSpeedtestResult = (latest, timedOut) => {
+        const rawPing = (latest.pingAvgMs !== undefined && latest.pingAvgMs !== null && latest.pingAvgMs !== '') ? Number(latest.pingAvgMs) : NaN;
+        const pingStr = Number.isFinite(rawPing) ? rawPing.toFixed(1) : '--';
+        const rawDown = (latest.downloadMbps !== undefined && latest.downloadMbps !== null) ? Number(latest.downloadMbps) : ((latest.downMbps !== undefined && latest.downMbps !== null) ? Number(latest.downMbps) : null);
+        const rawUp = (latest.uploadMbps !== undefined && latest.uploadMbps !== null) ? Number(latest.uploadMbps) : ((latest.upMbps !== undefined && latest.upMbps !== null) ? Number(latest.upMbps) : null);
+        const downStr = (rawDown !== null && Number.isFinite(rawDown)) ? String(rawDown) : '--';
+        const upStr = (rawUp !== null && Number.isFinite(rawUp)) ? String(rawUp) : '--';
+        const realCarrier = latest.isp || carrier;
+        const realLoss = (latest.packetLoss !== undefined && latest.packetLoss !== null) ? latest.packetLoss : 0;
+        const realGrade = evaluateIspGrade(rawPing, latest.jitterMs, realLoss, latest.grade).grade;
 
-      setTimeout(() => {
-        if (stageText) stageText.textContent = `Stage 2/2: Collecting fresh latency & throughput telemetry from gateway...`;
-        playChaosTone(587, 880, 'sine', 0.2);
-      }, 2500);
-
-      setTimeout(() => {
-        Promise.resolve(typeof fetchISPHistory === 'function' ? fetchISPHistory() : null).finally(() => {
-          const latest = window.ISP_LATEST || {};
-          const rawPing = (latest.pingAvgMs !== undefined && latest.pingAvgMs !== null && latest.pingAvgMs !== '') ? Number(latest.pingAvgMs) : NaN;
-          const pingStr = Number.isFinite(rawPing) ? rawPing.toFixed(1) : '--';
-          const rawDown = (latest.downloadMbps !== undefined && latest.downloadMbps !== null) ? Number(latest.downloadMbps) : ((latest.downMbps !== undefined && latest.downMbps !== null) ? Number(latest.downMbps) : null);
-          const rawUp = (latest.uploadMbps !== undefined && latest.uploadMbps !== null) ? Number(latest.uploadMbps) : ((latest.upMbps !== undefined && latest.upMbps !== null) ? Number(latest.upMbps) : null);
-          const downStr = (rawDown !== null && Number.isFinite(rawDown)) ? String(rawDown) : '--';
-          const upStr = (rawUp !== null && Number.isFinite(rawUp)) ? String(rawUp) : '--';
-          const realCarrier = latest.isp || carrier;
-          const realLoss = (latest.packetLoss !== undefined && latest.packetLoss !== null) ? latest.packetLoss : 0;
-          const realGrade = evaluateIspGrade(rawPing, latest.jitterMs, realLoss, latest.grade).grade;
-
-          if (pingEl) pingEl.innerHTML = `${pingStr} <span style="font-size: 0.85rem; color: #94a3b8;">ms</span>`;
-          if (downEl) downEl.innerHTML = downStr === '--' ? `--` : `${downStr} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
-          if (upEl) upEl.innerHTML = upStr === '--' ? `--` : `${upStr} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
-          if (gaugeNum) gaugeNum.textContent = downStr;
-          if (gaugeNeedle) {
-            const angle = (rawDown !== null && Number.isFinite(rawDown)) ? (-135 + (Math.min(rawDown, 1000) / 1000) * 180) : -135;
-            gaugeNeedle.style.transform = `rotate(${angle}deg)`;
-          }
-          if (btn) { btn.disabled = false; btn.innerHTML = 'Run Gigabit Speedtest'; }
-          if (stageText) {
-            stageText.textContent = `Probe Complete: ${pingStr} ms Ping  -  Packet Loss ${realLoss}%  -  Grade ${realGrade} (${realCarrier})`;
-          }
+        if (pingEl) pingEl.innerHTML = `${pingStr} <span style="font-size: 0.85rem; color: #94a3b8;">ms</span>`;
+        if (downEl) downEl.innerHTML = downStr === '--' ? `--` : `${downStr} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
+        if (upEl) upEl.innerHTML = upStr === '--' ? `--` : `${upStr} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
+        if (gaugeNum) gaugeNum.textContent = downStr;
+        if (gaugeNeedle) {
+          const angle = (rawDown !== null && Number.isFinite(rawDown)) ? (-135 + (Math.min(rawDown, 1000) / 1000) * 180) : -135;
+          gaugeNeedle.style.transform = `rotate(${angle}deg)`;
+        }
+        if (btn) { btn.disabled = false; btn.innerHTML = 'Run Gigabit Speedtest'; }
+        const statusLabel = timedOut ? 'Probe Timed Out — Showing Latest' : 'Probe Complete';
+        if (stageText) {
+          stageText.textContent = `${statusLabel}: ${pingStr} ms Ping  -  Packet Loss ${realLoss}%  -  Grade ${realGrade} (${realCarrier})`;
+        }
+        if (!timedOut) {
           playChaosTone(523, 1046, 'triangle', 0.35);
           showToast('success', `${realCarrier} Probe Complete`, `Ping: ${pingStr} ms  -  Loss: ${realLoss}%  -  Grade: ${realGrade}`);
-          isSpeedtesting = false;
-        });
-      }, 8500);
+        } else {
+          showToast('warning', 'Probe Timed Out — Showing Latest', `Ping: ${pingStr} ms  -  Loss: ${realLoss}%  -  Grade: ${realGrade}`);
+        }
+        isSpeedtesting = false;
+      };
+
+      pollIspSpeedtestUpdate({
+        onStage2: () => {
+          if (stageText) stageText.textContent = `Stage 2/2: Collecting fresh latency & throughput telemetry from gateway...`;
+          playChaosTone(587, 880, 'sine', 0.2);
+        },
+        onComplete: (latest) => renderSpeedtestResult(latest, false),
+        onTimeout: (latest) => renderSpeedtestResult(latest, true)
+      });
     }
     window.runLiveSpeedtestBenchmark = runLiveSpeedtestBenchmark;
 

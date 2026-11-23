@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-23T03:21:53Z",
-    "currentVersion":  "v2.8.80",
+    "updatedAt":  "2026-11-23T04:58:27Z",
+    "currentVersion":  "v2.8.81",
     "releases":  [
+                     {
+                         "version":  "v2.8.81",
+                         "date":  "November 22, 2026",
+                         "title":  "Wave 9 AI Canvas, Speedtest Polling \u0026 Placeholder Cleanup",
+                         "changes":  [
+                                         {
+                                             "label":  "AI Vision Canvas",
+                                             "text":  "Fixed missing Y coordinate in ai.html processDetections ctx.lineTo that left bounding-box overlay blank"
+                                         },
+                                         {
+                                             "label":  "Speedtest Polling",
+                                             "text":  "Replaced blind 8.5s/9s wait in runLiveSpeedtestBenchmark \u0026 testISPNow with timestamp-advancing 2s polling"
+                                         },
+                                         {
+                                             "label":  "Placeholder \u0026 DOM Cleanup",
+                                             "text":  "Removed hardcoded 32 GB NUC RAM fallback, cleaned 7 orphaned DOM ID references, and hardened null storage capacity rendering"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.80",
                          "date":  "November 22, 2026",

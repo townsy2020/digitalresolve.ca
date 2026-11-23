@@ -1200,7 +1200,7 @@
           // Top-Right
           ctx.beginPath();
           ctx.moveTo(x + w - cornerLen, y);
-          ctx.lineTo(x + w);
+          ctx.lineTo(x + w, y);
           ctx.lineTo(x + w, y + cornerLen);
           ctx.stroke();
 
@@ -1265,7 +1265,7 @@
           ctx.beginPath();
           ctx.moveTo(x, y + cornerLen); ctx.lineTo(x, y); ctx.lineTo(x + cornerLen, y); ctx.stroke();
           ctx.beginPath();
-          ctx.moveTo(x + w - cornerLen, y); ctx.lineTo(x + w); ctx.lineTo(x + w, y + cornerLen); ctx.stroke();
+          ctx.moveTo(x + w - cornerLen, y); ctx.lineTo(x + w, y); ctx.lineTo(x + w, y + cornerLen); ctx.stroke();
           ctx.beginPath();
           ctx.moveTo(x + w, y + h - cornerLen); ctx.lineTo(x + w, y + h); ctx.lineTo(x + w - cornerLen, y + h); ctx.stroke();
           ctx.beginPath();

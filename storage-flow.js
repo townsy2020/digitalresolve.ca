@@ -151,8 +151,13 @@
     return Number.isFinite(n) ? n : fallback;
   }
 
+  function isValidNum(val) {
+    return val !== null && val !== undefined && val !== '' && Number.isFinite(Number(val));
+  }
+
   function fmtGB(gb) {
-    const n = safeNum(gb, 0);
+    if (!isValidNum(gb)) return '--';
+    const n = Number(gb);
     if (n >= 1024) return (n / 1024).toFixed(2) + ' TB';
     return n.toFixed(1) + ' GB';
   }
@@ -315,7 +320,7 @@
       safeNum(t.qnap_iscsi_desktop && t.qnap_iscsi_desktop.totalGB) +
       safeNum(t.cloud_onedrive && t.cloud_onedrive.totalGB);
 
-    setText('kpi-total-capacity', fmtGB(totalGB));
+    setText('kpi-total-capacity', totalGB > 0 ? fmtGB(totalGB) : '--');
     setText('kpi-total-capacity-sub', 'Desktop + NUC + QNAP SMB & Dual iSCSI + OneDrive');
 
     const qOnline = Boolean(data.qnapOnline);
@@ -388,7 +393,10 @@
     setText('node-tag-desktop-drives', desk.online ? 'Online' : 'Standby');
     const deskTempVal = getMaxNvmeTemp(desk);
     const deskTemp = deskTempVal !== null ? ` • NVMe ${deskTempVal}°C` : '';
-    setText('node-meta-desktop-drives', `${fmtGB(desk.freeGB)} Free / ${fmtGB(desk.totalGB)}${deskTemp}`);
+    const deskCapMeta = isValidNum(desk.totalGB) && Number(desk.totalGB) > 0
+      ? `${fmtGB(desk.freeGB)} Free / ${fmtGB(desk.totalGB)}`
+      : '--';
+    setText('node-meta-desktop-drives', `${deskCapMeta}${deskTemp}`);
 
     const nuc = t.nuc_hot || {};
     const dFreeGB = safeNum(nuc.dDriveFreeGB, 0);
@@ -406,19 +414,20 @@
     const nucTempVal = getMaxNvmeTemp(nuc);
     const nucTemp = nucTempVal !== null ? ` • NVMe ${nucTempVal}°C` : '';
     setText('node-tag-nuc-c', nuc.online ? 'Online' : 'Standby');
-    setText('node-meta-nuc-c', `192.168.2.35 • ${fmtGB(cFreeGB)} Free / ${fmtGB(cTotalGB)}${nucTemp}`);
+    const cCapMeta = cTotalGB > 0 ? `${fmtGB(cFreeGB)} Free / ${fmtGB(cTotalGB)}` : '--';
+    setText('node-meta-nuc-c', `192.168.2.35 • ${cCapMeta}${nucTemp}`);
 
     const smb = t.qnap_smb || {};
     setText('node-tag-qnap-smb', safeNum(smb.totalGB, 0) > 0 ? fmtGB(smb.totalGB) : '--');
-    setText('node-meta-qnap-smb', `${safeStr(smb.path, '\\\\192.168.2.125\\Torrents')} • ${fmtGB(smb.freeGB)} Free`);
+    setText('node-meta-qnap-smb', `${safeStr(smb.path, '\\\\192.168.2.125\\Torrents')} • ${isValidNum(smb.freeGB) ? fmtGB(smb.freeGB) + ' Free' : '--'}`);
 
     const iNuc = t.qnap_iscsi_nuc || {};
     setText('node-tag-qnap-iscsi-nuc', safeNum(iNuc.totalGB, 0) > 0 ? fmtGB(iNuc.totalGB) : '--');
-    setText('node-meta-qnap-iscsi-nuc', `${safeStr(iNuc.drive, 'E:')} • ${fmtGB(iNuc.freeGB)} Free • ${iNuc.sessionConnected ? 'iSCSI Connected' : 'Standby'}`);
+    setText('node-meta-qnap-iscsi-nuc', `${safeStr(iNuc.drive, 'E:')} • ${isValidNum(iNuc.freeGB) ? fmtGB(iNuc.freeGB) + ' Free' : '--'} • ${iNuc.sessionConnected ? 'iSCSI Connected' : 'Standby'}`);
 
     const iDesk = t.qnap_iscsi_desktop || {};
     setText('node-tag-qnap-iscsi-desktop', safeNum(iDesk.totalGB, 0) > 0 ? fmtGB(iDesk.totalGB) : '--');
-    setText('node-meta-qnap-iscsi-desktop', `${safeStr(iDesk.drive, 'E:')} • ${fmtGB(iDesk.freeGB)} Free • Mirrored Snapshots`);
+    setText('node-meta-qnap-iscsi-desktop', `${safeStr(iDesk.drive, 'E:')} • ${isValidNum(iDesk.freeGB) ? fmtGB(iDesk.freeGB) + ' Free' : '--'} • Mirrored Snapshots`);
 
     const od = t.cloud_onedrive || {};
     setText('node-tag-onedrive-vault', od.online ? fmtGB(od.totalGB) : 'Synced');
@@ -653,7 +662,7 @@
     const stackedEl = document.getElementById('storage-capacity-stacked');
     if (stackedEl) {
       stackedEl.innerHTML = rows
-        .map(r => `<div class="storage-cap-seg" style="width:${((r.total / totalCluster) * 100).toFixed(2)}%;background:${r.color};" title="${escapeHtml(r.label)}: ${fmtGB(r.total)}"></div>`)
+        .map(r => `<div class="storage-cap-seg" style="width:${((r.total / totalCluster) * 100).toFixed(2)}%;background:${r.color};" title="${escapeHtml(r.label)}: ${r.total > 0 ? fmtGB(r.total) : '--'}"></div>`)
         .join('');
     }
 
@@ -661,7 +670,9 @@
     if (barsEl) {
       barsEl.innerHTML = rows.map(r => {
         const pct = r.isCloud ? Math.min(100, Math.max(0, (r.used / 1024) * 100)) : Math.min(100, Math.max(0, r.total > 0 ? (r.used / r.total) * 100 : 0));
-        const rightLbl = r.isCloud ? `${fmtGB(r.used)} Synced` : `${fmtGB(r.used)} / ${fmtGB(r.total)} (${pct.toFixed(0)}%)`;
+        const rightLbl = r.isCloud
+          ? (r.used > 0 ? `${fmtGB(r.used)} Synced` : '--')
+          : (r.total > 0 ? `${fmtGB(r.used)} / ${fmtGB(r.total)} (${pct.toFixed(0)}%)` : '--');
         return `
           <div class="storage-cap-row">
             <div class="storage-cap-row-top">
