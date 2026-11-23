@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-23T12:04:44Z",
-    "currentVersion":  "v2.8.82",
+    "updatedAt":  "2026-11-23T12:20:00Z",
+    "currentVersion":  "v2.8.83",
     "releases":  [
+                     {
+                         "version":  "v2.8.83",
+                         "date":  "November 23, 2026",
+                         "title":  "Wave 11 Feeder Hydration, Modal Isolation \u0026 CSS Cleanup",
+                         "changes":  [
+                                         {
+                                             "label":  "Feeder Hydration",
+                                             "text":  "Fixed ops.html feeder card/badge hydration and wired live feeder status into all 8 top-nav dropdown badges"
+                                         },
+                                         {
+                                             "label":  "Modal \u0026 Metric Safety",
+                                             "text":  "Stopped Changelog backdrop clicks from closing Maintenance modal and guarded LAST_NUC_DISK.usedPercent against NaN"
+                                         },
+                                         {
+                                             "label":  "CSS Cascade Cleanup",
+                                             "text":  "Resolved conflicting duplicate html.mobile-layout nav rules in styles.css"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.82",
                          "date":  "November 23, 2026",

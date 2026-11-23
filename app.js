@@ -164,16 +164,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.82';
+          const activeVer = match ? match[0] : 'v2.8.83';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 19665;
-      const baseCssLines = 7269;
-      const baseJsLines = 8435;
+      const baseHtmlLines = 19769;
+      const baseCssLines = 7247;
+      const baseJsLines = 8464;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -1637,7 +1637,8 @@
       const cStorage = document.getElementById('c-node-storage');
       if (cStorage && window.LAST_NUC_DISK) {
         const st = cStorage.querySelector('.chaos-node-status');
-        if (st && !isChaosFaultNode(cStorage)) st.textContent = `Healthy (${Math.round(window.LAST_NUC_DISK.usedPercent)}% Used)`;
+        const usedPct = Number(window.LAST_NUC_DISK.usedPercent);
+        if (st && !isChaosFaultNode(cStorage)) st.textContent = Number.isFinite(usedPct) ? `Healthy (${Math.round(usedPct)}% Used)` : 'Healthy (Pool Online)';
       }
     }
 
@@ -1669,7 +1670,7 @@
         selectSchematicNode('cf', true);
       }
       fetchAgySessionInfo();
-      if (typeof fetchFeederStatus === 'function' && (document.getElementById('feeder-hopper-pct') || document.getElementById('feeder-card-kibble') || document.getElementById('stag-feeder'))) {
+      if (typeof fetchFeederStatus === 'function' && (document.getElementById('feeder-hopper-pct') || document.getElementById('feeder-card-kibble') || document.getElementById('stag-feeder') || document.getElementById('feeder-nuc-hopper-pct') || document.querySelector('.feeder-live-status-badge') || document.querySelector('.feeder-nav-status-badge'))) {
         fetchFeederStatus();
       }
 
@@ -5426,7 +5427,7 @@
 
     function closeChangelogModalOnBackdrop(e) {
       if (e.target && e.target.id === 'changelog-modal-overlay') {
-        closeChangelogModal(); if (typeof closeMaintenanceModal === 'function') closeMaintenanceModal();
+        closeChangelogModal();
       }
     }
 
@@ -5970,7 +5971,7 @@
         { id: 'c-node-nuc', status: 'Online (24/7 Node)' },
         { id: 'c-node-desktop', status: window.DESKTOP_IS_ONLINE ? 'Online (2.5 GbE)' : 'Standby (Eco Mode)' },
         { id: 'c-node-cf', status: 'Active (Zero Trust)' },
-        { id: 'c-node-storage', status: window.LAST_NUC_DISK ? `Healthy (${Math.round(window.LAST_NUC_DISK.usedPercent)}% Pool)` : 'Healthy (Pool Online)' }
+        { id: 'c-node-storage', status: (window.LAST_NUC_DISK && Number.isFinite(Number(window.LAST_NUC_DISK.usedPercent))) ? `Healthy (${Math.round(Number(window.LAST_NUC_DISK.usedPercent))}% Pool)` : 'Healthy (Pool Online)' }
       ];
 
       nodes.forEach(n => {
@@ -7227,6 +7228,27 @@
           badge.innerHTML = '<span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10b981; margin-right: 4px; box-shadow: 0 0 6px #10b981;"></span>192.168.2.22 &bull; Connected &amp; Armed';
         }
       });
+      document.querySelectorAll('.feeder-nav-status-badge').forEach(badge => {
+        if (state.online === false) {
+          badge.className = 'item-tag offline feeder-nav-status-badge';
+          badge.style.background = '';
+          badge.style.color = '';
+          badge.style.borderColor = '';
+          badge.innerHTML = 'Offline &bull; 192.168.2.22';
+        } else if (pct !== null && pct <= 20) {
+          badge.className = 'item-tag offline feeder-nav-status-badge';
+          badge.style.background = 'rgba(245, 158, 11, 0.2)';
+          badge.style.color = '#fbbf24';
+          badge.style.borderColor = 'rgba(245, 158, 11, 0.35)';
+          badge.innerHTML = 'Low Hopper &bull; 192.168.2.22';
+        } else {
+          badge.className = 'item-tag online feeder-nav-status-badge';
+          badge.style.background = '';
+          badge.style.color = '';
+          badge.style.borderColor = '';
+          badge.innerHTML = 'Live &bull; 192.168.2.22';
+        }
+      });
       const stagFeeder = document.getElementById('stag-feeder');
       if (stagFeeder) {
         if (pct === null) {
@@ -7322,6 +7344,13 @@
               badge.style.background = 'rgba(239, 68, 68, 0.2)';
               badge.style.color = '#fca5a5';
               badge.innerHTML = '<span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #ef4444; margin-right: 4px; box-shadow: 0 0 6px #ef4444;"></span>192.168.2.22 &bull; Offline';
+            });
+            document.querySelectorAll('.feeder-nav-status-badge').forEach(badge => {
+              badge.className = 'item-tag offline feeder-nav-status-badge';
+              badge.style.background = '';
+              badge.style.color = '';
+              badge.style.borderColor = '';
+              badge.innerHTML = 'Offline &bull; 192.168.2.22';
             });
           };
 
