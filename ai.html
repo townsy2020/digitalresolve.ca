@@ -547,6 +547,12 @@
 
     function connectEndpoint(endpoints, idx) {
       if (idx >= endpoints.length) {
+        if (window.location.protocol === 'https:' && !streamConnected && loadingOverlay) {
+          const msgEl = loadingOverlay.querySelector('div:nth-child(2)');
+          if (msgEl) {
+            msgEl.innerHTML = 'Stream requires <a href="https://cam.digitalresolve.ca/" target="_blank" rel="noopener noreferrer" style="color:#38bdf8;text-decoration:underline;">CF Access SSO</a> &bull; Retrying...';
+          }
+        }
         scheduleReconnect();
         return;
       }
@@ -834,7 +840,7 @@
           if (sock.readyState === WebSocket.OPEN && ws === sock) {
             sock.send(JSON.stringify({ type: 'webrtc/offer', value: activePc.localDescription.sdp }));
           }
-        });
+        }).catch(() => advanceEndpoint());
       });
 
       sock.addEventListener('message', ev => {
@@ -1030,6 +1036,7 @@
       if (immediatePet && immediatePet.score >= detectionThreshold) {
         trackedPenny.active = true;
         trackedPenny.lastSeen = now;
+        trackedPenny.baseScore = immediatePet.score;
         trackedPenny.score = immediatePet.score;
         trackedPenny.rawBbox = immediatePet.bbox;
         trackedPenny.label = immediatePet.class === 'cat' ? 'Penny (Cat)' : 'Penny (Pet)';
@@ -1038,7 +1045,7 @@
         if (elapsed < PENNY_HOLD_DURATION_MS) {
           // Maintain active lock during stationary rest on bed
           const decay = 1 - (elapsed / PENNY_HOLD_DURATION_MS) * 0.20;
-          trackedPenny.score = Math.max(0.15, trackedPenny.score * decay);
+          trackedPenny.score = Math.max(0.15, (trackedPenny.baseScore || trackedPenny.score) * decay);
         } else {
           // Release lock after 5 seconds of total absence
           trackedPenny.active = false;
@@ -1312,6 +1319,7 @@
     // Double-tap or double-click to toggle fullscreen
     let lastTap = 0;
     container.addEventListener('touchend', (e) => {
+      if (e.target && e.target.closest && e.target.closest('button, a, input, select, .hud-bottom-bar')) return;
       const now = new Date().getTime();
       const delta = now - lastTap;
       if (delta < 300 && delta > 0) {

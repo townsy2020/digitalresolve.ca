@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-22T20:14:39Z",
-    "currentVersion":  "v2.8.79",
+    "updatedAt":  "2026-11-23T03:21:53Z",
+    "currentVersion":  "v2.8.80",
     "releases":  [
+                     {
+                         "version":  "v2.8.80",
+                         "date":  "November 22, 2026",
+                         "title":  "Wave 5 Reliability, Interactive Storage Flow \u0026 Telemetry Fixes",
+                         "changes":  [
+                                         {
+                                             "label":  "Interactive Storage Flow",
+                                             "text":  "Fixed SVG flow pipe click blocking, NUC C: capacity display, mobile filter count, and CF Access SSO fallback"
+                                         },
+                                         {
+                                             "label":  "Dashboard Telemetry",
+                                             "text":  "Fixed Health Radar WireGuard row, Chaos Monkey persistence, Bell Fiber speedometer angle, DL speed display, and feeder alert priority"
+                                         },
+                                         {
+                                             "label":  "Camera \u0026 Controls",
+                                             "text":  "Fixed AI pet-lock linear decay, touch HUD taps, WebRTC SSO notice preservation, and strict mutation status validation"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.79",
                          "date":  "November 22, 2026",

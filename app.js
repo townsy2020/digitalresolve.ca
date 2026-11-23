@@ -130,13 +130,14 @@
       ];
       metricSelectors.forEach(sel => {
         document.querySelectorAll(sel).forEach(el => {
+          if (window.DESKTOP_IS_ONLINE === false && el.id && el.id.includes('desktop')) return;
           if (el.querySelector('.btn-check-inline')) return;
           const txt = (el.textContent ? el.textContent.trim() : '').toLowerCase();
           const isStuck = txt === '' ||
             txt.includes('--') ||
             txt.includes('null') ||
             txt.includes('undefined') ||
-            txt.includes('nan') ||
+            /\bnan\b/.test(txt) ||
             txt.includes('connecting') ||
             txt.includes('querying') ||
             txt.includes('calculating') ||
@@ -163,16 +164,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.79';
+          const activeVer = match ? match[0] : 'v2.8.80';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 19337;
-      const baseCssLines = 7267;
-      const baseJsLines = 8253;
+      const baseHtmlLines = 19457;
+      const baseCssLines = 7269;
+      const baseJsLines = 8339;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -511,8 +512,9 @@
       return fetchTelemetryWithFallback(target)
         .then(data => {
           if (data && data.online !== false) {
-            const diskSub = (data.disk && data.disk.drive) ? ` | D: ${data.disk.freeGB} GB free (${data.disk.usedPercent}% used)` : '';
-            showToast('success', `${dev.name} is Online`, `${data.latencyMs !== null ? data.latencyMs : 0} ms latency${diskSub}`, 5000);
+            const diskSub = (data.disk && data.disk.drive) ? ` | ${data.disk.drive} ${data.disk.freeGB} GB free (${data.disk.usedPercent}% used)` : '';
+            const latVal = (data.latencyMs !== null && data.latencyMs !== undefined && Number.isFinite(Number(data.latencyMs))) ? data.latencyMs : 0;
+            showToast('success', `${dev.name} is Online`, `${latVal} ms latency${diskSub}`, 5000);
             updateStatusUI(target, true, data.latencyMs, data.disk, data.torrent, data.vitals);
           } else {
             showToast('error', `${dev.name} is Offline`, `No ping response from ${ip}`, 5000);
@@ -645,7 +647,8 @@
 
       fetch(`${GATEWAY}/wake?target=${encodeURIComponent(target)}`, { method: 'POST', credentials: 'include', headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }), body: '{}', signal: _fetchSig(8000) })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-        .then(() => {
+        .then(resData => {
+          if (!resData || resData.status !== 'success') throw new Error((resData && resData.message) || 'Gateway rejected request');
           showToast('loading', `Magic Packet Broadcasted`, `Waiting for ${dev.name} to boot...`, 0);
 
           if (target === 'both') {
@@ -670,7 +673,7 @@
                   settled = true;
                   clearInterval(pollInterval);
                   const latPart = (data.latencyMs !== null && data.latencyMs !== undefined && Number.isFinite(Number(data.latencyMs))) ? `${data.latencyMs} ms latency` : '';
-                  const diskPart = (data.disk && data.disk.drive) ? `D: ${data.disk.freeGB} GB free` : '';
+                  const diskPart = (data.disk && data.disk.drive) ? `${data.disk.drive} ${data.disk.freeGB} GB free` : '';
                   const toastBody = [latPart, diskPart].filter(Boolean).join(' | ') || 'Online';
                   showToast('success', `${dev.name} is Awake & Online!`, toastBody, 6000);
                   updateStatusUI(target, true, data.latencyMs, data.disk);
@@ -705,34 +708,46 @@
 
       fetch(`${GATEWAY}/sleep?target=${encodeURIComponent(target)}`, { method: 'POST', credentials: 'include', headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }), body: '{}', signal: _fetchSig(8000) })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-        .then(() => {
+        .then(resData => {
+          if (!resData || resData.status !== 'success') throw new Error((resData && resData.message) || 'Gateway rejected request');
           showToast('loading', `Sleep Signal Dispatched`, `Waiting for ${dev.name} to enter standby...`, 0);
 
           let attempts = 0;
           let consecutiveErrors = 0;
           const maxAttempts = 10;
+          let settled = false;
           pollInterval = setInterval(() => {
+            if (settled || attempts >= maxAttempts) {
+              clearInterval(pollInterval);
+              return;
+            }
             attempts++;
             fetch(`${GATEWAY}/status?target=${encodeURIComponent(target)}`, { credentials: 'include', cache: 'no-store', signal: _fetchSig(5000) })
               .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
               .then(data => {
+                if (settled) return;
                 consecutiveErrors = 0;
                 if (!data.online) {
+                  settled = true;
                   clearInterval(pollInterval);
                   showToast('success', `${dev.name} is now Asleep`, 'System in low-power standby mode.', 6000);
                   updateStatusUI(target, false);
                 } else if (attempts >= maxAttempts) {
+                  settled = true;
                   clearInterval(pollInterval);
                   showToast('error', `Sleep Signal Dispatched`, `${dev.name} may still be finalizing background tasks.`, 5000);
                 }
               })
               .catch(() => {
+                if (settled) return;
                 consecutiveErrors++;
                 if (target === 'nuc' && consecutiveErrors >= 3) {
+                  settled = true;
                   clearInterval(pollInterval);
                   showToast('success', `${dev.name} is now Asleep`, 'Gateway offline / in standby.', 6000);
                   updateStatusUI(target, false);
                 } else if (attempts >= maxAttempts) {
+                  settled = true;
                   clearInterval(pollInterval);
                   showToast('error', 'Status Check Interrupted', `Could not confirm ${dev.name} sleep state via gateway.`, 5000);
                 }
@@ -1133,16 +1148,18 @@
 
       // Update Torrent Speeds
       if (torrent) {
+        const dlNum = Number(torrent.dlSpeed) || 0;
+        const dlTxt = torrent.dlSpeedText || (dlNum >= 1048576 ? `${(dlNum / 1048576).toFixed(1)} MB/s` : `${Math.round(dlNum / 1024)} KB/s`);
         if (target === 'desktop') {
           const dTag = document.getElementById('desktop-speed-tag');
           if (dTag) {
-            dTag.textContent = torrent.dlSpeed > 0 ? `DL: ${torrent.dlSpeedText}` : 'Idle';
-            dTag.className = torrent.dlSpeed > 0 ? 'item-tag online' : 'item-tag';
+            dTag.textContent = dlNum > 0 ? `DL: ${dlTxt}` : 'Idle';
+            dTag.className = dlNum > 0 ? 'item-tag online' : 'item-tag';
           }
         } else if (target === 'nuc') {
           const nTag = document.getElementById('nuc-disk-tag');
-          if (nTag && torrent.dlSpeed > 1024) {
-            nTag.textContent = `DL: ${torrent.dlSpeedText}`;
+          if (nTag && dlNum > 1024) {
+            nTag.textContent = `DL: ${dlTxt}`;
             nTag.className = 'item-tag online';
           }
         }
@@ -1361,7 +1378,12 @@
           rStorage.textContent = `${disk.freeGB} GB Free (${disk.usedPercent}% used)`;
         }
         if (typeof updateHealthRadarUI === 'function') {
-          updateHealthRadarUI({ nucOnline: isOnline, nucLatency: latencyMs, nucDisk: disk });
+          updateHealthRadarUI({
+            nucOnline: isOnline,
+            nucLatency: latencyMs,
+            nucDisk: disk,
+            vpnExitIp: (torrent && torrent.vpnExitIp) || (window.LAST_SWARM && window.LAST_SWARM.vpnExitIp)
+          });
         }
         updateClusterPowerAndThermalsUI(Boolean(window.DESKTOP_IS_ONLINE));
         updateSslCertExpiryUI();
@@ -1596,9 +1618,16 @@
       document.querySelectorAll('#modal-health-score').forEach(el => {
         el.textContent = `${score}% ${statusText}`;
       });
-      document.querySelectorAll('#chaos-score-val').forEach(el => {
-        el.textContent = `${score}% ${statusText}`;
-      });
+      const isChaosFaultNode = (el) => Boolean(el && (el.classList.contains('node-fault') || el.classList.contains('node-rerouted') || el.classList.contains('severed')));
+      const anyChaosActive = Boolean(
+        (typeof chaosState !== 'undefined' && chaosState.faults && Object.values(chaosState.faults).some(Boolean)) ||
+        document.querySelector('#chaos-modal-overlay .node-fault, #chaos-modal-overlay .node-rerouted, .chaos-node.node-fault, .chaos-node.node-rerouted, .chaos-node.severed')
+      );
+      if (!anyChaosActive) {
+        document.querySelectorAll('#chaos-score-val').forEach(el => {
+          el.textContent = `${score}% ${statusText}`;
+        });
+      }
       const heroBtn = document.getElementById('hero-health-radar-text');
       if (heroBtn) {
         heroBtn.textContent = `Health Radar (${score}% ${statusText})`;
@@ -1606,18 +1635,22 @@
       const cNuc = document.getElementById('c-node-nuc');
       if (cNuc) {
         const st = cNuc.querySelector('.chaos-node-status');
-        if (st && !cNuc.classList.contains('severed')) st.textContent = nucOn ? 'Online (24/7 Node)' : 'Offline (Unreachable)';
+        if (st && !isChaosFaultNode(cNuc)) st.textContent = nucOn ? 'Online (24/7 Node)' : 'Offline (Unreachable)';
       }
       const cDesk = document.getElementById('c-node-desktop');
       if (cDesk) {
         const st = cDesk.querySelector('.chaos-node-status');
-        if (st && !cDesk.classList.contains('severed')) st.textContent = deskOn ? 'Online (2.5 GbE)' : 'Standby (Eco Mode)';
+        if (st && !isChaosFaultNode(cDesk)) st.textContent = deskOn ? 'Online (2.5 GbE)' : 'Standby (Eco Mode)';
       }
       const cStorage = document.getElementById('c-node-storage');
       if (cStorage && window.LAST_NUC_DISK) {
         const st = cStorage.querySelector('.chaos-node-status');
-        if (st && !cStorage.classList.contains('severed')) st.textContent = `Healthy (${Math.round(window.LAST_NUC_DISK.usedPercent)}% Used)`;
+        if (st && !isChaosFaultNode(cStorage)) st.textContent = `Healthy (${Math.round(window.LAST_NUC_DISK.usedPercent)}% Used)`;
       }
+    }
+
+    function hasUptimeDom() {
+      return Boolean(document.getElementById('uptimeMatrix') || document.getElementById('uptime-sla-val') || document.getElementById('uptime-desktop-status'));
     }
 
     // Check status on load
@@ -1644,7 +1677,9 @@
         selectSchematicNode('cf', true);
       }
       fetchAgySessionInfo();
-      if (typeof fetchFeederStatus === 'function') fetchFeederStatus();
+      if (typeof fetchFeederStatus === 'function' && (document.getElementById('feeder-hopper-pct') || document.getElementById('feeder-card-kibble') || document.getElementById('stag-feeder'))) {
+        fetchFeederStatus();
+      }
 
       // Ensure all modal overlays are strictly hidden on load
       ['magnet-modal-overlay', 'agy-console-modal-overlay', 'changelog-modal-overlay', 'health-modal-overlay', 'chaos-modal-overlay', 'disaster-modal-overlay', 'speedtest-sso-modal-overlay', 'cloudflare-stats-modal-overlay', 'adguard-modal-overlay', 'tailscale-modal-overlay'].forEach(id => {
@@ -1754,7 +1789,6 @@
 
       const hasClimateDom = () => Boolean(document.getElementById('iot-ambient-temp') || document.getElementById('ribbon-climate') || document.getElementById('climate-temp-val') || document.getElementById('climate-temp') || document.querySelector('[id*="climate-"]'));
       const hasIspDom = () => Boolean(document.getElementById('isp-ping-val') || document.getElementById('isp-history-tbody') || document.getElementById('uptimeSparkline') || document.getElementById('st-val-down') || document.getElementById('gauge-live-num'));
-      const hasUptimeDom = () => Boolean(document.getElementById('uptimeMatrix') || document.getElementById('uptime-sla-val') || document.getElementById('uptime-desktop-status'));
       const hasServicesDom = () => Boolean(document.getElementById('dashServiceGrid') || document.getElementById('dash-global-status') || document.querySelector('[id^="kuma-lat-"]'));
       const hasTermDom = () => Boolean(document.getElementById('terminal-content'));
 
@@ -1783,6 +1817,7 @@
         setInterval(() => { if (!document.hidden) fetchISPHistory(); }, 15000);
       }
       if (hasUptimeDom()) {
+        window._uptimeInitialized = true;
         renderUptimeMatrix();
         setInterval(() => { if (!document.hidden) renderUptimeMatrix(); }, 60000);
       }
@@ -1878,8 +1913,10 @@
         return true;
       } catch (err) {
         const status = err && err.status;
-        const isTransient = (err && (err.name === 'AbortError' || err.name === 'TimeoutError' || err.name === 'TypeError')) || [502, 503, 504, 530].includes(status);
-        const isAuthFailure = !isTransient && (status === 401 || status === 403);
+        const isHttpsWan = window.location.protocol === 'https:' && /(^|\.)digitalresolve\.ca$/i.test(window.location.hostname);
+        const isCorsAuthBlock = isHttpsWan && err && err.name === 'TypeError' && !status;
+        const isTransient = !isCorsAuthBlock && ((err && (err.name === 'AbortError' || err.name === 'TimeoutError' || err.name === 'TypeError')) || [502, 503, 504, 530].includes(status));
+        const isAuthFailure = !isTransient && (status === 401 || status === 403 || isCorsAuthBlock);
         let syncAttempted = false;
         try { syncAttempted = Boolean(sessionStorage.getItem('dr_sso_sync_attempted')); } catch(e) {}
         if (autoRedirect && isAuthFailure && /(^|\.)digitalresolve\.ca$/i.test(window.location.hostname) && !syncAttempted) {
@@ -3010,7 +3047,7 @@
           const rawUrl = item && item.url ? String(item.url) : 'https://audiobooks.digitalresolve.ca';
           const safeUrl = /^https?:\/\//i.test(rawUrl) ? rawUrl : 'https://audiobooks.digitalresolve.ca';
           const safeTitle = title || 'Audiobookshelf';
-          return `<div class="book-card" role="button" tabindex="0" style="cursor: pointer;" onclick="launchProtectedService('${escapeHtml(safeUrl)}', '${escapeHtml(safeTitle)}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
+          return `<div class="book-card" role="button" tabindex="0" style="cursor: pointer;" data-url="${escapeHtml(safeUrl)}" data-title="${escapeHtml(safeTitle)}" onclick="launchProtectedService(this.dataset.url, this.dataset.title)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
                 <div class="book-cover" style="background: ${pal.cover}; display: flex; align-items: center; justify-content: center;">
                   <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="${pal.accent}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.85;" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                 </div>
@@ -3057,12 +3094,23 @@
 
     function applyClusterStatsPayload(data) {
       if (!data) return null;
-      try { localStorage.setItem('dr_cluster_stats', JSON.stringify(data)); } catch (e) {}
-      if (data.status === 'success' && data.nuc) {
+      try {
+        const prevRaw = localStorage.getItem('dr_cluster_stats');
+        const prev = prevRaw ? JSON.parse(prevRaw) : null;
+        const merged = (prev && typeof prev === 'object') ? Object.assign({}, prev, data) : data;
+        localStorage.setItem('dr_cluster_stats', JSON.stringify(merged));
+      } catch (e) {}
+      if ((data.status === 'success' || data.nuc) && data.nuc) {
         const nuc = data.nuc;
+        if (nuc.swarm) {
+          window.LAST_SWARM = nuc.swarm;
+        }
         updateStatusUI('nuc', Boolean(nuc.online), nuc.latencyMs, nuc.disk, nuc.swarm, nuc.vitals);
         if (nuc.swarm) {
           const sw = nuc.swarm;
+          if (typeof updateHealthRadarUI === 'function') {
+            updateHealthRadarUI({ vpnExitIp: sw.vpnExitIp });
+          }
           const swAct = document.getElementById('stat-swarm-active');
           const dht = document.getElementById('stat-dht');
           const vpnIp = document.getElementById('stat-vpn-ip');
@@ -3143,19 +3191,19 @@
           const mixesPct = ((stMix / stTot) * 100).toFixed(1);
           const freePct = ((stFree / stTot) * 100).toFixed(1);
 
-          document.querySelectorAll('.seg-movies').forEach(el => {
+          document.querySelectorAll('.storage-segments-bar .seg-movies').forEach(el => {
             el.style.width = `${moviesPct}%`;
             el.title = `Movies: ${stMov} GB`;
           });
-          document.querySelectorAll('.seg-tv').forEach(el => {
+          document.querySelectorAll('.storage-segments-bar .seg-tv').forEach(el => {
             el.style.width = `${tvPct}%`;
             el.title = `TV Series: ${stTv} GB`;
           });
-          document.querySelectorAll('.seg-mixes').forEach(el => {
+          document.querySelectorAll('.storage-segments-bar .seg-mixes').forEach(el => {
             el.style.width = `${mixesPct}%`;
             el.title = `Media Mixes: ${Math.round(stMix)} GB`;
           });
-          document.querySelectorAll('.seg-free').forEach(el => {
+          document.querySelectorAll('.storage-segments-bar .seg-free').forEach(el => {
             el.style.width = `${freePct}%`;
             el.title = `Free Space: ${stFree} GB (${freePct}%)`;
           });
@@ -3568,7 +3616,7 @@
         if (gaugeNum) gaugeNum.textContent = downMbps !== null ? `${downMbps}` : '--';
         const gaugeNeedle = document.getElementById('speed-dial-needle');
         if (gaugeNeedle) {
-          const angle = downMbps !== null ? (-45 + (Math.min(downMbps, 1000) / 1000) * 180) : -45;
+          const angle = downMbps !== null ? (-135 + (Math.min(downMbps, 1000) / 1000) * 180) : -135;
           gaugeNeedle.style.transform = `rotate(${angle}deg)`;
         }
 
@@ -3646,9 +3694,6 @@
         probeBtn.innerHTML = 'Probing...';
       }
       sendControl('run-speedtest');
-      setTimeout(fetchISPHistory, 2000);
-      setTimeout(fetchISPHistory, 4500);
-      setTimeout(fetchISPHistory, 7000);
       setTimeout(() => {
         fetchISPHistory();
         if (probeBtn) {
@@ -3683,11 +3728,12 @@
       })
       .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(data => {
+        if (!data || data.status !== 'success') throw new Error((data && data.message) || 'Gateway rejected request');
         if (input) input.value = '';
         showToast('success', 'Download Started!', data.message || `Torrent sent to ${target.toUpperCase()}`);
       })
-      .catch(() => {
-        showToast('error', 'Dispatch Failed', `Could not reach ${GATEWAY} to inject torrent.`);
+      .catch(err => {
+        showToast('error', 'Dispatch Failed', (err && err.message) || `Could not reach ${GATEWAY} to inject torrent.`);
       });
     }
 
@@ -3743,6 +3789,7 @@
       })
       .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(data => {
+        if (!data || data.status !== 'success') throw new Error((data && data.message) || 'Gateway rejected request');
         closeMagnetModal();
         if (input) input.value = '';
         if (btn) { btn.disabled = false; btn.textContent = 'Start Remote Download'; }
@@ -3750,7 +3797,7 @@
       })
       .catch(err => {
         if (btn) { btn.disabled = false; btn.textContent = 'Start Remote Download'; }
-        showToast('error', 'Dispatch Failed', `Could not reach ${GATEWAY} to inject torrent.`);
+        showToast('error', 'Dispatch Failed', (err && err.message) || `Could not reach ${GATEWAY} to inject torrent.`);
       });
     }
 
@@ -4072,7 +4119,8 @@
         signal: controller.signal
       })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-        .then(() => {
+        .then(resData => {
+          if (!resData || resData.status !== 'success') throw new Error((resData && resData.message) || 'Gateway rejected request');
           const expiresAt = durationMinutes > 0 ? (Date.now() + durationMinutes * 60000) : null;
           const data = {
             active: true,
@@ -4117,7 +4165,8 @@
         signal: controller.signal
       })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-        .then(() => {
+        .then(resData => {
+          if (!resData || resData.status !== 'success') throw new Error((resData && resData.message) || 'Gateway rejected request');
           try { localStorage.removeItem('dr_nuc_maintenance'); } catch(e) {}
           updateMaintenanceVisualStates();
           updateMaintenanceModalUI();
@@ -4216,7 +4265,9 @@
       }
 
       // 5. Re-render Uptime Matrix
-      try { renderUptimeMatrix(); } catch(e) {}
+      if (typeof hasUptimeDom === 'function' && hasUptimeDom() && window._uptimeInitialized) {
+        try { renderUptimeMatrix(); } catch(e) {}
+      }
     }
     window.updateMaintenanceVisualStates = updateMaintenanceVisualStates;
     // 90-Day Uptime Matrix & Sparkline Controller
@@ -4805,7 +4856,9 @@
       setStatus('stag-streamhub', 'meta-watch-streamhub', s.streamhub, 'Operational', 'Sentinel Verified');
       setStatus('stag-files', 'meta-watch-files', s.filebrowser, 'Operational', 'Vault Active');
       setStatus('stag-cam', 'meta-watch-cam', s.cam, 'Operational', 'go2rtc Active');
-      setStatus('stag-feeder', 'feeder-card-watchdog', s.feeder, 'Armed & Active', 'Armed & Active');
+      if (!window._feederLowHopperAlert) {
+        setStatus('stag-feeder', 'feeder-card-watchdog', s.feeder, 'Armed & Active', 'Armed & Active');
+      }
       setStatus('stag-wol', 'meta-watch-wol', s.wol, 'Operational', 'Gateway Active');
       setStatus('stag-torrents2', 'meta-watch-torrents2', s.torrents2, 'Operational', 'WireGuard Swarm');
 
@@ -6264,12 +6317,7 @@
       setTimeout(() => {
         if (stageText) stageText.textContent = `Stage 2/2: Collecting fresh latency & throughput telemetry from gateway...`;
         playChaosTone(587, 880, 'sine', 0.2);
-        if (typeof fetchISPHistory === 'function') fetchISPHistory();
       }, 2500);
-
-      setTimeout(() => {
-        if (typeof fetchISPHistory === 'function') fetchISPHistory();
-      }, 5500);
 
       setTimeout(() => {
         Promise.resolve(typeof fetchISPHistory === 'function' ? fetchISPHistory() : null).finally(() => {
@@ -6289,7 +6337,7 @@
           if (upEl) upEl.innerHTML = upStr === '--' ? `--` : `${upStr} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
           if (gaugeNum) gaugeNum.textContent = downStr;
           if (gaugeNeedle) {
-            const angle = (rawDown !== null && Number.isFinite(rawDown)) ? (-45 + (Math.min(rawDown, 1000) / 1000) * 180) : -45;
+            const angle = (rawDown !== null && Number.isFinite(rawDown)) ? (-135 + (Math.min(rawDown, 1000) / 1000) * 180) : -135;
             gaugeNeedle.style.transform = `rotate(${angle}deg)`;
           }
           if (btn) { btn.disabled = false; btn.innerHTML = 'Run Gigabit Speedtest'; }
@@ -7108,6 +7156,7 @@
       }
 
       // Live Homelab Service Dashboard Card (index.html & uptime.html)
+      window._feederLowHopperAlert = (pct !== null && pct <= 20);
       const stagFeeder = document.getElementById('stag-feeder');
       if (stagFeeder) {
         if (pct === null) {
@@ -7233,13 +7282,14 @@
       fetch(`${GATEWAY}/api/feeder/refill`, { method: 'POST', credentials: 'include', headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }), body: '{}', signal: _fetchSig(10000) })
         .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
         .then(data => {
-          if (data && data.status === 'success') {
-            if (data.feeder) {
-              try { localStorage.setItem('dr_feeder_cache', JSON.stringify(data.feeder)); } catch (e) {}
-              updateFeederUI(data.feeder);
-            }
-            showToast('success', "Hopper Refilled", "Kibble hopper reset to 100% (1,500g / ~18.7 days).");
+          if (!data || data.status !== 'success') {
+            throw new Error((data && data.message) || 'Gateway rejected request');
           }
+          if (data.feeder) {
+            try { localStorage.setItem('dr_feeder_cache', JSON.stringify(data.feeder)); } catch (e) {}
+            updateFeederUI(data.feeder);
+          }
+          showToast('success', "Hopper Refilled", "Kibble hopper reset to 100% (1,500g / ~18.7 days).");
         })
         .catch(err => {
           showToast('error', "Hopper Refill Error", err.message);
@@ -7265,13 +7315,6 @@
       if (watchEl) watchEl.textContent = 'Optical Watchdog: Verifying motor & bowl...';
       if (dishEl) dishEl.textContent = 'Detecting kibble drop...';
 
-      if (logEl) {
-        const item = document.createElement('div');
-        item.style.cssText = 'display: flex; justify-content: space-between; padding: 4px 0; border-top: 1px solid rgba(255,255,255,0.06); color: #cbd5e1;';
-        item.innerHTML = `<span>${escapeHtml(portionLabel)} (Hardware Bridge Dispense)</span><span class="mono" style="color: #34d399;">${escapeHtml(nowStr)}</span>`;
-        logEl.prepend(item);
-      }
-
       const endpoint = `${GATEWAY}/api/feeder/dispense?portion=${encodeURIComponent(portionLabel)}`;
       fetch(endpoint, { method: 'POST', credentials: 'include', headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }), body: '{}', signal: _fetchSig(10000) })
         .then(r => {
@@ -7279,7 +7322,13 @@
           return r.json();
         })
         .then(data => {
-          if (data.status === 'success' || (data.tuya && data.tuya.success)) {
+          if (data && (data.status === 'success' || (data.tuya && data.tuya.success))) {
+            if (logEl) {
+              const item = document.createElement('div');
+              item.style.cssText = 'display: flex; justify-content: space-between; padding: 4px 0; border-top: 1px solid rgba(255,255,255,0.06); color: #cbd5e1;';
+              item.innerHTML = `<span>${escapeHtml(portionLabel)} (Hardware Bridge Dispense)</span><span class="mono" style="color: #34d399;">${escapeHtml(nowStr)}</span>`;
+              logEl.prepend(item);
+            }
             showToast('success', "Penny's Smart Feeder Actuated", `192.168.2.22 dispensed ${portionLabel}. Optical Watchdog: Kibble verified.`);
             if (data.feeder) {
               updateFeederUI(data.feeder);
@@ -7287,7 +7336,7 @@
               fetchFeederStatus();
             }
           } else {
-            showToast('warning', "Penny's Smart Feeder", data.message || `Dispense dispatched.`);
+            showToast('warning', "Penny's Smart Feeder", (data && data.message) || `Dispense rejected.`);
             if (watchEl) watchEl.textContent = 'Alert: Check feeder hopper';
           }
         })
@@ -7298,8 +7347,6 @@
     }
     window.triggerCatTreat = triggerCatTreat;
 
-    // Auto-fetch feeder status on page load
-    setTimeout(fetchFeederStatus, 1200);
     setTimeout(() => { if (typeof auditAndAttachCheckButtons === 'function') auditAndAttachCheckButtons(); }, 1600);
     setInterval(() => { if (document.hidden) return; if (typeof auditAndAttachCheckButtons === 'function') auditAndAttachCheckButtons(); }, 5000);
 

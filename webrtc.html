@@ -388,7 +388,7 @@
     <div class="hud-top-right">
       <span style="color:#38bdf8; font-weight:700;" id="hudCamTarget">CAM 1: LIVING ROOM TOWER</span>
       <span id="hudClock" style="color:#94a3b8;">UTC SYNCING...</span>
-      <span style="color:#10b981;">1080P HD &bull; H.264 &bull; AUTO NIGHT</span>
+      <span id="hudCamSpec" style="color:#10b981;">1080P HD &bull; H.264 &bull; AUTO NIGHT</span>
     </div>
     </header>
 
@@ -501,6 +501,12 @@
       camTitle.innerHTML = activeCam.title;
       hudCamTarget.textContent = activeCam.targetText;
       valIp.textContent = activeCam.ip;
+      const specEl = document.getElementById('hudCamSpec');
+      if (specEl) {
+        specEl.textContent = activeCam.stream.endsWith('_sd')
+          ? '480P SD \u2022 H.264 \u2022 AUTO NIGHT'
+          : '1080P HD \u2022 H.264 \u2022 AUTO NIGHT';
+      }
       const ssoBtn = document.getElementById('hudBtnSso');
       if (ssoBtn) ssoBtn.href = `https://cam.digitalresolve.ca/webrtc.html?src=${encodeURIComponent(activeCam.stream)}`;
       const lanBtn = document.getElementById('hudBtnLan');
@@ -1040,6 +1046,7 @@
 
     // Active Camera Ping Telemetry
     async function pollStatus() {
+      if (document.hidden || streamConnected) return;
       const hostname = window.location.hostname;
       if (hostname === 'cam.digitalresolve.ca') return;
       const isHttps = (window.location.protocol === 'https:');
@@ -1066,7 +1073,8 @@
               valIp.textContent = c.ip;
               const lat = (c.latencyMs !== null && c.latencyMs !== undefined && Number.isFinite(Number(c.latencyMs))) ? c.latencyMs + ' ms' : '--';
               valLatency.textContent = lat;
-              if (!streamConnected) {
+              const isSsoStandby = statusBadge && statusBadge.classList.contains('standby') && statusText && statusText.textContent.includes('SSO');
+              if (!streamConnected && !isSsoStandby) {
                 statusText.textContent = c.online ? `HARDWARE ONLINE \u2022 ${lat}` : 'CAMERA OFFLINE';
               }
               return;

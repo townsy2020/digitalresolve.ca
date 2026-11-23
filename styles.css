@@ -6821,6 +6821,7 @@ a:focus-visible {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 72px;
   align-items: start;
+  pointer-events: none;
 }
 
 @media (max-width: 1024px) {
@@ -6879,6 +6880,7 @@ a:focus-visible {
 .storage-node-card {
   position: relative;
   z-index: 3;
+  pointer-events: auto;
   background: #111827;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 12px;

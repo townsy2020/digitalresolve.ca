@@ -204,48 +204,64 @@
   }
 
   async function fetchStorageFlow() {
-    const gatewayUrl = `${GATEWAY}/api/storage-flow`;
-    const lanUrl = `${LAN_BASE}/api/storage-flow`;
-    const primaryUrl = isHttps ? gatewayUrl : lanUrl;
-    const primaryOpts = isHttps
-      ? { credentials: 'include', signal: AbortSignal.timeout ? AbortSignal.timeout(12000) : undefined }
-      : { signal: AbortSignal.timeout ? AbortSignal.timeout(10000) : undefined };
-
-    let res = null;
+    if (state.inFlight) return;
+    state.inFlight = true;
     try {
-      res = await fetch(primaryUrl, primaryOpts);
-    } catch (_err) {
-      if (!isHttps && primaryUrl !== gatewayUrl) {
-        try {
-          res = await fetch(gatewayUrl, { credentials: 'include', signal: AbortSignal.timeout ? AbortSignal.timeout(12000) : undefined });
-        } catch (_gwErr) {
+      const gatewayUrl = `${GATEWAY}/api/storage-flow`;
+      const lanUrl = `${LAN_BASE}/api/storage-flow`;
+      const primaryUrl = isHttps ? gatewayUrl : lanUrl;
+      const primaryOpts = isHttps
+        ? { credentials: 'include', signal: AbortSignal.timeout ? AbortSignal.timeout(12000) : undefined }
+        : { signal: AbortSignal.timeout ? AbortSignal.timeout(10000) : undefined };
+
+      let res = null;
+      try {
+        res = await fetch(primaryUrl, primaryOpts);
+      } catch (err) {
+        if (!isHttps && primaryUrl !== gatewayUrl) {
+          try {
+            res = await fetch(gatewayUrl, { credentials: 'include', signal: AbortSignal.timeout ? AbortSignal.timeout(12000) : undefined });
+          } catch (_gwErr) {
+            renderOfflineFallback();
+            return;
+          }
+        } else if (isHttps && err && err.name === 'TypeError') {
+          state.unauthenticated = true;
+          renderAuthFallback();
+          return;
+        } else {
           renderOfflineFallback();
           return;
         }
-      } else {
+      }
+
+      if (!res || !res.ok) {
+        if (res && (res.status === 401 || res.status === 403)) {
+          state.unauthenticated = true;
+          renderAuthFallback();
+        } else {
+          renderOfflineFallback();
+        }
+        return;
+      }
+
+      let json;
+      try {
+        json = await res.json();
+      } catch (_parseErr) {
         renderOfflineFallback();
         return;
       }
+      state.unauthenticated = false;
+      state.data = json;
+      const banner = document.getElementById('storage-sso-banner');
+      if (banner) banner.style.display = 'none';
+
+      pushWaveformSample(json);
+      renderAll(json);
+    } finally {
+      state.inFlight = false;
     }
-
-    if (!res || !res.ok) {
-      if (res && (res.status === 401 || res.status === 403)) {
-        state.unauthenticated = true;
-        renderAuthFallback();
-      } else {
-        renderOfflineFallback();
-      }
-      return;
-    }
-
-    const json = await res.json();
-    state.unauthenticated = false;
-    state.data = json;
-    const banner = document.getElementById('storage-sso-banner');
-    if (banner) banner.style.display = 'none';
-
-    pushWaveformSample(json);
-    renderAll(json);
   }
 
   function renderAuthFallback() {
@@ -384,10 +400,13 @@
     if (fillEl) fillEl.style.width = dUsedPct.toFixed(1) + '%';
     setText('nuc-d-used-lbl', dTotalGB > 0 ? `${dUsedPct.toFixed(0)}% Used` : '--');
 
+    const cVol = Array.isArray(nuc.volumes) ? nuc.volumes.find(v => v && v.drive === 'C:') : null;
+    const cTotalGB = cVol ? safeNum(cVol.totalGB, 0) : Math.max(0, safeNum(nuc.totalGB, 0) - dTotalGB);
+    const cFreeGB = cVol ? safeNum(cVol.freeGB, 0) : Math.max(0, safeNum(nuc.freeGB, 0) - dFreeGB);
     const nucTempVal = getMaxNvmeTemp(nuc);
     const nucTemp = nucTempVal !== null ? ` • NVMe ${nucTempVal}°C` : '';
     setText('node-tag-nuc-c', nuc.online ? 'Online' : 'Standby');
-    setText('node-meta-nuc-c', `192.168.2.35 • ${fmtGB(nuc.freeGB)} Free / ${fmtGB(nuc.totalGB)}${nucTemp}`);
+    setText('node-meta-nuc-c', `192.168.2.35 • ${fmtGB(cFreeGB)} Free / ${fmtGB(cTotalGB)}${nucTemp}`);
 
     const smb = t.qnap_smb || {};
     setText('node-tag-qnap-smb', safeNum(smb.totalGB, 0) > 0 ? fmtGB(smb.totalGB) : '--');
@@ -418,6 +437,10 @@
     const stage = document.getElementById('storage-flow-stage');
     if (!svg || !stage) return;
 
+    const pipelines = Array.isArray(data && data.pipelines) ? data.pipelines : [];
+    const filtered = pipelines.filter(p => matchesFilter(p.category, state.filter));
+    setText('flow-active-count', `${filtered.length} Active Pipelines`);
+
     const stageRect = stage.getBoundingClientRect();
     if (stageRect.width < 100 || window.innerWidth <= 1024) {
       svg.innerHTML = '';
@@ -425,9 +448,6 @@
     }
 
     svg.setAttribute('viewBox', `0 0 ${stageRect.width} ${stageRect.height}`);
-    const pipelines = Array.isArray(data && data.pipelines) ? data.pipelines : [];
-    const filtered = pipelines.filter(p => matchesFilter(p.category, state.filter));
-    setText('flow-active-count', `${filtered.length} Active Pipelines`);
 
     let html = `<defs>
       <filter id="pipe-glow" x="-20%" y="-20%" width="140%" height="140%">
@@ -575,6 +595,13 @@
 
   function renderCapacityBars(data) {
     const t = data.tiers || {};
+    const nucHot = t.nuc_hot || {};
+    const nucDTotal = safeNum(nucHot.dDriveTotalGB, 0);
+    const nucDFree = safeNum(nucHot.dDriveFreeGB, 0);
+    const nucCVol = Array.isArray(nucHot.volumes) ? nucHot.volumes.find(v => v && v.drive === 'C:') : null;
+    const nucCTotal = nucCVol ? safeNum(nucCVol.totalGB, 0) : Math.max(0, safeNum(nucHot.totalGB, 0) - nucDTotal);
+    const nucCFree = nucCVol ? safeNum(nucCVol.freeGB, 0) : Math.max(0, safeNum(nucHot.freeGB, 0) - nucDFree);
+    const nucCUsed = nucCVol ? safeNum(nucCVol.usedGB, Math.max(0, nucCTotal - nucCFree)) : Math.max(0, nucCTotal - nucCFree);
     const rows = [
       {
         label: 'QNAP SMB Cold Archive (Q:)',
@@ -589,9 +616,15 @@
         color: '#3b82f6'
       },
       {
+        label: 'NUC C: NVMe OS (C:)',
+        used: nucCUsed,
+        total: nucCTotal,
+        color: '#ec4899'
+      },
+      {
         label: 'NUC D: FireCuda SSHD (30% Marker)',
-        used: safeNum(t.nuc_hot && t.nuc_hot.dDriveUsedGB),
-        total: safeNum(t.nuc_hot && t.nuc_hot.dDriveTotalGB, 0),
+        used: safeNum(nucHot.dDriveUsedGB),
+        total: nucDTotal,
         color: '#a855f7',
         marker70: true
       },
@@ -610,7 +643,7 @@
       {
         label: 'OneDrive Cloud Vault',
         used: safeNum(t.cloud_onedrive && t.cloud_onedrive.totalGB),
-        total: Math.max(1024, safeNum(t.cloud_onedrive && t.cloud_onedrive.totalGB, 0)),
+        total: safeNum(t.cloud_onedrive && t.cloud_onedrive.totalGB, 0),
         color: '#f59e0b',
         isCloud: true
       }
@@ -853,6 +886,10 @@
         }
         return;
       }
+      const data = await res.json().catch(() => null);
+      if (!data || data.status !== 'success') {
+        throw new Error((data && data.message) || 'Gateway rejected request');
+      }
       if (typeof window.showToast === 'function') {
         window.showToast('success', 'Pipeline Triggered', `${pipeline.name} dispatched on cluster.`, 4500);
       }
@@ -913,7 +950,9 @@
     });
 
     fetchStorageFlow();
-    state.pollTimer = setInterval(fetchStorageFlow, 10000);
+    state.pollTimer = setInterval(() => {
+      if (!document.hidden && !state.inFlight) fetchStorageFlow();
+    }, 10000);
   }
 
   if (document.readyState === 'loading') {
