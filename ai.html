@@ -540,6 +540,10 @@
         src = src.includes('sd') ? 'pennys_feeder_sd' : 'pennys_feeder';
       }
       window.ACTIVE_CAM_STREAM = src;
+      const resEl = document.getElementById('stream-res');
+      if (resEl) {
+        resEl.textContent = src.endsWith('_sd') ? '480p SD' : '1080p';
+      }
 
       const endpoints = getStreamEndpoints(src);
       connectEndpoint(endpoints, 0);

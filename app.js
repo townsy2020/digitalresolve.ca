@@ -164,16 +164,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.85';
+          const activeVer = match ? match[0] : 'v2.8.86';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 19806;
-      const baseCssLines = 7307;
-      const baseJsLines = 8402;
+      const baseHtmlLines = 19914;
+      const baseCssLines = 7227;
+      const baseJsLines = 8431;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -2138,11 +2138,13 @@
       showToast('info', 'Signing Out of Microsoft 365 SSO...', 'Clearing Cloudflare Access session and local caches...', 3000);
       _cfAccessVerified = false;
       _cfAccessEmail = '';
+      _feederWarmHydrated = false;
       try {
         localStorage.removeItem('dr_sso_authenticated');
         localStorage.removeItem('dr_sso_pin');
         localStorage.removeItem('dr_sso_user');
         localStorage.removeItem('dr_sso_email');
+        localStorage.removeItem('dr_feeder_cache');
       } catch(e) {}
       try { sessionStorage.clear(); } catch(e) {}
       try {
@@ -7087,20 +7089,37 @@
     }
     window.updateFeederUI = updateFeederUI;
 
-    function fetchFeederStatus() {
+    let _feederWarmHydrated = false;
+    const FEEDER_CACHE_TTL_MS = 15 * 60 * 1000;
+    function _readValidFeederCache() {
       try {
-        const warm = localStorage.getItem('dr_feeder_cache');
-        if (warm) {
-          const parsedWarm = JSON.parse(warm);
-          if (parsedWarm && typeof parsedWarm === 'object') updateFeederUI(parsedWarm);
+        const raw = localStorage.getItem('dr_feeder_cache');
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object' && parsed.feeder && typeof parsed.feeder === 'object' && Number.isFinite(Number(parsed.ts))) {
+          if ((Date.now() - Number(parsed.ts)) <= FEEDER_CACHE_TTL_MS) {
+            return parsed.feeder;
+          }
+          localStorage.removeItem('dr_feeder_cache');
+        } else {
+          localStorage.removeItem('dr_feeder_cache');
         }
       } catch (e) {}
+      return null;
+    }
+
+    function fetchFeederStatus() {
+      if (!_feederWarmHydrated) {
+        _feederWarmHydrated = true;
+        const warmFeeder = _readValidFeederCache();
+        if (warmFeeder) updateFeederUI(warmFeeder);
+      }
       const ctrl = (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(4000) : undefined;
       return fetch(`${GATEWAY}/api/feeder/status`, { credentials: 'include', signal: ctrl })
         .then(r => r.ok ? r.json() : null)
         .then(data => {
           if (data && data.status === 'success' && data.feeder) {
-            try { localStorage.setItem('dr_feeder_cache', JSON.stringify(data.feeder)); } catch(e) {}
+            try { localStorage.setItem('dr_feeder_cache', JSON.stringify({ ts: Date.now(), feeder: data.feeder })); } catch(e) {}
             updateFeederUI(data.feeder);
             return data;
           } else {
@@ -7110,15 +7129,10 @@
         .catch(() => {
           const isHttps = typeof window !== 'undefined' && window.location && window.location.protocol === 'https:';
           const applyCachedOrOffline = () => {
-            const cached = localStorage.getItem('dr_feeder_cache');
-            if (cached) {
-              try {
-                const parsed = JSON.parse(cached);
-                if (parsed && typeof parsed === 'object') {
-                  updateFeederUI(parsed);
-                  return;
-                }
-              } catch (e) {}
+            const cachedFeeder = _readValidFeederCache();
+            if (cachedFeeder) {
+              updateFeederUI(cachedFeeder);
+              return;
             }
             const setOfflineText = (id, text, color = '#94a3b8') => {
               const el = document.getElementById(id);
@@ -7166,7 +7180,7 @@
             .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(d => {
               if (d && d.feeder) {
-                try { localStorage.setItem('dr_feeder_cache', JSON.stringify(d.feeder)); } catch (e) {}
+                try { localStorage.setItem('dr_feeder_cache', JSON.stringify({ ts: Date.now(), feeder: d.feeder })); } catch (e) {}
                 updateFeederUI(d.feeder);
                 return d;
               } else {

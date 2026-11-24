@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-24T06:00:26Z",
-    "currentVersion":  "v2.8.85",
+    "updatedAt":  "2026-11-24T12:32:57Z",
+    "currentVersion":  "v2.8.86",
     "releases":  [
+                     {
+                         "version":  "v2.8.86",
+                         "date":  "November 24, 2026",
+                         "title":  "Round 2 Audit Hardening: Standby Telemetry, Feeder Cache TTL \u0026 Ingest Resilience",
+                         "changes":  [
+                                         {
+                                             "label":  "Storage Flow Offline \u0026 Desktop Standby Accuracy",
+                                             "text":  "Prevented cached Desktop vitals from reporting Online or frozen I/O while Desktop sleeps, enabled Storage Flow category filter pills and SVG curve reflow when offline/unauthenticated, and eliminated residual Disk+NIC throughput double-counting."
+                                         },
+                                         {
+                                             "label":  "Feeder Cache TTL \u0026 Uptime SLA Timebase",
+                                             "text":  "Added a 15-minute TTL and SSO sign-out purge for dr_feeder_cache so real feeder outages surface honestly, and aligned /api/uptime ISP SLA math onto the 90-day monitored-seconds window."
+                                         },
+                                         {
+                                             "label":  "Audiobook Ingest, Archive Extraction \u0026 DR Resilience",
+                                             "text":  "Filtered legacy .M4B directories, added series_sequence + frozenset volume matching in sort_and_ingest_audiobooks.py, fixed 3-digit multi-part RAR filtering in PostProcess-Torrent.ps1, isolated QNAP vs OneDrive staging errors in Backup-HomelabResilience.ps1, and pruned retired Edge AI styles."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.85",
                          "date":  "November 24, 2026",

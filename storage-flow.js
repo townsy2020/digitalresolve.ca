@@ -319,9 +319,16 @@
     });
     const fillEl = document.getElementById('nuc-d-threshold-fill');
     if (fillEl) fillEl.style.width = '0%';
+    setText('node-meta-desktop-drives', 'C: + D: + F: • Standby');
+    setText('node-meta-nuc-c', 'NUC Core • --');
+    setText('node-meta-nuc-d', 'D: Staging • 30% Offload Guardrail');
     setText('node-meta-qnap-smb', 'SMB Share (Q:) • --');
     setText('node-meta-qnap-iscsi-nuc', 'E: • -- • Homelab Resilience & WindowsImageBackup');
     setText('node-meta-qnap-iscsi-desktop', 'E: • -- • Mirrored Snapshots & Bare-Metal');
+    setText('node-meta-onedrive-vault', 'Offsite Encrypted Cloud Vault');
+    const odTagFallback = document.getElementById('node-tag-onedrive-vault');
+    if (odTagFallback) odTagFallback.className = 'storage-node-tag info';
+    applyNodeCategoryFilter();
     const stackedEl = document.getElementById('storage-capacity-stacked');
     if (stackedEl) stackedEl.innerHTML = '';
     const barsEl = document.getElementById('storage-capacity-bars');
@@ -370,7 +377,7 @@
     const lf = (data && data.liveFlow) || {};
     const nucIO = safeNum(lf.nucDiskReadMBps) + safeNum(lf.nucDiskWriteMBps);
     const qnapIO = Math.max(safeNum(lf.nucIscsiWriteMBps), safeNum(lf.nucNetMBps));
-    const deskIO = safeNum(lf.desktopDiskMBps) + safeNum(lf.desktopNetMBps);
+    const deskIO = Math.max(safeNum(lf.desktopDiskMBps), safeNum(lf.desktopNetMBps));
     state.waveformHistory.push({ nuc: nucIO, qnap: qnapIO, desk: deskIO, t: Date.now() });
     if (state.waveformHistory.length > state.maxWaveformPoints) {
       state.waveformHistory.shift();
@@ -521,10 +528,15 @@
     setText('node-meta-qnap-iscsi-desktop', `${safeStr(iDesk.drive, 'E:')} • ${isValidNum(iDesk.freeGB) ? fmtGB(iDesk.freeGB) + ' Free' : '--'} • Mirrored Snapshots`);
 
     const od = t.cloud_onedrive || {};
-    setText('node-tag-onedrive-vault', od.online ? fmtGB(od.totalGB) : 'Synced');
+    setText('node-tag-onedrive-vault', od.online ? fmtGB(od.totalGB) : '--');
+    const odTagEl = document.getElementById('node-tag-onedrive-vault');
+    if (odTagEl) odTagEl.className = 'storage-node-tag ' + (od.online ? 'ok' : 'info');
     setText('node-meta-onedrive-vault', `${safeNum(od.fileCount, 0).toLocaleString()} files • ${safeNum(od.snapshotCount, 0)} snapshots`);
 
-    // Apply category dimming on node cards
+    applyNodeCategoryFilter();
+  }
+
+  function applyNodeCategoryFilter() {
     document.querySelectorAll('.storage-node-card').forEach(card => {
       const cats = (card.getAttribute('data-category') || '').split(',');
       const visible = state.filter === 'all' || cats.some(c => matchesFilter(c, state.filter));
@@ -1069,6 +1081,9 @@
           renderTierNodes(state.data);
           renderPipesSVG(state.data);
           renderMatrix(state.data);
+        } else {
+          applyNodeCategoryFilter();
+          renderPipesSVG(null);
         }
       });
     });
@@ -1088,7 +1103,7 @@
         const stage = document.getElementById('storage-flow-stage');
         if (stage) stage.classList.toggle('is-paused', state.animPaused);
         animBtn.textContent = state.animPaused ? 'Resume Flow Animation' : 'Pause Flow Animation';
-        if (state.data) renderPipesSVG(state.data);
+        renderPipesSVG(state.data);
       });
     }
 
@@ -1099,7 +1114,7 @@
     }
 
     window.addEventListener('resize', () => {
-      if (state.data) renderPipesSVG(state.data);
+      renderPipesSVG(state.data);
       renderWaveform();
     });
 
