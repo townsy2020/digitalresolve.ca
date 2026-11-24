@@ -26,15 +26,30 @@
     'postprocess-torrent': { from: 'postprocess-7z', to: 'nuc-d', color: '#38bdf8', dy: -8 },
     'tier-coldstorage': { from: 'nuc-d', to: 'qnap-smb', color: '#a855f7', dy: -10 },
     'audible-sync': { from: 'audible-sync', to: 'qnap-smb', color: '#f472b6', dy: 14 },
-    'audiobook-ingest': { from: 'qnap-smb', to: 'nuc-c', color: '#fbbf24', dy: 18 },
+    'audiobook-ingest': { from: 'nuc-c', to: 'qnap-smb', color: '#fbbf24', dy: 16, dy2: -8 },
     'homelab-resilience': { from: 'nuc-c', to: 'qnap-iscsi-nuc', color: '#10b981', dy: -12 },
     'iscsi-watchdog': { from: 'nuc-qbit', to: 'qnap-iscsi-nuc', color: '#f59e0b', dy: 14 },
     'baremetal-nuc': { from: 'nuc-c', to: 'qnap-iscsi-nuc', color: '#34d399', dy: 6 },
     'baremetal-desktop': { from: 'desktop-drives', to: 'qnap-iscsi-desktop', color: '#60a5fa', dy: 16 },
     'sync-qnap-backups': { from: 'qnap-iscsi-nuc', to: 'qnap-iscsi-desktop', color: '#2dd4bf', dy: 0 },
-    'cloud-daily': { from: 'nuc-c', to: 'onedrive-vault', color: '#38bdf8', dy: -14 },
-    'dr-nightly': { from: 'nuc-c', to: 'onedrive-vault', color: '#818cf8', dy: 14 },
+    'cloud-daily': { from: 'nuc-c', to: 'onedrive-vault', color: '#38bdf8', dy: -16, dy2: -4 },
+    'dr-nightly': { from: 'nuc-c', to: 'onedrive-vault', color: '#818cf8', dy: 10, dy2: 22 },
     'ssd-guard': { from: 'nuc-d', to: 'nuc-qbit', color: '#f59e0b', dy: 0 }
+  };
+
+  const PIPELINE_FALLBACKS = {
+    'tier-coldstorage': { id: 'tier-coldstorage', name: 'Media Cold-Storage Tiering', category: 'media', sourceTier: 'nuc_hot', targetTier: 'qnap_smb', scriptPath: 'C:\\ProgramData\\StreamHub\\Tier-ColdStorage.ps1', schedule: 'Every 2 hours', description: 'Offloads completed qBittorrent media packages from NUC D: SSHD to QNAP SMB cold archive whenever NUC D: drops below 30% free.', triggerAction: 'run-tier-coldstorage' },
+    'audible-sync': { id: 'audible-sync', name: 'Audible Library Sync', category: 'media', sourceTier: 'audible_cloud', targetTier: 'qnap_smb', scriptPath: 'C:\\ProgramData\\qBittorrent-Automation\\sync_audible.py', schedule: 'Daily 05:00', description: 'Downloads new Audible audiobooks & vouchers directly into QNAP SMB cold storage.', triggerAction: 'run-audible-sync' },
+    'audiobook-ingest': { id: 'audiobook-ingest', name: 'Audiobook Sort & Ingest', category: 'media', sourceTier: 'nuc_hot', targetTier: 'qnap_smb', scriptPath: 'C:\\ProgramData\\qBittorrent-Automation\\sort_and_ingest_audiobooks.py', schedule: 'Post-Sync', description: 'Organizes ingested audiobooks into QNAP SMB Progression Fantasy library and triggers Audiobookshelf scan.', triggerAction: 'run-audiobook-ingest' },
+    'postprocess-torrent': { id: 'postprocess-torrent', name: 'qBittorrent Post-Process Hook', category: 'media', sourceTier: 'nuc_hot', targetTier: 'nuc_hot', scriptPath: 'C:\\ProgramData\\qBittorrent-Automation\\PostProcess-Torrent.ps1', schedule: 'On Completion', description: 'Extracts 7z/RAR/ZIP archives and stages completed torrent media into NUC D: hot library.', triggerAction: '' },
+    'homelab-resilience': { id: 'homelab-resilience', name: 'Homelab Resilience Snapshot', category: 'backup', sourceTier: 'nuc_hot', targetTier: 'qnap_iscsi_nuc', scriptPath: 'C:\\ProgramData\\digitalresolve\\Backup-HomelabResilience.ps1', schedule: 'Weekly Sun 03:30', description: 'Snapshots critical homelab scripts, configs, Caddy, and go2rtc state to NUC E: iSCSI LUN and OneDrive.', triggerAction: 'run-resilience-backup' },
+    'sync-qnap-backups': { id: 'sync-qnap-backups', name: 'Desktop QNAP Backup Mirror', category: 'backup', sourceTier: 'qnap_iscsi_nuc', targetTier: 'qnap_iscsi_desktop', scriptPath: '%USERPROFILE%\\Projects\\Sync-QNAP-HomelabBackups.ps1', schedule: 'Daily 03:45', description: 'Mirrors NUC E: Homelab-Resilience snapshots onto Desktop E: QNAP iSCSI LUN with retention pruning.', triggerAction: 'run-qnap-sync' },
+    'baremetal-nuc': { id: 'baremetal-nuc', name: 'NUC Weekly Bare-Metal Image', category: 'backup', sourceTier: 'nuc_hot', targetTier: 'qnap_iscsi_nuc', scriptPath: 'C:\\ProgramData\\digitalresolve\\Run-BareMetalBackup.ps1', schedule: 'Weekly Sun 04:30', description: 'Creates full wbadmin WindowsImageBackup of NUC C: OS NVMe onto NUC E: QNAP iSCSI LUN.', triggerAction: '' },
+    'baremetal-desktop': { id: 'baremetal-desktop', name: 'Desktop Weekly Bare-Metal Image', category: 'backup', sourceTier: 'desktop_hot', targetTier: 'qnap_iscsi_desktop', scriptPath: 'C:\\ProgramData\\digitalresolve\\Run-BareMetalBackup.ps1', schedule: 'Weekly Sun 04:00', description: 'Creates full wbadmin WindowsImageBackup of Desktop C: OS NVMe onto Desktop E: QNAP iSCSI LUN.', triggerAction: '' },
+    'cloud-daily': { id: 'cloud-daily', name: 'Cloud Daily Offsite Backup', category: 'backup', sourceTier: 'nuc_hot', targetTier: 'cloud_onedrive', scriptPath: '%USERPROFILE%\\Projects\\scripts\\Backup-Homelab-Cloud.py', schedule: 'Daily 02:00', description: 'Replicates daily homelab configs and database snapshots offsite to OneDrive Antigravity-Backups.', triggerAction: 'run-cloud-backup' },
+    'dr-nightly': { id: 'dr-nightly', name: 'Nightly Disaster Recovery Sync', category: 'backup', sourceTier: 'nuc_hot', targetTier: 'cloud_onedrive', scriptPath: 'C:\\ProgramData\\digitalresolve\\Backup-DisasterRecovery.ps1', schedule: 'Daily 03:00', description: 'Backs up qBittorrent state, cloudflared configs, and StreamHub metadata to OneDrive Nightly-Backups.', triggerAction: '' },
+    'ssd-guard': { id: 'ssd-guard', name: 'NVMe & SSD Free-Space Guard', category: 'guard', sourceTier: 'nuc_hot', targetTier: 'nuc_hot', scriptPath: 'C:\\ProgramData\\digitalresolve\\Enforce-SsdFreeSpace.ps1', schedule: 'Every 30 min', description: 'Monitors C: NVMe headroom (20% floor) and SMART thermals across NUC and Desktop.', triggerAction: 'run-ssd-guard-nuc' },
+    'iscsi-watchdog': { id: 'iscsi-watchdog', name: 'QNAP iSCSI Persistent Watchdog', category: 'guard', sourceTier: 'nuc_hot', targetTier: 'qnap_iscsi_nuc', scriptPath: 'C:\\ProgramData\\digitalresolve\\Watchdog-QnapIscsi.ps1', schedule: 'Every 3 min', description: 'Verifies QNAP TS-639 iSCSI TCP :3260 session health and E: drive availability.', triggerAction: 'run-iscsi-watchdog-nuc' }
   };
 
   const NODE_DETAILS = {
@@ -42,7 +57,7 @@
       title: 'Desktop Workstation Storage (C: / D: / F:)',
       scriptName: 'Desktop Volume & NVMe Telemetry',
       scriptPath: 'C:\\ProgramData\\digitalresolve\\wol-listener.ps1',
-      route: 'Desktop (192.168.2.62) -> Cluster Telemetry',
+      route: 'Desktop Workstation -> Cluster Telemetry',
       schedule: 'Continuous 10s cache',
       description: 'Primary workstation NVMe OS, media staging, and high-capacity local volumes monitored for thermals and bare-metal DR.',
       pipelineId: 'baremetal-desktop'
@@ -50,8 +65,8 @@
     'desktop-qbit': {
       title: 'Desktop qBittorrent Ingest (:8080)',
       scriptName: 'qBittorrent Workstation Swarm',
-      scriptPath: 'C:\\ProgramData\\qBittorrent-Automation\\PostProcess-Torrent.ps1',
-      route: 'WAN Swarm -> Desktop Staging -> NUC Hot Media',
+      scriptPath: 'Desktop qBittorrent WebUI (:8080)',
+      route: 'WAN Swarm -> Desktop Staging -> PostProcess 7z',
       schedule: 'Event-driven on torrent completion',
       description: 'High-speed workstation torrent ingest feeding PostProcess 7z extraction and NUC media library.',
       pipelineId: 'postprocess-torrent'
@@ -62,7 +77,7 @@
       scriptPath: 'C:\\ProgramData\\qBittorrent-Automation\\PostProcess-Torrent.ps1',
       route: 'Completed Downloads -> Extracted Arr Staging',
       schedule: 'Triggered on torrent completion',
-      description: 'Automatically extracts multi-part 7z/RAR archives for Sonarr, Radarr, and Readarr import.',
+      description: 'Automatically extracts multi-part 7z/RAR/ZIP archives for Sonarr, Radarr, and Readarr import.',
       pipelineId: 'postprocess-torrent'
     },
     'audible-sync': {
@@ -87,7 +102,7 @@
       title: 'NUC D: 1.86 TB FireCuda SSHD (30% Guardrail)',
       scriptName: 'Tier-ColdStorage & SSD Guardrail',
       scriptPath: 'C:\\ProgramData\\StreamHub\\Tier-ColdStorage.ps1',
-      route: 'NUC D:\\ -> \\\\192.168.2.125\\Torrents (Q:)',
+      route: 'NUC D:\\ -> QNAP SMB Cold Archive (Q:)',
       schedule: 'Enforced at 30% free-space threshold',
       description: 'Hot 24/7 media buffer; automatically tiers older completed media to QNAP SMB cold archive when free space drops below 30%.',
       pipelineId: 'tier-coldstorage'
@@ -104,35 +119,35 @@
     'qnap-smb': {
       title: 'QNAP TS-639 SMB Cold Archive (Q:)',
       scriptName: 'Cold Media Archive Share',
-      scriptPath: '\\\\192.168.2.125\\Torrents',
-      route: 'NUC D:\\ -> QNAP SMB :445 (9.16 TB)',
+      scriptPath: '\\\\QNAP-NAS\\Torrents (Q:)',
+      route: 'NUC D:\\ -> QNAP SMB :445 Cold Archive',
       schedule: 'Continuous SMB mount + Tiering',
-      description: '9.16 TB RAID cold storage archive holding tiered movies, TV series, and audiobooks.',
+      description: 'RAID cold storage archive holding tiered movies, TV series, and audiobooks.',
       pipelineId: 'tier-coldstorage'
     },
     'qnap-iscsi-nuc': {
-      title: 'QNAP NUC iSCSI LUN (E: • 2.05 TB)',
+      title: 'QNAP NUC iSCSI LUN (E:)',
       scriptName: 'NUC iSCSI Block Target & Watchdog',
       scriptPath: 'C:\\ProgramData\\digitalresolve\\Watchdog-QnapIscsi.ps1',
       route: 'NUC -> QNAP iSCSI :3260 (E:)',
-      schedule: 'Watchdog every 5 min + Nightly/Weekly DR',
-      description: 'Dedicated 2.05 TB iSCSI block LUN storing Homelab Resilience snapshots and WindowsImageBackup.',
+      schedule: 'Watchdog every 3 min + Nightly/Weekly DR',
+      description: 'Dedicated iSCSI block LUN storing Homelab Resilience snapshots and WindowsImageBackup.',
       pipelineId: 'homelab-resilience'
     },
     'qnap-iscsi-desktop': {
-      title: 'QNAP Desktop iSCSI LUN (E: • 2.05 TB)',
+      title: 'QNAP Desktop iSCSI LUN (E:)',
       scriptName: 'Desktop iSCSI Block Target & Mirror',
-      scriptPath: 'C:\\Users\\CoryTownsend\\Projects\\Sync-QNAP-HomelabBackups.ps1',
+      scriptPath: '%USERPROFILE%\\Projects\\Sync-QNAP-HomelabBackups.ps1',
       route: 'Desktop -> QNAP iSCSI :3260 (E:)',
       schedule: 'Scheduled Mirror + Weekly Bare-Metal',
-      description: 'Dedicated 2.05 TB iSCSI block LUN for Desktop bare-metal images and mirrored NUC snapshots.',
+      description: 'Dedicated iSCSI block LUN for Desktop bare-metal images and mirrored NUC snapshots.',
       pipelineId: 'sync-qnap-backups'
     },
     'onedrive-vault': {
       title: 'OneDrive Offsite Cloud Vault',
       scriptName: 'Cloud Daily & DR Nightly Sync',
-      scriptPath: 'C:\\Users\\CoryTownsend\\Projects\\scripts\\Backup-Homelab-Cloud.py',
-      route: 'NUC C:\\ -> OneDrive - digitalresolve.ca\\Antigravity-Backups',
+      scriptPath: '%USERPROFILE%\\Projects\\scripts\\Backup-Homelab-Cloud.py',
+      route: 'NUC C:\\ -> %OneDriveCommercial%\\Antigravity-Backups',
       schedule: 'Daily / Nightly cloud sync',
       description: 'Offsite Microsoft 365 OneDrive vault storing critical homelab scripts, configs, and website backups.',
       pipelineId: 'cloud-daily'
@@ -269,26 +284,81 @@
     }
   }
 
-  function resetCapacityFallbacks() {
-    ['kpi-total-capacity', 'node-tag-nuc-d', 'nuc-d-used-lbl', 'node-tag-qnap-smb', 'node-tag-qnap-iscsi-nuc', 'node-tag-qnap-iscsi-desktop', 'capacity-summary-badge'].forEach(id => {
+  function resetCapacityFallbacks(fallbackMessage) {
+    [
+      'kpi-total-capacity',
+      'kpi-qnap-link',
+      'kpi-flowrate',
+      'kpi-data-moved',
+      'flow-active-count',
+      'node-tag-desktop-drives',
+      'node-tag-nuc-c',
+      'node-tag-nuc-d',
+      'nuc-d-used-lbl',
+      'node-tag-qnap-smb',
+      'node-tag-qnap-iscsi-nuc',
+      'node-tag-qnap-iscsi-desktop',
+      'node-tag-onedrive-vault',
+      'waveform-active-badge',
+      'capacity-summary-badge'
+    ].forEach(id => {
       setText(id, '--');
     });
+    setText('kpi-qnap-sub', 'QNAP NAS • SMB :445 + iSCSI :3260');
+    [
+      'node-tag-desktop-drives',
+      'node-tag-nuc-c',
+      'node-tag-nuc-d',
+      'node-tag-qnap-smb',
+      'node-tag-qnap-iscsi-nuc',
+      'node-tag-qnap-iscsi-desktop',
+      'waveform-active-badge'
+    ].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.className = 'storage-node-tag info';
+    });
+    const fillEl = document.getElementById('nuc-d-threshold-fill');
+    if (fillEl) fillEl.style.width = '0%';
+    setText('node-meta-qnap-smb', 'SMB Share (Q:) • --');
+    setText('node-meta-qnap-iscsi-nuc', 'E: • -- • Homelab Resilience & WindowsImageBackup');
+    setText('node-meta-qnap-iscsi-desktop', 'E: • -- • Mirrored Snapshots & Bare-Metal');
+    const stackedEl = document.getElementById('storage-capacity-stacked');
+    if (stackedEl) stackedEl.innerHTML = '';
+    const barsEl = document.getElementById('storage-capacity-bars');
+    if (barsEl) {
+      barsEl.innerHTML = `<div style="padding:14px;color:#94a3b8;font-size:0.84rem;">${escapeHtml(fallbackMessage || 'Cluster Gateway Standby — Awaiting Live Storage Telemetry')}</div>`;
+    }
+    const gridEl = document.getElementById('storage-matrix-grid');
+    if (gridEl) {
+      gridEl.innerHTML = `<div style="grid-column:1/-1;padding:16px;color:#94a3b8;font-size:0.84rem;">${escapeHtml(fallbackMessage || 'Sign in or connect on LAN to inspect live pipeline metrics.')}</div>`;
+    }
+    const tbodyEl = document.getElementById('storage-activity-tbody');
+    if (tbodyEl) {
+      tbodyEl.innerHTML = `<tr><td colspan="6" style="color:#94a3b8;text-align:center;">${escapeHtml(fallbackMessage || 'Telemetry standby — awaiting live gateway connection.')}</td></tr>`;
+    }
+    renderPipesSVG(null);
+    updateInspector();
   }
 
   function renderAuthFallback() {
+    state.data = null;
+    state.unauthenticated = true;
     const banner = document.getElementById('storage-sso-banner');
     if (banner) banner.style.display = 'flex';
     setText('storage-route-text', 'M365 SSO');
     setText('storage-updated-text', 'Sign in for Live Telemetry');
     setText('kpi-last-sync', 'M365 SSO');
     setText('kpi-last-sync-sub', 'Sign in for Live Telemetry');
-    resetCapacityFallbacks();
+    resetCapacityFallbacks('Sign In via M365 SSO to load live cluster drive capacities.');
   }
 
   function renderOfflineFallback() {
-    setText('storage-route-text', 'Gateway Standby');
+    state.data = null;
+    setText('storage-route-text', 'Gateway Offline');
     setText('storage-updated-text', 'Retrying Telemetry');
-    resetCapacityFallbacks();
+    setText('kpi-last-sync', 'Offline');
+    setText('kpi-last-sync-sub', 'Gateway Unavailable — Retrying');
+    resetCapacityFallbacks('Gateway Offline — Cluster storage telemetry temporarily unavailable.');
   }
 
   function setText(id, val) {
@@ -299,7 +369,7 @@
   function pushWaveformSample(data) {
     const lf = (data && data.liveFlow) || {};
     const nucIO = safeNum(lf.nucDiskReadMBps) + safeNum(lf.nucDiskWriteMBps);
-    const qnapIO = safeNum(lf.nucIscsiWriteMBps) + safeNum(lf.nucNetMBps);
+    const qnapIO = Math.max(safeNum(lf.nucIscsiWriteMBps), safeNum(lf.nucNetMBps));
     const deskIO = safeNum(lf.desktopDiskMBps) + safeNum(lf.desktopNetMBps);
     state.waveformHistory.push({ nuc: nucIO, qnap: qnapIO, desk: deskIO, t: Date.now() });
     if (state.waveformHistory.length > state.maxWaveformPoints) {
@@ -325,11 +395,10 @@
       safeNum(t.nuc_hot && t.nuc_hot.totalGB) +
       safeNum(t.qnap_smb && t.qnap_smb.totalGB) +
       safeNum(t.qnap_iscsi_nuc && t.qnap_iscsi_nuc.totalGB) +
-      safeNum(t.qnap_iscsi_desktop && t.qnap_iscsi_desktop.totalGB) +
-      safeNum(t.cloud_onedrive && t.cloud_onedrive.totalGB);
+      safeNum(t.qnap_iscsi_desktop && t.qnap_iscsi_desktop.totalGB);
 
     setText('kpi-total-capacity', totalGB > 0 ? fmtGB(totalGB) : '--');
-    setText('kpi-total-capacity-sub', 'Desktop + NUC + QNAP SMB & Dual iSCSI + OneDrive');
+    setText('kpi-total-capacity-sub', 'Desktop + NUC + QNAP SMB & Dual iSCSI (+ Offsite Cloud)');
 
     const qOnline = Boolean(data.qnapOnline);
     const lat = safeNum(data.qnapLatencyMs, 0);
@@ -367,6 +436,8 @@
       ? lf.activeProcesses.join(', ')
       : 'Idle / Ready';
     setText('waveform-active-badge', activeProcs);
+    const wfBadgeEl = document.getElementById('waveform-active-badge');
+    if (wfBadgeEl) wfBadgeEl.className = 'storage-node-tag ok';
   }
 
   function getMaxNvmeTemp(tier) {
@@ -399,6 +470,8 @@
     const t = data.tiers || {};
     const desk = t.desktop_hot || {};
     setText('node-tag-desktop-drives', desk.online ? 'Online' : 'Standby');
+    const deskTagEl = document.getElementById('node-tag-desktop-drives');
+    if (deskTagEl) deskTagEl.className = 'storage-node-tag ' + (desk.online ? 'ok' : 'info');
     const deskTempVal = getMaxNvmeTemp(desk);
     const deskTemp = deskTempVal !== null ? ` • NVMe ${deskTempVal}°C` : '';
     const deskCapMeta = isValidNum(desk.totalGB) && Number(desk.totalGB) > 0
@@ -411,6 +484,8 @@
     const dTotalGB = safeNum(nuc.dDriveTotalGB, 0);
     const dUsedPct = dTotalGB > 0 ? Math.min(100, Math.max(0, (safeNum(nuc.dDriveUsedGB, Math.max(0, dTotalGB - dFreeGB)) / dTotalGB) * 100)) : 0;
     setText('node-tag-nuc-d', dTotalGB > 0 ? `${Math.round(dFreeGB)} GB Free` : '--');
+    const nucDTagEl = document.getElementById('node-tag-nuc-d');
+    if (nucDTagEl) nucDTagEl.className = 'storage-node-tag ' + (dTotalGB > 0 ? (dUsedPct >= 70 ? 'warn' : 'ok') : 'info');
     setText('node-meta-nuc-d', dTotalGB > 0 ? `${fmtGB(dFreeGB)} Free / ${fmtGB(dTotalGB)} • 30% Offload Guardrail` : 'Awaiting telemetry...');
     const fillEl = document.getElementById('nuc-d-threshold-fill');
     if (fillEl) fillEl.style.width = dUsedPct.toFixed(1) + '%';
@@ -422,19 +497,27 @@
     const nucTempVal = getMaxNvmeTemp(nuc);
     const nucTemp = nucTempVal !== null ? ` • NVMe ${nucTempVal}°C` : '';
     setText('node-tag-nuc-c', nuc.online ? 'Online' : 'Standby');
+    const nucTagEl = document.getElementById('node-tag-nuc-c');
+    if (nucTagEl) nucTagEl.className = 'storage-node-tag ' + (nuc.online ? 'ok' : 'info');
     const cCapMeta = cTotalGB > 0 ? `${fmtGB(cFreeGB)} Free / ${fmtGB(cTotalGB)}` : '--';
-    setText('node-meta-nuc-c', `192.168.2.35 • ${cCapMeta}${nucTemp}`);
+    setText('node-meta-nuc-c', `NUC Core • ${cCapMeta}${nucTemp}`);
 
     const smb = t.qnap_smb || {};
     setText('node-tag-qnap-smb', safeNum(smb.totalGB, 0) > 0 ? fmtGB(smb.totalGB) : '--');
-    setText('node-meta-qnap-smb', `${safeStr(smb.path, '\\\\192.168.2.125\\Torrents')} • ${isValidNum(smb.freeGB) ? fmtGB(smb.freeGB) + ' Free' : '--'}`);
+    const smbTagEl = document.getElementById('node-tag-qnap-smb');
+    if (smbTagEl) smbTagEl.className = 'storage-node-tag ' + (smb.online && safeNum(smb.totalGB, 0) > 0 ? 'ok' : 'info');
+    setText('node-meta-qnap-smb', `${safeStr(smb.shareName ? ('SMB Share (' + smb.shareName + ')') : null, 'SMB Share (Q:)')} • ${isValidNum(smb.freeGB) ? fmtGB(smb.freeGB) + ' Free' : '--'}`);
 
     const iNuc = t.qnap_iscsi_nuc || {};
     setText('node-tag-qnap-iscsi-nuc', safeNum(iNuc.totalGB, 0) > 0 ? fmtGB(iNuc.totalGB) : '--');
+    const iNucTagEl = document.getElementById('node-tag-qnap-iscsi-nuc');
+    if (iNucTagEl) iNucTagEl.className = 'storage-node-tag ' + (iNuc.online && safeNum(iNuc.totalGB, 0) > 0 ? 'ok' : 'info');
     setText('node-meta-qnap-iscsi-nuc', `${safeStr(iNuc.drive, 'E:')} • ${isValidNum(iNuc.freeGB) ? fmtGB(iNuc.freeGB) + ' Free' : '--'} • ${iNuc.sessionConnected ? 'iSCSI Connected' : 'Standby'}`);
 
     const iDesk = t.qnap_iscsi_desktop || {};
     setText('node-tag-qnap-iscsi-desktop', safeNum(iDesk.totalGB, 0) > 0 ? fmtGB(iDesk.totalGB) : '--');
+    const iDeskTagEl = document.getElementById('node-tag-qnap-iscsi-desktop');
+    if (iDeskTagEl) iDeskTagEl.className = 'storage-node-tag ' + (iDesk.online && safeNum(iDesk.totalGB, 0) > 0 ? 'ok' : 'info');
     setText('node-meta-qnap-iscsi-desktop', `${safeStr(iDesk.drive, 'E:')} • ${isValidNum(iDesk.freeGB) ? fmtGB(iDesk.freeGB) + ' Free' : '--'} • Mirrored Snapshots`);
 
     const od = t.cloud_onedrive || {};
@@ -454,9 +537,10 @@
     const stage = document.getElementById('storage-flow-stage');
     if (!svg || !stage) return;
 
-    const pipelines = Array.isArray(data && data.pipelines) ? data.pipelines : [];
+    const hasLive = Boolean(data && Array.isArray(data.pipelines) && data.pipelines.length > 0);
+    const pipelines = hasLive ? data.pipelines : Object.values(PIPELINE_FALLBACKS);
     const filtered = pipelines.filter(p => matchesFilter(p.category, state.filter));
-    setText('flow-active-count', `${filtered.length} Active Pipelines`);
+    setText('flow-active-count', hasLive ? `${filtered.length} Active Pipelines` : '--');
 
     const stageRect = stage.getBoundingClientRect();
     if (stageRect.width < 100 || window.innerWidth <= 1024) {
@@ -467,14 +551,19 @@
     svg.setAttribute('viewBox', `0 0 ${stageRect.width} ${stageRect.height}`);
 
     let html = `<defs>
-      <filter id="pipe-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <filter id="pipe-glow" filterUnits="userSpaceOnUse" x="-40" y="-40" width="${Math.ceil(stageRect.width + 80)}" height="${Math.ceil(stageRect.height + 80)}">
         <feGaussianBlur stdDeviation="2.5" result="blur" />
         <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
       </filter>
     </defs>`;
 
-    pipelines.forEach((p, idx) => {
-      const cfg = PIPE_NODE_MAP[p.id];
+    const pipeItems = pipelines.map(p => ({ p, cfg: PIPE_NODE_MAP[p.id], structural: false }));
+    if (pipelines.length > 0) {
+      const ppRef = pipelines.find(item => item.id === 'postprocess-torrent') || { id: 'postprocess-torrent', name: 'Desktop qBittorrent Ingest -> PostProcess 7z', category: 'media', rateMBps: 0, bytesCopiedFormatted: 'Ready' };
+      pipeItems.push({ p: ppRef, cfg: { from: 'desktop-qbit', to: 'postprocess-7z', color: '#38bdf8', dy: 0 }, structural: true });
+    }
+
+    pipeItems.forEach(({ p, cfg, structural }, idx) => {
       if (!cfg) return;
       const fromEl = stage.querySelector(`[data-node-id="${cfg.from}"]`);
       const toEl = stage.querySelector(`[data-node-id="${cfg.to}"]`);
@@ -500,7 +589,8 @@
         x1 = (goRight ? r1.right : r1.left) - stageRect.left;
         y1 = r1.top - stageRect.top + r1.height * 0.5 + (cfg.dy || 0);
         x2 = (goRight ? r2.left : r2.right) - stageRect.left;
-        y2 = r2.top - stageRect.top + r2.height * 0.5 + (cfg.dy || 0);
+        y2 = r2.top - stageRect.top + r2.height * 0.5 + (cfg.dy2 !== undefined ? cfg.dy2 : (cfg.dy || 0));
+        if (Math.abs(y2 - y1) < 8) y2 += 12;
         const dx = Math.abs(x2 - x1) * 0.45;
         const cx1 = goRight ? x1 + dx : x1 - dx;
         const cx2 = goRight ? x2 - dx : x2 + dx;
@@ -511,13 +601,13 @@
       }
 
       const isVisible = matchesFilter(p.category, state.filter);
-      const isSelected = state.selectedType === 'pipeline' && state.selectedId === p.id;
-      const opacity = isVisible ? (isSelected ? 1 : 0.82) : 0.12;
-      const strokeW = isSelected ? 3.2 : 2.2;
+      const isSelected = (state.selectedType === 'pipeline' && state.selectedId === p.id) || (structural && state.selectedType === 'node' && state.selectedId === 'desktop-qbit');
+      const opacity = isVisible ? (isSelected ? 1 : (structural ? 0.65 : 0.82)) : 0.12;
+      const strokeW = isSelected ? 3.2 : (structural ? 1.8 : 2.2);
       const rate = safeNum(p.rateMBps, 0);
       const animDur = rate > 50 ? '0.8s' : rate > 10 ? '1.3s' : rate > 1 ? '1.9s' : '2.8s';
       const shortName = p.id.replace('postprocess-torrent', 'postproc').replace('homelab-resilience', 'resilience').replace('baremetal-desktop', 'bm-desk').replace('baremetal-nuc', 'bm-nuc').replace('iscsi-watchdog', 'iscsi-wd').replace('tier-coldstorage', 'cold-tier');
-      const label = `${shortName} • ${rate > 0 ? rate.toFixed(1) + 'M/s' : safeStr(p.bytesCopiedFormatted, 'Ready')}`;
+      const label = `${shortName} • ${rate > 0 ? rate.toFixed(1) + 'M/s' : safeStr(p.bytesCopiedFormatted, hasLive ? 'Ready' : '--')}`;
       const pillW = Math.min(116, Math.max(68, label.length * 5.6 + 10));
 
       html += `
@@ -525,12 +615,12 @@
           <title>${escapeHtml(p.name)} (${escapeHtml(safeStr(p.bytesCopiedFormatted, '0 B'))} • ${rate.toFixed(1)} MB/s)</title>
           <path d="${dStr}" class="storage-pipe-path" stroke="${cfg.color}" stroke-width="${strokeW}" filter="url(#pipe-glow)" />
           <path d="${dStr}" class="storage-pipe-dashed" stroke="#ffffff" stroke-width="1.4" stroke-opacity="0.65" style="animation-duration: ${animDur};" />
-          ${isVisible && !state.animPaused ? `
+          ${hasLive && isVisible && !state.animPaused ? `
           <circle r="3.2" fill="${cfg.color}" filter="url(#pipe-glow)">
             <animateMotion dur="${animDur}" repeatCount="indefinite" path="${dStr}" />
           </circle>` : ''}
           <path d="${dStr}" class="storage-pipe-hit" stroke="transparent" stroke-width="14" fill="none" />
-          ${isVisible && (isSelected || ['tier-coldstorage', 'postprocess-torrent', 'homelab-resilience', 'cloud-daily', 'sync-qnap-backups', 'ssd-guard'].includes(p.id)) ? `
+          ${!structural && isVisible && (isSelected || ['tier-coldstorage', 'postprocess-torrent', 'homelab-resilience', 'cloud-daily', 'sync-qnap-backups', 'ssd-guard'].includes(p.id)) ? `
           <g class="storage-pipe-pill-group ${isSelected ? 'is-selected' : ''}" transform="translate(${mx - pillW / 2}, ${my - 9})">
             <rect width="${pillW}" height="18" rx="9" class="storage-pipe-pill-bg" />
             <text x="${pillW / 2}" y="12.5" text-anchor="middle" class="storage-pipe-pill-text" style="font-size:9px;">${escapeHtml(label)}</text>
@@ -658,19 +748,20 @@
         color: '#60a5fa'
       },
       {
-        label: 'OneDrive Cloud Vault',
+        label: 'OneDrive Cloud Vault (Offsite)',
         used: safeNum(t.cloud_onedrive && t.cloud_onedrive.totalGB),
-        total: safeNum(t.cloud_onedrive && t.cloud_onedrive.totalGB, 0),
+        total: 0,
         color: '#f59e0b',
         isCloud: true
       }
     ];
 
-    const totalCluster = rows.reduce((s, r) => s + r.total, 0) || 1;
-    setText('capacity-summary-badge', `${rows.length} Drives • 4 Tiers`);
+    const physicalRows = rows.filter(r => !r.isCloud);
+    const totalCluster = physicalRows.reduce((s, r) => s + r.total, 0) || 1;
+    setText('capacity-summary-badge', `${physicalRows.length} Drives • 4 Tiers`);
     const stackedEl = document.getElementById('storage-capacity-stacked');
     if (stackedEl) {
-      stackedEl.innerHTML = rows
+      stackedEl.innerHTML = physicalRows
         .map(r => `<div class="storage-cap-seg" style="width:${((r.total / totalCluster) * 100).toFixed(2)}%;background:${r.color};" title="${escapeHtml(r.label)}: ${r.total > 0 ? fmtGB(r.total) : '--'}"></div>`)
         .join('');
     }
@@ -680,7 +771,7 @@
       barsEl.innerHTML = rows.map(r => {
         const pct = r.isCloud ? Math.min(100, Math.max(0, (r.used / 1024) * 100)) : Math.min(100, Math.max(0, r.total > 0 ? (r.used / r.total) * 100 : 0));
         const rightLbl = r.isCloud
-          ? (r.used > 0 ? `${fmtGB(r.used)} Synced` : '--')
+          ? (r.used > 0 ? `${fmtGB(r.used)} Offsite Synced` : '--')
           : (r.total > 0 ? `${fmtGB(r.used)} / ${fmtGB(r.total)} (${pct.toFixed(0)}%)` : '--');
         return `
           <div class="storage-cap-row">
@@ -698,17 +789,51 @@
   }
 
   function updateInspector() {
-    const pipelines = Array.isArray(state.data && state.data.pipelines) ? state.data.pipelines : [];
+    const hasLiveData = Boolean(state.data && Array.isArray(state.data.pipelines) && state.data.pipelines.length > 0);
+    const pipelines = hasLiveData ? state.data.pipelines : [];
     let p = null;
     let nodeInfo = null;
 
     if (state.selectedType === 'node') {
       nodeInfo = NODE_DETAILS[state.selectedId] || null;
       if (nodeInfo && nodeInfo.pipelineId) {
-        p = pipelines.find(item => item.id === nodeInfo.pipelineId) || null;
+        p = pipelines.find(item => item.id === nodeInfo.pipelineId) || PIPELINE_FALLBACKS[nodeInfo.pipelineId] || null;
       }
     } else {
-      p = pipelines.find(item => item.id === state.selectedId) || pipelines[0] || null;
+      p = pipelines.find(item => item.id === state.selectedId) || PIPELINE_FALLBACKS[state.selectedId] || pipelines[0] || PIPELINE_FALLBACKS['tier-coldstorage'];
+    }
+
+    const offlineStatusLabel = state.unauthenticated ? 'M365 SSO Required' : 'Gateway Standby';
+
+    if (nodeInfo && !hasLiveData) {
+      setText('insp-title', nodeInfo.title);
+      setText('insp-desc', nodeInfo.description);
+      setText('insp-script-name', nodeInfo.scriptName);
+      setText('insp-script-path', nodeInfo.scriptPath);
+      setText('insp-route', nodeInfo.route);
+      setText('insp-schedule', nodeInfo.schedule);
+      setText('insp-last-sync', '--');
+      setText('insp-bytes', '--');
+      setText('insp-rate', '--');
+      setText('insp-exit', offlineStatusLabel);
+      const badge = document.getElementById('insp-health-badge');
+      if (badge) {
+        badge.textContent = offlineStatusLabel;
+        badge.className = 'storage-node-tag info';
+      }
+      const trigBtn = document.getElementById('insp-trigger-btn');
+      if (trigBtn) {
+        if (p && p.triggerAction) {
+          trigBtn.disabled = false;
+          trigBtn.textContent = 'Run Pipeline Now (M365 SSO)';
+          trigBtn.onclick = () => triggerPipeline(p);
+        } else {
+          trigBtn.disabled = true;
+          trigBtn.textContent = 'Scheduled / Hook-Driven';
+          trigBtn.onclick = null;
+        }
+      }
+      return;
     }
 
     if (nodeInfo && !p) {
@@ -722,7 +847,11 @@
       setText('insp-bytes', 'Cluster Active');
       setText('insp-rate', '0.0 MB/s');
       setText('insp-exit', 'Healthy');
-      setText('insp-health-badge', 'Online');
+      const badge = document.getElementById('insp-health-badge');
+      if (badge) {
+        badge.textContent = 'Online';
+        badge.className = 'storage-node-tag ok';
+      }
       const trigBtn = document.getElementById('insp-trigger-btn');
       if (trigBtn) {
         trigBtn.disabled = true;
@@ -739,18 +868,23 @@
     setText('insp-script-name', safeStr(p.id, 'pipeline'));
     setText('insp-script-path', safeStr(p.scriptPath, 'C:\\ProgramData\\digitalresolve\\'));
     setText('insp-route', `${safeStr(p.sourceTier, 'source')} -> ${safeStr(p.targetTier, 'target')}`);
-    const nextStr = p.nextRunAt ? ` (Next: ${fmtNextTime(p.nextRunAt)})` : '';
+    const nextStr = (hasLiveData && p.nextRunAt) ? ` (Next: ${fmtNextTime(p.nextRunAt)})` : '';
     setText('insp-schedule', safeStr(p.schedule, 'Scheduled') + nextStr);
-    setText('insp-last-sync', p.lastRunAt ? `${fmtRelativeTime(p.lastRunAt)} (${new Date(p.lastRunAt).toLocaleTimeString()})` : 'Scheduled');
-    setText('insp-bytes', `${safeStr(p.bytesCopiedFormatted, fmtBytes(p.bytesCopied))} (${safeNum(p.filesMoved, 0)} files)`);
-    setText('insp-rate', `${safeNum(p.durationSec, 0)}s • ${safeNum(p.rateMBps, 0).toFixed(2)} MB/s`);
-    setText('insp-exit', safeStr(p.summary, safeStr(p.status, 'Healthy')));
+    setText('insp-last-sync', hasLiveData ? (p.lastRunAt ? `${fmtRelativeTime(p.lastRunAt)} (${new Date(p.lastRunAt).toLocaleTimeString()})` : 'Scheduled') : '--');
+    setText('insp-bytes', hasLiveData ? `${safeStr(p.bytesCopiedFormatted, fmtBytes(p.bytesCopied))} (${safeNum(p.filesMoved, 0)} files)` : '--');
+    setText('insp-rate', hasLiveData ? `${safeNum(p.durationSec, 0)}s • ${safeNum(p.rateMBps, 0).toFixed(2)} MB/s` : '--');
+    setText('insp-exit', hasLiveData ? safeStr(p.summary, safeStr(p.status, 'Healthy')) : offlineStatusLabel);
 
     const badge = document.getElementById('insp-health-badge');
     if (badge) {
-      const st = String(p.status || 'success').toLowerCase();
-      badge.textContent = st === 'success' ? 'Healthy' : st.toUpperCase();
-      badge.className = 'storage-node-tag ' + (st === 'error' ? 'warn' : st === 'warning' ? 'warn' : 'ok');
+      if (!hasLiveData) {
+        badge.textContent = offlineStatusLabel;
+        badge.className = 'storage-node-tag info';
+      } else {
+        const st = String(p.status || 'success').toLowerCase();
+        badge.textContent = st === 'success' ? 'Healthy' : st.toUpperCase();
+        badge.className = 'storage-node-tag ' + (st === 'error' ? 'warn' : st === 'warning' ? 'warn' : 'ok');
+      }
     }
 
     const trigBtn = document.getElementById('insp-trigger-btn');
@@ -969,6 +1103,7 @@
       renderWaveform();
     });
 
+    updateInspector();
     fetchStorageFlow();
     state.pollTimer = setInterval(() => {
       if (!document.hidden && !state.inFlight) fetchStorageFlow();

@@ -1,7 +1,30 @@
 {
-    "updatedAt":  "2026-11-23T12:20:00Z",
-    "currentVersion":  "v2.8.83",
+    "updatedAt":  "2026-11-24T05:38:17Z",
+    "currentVersion":  "v2.8.84",
     "releases":  [
+                     {
+                         "version":  "v2.8.84",
+                         "date":  "November 24, 2026",
+                         "title":  "Storage Flow Telemetry Accuracy, Retired Local LLM Cleanup \u0026 LAN Optical Feeder Alerts",
+                         "changes":  [
+                                         {
+                                             "label":  "Storage Flow Telemetry \u0026 Offline Inspector",
+                                             "text":  "Eliminated network/iSCSI throughput double-counting and Megabit/Megabyte unit collision, excluded cloud backup folder usage from physical cluster capacity, isolated sidecar health from historical log entries, sanitized environment paths, and enabled full 12-pipeline offline Inspector navigation."
+                                         },
+                                         {
+                                             "label":  "Retired Ollama Playground Removal",
+                                             "text":  "Removed retired Port 11434 local LLM playground panels, service cards, status badges, and /api/ai/chat gateway proxy across the dashboard."
+                                         },
+                                         {
+                                             "label":  "LAN Optical Low-Hopper Alert Delivery",
+                                             "text":  "Enabled rate-limited local-network optical kibble-low notifications from the AI vision HUD via Caddy HTTPS reverse proxy with automatic WAN fallback."
+                                         },
+                                         {
+                                             "label":  "Media Pipeline \u0026 Daemon Hardening",
+                                             "text":  "Added RAMDisk sub-millisecond snapshot idle tolerance, .7z extraction and archive symlink rejection in torrent post-processing, volume-token sequel protection and UTF-8 BOM safety in audiobook ingestion, and TCP reachability pre-checks across homelab daemons."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.83",
                          "date":  "November 23, 2026",

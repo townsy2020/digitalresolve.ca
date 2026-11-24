@@ -1129,13 +1129,34 @@
           if (hopperBeaconBadge) hopperBeaconBadge.style.display = 'inline-flex';
           if (hopperBeaconText) hopperBeaconText.innerHTML = '<strong>Kibble Low</strong> [Red Blink Detected]';
           
-          // Notify gateway if confirmed
+          // Notify gateway if confirmed (15-min server cooldown; LAN optical=true allowed on 192.168.2.0/24 via :8082 or wake-lan Caddy)
           if (now - lastHopperWebhookNotify > 60000) {
             lastHopperWebhookNotify = now;
-            const beaconUrl = (window.location.protocol === 'https:')
-              ? 'https://wake.digitalresolve.ca/api/feeder/beacon-alert?state=low&optical=true'
-              : 'http://192.168.2.35:8082/api/feeder/beacon-alert?state=low&optical=true';
-            fetch(beaconUrl, { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: '{}', signal: (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') ? AbortSignal.timeout(5000) : undefined }).catch(() => {});
+            const isHttpsPage = (window.location.protocol === 'https:');
+            const postBeacon = (url, creds, timeoutMs) => fetch(url, {
+              method: 'POST',
+              credentials: creds,
+              headers: { 'Content-Type': 'application/json' },
+              body: '{}',
+              signal: (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') ? AbortSignal.timeout(timeoutMs) : undefined
+            });
+            if (isHttpsPage) {
+              postBeacon('https://wake-lan.digitalresolve.ca/api/feeder/beacon-alert?state=low&optical=true', 'omit', 3000)
+                .then(r => {
+                  if (!r.ok) throw new Error('LAN HTTPS ' + r.status);
+                })
+                .catch(() => postBeacon('https://wake.digitalresolve.ca/api/feeder/beacon-alert?state=low&optical=true', 'include', 5000))
+                .then(r => {
+                  if (r && !r.ok) console.warn('Feeder optical beacon alert HTTP ' + r.status);
+                })
+                .catch(() => {});
+            } else {
+              postBeacon('http://192.168.2.35:8082/api/feeder/beacon-alert?state=low&optical=true', 'omit', 5000)
+                .then(r => {
+                  if (!r.ok) console.warn('Feeder optical beacon alert HTTP ' + r.status);
+                })
+                .catch(() => {});
+            }
           }
         } else {
           if (redBlinkSamples.length > 10 && transitions === 0 && !hasRedPulse) {

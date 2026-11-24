@@ -8,8 +8,8 @@
   <meta http-equiv="Expires" content="0">
   <title>Tiered Storage &amp; Live Data Flow - DigitalResolve</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b0f17'/%3E%3Cpath d='M8 22V10h7a6 6 0 0 1 0 12H8zm4-3.5h3a2.5 2.5 0 0 0 0-5h-3v5z' fill='%2338bdf8'/%3E%3C/svg%3E">
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.83 - Tiered Storage &amp; Live Data Flow">
-  <link rel="stylesheet" href="styles.css?v=2.8.83">
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.84 - Tiered Storage &amp; Live Data Flow">
+  <link rel="stylesheet" href="styles.css?v=2.8.84">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -246,7 +246,7 @@
             </button>
             <a href="ops.html#ops-ai" class="btn-action-item" title="Jump to In-Page Compute, AI &amp; Terminal Operations Console">
               <span class="dropdown-dot dot-1"></span>
-              <span>In-Page Terminal &amp; Ollama</span>
+              <span>In-Page Live Terminal</span>
               <span class="item-tag">Ops Hub</span>
             </a>
             <button type="button" class="btn-action-item" onclick="openEmbeddedConsole(true)" title="Open Fullscreen Antigravity Command &amp; Telemetry Console">
@@ -262,7 +262,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.83</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.84</span>)</span>
             </button>
             <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO(true, event)" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -375,12 +375,12 @@
         <div class="storage-kpi-card">
           <div class="storage-kpi-label">Total Cluster Capacity</div>
           <div class="storage-kpi-value" id="kpi-total-capacity">--</div>
-          <div class="storage-kpi-sub" id="kpi-total-capacity-sub">Desktop + NUC + QNAP SMB &amp; Dual iSCSI + OneDrive</div>
+          <div class="storage-kpi-sub" id="kpi-total-capacity-sub">Desktop + NUC + QNAP SMB &amp; Dual iSCSI (+ Offsite Cloud)</div>
         </div>
         <div class="storage-kpi-card">
           <div class="storage-kpi-label">QNAP TS-639 Link &amp; Latency</div>
-          <div class="storage-kpi-value" id="kpi-qnap-link">SMB + iSCSI</div>
-          <div class="storage-kpi-sub" id="kpi-qnap-sub">192.168.2.125 &bull; SMB :445 + iSCSI :3260</div>
+          <div class="storage-kpi-value" id="kpi-qnap-link">--</div>
+          <div class="storage-kpi-sub" id="kpi-qnap-sub">QNAP NAS &bull; SMB :445 + iSCSI :3260</div>
         </div>
         <div class="storage-kpi-card">
           <div class="storage-kpi-label">Live / Last Flowrate</div>
@@ -420,7 +420,7 @@
             <h2 class="storage-panel-title">Interactive 4-Tier Data Flow Schematic</h2>
             <div class="storage-panel-sub">Click any storage tier node or animated flow pipe to inspect script paths, schedules, throughput, and trigger runs.</div>
           </div>
-          <span class="storage-node-tag info" id="flow-active-count">8 Active Pipelines</span>
+          <span class="storage-node-tag info" id="flow-active-count">-- Active Pipelines</span>
         </div>
 
         <div class="storage-flow-stage" id="storage-flow-stage">
@@ -434,12 +434,12 @@
                 <span class="storage-tier-title">Workstation &amp; Ingest</span>
               </div>
 
-              <button type="button" class="storage-node-card is-selected" data-node-id="desktop-drives" data-category="backup">
+              <button type="button" class="storage-node-card" data-node-id="desktop-drives" data-category="backup">
                 <div class="storage-node-top">
                   <span class="storage-node-name">Desktop C: / D: / F:</span>
-                  <span class="storage-node-tag ok" id="node-tag-desktop-drives">Online</span>
+                  <span class="storage-node-tag" id="node-tag-desktop-drives">--</span>
                 </div>
-                <div class="storage-node-meta" id="node-meta-desktop-drives">NVMe + HDD Array &bull; 192.168.2.62</div>
+                <div class="storage-node-meta" id="node-meta-desktop-drives">NVMe + HDD Array &bull; Workstation</div>
                 <div class="storage-node-desc" id="node-desc-desktop-drives">Primary workstation ingest, NVMe thermals &amp; bare-metal snapshot source.</div>
               </button>
 
@@ -481,20 +481,20 @@
               <button type="button" class="storage-node-card" data-node-id="nuc-c" data-category="backup">
                 <div class="storage-node-top">
                   <span class="storage-node-name">NUC C: NVMe OS</span>
-                  <span class="storage-node-tag ok" id="node-tag-nuc-c">Online</span>
+                  <span class="storage-node-tag" id="node-tag-nuc-c">--</span>
                 </div>
-                <div class="storage-node-meta" id="node-meta-nuc-c">192.168.2.35 &bull; Gateway &amp; Services</div>
+                <div class="storage-node-meta" id="node-meta-nuc-c">NUC Core &bull; Gateway &amp; Services</div>
                 <div class="storage-node-desc" id="node-desc-nuc-c">24/7 homelab gateway, go2rtc, Jellyfin, Arr stack &amp; Antigravity configs.</div>
               </button>
 
               <button type="button" class="storage-node-card" data-node-id="nuc-d" data-category="media,guardrail">
                 <div class="storage-node-top">
                   <span class="storage-node-name">NUC D: 1.86 TB FireCuda SSHD</span>
-                  <span class="storage-node-tag ok" id="node-tag-nuc-d">--</span>
+                  <span class="storage-node-tag info" id="node-tag-nuc-d">--</span>
                 </div>
                 <div class="storage-node-meta" id="node-meta-nuc-d">Hot Media Buffer &bull; 30% Offload Guardrail</div>
                 <div class="storage-threshold-track" title="30% Free Space Offload Threshold (70% Used)">
-                  <div class="storage-threshold-fill" id="nuc-d-threshold-fill" style="width: 48%;"></div>
+                  <div class="storage-threshold-fill" id="nuc-d-threshold-fill" style="width: 0%;"></div>
                   <div class="storage-threshold-marker" title="30% Free Offload Threshold"></div>
                 </div>
                 <div class="storage-threshold-label">
@@ -518,33 +518,33 @@
             <div class="storage-tier-col" data-tier="2">
               <div class="storage-tier-header">
                 <span class="storage-tier-badge tier-2">TIER 2</span>
-                <span class="storage-tier-title">QNAP TS-639 NAS (192.168.2.125)</span>
+                <span class="storage-tier-title">QNAP TS-639 NAS</span>
               </div>
 
               <button type="button" class="storage-node-card" data-node-id="qnap-smb" data-category="media">
                 <div class="storage-node-top">
                   <span class="storage-node-name">SMB Cold Archive</span>
-                  <span class="storage-node-tag ok" id="node-tag-qnap-smb">--</span>
+                  <span class="storage-node-tag info" id="node-tag-qnap-smb">--</span>
                 </div>
-                <div class="storage-node-meta" id="node-meta-qnap-smb">\\192.168.2.125\Torrents / Q: &bull; 9.16 TB</div>
+                <div class="storage-node-meta" id="node-meta-qnap-smb">SMB Share (Q:) &bull; --</div>
                 <div class="storage-node-desc">Primary cold media archive receiving automated NUC D: tiering offloads.</div>
               </button>
 
               <button type="button" class="storage-node-card" data-node-id="qnap-iscsi-nuc" data-category="backup">
                 <div class="storage-node-top">
                   <span class="storage-node-name">NUC iSCSI LUN (E:)</span>
-                  <span class="storage-node-tag ok" id="node-tag-qnap-iscsi-nuc">--</span>
+                  <span class="storage-node-tag info" id="node-tag-qnap-iscsi-nuc">--</span>
                 </div>
-                <div class="storage-node-meta" id="node-meta-qnap-iscsi-nuc">E: &bull; 2.05 TB &bull; Homelab Resilience &amp; WindowsImageBackup</div>
+                <div class="storage-node-meta" id="node-meta-qnap-iscsi-nuc">E: &bull; -- &bull; Homelab Resilience &amp; WindowsImageBackup</div>
                 <div class="storage-node-desc">Dedicated iSCSI block target for NUC bare-metal images &amp; state snapshots.</div>
               </button>
 
               <button type="button" class="storage-node-card" data-node-id="qnap-iscsi-desktop" data-category="backup">
                 <div class="storage-node-top">
                   <span class="storage-node-name">Desktop iSCSI LUN (E:)</span>
-                  <span class="storage-node-tag ok" id="node-tag-qnap-iscsi-desktop">--</span>
+                  <span class="storage-node-tag info" id="node-tag-qnap-iscsi-desktop">--</span>
                 </div>
-                <div class="storage-node-meta" id="node-meta-qnap-iscsi-desktop">E: &bull; 2.05 TB &bull; Mirrored Snapshots &amp; Bare-Metal</div>
+                <div class="storage-node-meta" id="node-meta-qnap-iscsi-desktop">E: &bull; -- &bull; Mirrored Snapshots &amp; Bare-Metal</div>
                 <div class="storage-node-desc">Dedicated iSCSI block target for Desktop mirrored snapshots &amp; bare-metal DR.</div>
               </button>
             </div>
@@ -559,9 +559,9 @@
               <button type="button" class="storage-node-card" data-node-id="onedrive-vault" data-category="backup">
                 <div class="storage-node-top">
                   <span class="storage-node-name">OneDrive Cloud Vault</span>
-                  <span class="storage-node-tag info" id="node-tag-onedrive-vault">Synced</span>
+                  <span class="storage-node-tag info" id="node-tag-onedrive-vault">--</span>
                 </div>
-                <div class="storage-node-meta" id="node-meta-onedrive-vault">OneDrive - digitalresolve.ca\Antigravity-Backups</div>
+                <div class="storage-node-meta" id="node-meta-onedrive-vault">%OneDriveCommercial%\Antigravity-Backups</div>
                 <div class="storage-node-desc">Offsite encrypted cloud mirror for critical homelab scripts, configs, and website backups.</div>
               </button>
             </div>
@@ -577,7 +577,7 @@
               <h2 class="storage-panel-title">Tier Throughput &amp; Disk Flowrate Waveform</h2>
               <div class="storage-panel-sub">Real-time MB/s multi-series trace across NUC, Desktop, and QNAP I/O</div>
             </div>
-            <span class="storage-node-tag ok" id="waveform-active-badge">Idle / Ready</span>
+            <span class="storage-node-tag info" id="waveform-active-badge">--</span>
           </div>
           <div class="storage-waveform-wrap">
             <canvas id="storage-waveform-canvas"></canvas>
@@ -610,7 +610,7 @@
             <h2 class="storage-panel-title" id="insp-title">Tier-ColdStorage Offload Pipeline</h2>
           </div>
           <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-            <span class="storage-node-tag ok" id="insp-health-badge">Healthy</span>
+            <span class="storage-node-tag info" id="insp-health-badge">--</span>
             <button type="button" class="btn btn-primary" id="insp-trigger-btn" style="padding: 7px 14px; font-size: 0.8rem;">Run Pipeline Now (M365 SSO)</button>
           </div>
         </div>
@@ -618,35 +618,35 @@
         <div class="storage-inspector-grid">
           <div class="storage-inspector-item">
             <div class="storage-inspector-key">Script / Component</div>
-            <div class="storage-inspector-val" id="insp-script-name">Tier-ColdStorage</div>
+            <div class="storage-inspector-val" id="insp-script-name">tier-coldstorage</div>
           </div>
           <div class="storage-inspector-item">
             <div class="storage-inspector-key">Exact Script Path</div>
-            <div class="storage-inspector-val" id="insp-script-path">C:\ProgramData\DigitalResolve\Tier-ColdStorage.ps1</div>
+            <div class="storage-inspector-val" id="insp-script-path">C:\ProgramData\StreamHub\Tier-ColdStorage.ps1</div>
           </div>
           <div class="storage-inspector-item">
             <div class="storage-inspector-key">Source &rarr; Destination</div>
-            <div class="storage-inspector-val" id="insp-route">NUC D:\ &rarr; \\192.168.2.125\Torrents</div>
+            <div class="storage-inspector-val" id="insp-route">nuc_hot &rarr; qnap_smb</div>
           </div>
           <div class="storage-inspector-item">
             <div class="storage-inspector-key">Schedule &amp; Next Run</div>
-            <div class="storage-inspector-val" id="insp-schedule">Automated Threshold / Scheduled</div>
+            <div class="storage-inspector-val" id="insp-schedule">Every 2 hours</div>
           </div>
           <div class="storage-inspector-item">
             <div class="storage-inspector-key">Last Synced / Copied</div>
-            <div class="storage-inspector-val" id="insp-last-sync">Verified Ready</div>
+            <div class="storage-inspector-val" id="insp-last-sync">--</div>
           </div>
           <div class="storage-inspector-item">
             <div class="storage-inspector-key">Data Copied / Files</div>
-            <div class="storage-inspector-val" id="insp-bytes">0.0 GB (0 files)</div>
+            <div class="storage-inspector-val" id="insp-bytes">--</div>
           </div>
           <div class="storage-inspector-item">
             <div class="storage-inspector-key">Duration &amp; Avg Flowrate</div>
-            <div class="storage-inspector-val" id="insp-rate">0.0 MB/s</div>
+            <div class="storage-inspector-val" id="insp-rate">--</div>
           </div>
           <div class="storage-inspector-item">
             <div class="storage-inspector-key">Task Exit / Health</div>
-            <div class="storage-inspector-val" id="insp-exit">Exit 0 (Healthy)</div>
+            <div class="storage-inspector-val" id="insp-exit">--</div>
           </div>
         </div>
       </section>
@@ -698,12 +698,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.83</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.84</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 35,481 Lines of Code (HTML: 19,769 lines | CSS: 7,247 lines | JS: 8,464 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 35,360 Lines of Code (HTML: 19,718 lines | CSS: 7,247 lines | JS: 8,394 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">35,481</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">35,360</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1299,10 +1299,24 @@
       </div>
 
             <div class="changelog-body">
-                                                                                <!-- Version v2.8.83 (Current) -->
+                                                                                        <!-- Version v2.8.84 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.83 | Current</span>
+            <span class="ver-tag current">v2.8.84 | Current</span>
+            <span class="ver-date">November 24, 2026</span>
+          </div>
+          <h4 class="ver-title">Storage Flow Telemetry Accuracy, Retired Local LLM Cleanup &amp; LAN Optical Feeder Alerts</h4>
+          <ul class="ver-list">
+            <li><strong>Storage Flow Telemetry &amp; Offline Inspector:</strong> Eliminated network/iSCSI throughput double-counting and Megabit/Megabyte unit collision, excluded cloud backup folder usage from physical cluster capacity, isolated sidecar health from historical log entries, sanitized environment paths, and enabled full 12-pipeline offline Inspector navigation.</li>
+            <li><strong>Retired Ollama Playground Removal:</strong> Removed retired Port 11434 local LLM playground panels, service cards, status badges, and /api/ai/chat gateway proxy across the dashboard.</li>
+            <li><strong>LAN Optical Low-Hopper Alert Delivery:</strong> Enabled rate-limited local-network optical kibble-low notifications from the AI vision HUD via Caddy HTTPS reverse proxy with automatic WAN fallback.</li>
+            <li><strong>Media Pipeline &amp; Daemon Hardening:</strong> Added RAMDisk sub-millisecond snapshot idle tolerance, .7z extraction and archive symlink rejection in torrent post-processing, volume-token sequel protection and UTF-8 BOM safety in audiobook ingestion, and TCP reachability pre-checks across homelab daemons.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.83 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.83</span>
             <span class="ver-date">November 23, 2026</span>
           </div>
           <h4 class="ver-title">Wave 11 Feeder Hydration, Modal Isolation &amp; CSS Cleanup</h4>
@@ -1906,7 +1920,7 @@
       </div>
     </div>
   </div>
-  <script src="app.js?v=2.8.83"></script>
-  <script src="storage-flow.js?v=2.8.83"></script>
+  <script src="app.js?v=2.8.84"></script>
+  <script src="storage-flow.js?v=2.8.84"></script>
 </body>
 </html>

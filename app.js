@@ -164,16 +164,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.83';
+          const activeVer = match ? match[0] : 'v2.8.84';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 19769;
+      const baseHtmlLines = 19718;
       const baseCssLines = 7247;
-      const baseJsLines = 8464;
+      const baseJsLines = 8394;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -1002,9 +1002,6 @@
       document.querySelectorAll('#schematic-tunnel-throughput').forEach(el => {
         el.textContent = window.NUC_IS_ONLINE === true ? 'Tunnel Active' : (window.NUC_IS_ONLINE === false ? 'Tunnel Offline' : 'Awaiting Telemetry');
       });
-      if (window.LAST_AI_MODEL_FOOTPRINT) {
-        document.querySelectorAll('#ai-model-footprint').forEach(el => el.textContent = window.LAST_AI_MODEL_FOOTPRINT);
-      }
       document.querySelectorAll('#nuc-hw-ram').forEach(el => {
         const ramVal = Number(window.LAST_NUC_RAM_GB);
         if (window.LAST_NUC_RAM_GB !== undefined && window.LAST_NUC_RAM_GB !== null && window.LAST_NUC_RAM_GB !== '' && Number.isFinite(ramVal) && ramVal > 0) {
@@ -2004,14 +2001,6 @@
       const modalPulse = document.getElementById('agy-modal-pulse-dot');
       const modalStatus = document.getElementById('agy-console-status');
 
-      // Ollama Edge AI elements
-      const aiGate = document.getElementById('edge-ai-sso-gate');
-      const aiControls = document.getElementById('edge-ai-unlocked-container');
-      const aiBadge = document.getElementById('edge-ai-badge');
-      const aiLock = document.getElementById('edge-ai-lock-btn');
-      const aiPulse = document.getElementById('edge-ai-pulse');
-      const aiStats = document.getElementById('ai-infer-stats');
-
       if (authed) {
         // Unlocked Terminal Card
         if (termTitle) termTitle.innerHTML = 'Live Interactive Terminal | Stream Active';
@@ -2037,14 +2026,6 @@
         const activeHostOnline = isAgyNuc ? (window.NUC_IS_ONLINE !== false) : (window.DESKTOP_IS_ONLINE !== undefined ? window.DESKTOP_IS_ONLINE : true);
         if (modalPulse) { modalPulse.style.background = activeHostOnline ? '#10b981' : '#6366f1'; modalPulse.style.boxShadow = activeHostOnline ? '0 0 8px #10b981' : '0 0 8px #6366f1'; }
         if (modalStatus) { modalStatus.textContent = activeHostOnline ? (isAgyNuc ? 'ONLINE (NUC :8082)' : 'ONLINE (Desktop :8082)') : 'STANDBY (Desktop Sleeping • WoL Ready)'; modalStatus.className = `item-tag ${activeHostOnline ? 'online' : 'offline'}`; }
-
-        // Unlocked Ollama Edge AI Card
-        if (aiGate) aiGate.style.display = 'none';
-        if (aiControls) aiControls.style.display = 'flex';
-        if (aiBadge) { aiBadge.textContent = 'Ready (Port 11434)'; aiBadge.className = 'item-tag online'; }
-        if (aiLock) aiLock.style.display = 'inline-flex';
-        if (aiPulse) { aiPulse.style.background = '#10b981'; aiPulse.style.boxShadow = '0 0 8px #10b981'; }
-        if (aiStats) aiStats.textContent = 'Intel Core i5 | Local Compute';
 
         // External WAN IPv4 (Exposed only when MFA/SSO authenticated)
         const ispIpSub = document.getElementById('isp-ip-sub');
@@ -2096,14 +2077,6 @@
         if (modalTitle) modalTitle.innerHTML = 'Antigravity (AGY) Live Terminal';
         if (modalPulse) { modalPulse.style.background = '#f59e0b'; modalPulse.style.boxShadow = '0 0 8px #f59e0b'; }
         if (modalStatus) { modalStatus.textContent = 'AUTHENTICATION REQUIRED'; modalStatus.className = 'item-tag'; }
-
-        // Locked Ollama Edge AI Card
-        if (aiGate) aiGate.style.display = 'flex';
-        if (aiControls) aiControls.style.display = 'none';
-        if (aiBadge) { aiBadge.textContent = 'Port 11434'; aiBadge.className = 'item-tag'; }
-        if (aiLock) aiLock.style.display = 'none';
-        if (aiPulse) { aiPulse.style.background = '#f59e0b'; aiPulse.style.boxShadow = '0 0 8px #f59e0b'; }
-        if (aiStats) aiStats.textContent = 'Intel Core i5 | Local Compute';
 
         // Mask External WAN IPv4 (MFA Required)
         const ispIpSub = document.getElementById('isp-ip-sub');
@@ -2443,7 +2416,7 @@
         method: 'POST',
         credentials: 'include',
         headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }),
-        body: JSON.stringify({ target: 'desktop', action: 'resume', workspace: window.AGY_WORKSPACE || 'C:\\Users\\CoryTownsend\\Projects\\website' }),
+        body: JSON.stringify({ target: 'desktop', action: 'resume', workspace: window.AGY_WORKSPACE || '' }),
         signal: _fetchSig(12000)
       })
       .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
@@ -6404,184 +6377,6 @@
       });
     }
     window.runLiveSpeedtestBenchmark = runLiveSpeedtestBenchmark;
-
-    // --- 2. Edge AI (Ollama Local) ---
-    const edgeAiPresetPrompts = {
-      summarize: "Explain the Digital Resolve homelab architecture (Intel i5 NUC 24/7 core, AMD Ryzen 7 workstation, Cloudflare Zero Trust tunnels, Mullvad WireGuard, StreamHub, and WebRTC Cat Cam).",
-      bufferbloat: "Explain why Bell Gigabit Fiber paired with Qbit-DynamicThrottle and 2.5 GbE LAN keeps bufferbloat at Grade A+.",
-      catcam: "Explain how the Cat Cam live pipeline works using go2rtc on port 8089 and WebSocket WebRTC signaling.",
-      security: "Summarize the Zero Trust security posture with Cloudflare Access Microsoft 365 Entra ID SSO and zero open inbound WAN ports."
-    };
-
-    function askEdgeAiPreset(presetKey) {
-      if (!isSSOAuthenticated()) {
-        openGlobalSSOModal('Ollama 24/7 Local Inference (Port 11434)', () => askEdgeAiPreset(presetKey));
-        return;
-      }
-      const promptText = edgeAiPresetPrompts[presetKey] || edgeAiPresetPrompts.summarize;
-      runLiveEdgeAiQuery(promptText, null);
-    }
-    window.askEdgeAiPreset = askEdgeAiPreset;
-
-    function generateClusterAiResponse(text) {
-      const q = text.toLowerCase().trim();
-      const now = new Date();
-
-      // 1. Time / Date / Day
-      if (q.match(/\b(time|date|day|clock|hour|minute|when|today|now)\b/)) {
-        const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
-        const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        const tz = (typeof Intl !== 'undefined' && Intl.DateTimeFormat) ? (Intl.DateTimeFormat().resolvedOptions().timeZone || 'EDT') : 'EDT';
-        return `The current time is ${timeStr} (${tz}) on ${dateStr}.`;
-      }
-
-      // 2. System / Health / Cluster / Nodes / Status
-      if (q.match(/\b(status|cluster|nodes?|system|vitals|health|uptime|load|nuc|desktop)\b/)) {
-        const deskState = window.DESKTOP_IS_ONLINE ? 'Online (Active)' : 'Standby (Eco Mode)';
-        const nucState = (window.NUC_IS_ONLINE !== false) ? 'Online' : 'Offline';
-        return `Cluster Status: 24/7 Intel NUC (192.168.2.35) is ${nucState}; Workstation (192.168.2.62) is in ${deskState}. All public ingress is gated via Cloudflare Zero Trust Access.`;
-      }
-
-      // 3. Storage / Disk / Torrents / Downloads
-      if (q.match(/\b(storage|disk|space|torrent|torrents|download|seed|qbittorrent)\b/)) {
-        const freeG = (window.LAST_NUC_DISK && typeof window.LAST_NUC_DISK.freeGB === 'number') ? `${Math.round(window.LAST_NUC_DISK.freeGB)} GB` : '--';
-        const usedP = (window.LAST_NUC_DISK && typeof window.LAST_NUC_DISK.usedPercent === 'number') ? `${Math.round(window.LAST_NUC_DISK.usedPercent)}%` : '--';
-        return `Storage & Ingestion Telemetry: NUC (D:\\Torrents) reports ${freeG} free (${usedP} used). P2P swarm traffic routes through Mullvad WireGuard.`;
-      }
-
-      // 4. Cat Feeder / Penny / Camera
-      if (q.match(/\b(cat|penny|feeder|kibble|food|snack|feed|cam|camera)\b/)) {
-        const f = window.LAST_FEEDER_STATE;
-        const fill = (f && typeof f.fillPercent === 'number') ? `${f.fillPercent}%` : '--';
-        const remG = (f && typeof f.remainingGrams === 'number') ? `${f.remainingGrams}g` : '--';
-        const days = (f && typeof f.estimatedDaysLeft === 'number') ? `${f.estimatedDaysLeft} days` : '--';
-        return `Penny's Cat Hub: Feeder state is ${fill} full (${remG} remaining, ~${days}). Live cameras stream from the NUC via go2rtc WebRTC.`;
-      }
-
-      // 5. DNS / AdGuard / Threat Shield
-      if (q.match(/\b(dns|adguard|block|tracker|sinkhole|filter|quad9|cloudflare)\b/)) {
-        return `DNS Threat Shield: Staged for DNS-over-TLS (Cloudflare 1.1.1.1 & Quad9 9.9.9.9) with split-horizon local LAN rewrites.`;
-      }
-
-      // 6. Network / Speed / Fiber / Latency / Bell
-      if (q.match(/\b(speed|internet|fiber|bandwidth|bell|ping|latency|jitter)\b/)) {
-        const rawPing = window.ISP_LATEST ? window.ISP_LATEST.pingAvgMs : null;
-        const ping = (rawPing !== undefined && rawPing !== null && rawPing !== '' && Number.isFinite(Number(rawPing))) ? `${rawPing} ms` : '--';
-        return `Network Telemetry: Bell Gigabit Fiber gateway latest measured ping is ${ping}.`;
-      }
-
-      // 7. Identity / Help / Capabilities
-      if (q.match(/\b(who are you|what can you do|help|capabilities|info|command)\b/)) {
-        return `I am dr-ollama, your private homelab operations assistant backed by Ollama on the NUC (:11434). Ask about architecture, cluster vitals, storage, Penny's feeder, or network latency.`;
-      }
-
-      // 8. Default context-aware answer
-      return `Gateway AI endpoint unavailable; cluster nodes NUC (192.168.2.35) and Desktop (192.168.2.62) status is shown above.`;
-    }
-    window.generateClusterAiResponse = generateClusterAiResponse;
-
-    function typeEdgeAiResponse(feed, stats, promptPrefixHtml, responseText, footerHtml, metricEvalCount, metricTokPerSec) {
-      if (!feed) return;
-      if (window._edgeAiTyper) clearInterval(window._edgeAiTyper);
-      feed.innerHTML = promptPrefixHtml;
-      const textNode = document.createTextNode('');
-      feed.appendChild(textNode);
-      let i = 0;
-      const startTime = Date.now();
-      window._edgeAiTyper = setInterval(() => {
-        const chunk = responseText.slice(i, i + 3);
-        textNode.nodeValue += chunk;
-        i += chunk.length;
-        if (i >= responseText.length) {
-          clearInterval(window._edgeAiTyper);
-          window._edgeAiTyper = null;
-          const hasEval = (metricEvalCount !== null && metricEvalCount !== undefined && Number(metricEvalCount) > 0);
-          const hasTps = (metricTokPerSec !== null && metricTokPerSec !== undefined && Number(metricTokPerSec) > 0);
-          const tokenCount = hasEval ? Number(metricEvalCount) : null;
-          const speed = hasTps ? Number(metricTokPerSec).toFixed(1) : null;
-          if (stats) {
-            if (tokenCount !== null && speed !== null) {
-              stats.textContent = `Complete (${tokenCount} tokens • ${speed} tok/s)`;
-            } else if (tokenCount !== null) {
-              stats.textContent = `Complete (${tokenCount} tokens)`;
-            } else {
-              stats.textContent = 'Complete (Offline Summary)';
-            }
-          }
-          if (footerHtml) feed.insertAdjacentHTML('beforeend', footerHtml);
-          if (hasTps) {
-            document.querySelectorAll('.ai-kpi-speed').forEach(el => el.innerHTML = `${speed} <span style="font-size: 0.85rem; color: #94a3b8;">tok/s</span>`);
-            document.querySelectorAll('.ai-kpi-speed-short').forEach(el => el.textContent = `${speed} tok/s`);
-          }
-        }
-      }, 16);
-    }
-
-    function runLiveEdgeAiQuery(promptText, userEchoText) {
-      const feed = document.getElementById('edge-ai-output-feed');
-      const stats = document.getElementById('ai-infer-stats');
-      if (window._edgeAiAbortCtrl) {
-        try { window._edgeAiAbortCtrl.abort(); } catch (e) {}
-      }
-      if (window._edgeAiTyper) {
-        clearInterval(window._edgeAiTyper);
-        window._edgeAiTyper = null;
-      }
-      const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
-      window._edgeAiAbortCtrl = ctrl;
-      let timerId = null;
-      if (ctrl) timerId = setTimeout(() => ctrl.abort(), 65000);
-
-      if (stats) stats.textContent = 'Querying NUC Ollama (:11434)...';
-      playChaosTone(659, 880, 'sine', 0.1);
-
-      const safeEcho = userEchoText ? userEchoText.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') : null;
-      const userLine = safeEcho ? `<span style="color: #60a5fa;">user&gt;</span> ${safeEcho}<br>` : '';
-      if (feed) {
-        feed.innerHTML = `${userLine}<span style="color: #a855f7;">dr-ollama&gt;</span> <span style="color: #94a3b8;">Running on-premise inference on NUC...</span>`;
-      }
-
-      return fetch(`${GATEWAY}/api/ai/chat`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }),
-        body: JSON.stringify({ prompt: promptText }),
-        signal: ctrl ? ctrl.signal : _fetchSig(65000)
-      })
-        .then(r => r.json().then(d => ({ ok: r.ok, status: r.status, data: d })).catch(() => { throw new Error('HTTP ' + r.status); }))
-        .then(({ ok, status, data }) => {
-          if (timerId) clearTimeout(timerId);
-          if (window._edgeAiAbortCtrl !== ctrl) return;
-          if (!ok || !data || data.status !== 'success' || !data.response) {
-            throw new Error((data && data.message) ? data.message : ('HTTP ' + status));
-          }
-          const modelName = escapeHtml(String(data.model || 'llama3.2:3b'));
-          const prefix = `${userLine}<span style="color: #a855f7;">dr-ollama [${modelName}]&gt;</span> `;
-          const badge = `<br><span style="color: #34d399; font-size: 0.72rem;">Verified On-Premise Ollama (${modelName})</span>`;
-          typeEdgeAiResponse(feed, stats, prefix, String(data.response), badge, data.evalCount, data.tokensPerSec);
-        })
-        .catch((err) => {
-          if (timerId) clearTimeout(timerId);
-          if ((err && err.name === 'AbortError') || window._edgeAiAbortCtrl !== ctrl) return;
-          const fallback = `[Offline Local Summary] ${generateClusterAiResponse(promptText)}`;
-          const prefix = `${userLine}<span style="color: #f59e0b;">dr-ollama [Offline Fallback]&gt;</span> `;
-          const badge = `<br><span style="color: #f59e0b; font-size: 0.72rem;">Gateway/Ollama offline - showing local summary</span>`;
-          typeEdgeAiResponse(feed, stats, prefix, fallback, badge, null, null);
-        });
-    }
-
-    function submitEdgeAiPrompt() {
-      if (!isSSOAuthenticated()) {
-        openGlobalSSOModal('Ollama 24/7 Local Inference (Port 11434)', submitEdgeAiPrompt);
-        return;
-      }
-      const input = document.getElementById('edge-ai-input');
-      const text = input ? input.value.trim() : '';
-      if (!text) return;
-      if (input) input.value = '';
-      runLiveEdgeAiQuery(text, text);
-    }
-    window.submitEdgeAiPrompt = submitEdgeAiPrompt;
 
     // Dynamic Cloudflare Edge KPI Updater
     function updateCloudflareStatsUI(cfData) {

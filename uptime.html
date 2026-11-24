@@ -8,8 +8,8 @@
   <meta http-equiv="Expires" content="0">
   <title>Uptime & SLA Matrix - Homelab Operations</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b0f17'/%3E%3Cpath d='M8 22V10h7a6 6 0 0 1 0 12H8zm4-3.5h3a2.5 2.5 0 0 0 0-5h-3v5z' fill='%2338bdf8'/%3E%3C/svg%3E">
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.83 - Uptime & SLA Matrix - Homelab Operations">
-  <link rel="stylesheet" href="styles.css?v=2.8.83">
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.84 - Uptime & SLA Matrix - Homelab Operations">
+  <link rel="stylesheet" href="styles.css?v=2.8.84">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -244,9 +244,9 @@
               <span>Open AGY Terminal (Auto-Detect)</span>
               <span class="item-tag online">Live</span>
             </button>
-            <a href="ops.html#ops-ai" class="btn-action-item" title="Jump to In-Page Compute, AI &amp; Terminal Operations Console">
+            <a href="ops.html#ops-ai" class="btn-action-item" title="Jump to In-Page Compute &amp; Live Terminal Operations Console">
               <span class="dropdown-dot dot-1"></span>
-              <span>In-Page Terminal &amp; Ollama</span>
+              <span>In-Page Live Terminal</span>
               <span class="item-tag">Ops Hub</span>
             </a>
             <button type="button" class="btn-action-item" onclick="openEmbeddedConsole(true)" title="Open Fullscreen Antigravity Command &amp; Telemetry Console">
@@ -262,7 +262,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.83</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.84</span>)</span>
             </button>
             <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO(true, event)" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -934,12 +934,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.83</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.84</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 35,481 Lines of Code (HTML: 19,769 lines | CSS: 7,247 lines | JS: 8,464 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 35,360 Lines of Code (HTML: 19,718 lines | CSS: 7,247 lines | JS: 8,394 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">35,481</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">35,360</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1534,10 +1534,24 @@
       </div>
 
             <div class="changelog-body">
-                                                                                <!-- Version v2.8.83 (Current) -->
+                                                                                        <!-- Version v2.8.84 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.83 | Current</span>
+            <span class="ver-tag current">v2.8.84 | Current</span>
+            <span class="ver-date">November 24, 2026</span>
+          </div>
+          <h4 class="ver-title">Storage Flow Telemetry Accuracy, Retired Local LLM Cleanup &amp; LAN Optical Feeder Alerts</h4>
+          <ul class="ver-list">
+            <li><strong>Storage Flow Telemetry &amp; Offline Inspector:</strong> Eliminated network/iSCSI throughput double-counting and Megabit/Megabyte unit collision, excluded cloud backup folder usage from physical cluster capacity, isolated sidecar health from historical log entries, sanitized environment paths, and enabled full 12-pipeline offline Inspector navigation.</li>
+            <li><strong>Retired Ollama Playground Removal:</strong> Removed retired Port 11434 local LLM playground panels, service cards, status badges, and /api/ai/chat gateway proxy across the dashboard.</li>
+            <li><strong>LAN Optical Low-Hopper Alert Delivery:</strong> Enabled rate-limited local-network optical kibble-low notifications from the AI vision HUD via Caddy HTTPS reverse proxy with automatic WAN fallback.</li>
+            <li><strong>Media Pipeline &amp; Daemon Hardening:</strong> Added RAMDisk sub-millisecond snapshot idle tolerance, .7z extraction and archive symlink rejection in torrent post-processing, volume-token sequel protection and UTF-8 BOM safety in audiobook ingestion, and TCP reachability pre-checks across homelab daemons.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.83 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.83</span>
             <span class="ver-date">November 23, 2026</span>
           </div>
           <h4 class="ver-title">Wave 11 Feeder Hydration, Modal Isolation &amp; CSS Cleanup</h4>
@@ -2141,6 +2155,6 @@
       </div>
     </div>
   </div>
-  <script src="app.js?v=2.8.83"></script>
+  <script src="app.js?v=2.8.84"></script>
 </body>
 </html>
