@@ -1,7 +1,18 @@
 {
-    "updatedAt":  "2026-11-24T05:38:17Z",
-    "currentVersion":  "v2.8.84",
+    "updatedAt":  "2026-11-24T06:00:26Z",
+    "currentVersion":  "v2.8.85",
     "releases":  [
+                     {
+                         "version":  "v2.8.85",
+                         "date":  "November 24, 2026",
+                         "title":  "Fleet Telemetry Card Padding \u0026 Responsive Row Spacing",
+                         "changes":  [
+                                         {
+                                             "label":  "Fleet Card Padding \u0026 Layout",
+                                             "text":  "Expanded Fleet telemetry container width (1380px), increased card padding (36px x 34px desktop, 26px x 24px mobile) and grid gaps (28px), added 12px vertical row padding with subtle dividers, and prevented latency pills from overflowing card borders."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.84",
                          "date":  "November 24, 2026",

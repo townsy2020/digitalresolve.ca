@@ -164,16 +164,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.84';
+          const activeVer = match ? match[0] : 'v2.8.85';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 19718;
-      const baseCssLines = 7247;
-      const baseJsLines = 8394;
+      const baseHtmlLines = 19806;
+      const baseCssLines = 7307;
+      const baseJsLines = 8402;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -7088,6 +7088,13 @@
     window.updateFeederUI = updateFeederUI;
 
     function fetchFeederStatus() {
+      try {
+        const warm = localStorage.getItem('dr_feeder_cache');
+        if (warm) {
+          const parsedWarm = JSON.parse(warm);
+          if (parsedWarm && typeof parsedWarm === 'object') updateFeederUI(parsedWarm);
+        }
+      } catch (e) {}
       const ctrl = (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(4000) : undefined;
       return fetch(`${GATEWAY}/api/feeder/status`, { credentials: 'include', signal: ctrl })
         .then(r => r.ok ? r.json() : null)
@@ -7159,6 +7166,7 @@
             .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(d => {
               if (d && d.feeder) {
+                try { localStorage.setItem('dr_feeder_cache', JSON.stringify(d.feeder)); } catch (e) {}
                 updateFeederUI(d.feeder);
                 return d;
               } else {
