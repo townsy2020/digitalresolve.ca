@@ -164,16 +164,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.89';
+          const activeVer = match ? match[0] : 'v2.8.90';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 20225;
+      const baseHtmlLines = 20321;
       const baseCssLines = 7320;
-      const baseJsLines = 8577;
+      const baseJsLines = 8618;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -637,11 +637,13 @@
       sendWol('both');
     }
     window.triggerBroadcastWoL = triggerBroadcastWoL;
+    let _powerPollSeq = 0;
     function sendWol(target) {
       if (!isSSOAuthenticated()) {
         openGlobalSSOModal(`Wake-on-LAN: ${target.toUpperCase()}`, () => sendWol(target));
         return;
       }
+      const pollToken = ++_powerPollSeq;
       clearInterval(pollInterval);
       const dev = devices[target] || devices.both;
       showToast('loading', `Transmitting Magic Packet...`, `Target: ${dev.name}`, 0);
@@ -649,6 +651,7 @@
       fetch(`${GATEWAY}/wake?target=${encodeURIComponent(target)}`, { method: 'POST', credentials: 'include', headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }), body: '{}', signal: _fetchSig(8000) })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(resData => {
+          if (pollToken !== _powerPollSeq) return;
           if (!resData || resData.status !== 'success') throw new Error((resData && resData.message) || 'Gateway rejected request');
           showToast('loading', `Magic Packet Broadcasted`, `Waiting for ${dev.name} to boot...`, 0);
 
@@ -660,8 +663,9 @@
           let attempts = 0;
           const maxAttempts = 12;
           let settled = false;
+          clearInterval(pollInterval);
           pollInterval = setInterval(() => {
-            if (settled || attempts >= maxAttempts) {
+            if (settled || pollToken !== _powerPollSeq || attempts >= maxAttempts) {
               clearInterval(pollInterval);
               return;
             }
@@ -669,7 +673,7 @@
             fetch(`${GATEWAY}/status?target=${encodeURIComponent(target)}`, { credentials: 'include', cache: 'no-store', signal: _fetchSig(5000) })
               .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
               .then(data => {
-                if (settled) return;
+                if (settled || pollToken !== _powerPollSeq) return;
                 if (data.online) {
                   settled = true;
                   clearInterval(pollInterval);
@@ -685,7 +689,8 @@
                 }
               })
               .catch(() => {
-                if (!settled && attempts >= maxAttempts) {
+                if (settled || pollToken !== _powerPollSeq) return;
+                if (attempts >= maxAttempts) {
                   settled = true;
                   clearInterval(pollInterval);
                   showToast('error', `${dev.name} Not Responding`, 'Machine may still be booting POST.', 6000);
@@ -694,6 +699,7 @@
           }, 3000);
         })
         .catch(() => {
+          if (pollToken !== _powerPollSeq) return;
           showToast('error', 'Transmit Failed', `Could not reach ${GATEWAY}`, 5000);
         });
     }
@@ -703,6 +709,7 @@
         openGlobalSSOModal(`Sleep Standby: ${target.toUpperCase()}`, () => sendSleep(target));
         return;
       }
+      const pollToken = ++_powerPollSeq;
       clearInterval(pollInterval);
       const dev = devices[target] || devices.nuc;
       showToast('loading', `Entering Sleep Mode...`, `Dispatching suspend signal to ${dev.name}`, 0);
@@ -710,6 +717,7 @@
       fetch(`${GATEWAY}/sleep?target=${encodeURIComponent(target)}`, { method: 'POST', credentials: 'include', headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }), body: '{}', signal: _fetchSig(8000) })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(resData => {
+          if (pollToken !== _powerPollSeq) return;
           if (!resData || resData.status !== 'success') throw new Error((resData && resData.message) || 'Gateway rejected request');
           showToast('loading', `Sleep Signal Dispatched`, `Waiting for ${dev.name} to enter standby...`, 0);
 
@@ -717,8 +725,9 @@
           let consecutiveErrors = 0;
           const maxAttempts = 10;
           let settled = false;
+          clearInterval(pollInterval);
           pollInterval = setInterval(() => {
-            if (settled || attempts >= maxAttempts) {
+            if (settled || pollToken !== _powerPollSeq || attempts >= maxAttempts) {
               clearInterval(pollInterval);
               return;
             }
@@ -726,7 +735,7 @@
             fetch(`${GATEWAY}/status?target=${encodeURIComponent(target)}`, { credentials: 'include', cache: 'no-store', signal: _fetchSig(5000) })
               .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
               .then(data => {
-                if (settled) return;
+                if (settled || pollToken !== _powerPollSeq) return;
                 consecutiveErrors = 0;
                 if (!data.online) {
                   settled = true;
@@ -740,7 +749,7 @@
                 }
               })
               .catch(() => {
-                if (settled) return;
+                if (settled || pollToken !== _powerPollSeq) return;
                 consecutiveErrors++;
                 if (target === 'nuc' && consecutiveErrors >= 3) {
                   settled = true;
@@ -756,6 +765,7 @@
           }, 2500);
         })
         .catch(() => {
+          if (pollToken !== _powerPollSeq) return;
           showToast('error', 'Sleep Command Failed', `Unable to reach ${GATEWAY}`, 5000);
         });
     }
@@ -1887,23 +1897,33 @@
       });
 
       // Auto-stream inline terminal every 3s
+      let _termPollInFlight = false;
       setInterval(() => {
-        if (document.hidden || !hasTermDom()) return;
+        if (document.hidden || !hasTermDom() || _termPollInFlight) return;
         if (currentLogTab && isSSOAuthenticated()) {
-          fetch(`${GATEWAY}/api/logs?name=${encodeURIComponent(currentLogTab)}`, {
+          const reqTab = currentLogTab;
+          _termPollInFlight = true;
+          fetch(`${GATEWAY}/api/logs?name=${encodeURIComponent(reqTab)}`, {
             credentials: 'include',
             headers: getAdminAuthHeaders(),
             signal: _fetchSig(8000)
           })
             .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(data => {
+              if (reqTab !== currentLogTab) return;
               const body = document.getElementById('terminal-content');
               if (body && data && data.lines) {
                 const isAtBottom = body.scrollHeight - body.scrollTop - body.clientHeight < 80;
                 body.textContent = data.lines.join('\n');
                 if (isAtBottom) body.scrollTop = body.scrollHeight;
               }
-            }).catch(() => {});
+            })
+            .catch(() => {
+              if (reqTab !== currentLogTab) return;
+            })
+            .finally(() => {
+              _termPollInFlight = false;
+            });
         }
       }, 3000);
     }
@@ -3356,14 +3376,16 @@
     }
     window.fetchClimateData = fetchClimateData;
 
+    let _clusterStatsInFlight = null;
     function fetchClusterStats() {
+      if (_clusterStatsInFlight) return _clusterStatsInFlight;
       const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
       const timeoutId = controller ? setTimeout(() => controller.abort(), 12000) : null;
       const primaryStatsUrl = `${GATEWAY}/stats`;
       const lanStatsUrl = 'http://192.168.2.35:8082/stats';
       
       // Primary Route: Query ${GATEWAY}/stats with cache: no-store
-      return fetch(primaryStatsUrl, controller ? { credentials: 'include', signal: controller.signal, cache: 'no-store' } : { credentials: 'include', cache: 'no-store' })
+      _clusterStatsInFlight = fetch(primaryStatsUrl, controller ? { credentials: 'include', signal: controller.signal, cache: 'no-store' } : { credentials: 'include', cache: 'no-store' })
         .then(r => {
           if (!r.ok) throw new Error('HTTP ' + r.status);
           return r.json();
@@ -3396,7 +3418,11 @@
               try { updateCloudflareStatsUI(); } catch (e) {}
               return null;
             });
+        })
+        .finally(() => {
+          _clusterStatsInFlight = null;
         });
+      return _clusterStatsInFlight;
     }
     // Terminal Log Streamer
     // currentLogTab hoisted to global script top
@@ -3415,14 +3441,16 @@
       const body = document.getElementById('terminal-content');
       if (body) body.textContent = `Streaming ${name} log entries...`;
 
-      fetch(`${GATEWAY}/api/logs?name=${encodeURIComponent(name)}`, {
+      const reqTab = currentLogTab;
+      fetch(`${GATEWAY}/api/logs?name=${encodeURIComponent(reqTab)}`, {
         credentials: 'include',
         headers: getAdminAuthHeaders(),
         signal: _fetchSig(8000)
       })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(data => {
-          if (name === 'agy' && data && (data.conversationId || data.hostNode || data.sessionName)) {
+          if (reqTab !== currentLogTab) return;
+          if (reqTab === 'agy' && data && (data.conversationId || data.hostNode || data.sessionName)) {
             updateAgySessionDisplay(data.conversationId || '', data.sessionName || null, data.hostNode || null);
           }
           if (body && data.lines) {
@@ -3431,7 +3459,8 @@
           }
         })
         .catch(() => {
-          if (body) body.textContent = `[Failed to fetch ${name} log from ${GATEWAY}]`;
+          if (reqTab !== currentLogTab) return;
+          if (body) body.textContent = `[Failed to fetch ${reqTab} log from ${GATEWAY}]`;
         });
     }
 
@@ -5231,6 +5260,7 @@
       if (!consoleAutoPollActive) return;
       consolePollTick = 0;
       consoleAutoPollTimer = setInterval(() => {
+        if (document.hidden) return;
         const modal = document.getElementById('agy-console-modal-overlay');
         if (modal && modal.classList.contains('active')) {
           consolePollTick++;
@@ -5249,11 +5279,14 @@
       }
     }
 
+    let _agyConsoleInFlight = false;
     function refreshAgyConsole(isSilent = false) {
       if (!isSSOAuthenticated()) {
         updateSSOGateUI(); try { updateMaintenanceVisualStates(); } catch(e) {}
         return;
       }
+      if (_agyConsoleInFlight) return;
+      _agyConsoleInFlight = true;
       const screen = document.getElementById('agy-console-screen');
       const statusTag = document.getElementById('agy-console-status');
       if (!isSilent && statusTag) statusTag.textContent = 'STREAMING...';
@@ -5313,6 +5346,9 @@
             statusTag.textContent = 'RECONNECTING...';
             statusTag.className = 'item-tag';
           }
+        })
+        .finally(() => {
+          _agyConsoleInFlight = false;
         });
     }
 
@@ -5394,7 +5430,7 @@
 
 
       function escapeHtml(str) {
-      if (!str) return '';
+      if (str === null || str === undefined) return '';
       return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
 
@@ -7119,7 +7155,12 @@
       });
       const stagFeeder = document.getElementById('stag-feeder');
       if (stagFeeder) {
-        if (pct === null) {
+        if (state.online === false) {
+          stagFeeder.className = 'item-tag offline';
+          stagFeeder.textContent = 'Offline';
+          stagFeeder.style.background = 'rgba(239, 68, 68, 0.2)';
+          stagFeeder.style.color = '#fca5a5';
+        } else if (pct === null) {
           stagFeeder.className = 'item-tag';
           stagFeeder.textContent = 'Awaiting Telemetry';
           stagFeeder.style.background = 'rgba(148, 163, 184, 0.15)';

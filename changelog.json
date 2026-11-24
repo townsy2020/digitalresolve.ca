@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-24T15:07:42Z",
-    "currentVersion":  "v2.8.89",
+    "updatedAt":  "2026-11-24T23:27:28Z",
+    "currentVersion":  "v2.8.90",
     "releases":  [
+                     {
+                         "version":  "v2.8.90",
+                         "date":  "November 24, 2026",
+                         "title":  "Frontend Polling, Race \u0026 Feeder Badge Hardening",
+                         "changes":  [
+                                         {
+                                             "label":  "Polling Guards",
+                                             "text":  "Added in-flight and tab-visibility guards to cluster stats, terminal log streamer, and AGY console pollers."
+                                         },
+                                         {
+                                             "label":  "Power \u0026 Feeder Fixes",
+                                             "text":  "Fixed sendWol/sendSleep interval overlap, #stag-feeder offline state rendering, and escapeHtml(0) coercion."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.89",
                          "date":  "November 24, 2026",
