@@ -6715,11 +6715,11 @@ a:focus-visible {
 
 /* 4-Tier Interactive Animated SVG Flowchart */
 .storage-flow-panel {
-  background: rgba(13, 17, 23, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 22px;
+  background: rgba(13, 17, 23, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  padding: 26px 28px;
+  margin-bottom: 24px;
   position: relative;
   overflow: hidden;
 }
@@ -6728,29 +6728,113 @@ a:focus-visible {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   flex-wrap: wrap;
   margin-bottom: 16px;
 }
 
 .storage-panel-title {
-  font-size: 1.05rem;
+  font-size: 1.15rem;
   font-weight: 700;
   color: #f8fafc;
-  margin: 0;
+  margin: 0 0 3px;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .storage-panel-sub {
-  font-size: 0.78rem;
+  font-size: 0.84rem;
   color: #94a3b8;
+  line-height: 1.45;
+}
+
+.storage-flow-legend {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.storage-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.storage-legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.storage-pipe-selector-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 14px;
+  margin-top: 18px;
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+}
+
+.storage-pipe-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  background: rgba(30, 41, 59, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e2e8f0;
+  font-size: 0.76rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.storage-pipe-chip:hover {
+  border-color: rgba(56, 189, 248, 0.55);
+  background: rgba(30, 41, 59, 0.95);
+  color: #ffffff;
+}
+
+.storage-pipe-chip.is-selected {
+  background: rgba(56, 189, 248, 0.18);
+  border-color: #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.22);
+  color: #ffffff;
+}
+
+.storage-pipe-chip-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.storage-pipe-chip-name {
+  white-space: nowrap;
+}
+
+.storage-pipe-chip-meta {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: #94a3b8;
+  padding-left: 4px;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .storage-flow-stage {
   position: relative;
-  min-height: 520px;
+  min-height: 540px;
 }
 
 .storage-flow-svg {
@@ -6777,7 +6861,7 @@ a:focus-visible {
   z-index: 2;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 72px;
+  gap: 52px;
   align-items: start;
   pointer-events: none;
 }
@@ -6791,14 +6875,14 @@ a:focus-visible {
   }
   .storage-flow-grid {
     grid-template-columns: 1fr;
-    gap: 18px;
+    gap: 20px;
   }
 }
 
 .storage-tier-col {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .storage-tier-header {
@@ -6806,18 +6890,18 @@ a:focus-visible {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 8px 12px;
+  padding: 10px 14px;
   border-radius: 10px;
-  background: rgba(15, 23, 42, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .storage-tier-badge {
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  padding: 2px 8px;
+  padding: 3px 9px;
   border-radius: 6px;
   font-family: var(--font-mono);
   white-space: nowrap;
@@ -6830,9 +6914,9 @@ a:focus-visible {
 .tier-3 { background: rgba(56, 189, 248, 0.18); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35); }
 
 .storage-tier-title {
-  font-size: 0.82rem;
+  font-size: 0.86rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: #f1f5f9;
 }
 
 .storage-node-card {
@@ -6840,9 +6924,9 @@ a:focus-visible {
   z-index: 3;
   pointer-events: auto;
   background: #111827;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
-  padding: 13px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 13px;
+  padding: 16px 18px;
   cursor: pointer;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
   text-align: left;
@@ -6852,41 +6936,48 @@ a:focus-visible {
 }
 
 .storage-node-card:hover {
-  border-color: rgba(56, 189, 248, 0.55);
-  box-shadow: 0 6px 20px rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.6);
+  box-shadow: 0 6px 20px rgba(56, 189, 248, 0.16);
   transform: translateY(-1px);
 }
 
 .storage-node-card.is-selected {
   border-color: #38bdf8;
-  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25), 0 8px 24px rgba(56, 189, 248, 0.2);
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.28), 0 8px 24px rgba(56, 189, 248, 0.22);
+}
+
+.storage-node-card.is-route-endpoint {
+  border-color: rgba(168, 85, 247, 0.65);
+  box-shadow: 0 0 0 1px rgba(168, 85, 247, 0.28), 0 6px 18px rgba(168, 85, 247, 0.14);
 }
 
 .storage-node-card.is-dimmed {
-  opacity: 0.42;
+  opacity: 0.36;
 }
 
 .storage-node-top {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 8px;
-  margin-bottom: 6px;
+  gap: 10px;
+  margin-bottom: 7px;
 }
 
 .storage-node-name {
-  font-size: 0.86rem;
+  font-size: 0.92rem;
   font-weight: 700;
   color: #f8fafc;
+  line-height: 1.3;
 }
 
 .storage-node-tag {
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  padding: 2px 7px;
+  padding: 3px 8px;
   border-radius: 6px;
   font-family: var(--font-mono);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .storage-node-tag.ok { background: rgba(16, 185, 129, 0.16); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
@@ -6894,17 +6985,18 @@ a:focus-visible {
 .storage-node-tag.info { background: rgba(56, 189, 248, 0.16); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
 
 .storage-node-meta {
-  font-size: 0.74rem;
-  color: #94a3b8;
+  font-size: 0.78rem;
+  color: #93c5fd;
   font-family: var(--font-mono);
-  margin-bottom: 6px;
+  margin-bottom: 7px;
+  line-height: 1.4;
   word-break: break-word;
 }
 
 .storage-node-desc {
-  font-size: 0.76rem;
+  font-size: 0.81rem;
   color: #cbd5e1;
-  line-height: 1.4;
+  line-height: 1.48;
 }
 
 .storage-threshold-track {

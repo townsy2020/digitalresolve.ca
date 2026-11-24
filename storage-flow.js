@@ -21,24 +21,24 @@
     unauthenticated: false
   };
 
-  // Explicit node-to-node routing for each pipeline ID so SVG curves never overlap text
+  // Semantic category-colored node-to-node routing (#a855f7 Media, #10b981 Backup/DR, #f59e0b Guardrail)
   const PIPE_NODE_MAP = {
-    'postprocess-torrent': { from: 'postprocess-7z', to: 'nuc-d', color: '#38bdf8', dy: -8 },
-    'tier-coldstorage': { from: 'nuc-d', to: 'qnap-smb', color: '#a855f7', dy: -10 },
-    'audible-sync': { from: 'audible-sync', to: 'qnap-smb', color: '#f472b6', dy: 14 },
-    'audiobook-ingest': { from: 'nuc-c', to: 'qnap-smb', color: '#fbbf24', dy: 16, dy2: -8 },
-    'homelab-resilience': { from: 'nuc-c', to: 'qnap-iscsi-nuc', color: '#10b981', dy: -12 },
-    'iscsi-watchdog': { from: 'nuc-qbit', to: 'qnap-iscsi-nuc', color: '#f59e0b', dy: 14 },
-    'baremetal-nuc': { from: 'nuc-c', to: 'qnap-iscsi-nuc', color: '#34d399', dy: 6 },
-    'baremetal-desktop': { from: 'desktop-drives', to: 'qnap-iscsi-desktop', color: '#60a5fa', dy: 16 },
-    'sync-qnap-backups': { from: 'qnap-iscsi-nuc', to: 'qnap-iscsi-desktop', color: '#2dd4bf', dy: 0 },
-    'cloud-daily': { from: 'nuc-c', to: 'onedrive-vault', color: '#38bdf8', dy: -16, dy2: -4 },
-    'dr-nightly': { from: 'nuc-c', to: 'onedrive-vault', color: '#818cf8', dy: 10, dy2: 22 },
-    'ssd-guard': { from: 'nuc-d', to: 'nuc-qbit', color: '#f59e0b', dy: 0 }
+    'postprocess-torrent': { from: 'postprocess-7z', to: 'nuc-d', color: '#a855f7', dy: 0, shortLabel: '7z PostProcess' },
+    'tier-coldstorage': { from: 'nuc-d', to: 'qnap-smb', color: '#a855f7', dy: -6, shortLabel: 'Cold-Storage Tiering' },
+    'audible-sync': { from: 'audible-sync', to: 'qnap-smb', color: '#a855f7', dy: 0, dy2: 18, shortLabel: 'Audible Cloud Sync' },
+    'audiobook-ingest': { from: 'nuc-c', to: 'qnap-smb', color: '#a855f7', dy: 18, dy2: 6, shortLabel: 'Audiobook Ingest' },
+    'homelab-resilience': { from: 'nuc-c', to: 'qnap-iscsi-nuc', color: '#10b981', dy: -8, shortLabel: 'Resilience Snapshot' },
+    'iscsi-watchdog': { from: 'nuc-qbit', to: 'qnap-iscsi-nuc', color: '#f59e0b', dy: 0, dy2: 14, shortLabel: 'iSCSI Watchdog' },
+    'baremetal-nuc': { from: 'nuc-c', to: 'qnap-iscsi-nuc', color: '#10b981', dy: 6, shortLabel: 'NUC Bare-Metal' },
+    'baremetal-desktop': { from: 'desktop-drives', to: 'qnap-iscsi-desktop', color: '#10b981', dy: 12, shortLabel: 'Desktop Bare-Metal' },
+    'sync-qnap-backups': { from: 'qnap-iscsi-nuc', to: 'qnap-iscsi-desktop', color: '#10b981', dy: 0, shortLabel: 'QNAP LUN Mirror' },
+    'cloud-daily': { from: 'nuc-c', to: 'onedrive-vault', color: '#10b981', dy: -14, dy2: -6, shortLabel: 'Cloud Daily Backup' },
+    'dr-nightly': { from: 'nuc-c', to: 'onedrive-vault', color: '#10b981', dy: -2, dy2: 10, shortLabel: 'Nightly DR Sync' },
+    'ssd-guard': { from: 'nuc-c', to: 'nuc-qbit', color: '#f59e0b', dy: 0, shortLabel: 'NVMe 20% Space Guard' }
   };
 
   const PIPELINE_FALLBACKS = {
-    'tier-coldstorage': { id: 'tier-coldstorage', name: 'Media Cold-Storage Tiering', category: 'media', sourceTier: 'nuc_hot', targetTier: 'qnap_smb', scriptPath: 'C:\\ProgramData\\StreamHub\\Tier-ColdStorage.ps1', schedule: 'Every 2 hours', description: 'Offloads completed qBittorrent media packages from NUC D: SSHD to QNAP SMB cold archive whenever NUC D: drops below 30% free.', triggerAction: 'run-tier-coldstorage' },
+    'tier-coldstorage': { id: 'tier-coldstorage', name: 'Media Cold-Storage Tiering', category: 'media', sourceTier: 'nuc_hot', targetTier: 'qnap_smb', scriptPath: 'C:\\ProgramData\\StreamHub\\Tier-ColdStorage.ps1', schedule: 'Every 2 hours', description: 'Offloads completed qBittorrent media packages from NUC D: 2 TB SATA Hybrid HDD to QNAP SMB cold archive whenever NUC D: drops below 30% free.', triggerAction: 'run-tier-coldstorage' },
     'audible-sync': { id: 'audible-sync', name: 'Audible Library Sync', category: 'media', sourceTier: 'audible_cloud', targetTier: 'qnap_smb', scriptPath: 'C:\\ProgramData\\qBittorrent-Automation\\sync_audible.py', schedule: 'Daily 05:00', description: 'Downloads new Audible audiobooks & vouchers directly into QNAP SMB cold storage.', triggerAction: 'run-audible-sync' },
     'audiobook-ingest': { id: 'audiobook-ingest', name: 'Audiobook Sort & Ingest', category: 'media', sourceTier: 'nuc_hot', targetTier: 'qnap_smb', scriptPath: 'C:\\ProgramData\\qBittorrent-Automation\\sort_and_ingest_audiobooks.py', schedule: 'Post-Sync', description: 'Organizes ingested audiobooks into QNAP SMB Progression Fantasy library and triggers Audiobookshelf scan.', triggerAction: 'run-audiobook-ingest' },
     'postprocess-torrent': { id: 'postprocess-torrent', name: 'qBittorrent Post-Process Hook', category: 'media', sourceTier: 'nuc_hot', targetTier: 'nuc_hot', scriptPath: 'C:\\ProgramData\\qBittorrent-Automation\\PostProcess-Torrent.ps1', schedule: 'On Completion', description: 'Extracts 7z/RAR/ZIP archives and stages completed torrent media into NUC D: hot library.', triggerAction: '' },
@@ -54,12 +54,12 @@
 
   const NODE_DETAILS = {
     'desktop-drives': {
-      title: 'Desktop Workstation Storage (C: / D: / F:)',
+      title: 'Desktop NVMe (C: / F:) + 6 TB HDD (D:)',
       scriptName: 'Desktop Volume & NVMe Telemetry',
       scriptPath: 'C:\\ProgramData\\digitalresolve\\wol-listener.ps1',
       route: 'Desktop Workstation -> Cluster Telemetry',
       schedule: 'Continuous 10s cache',
-      description: 'Primary workstation NVMe OS, media staging, and high-capacity local volumes monitored for thermals and bare-metal DR.',
+      description: 'Samsung 970 EVO 500 GB NVMe (C:), WD SN750 500 GB NVMe (F:), and WD Black 6 TB SATA HDD (D:) monitored for thermals and bare-metal DR.',
       pipelineId: 'baremetal-desktop'
     },
     'desktop-qbit': {
@@ -90,21 +90,21 @@
       pipelineId: 'audible-sync'
     },
     'nuc-c': {
-      title: 'NUC C: NVMe OS & Homelab Core',
-      scriptName: 'Intel NUC 24/7 Core Volume',
+      title: 'NUC C: 1 TB Crucial P1 NVMe SSD (OS)',
+      scriptName: 'Intel NUC 24/7 Core NVMe Volume',
       scriptPath: 'C:\\ProgramData\\digitalresolve\\Backup-HomelabResilience.ps1',
       route: 'NUC C:\\ -> QNAP iSCSI LUN (E:) & OneDrive',
-      schedule: 'Daily snapshots + 24/7 services',
-      description: 'Hosts 24/7 homelab gateway, go2rtc, Jellyfin, Arr stack, and Antigravity automation scripts.',
+      schedule: 'Daily snapshots + 20% SSD Guard',
+      description: 'Crucial P1 1 TB NVMe SSD (930 GB) hosting 24/7 gateway, go2rtc, Jellyfin, Arr stack, and Enforce-SsdFreeSpace.ps1 20% headroom guard.',
       pipelineId: 'homelab-resilience'
     },
     'nuc-d': {
-      title: 'NUC D: 1.86 TB FireCuda SSHD (30% Guardrail)',
-      scriptName: 'Tier-ColdStorage & SSD Guardrail',
+      title: 'NUC D: 2 TB SATA Hybrid HDD (30% Guardrail)',
+      scriptName: 'Tier-ColdStorage Offload Guardrail',
       scriptPath: 'C:\\ProgramData\\StreamHub\\Tier-ColdStorage.ps1',
       route: 'NUC D:\\ -> QNAP SMB Cold Archive (Q:)',
       schedule: 'Enforced at 30% free-space threshold',
-      description: 'Hot 24/7 media buffer; automatically tiers older completed media to QNAP SMB cold archive when free space drops below 30%.',
+      description: 'Seagate FireCuda ST2000LX001 2 TB 2.5" 5400 RPM SATA Hybrid HDD (1.86 TiB formatted — mechanical SSHD, not NVMe); auto-tiers completed media to QNAP SMB below 30% free.',
       pipelineId: 'tier-coldstorage'
     },
     'nuc-qbit': {
@@ -544,6 +544,34 @@
     });
   }
 
+  function renderPipeSelectorBar(pipelines, hasLive) {
+    const bar = document.getElementById('storage-pipe-selector-bar');
+    if (!bar) return;
+    const visiblePipes = pipelines.filter(p => matchesFilter(p.category, state.filter));
+    const activePipeId = state.selectedType === 'pipeline'
+      ? state.selectedId
+      : ((NODE_DETAILS[state.selectedId] && NODE_DETAILS[state.selectedId].pipelineId) || '');
+    bar.innerHTML = visiblePipes.map(p => {
+      const cfg = PIPE_NODE_MAP[p.id] || { color: '#38bdf8', shortLabel: p.name };
+      const isSel = p.id === activePipeId;
+      const rate = safeNum(p.rateMBps, 0);
+      const hasBytes = safeNum(p.bytesCopied, 0) > 0;
+      const metricTxt = hasLive
+        ? (rate > 0 ? `${rate.toFixed(1)} MB/s` : (hasBytes ? safeStr(p.bytesCopiedFormatted, 'Ready') : safeStr(p.schedule, 'Ready')))
+        : safeStr(p.schedule, 'Scheduled');
+      return `<button type="button" class="storage-pipe-chip ${isSel ? 'is-selected' : ''}" data-chip-pipe-id="${escapeHtml(p.id)}" title="${escapeHtml(p.name)} — Click to highlight route &amp; inspect">
+        <span class="storage-pipe-chip-dot" style="background:${cfg.color};box-shadow:0 0 6px ${cfg.color};"></span>
+        <span class="storage-pipe-chip-name">${escapeHtml(cfg.shortLabel || p.name)}</span>
+        <span class="storage-pipe-chip-meta">${escapeHtml(metricTxt)}</span>
+      </button>`;
+    }).join('');
+    bar.querySelectorAll('[data-chip-pipe-id]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectItem('pipeline', btn.getAttribute('data-chip-pipe-id'));
+      });
+    });
+  }
+
   function renderPipesSVG(data) {
     const svg = document.getElementById('storage-flow-svg');
     const stage = document.getElementById('storage-flow-stage');
@@ -553,6 +581,7 @@
     const pipelines = hasLive ? data.pipelines : Object.values(PIPELINE_FALLBACKS);
     const filtered = pipelines.filter(p => matchesFilter(p.category, state.filter));
     setText('flow-active-count', hasLive ? `${filtered.length} Active Pipelines` : '--');
+    renderPipeSelectorBar(pipelines, hasLive);
 
     const stageRect = stage.getBoundingClientRect();
     if (stageRect.width < 100 || window.innerWidth <= 1024) {
@@ -564,18 +593,36 @@
 
     let html = `<defs>
       <filter id="pipe-glow" filterUnits="userSpaceOnUse" x="-40" y="-40" width="${Math.ceil(stageRect.width + 80)}" height="${Math.ceil(stageRect.height + 80)}">
-        <feGaussianBlur stdDeviation="2.5" result="blur" />
+        <feGaussianBlur stdDeviation="2.2" result="blur" />
         <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
       </filter>
     </defs>`;
 
+    const activePipeId = state.selectedType === 'pipeline'
+      ? state.selectedId
+      : ((NODE_DETAILS[state.selectedId] && NODE_DETAILS[state.selectedId].pipelineId) || '');
+    const selectedNodeId = state.selectedType === 'node' ? state.selectedId : '';
+    const activeCfg = PIPE_NODE_MAP[activePipeId] || null;
+    document.querySelectorAll('.storage-node-card').forEach(card => {
+      const nid = card.getAttribute('data-node-id');
+      const isEp = Boolean(activeCfg && (nid === activeCfg.from || nid === activeCfg.to) && nid !== selectedNodeId);
+      card.classList.toggle('is-route-endpoint', isEp);
+    });
+
     const pipeItems = pipelines.map(p => ({ p, cfg: PIPE_NODE_MAP[p.id], structural: false }));
     if (pipelines.length > 0) {
       const ppRef = pipelines.find(item => item.id === 'postprocess-torrent') || { id: 'postprocess-torrent', name: 'Desktop qBittorrent Ingest -> PostProcess 7z', category: 'media', rateMBps: 0, bytesCopiedFormatted: 'Ready' };
-      pipeItems.push({ p: ppRef, cfg: { from: 'desktop-qbit', to: 'postprocess-7z', color: '#38bdf8', dy: 0 }, structural: true });
+      pipeItems.push({ p: ppRef, cfg: { from: 'desktop-qbit', to: 'postprocess-7z', color: '#a855f7', dy: 0, shortLabel: 'Ingest Hook' }, structural: true });
     }
 
-    pipeItems.forEach(({ p, cfg, structural }, idx) => {
+    // Render unselected background pipes first, then highlighted/selected pipes on top
+    const orderedItems = pipeItems.slice().sort((a, b) => {
+      const aHi = (a.p.id === activePipeId) || (selectedNodeId && a.cfg && (a.cfg.from === selectedNodeId || a.cfg.to === selectedNodeId));
+      const bHi = (b.p.id === activePipeId) || (selectedNodeId && b.cfg && (b.cfg.from === selectedNodeId || b.cfg.to === selectedNodeId));
+      return (aHi ? 1 : 0) - (bHi ? 1 : 0);
+    });
+
+    orderedItems.forEach(({ p, cfg, structural }) => {
       if (!cfg) return;
       const fromEl = stage.querySelector(`[data-node-id="${cfg.from}"]`);
       const toEl = stage.querySelector(`[data-node-id="${cfg.to}"]`);
@@ -585,58 +632,49 @@
       const r2 = toEl.getBoundingClientRect();
 
       const sameCol = Math.abs(r1.left - r2.left) < 40;
-      let x1, y1, x2, y2, dStr, mx, my;
+      let x1, y1, x2, y2, dStr;
 
       if (sameCol) {
         x1 = r1.right - stageRect.left;
         y1 = r1.top - stageRect.top + r1.height * 0.5;
         x2 = r2.right - stageRect.left;
         y2 = r2.top - stageRect.top + r2.height * 0.5;
-        const arcX = Math.max(x1, x2) + 30;
+        const arcX = Math.max(x1, x2) + 22;
         dStr = `M ${x1} ${y1} C ${arcX} ${y1}, ${arcX} ${y2}, ${x2} ${y2}`;
-        mx = arcX;
-        my = (y1 + y2) / 2;
       } else {
         const goRight = r2.left > r1.left;
         x1 = (goRight ? r1.right : r1.left) - stageRect.left;
         y1 = r1.top - stageRect.top + r1.height * 0.5 + (cfg.dy || 0);
         x2 = (goRight ? r2.left : r2.right) - stageRect.left;
         y2 = r2.top - stageRect.top + r2.height * 0.5 + (cfg.dy2 !== undefined ? cfg.dy2 : (cfg.dy || 0));
-        if (Math.abs(y2 - y1) < 8) y2 += 12;
-        const dx = Math.abs(x2 - x1) * 0.45;
+        if (Math.abs(y2 - y1) < 6) y2 += 8;
+        const dx = Math.min(90, Math.abs(x2 - x1) * 0.42);
         const cx1 = goRight ? x1 + dx : x1 - dx;
         const cx2 = goRight ? x2 - dx : x2 + dx;
         dStr = `M ${x1} ${y1} C ${cx1} ${y1}, ${cx2} ${y2}, ${x2} ${y2}`;
-        // Place pill strictly in the immediate gutter next to the source/target card so it never crosses intermediate columns
-        mx = goRight ? (x1 + 32) : (x1 - 32);
-        my = y1 + ((idx % 3) - 1) * 18;
       }
 
       const isVisible = matchesFilter(p.category, state.filter);
-      const isSelected = (state.selectedType === 'pipeline' && state.selectedId === p.id) || (structural && state.selectedType === 'node' && state.selectedId === 'desktop-qbit');
-      const opacity = isVisible ? (isSelected ? 1 : (structural ? 0.65 : 0.82)) : 0.12;
-      const strokeW = isSelected ? 3.2 : (structural ? 1.8 : 2.2);
+      const isHighlighted = !structural
+        ? (p.id === activePipeId || (selectedNodeId && (cfg.from === selectedNodeId || cfg.to === selectedNodeId)))
+        : (selectedNodeId === 'desktop-qbit' || selectedNodeId === 'postprocess-7z');
+      const isCategoryFiltered = state.filter !== 'all' && isVisible;
+      const showFlowAnim = isVisible && (isHighlighted || isCategoryFiltered);
+      const opacity = !isVisible ? 0.06 : (isHighlighted ? 0.98 : (isCategoryFiltered ? 0.72 : 0.28));
+      const strokeW = isHighlighted ? 3.2 : (isCategoryFiltered ? 2.2 : 1.6);
       const rate = safeNum(p.rateMBps, 0);
-      const animDur = rate > 50 ? '0.8s' : rate > 10 ? '1.3s' : rate > 1 ? '1.9s' : '2.8s';
-      const shortName = p.id.replace('postprocess-torrent', 'postproc').replace('homelab-resilience', 'resilience').replace('baremetal-desktop', 'bm-desk').replace('baremetal-nuc', 'bm-nuc').replace('iscsi-watchdog', 'iscsi-wd').replace('tier-coldstorage', 'cold-tier');
-      const label = `${shortName} • ${rate > 0 ? rate.toFixed(1) + 'M/s' : safeStr(p.bytesCopiedFormatted, hasLive ? 'Ready' : '--')}`;
-      const pillW = Math.min(116, Math.max(68, label.length * 5.6 + 10));
+      const animDur = rate > 50 ? '0.9s' : rate > 10 ? '1.4s' : rate > 1 ? '2.0s' : '2.8s';
 
       html += `
         <g opacity="${opacity}" data-pipe-id="${escapeHtml(p.id)}">
           <title>${escapeHtml(p.name)} (${escapeHtml(safeStr(p.bytesCopiedFormatted, '0 B'))} • ${rate.toFixed(1)} MB/s)</title>
-          <path d="${dStr}" class="storage-pipe-path" stroke="${cfg.color}" stroke-width="${strokeW}" filter="url(#pipe-glow)" />
-          <path d="${dStr}" class="storage-pipe-dashed" stroke="#ffffff" stroke-width="1.4" stroke-opacity="0.65" style="animation-duration: ${animDur};" />
-          ${hasLive && isVisible && !state.animPaused ? `
-          <circle r="3.2" fill="${cfg.color}" filter="url(#pipe-glow)">
+          <path d="${dStr}" class="storage-pipe-path" stroke="${cfg.color}" stroke-width="${strokeW}" ${isHighlighted ? 'filter="url(#pipe-glow)"' : ''} />
+          ${showFlowAnim ? `<path d="${dStr}" class="storage-pipe-dashed" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.75" style="animation-duration: ${animDur};" />` : ''}
+          ${hasLive && showFlowAnim && !state.animPaused ? `
+          <circle r="3.6" fill="${cfg.color}" filter="url(#pipe-glow)">
             <animateMotion dur="${animDur}" repeatCount="indefinite" path="${dStr}" />
           </circle>` : ''}
-          <path d="${dStr}" class="storage-pipe-hit" stroke="transparent" stroke-width="14" fill="none" />
-          ${!structural && isVisible && (isSelected || ['tier-coldstorage', 'postprocess-torrent', 'homelab-resilience', 'cloud-daily', 'sync-qnap-backups', 'ssd-guard'].includes(p.id)) ? `
-          <g class="storage-pipe-pill-group ${isSelected ? 'is-selected' : ''}" transform="translate(${mx - pillW / 2}, ${my - 9})">
-            <rect width="${pillW}" height="18" rx="9" class="storage-pipe-pill-bg" />
-            <text x="${pillW / 2}" y="12.5" text-anchor="middle" class="storage-pipe-pill-text" style="font-size:9px;">${escapeHtml(label)}</text>
-          </g>` : ''}
+          <path d="${dStr}" class="storage-pipe-hit" stroke="transparent" stroke-width="16" fill="none" />
         </g>`;
     });
 
@@ -729,19 +767,19 @@
         color: '#10b981'
       },
       {
-        label: 'Desktop Hot Array (C:/D:/F:)',
+        label: 'Desktop NVMe (C:/F:) + 6 TB HDD (D:)',
         used: safeNum(t.desktop_hot && t.desktop_hot.usedGB),
         total: safeNum(t.desktop_hot && t.desktop_hot.totalGB, 0),
         color: '#3b82f6'
       },
       {
-        label: 'NUC C: NVMe OS (C:)',
+        label: 'NUC C: 1 TB NVMe SSD (OS)',
         used: nucCUsed,
         total: nucCTotal,
         color: '#ec4899'
       },
       {
-        label: 'NUC D: FireCuda SSHD (30% Marker)',
+        label: 'NUC D: 2 TB SATA Hybrid HDD (30% Marker)',
         used: safeNum(nucHot.dDriveUsedGB),
         total: nucDTotal,
         color: '#a855f7',
@@ -1006,7 +1044,7 @@
     document.querySelectorAll('.storage-node-card').forEach(card => {
       card.classList.toggle('is-selected', type === 'node' && card.getAttribute('data-node-id') === id);
     });
-    renderPipesSVG(state.data || {});
+    renderPipesSVG(state.data);
     updateInspector();
   }
 
@@ -1118,6 +1156,17 @@
       renderWaveform();
     });
 
+    if (typeof ResizeObserver !== 'undefined') {
+      const stageEl = document.getElementById('storage-flow-stage');
+      if (stageEl) {
+        const ro = new ResizeObserver(() => {
+          renderPipesSVG(state.data);
+        });
+        ro.observe(stageEl);
+      }
+    }
+
+    renderPipesSVG(null);
     updateInspector();
     fetchStorageFlow();
     state.pollTimer = setInterval(() => {

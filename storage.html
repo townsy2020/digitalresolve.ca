@@ -8,8 +8,8 @@
   <meta http-equiv="Expires" content="0">
   <title>Tiered Storage &amp; Live Data Flow - DigitalResolve</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b0f17'/%3E%3Cpath d='M8 22V10h7a6 6 0 0 1 0 12H8zm4-3.5h3a2.5 2.5 0 0 0 0-5h-3v5z' fill='%2338bdf8'/%3E%3C/svg%3E">
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.86 - Tiered Storage &amp; Live Data Flow">
-  <link rel="stylesheet" href="styles.css?v=2.8.86">
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.8.87 - Tiered Storage &amp; Live Data Flow">
+  <link rel="stylesheet" href="styles.css?v=2.8.87">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -262,7 +262,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.86</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.8.87</span>)</span>
             </button>
             <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO(true, event)" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -418,9 +418,14 @@
         <div class="storage-panel-header">
           <div>
             <h2 class="storage-panel-title">Interactive 4-Tier Data Flow Schematic</h2>
-            <div class="storage-panel-sub">Click any storage tier node or animated flow pipe to inspect script paths, schedules, throughput, and trigger runs.</div>
+            <div class="storage-panel-sub">Click any storage node, pipeline chip, or flow line below to highlight its route and inspect its script, schedule, and live throughput.</div>
           </div>
-          <span class="storage-node-tag info" id="flow-active-count">-- Active Pipelines</span>
+          <div class="storage-flow-legend" aria-label="Flow Category Legend">
+            <span class="storage-legend-item"><span class="storage-legend-dot" style="background:#a855f7;"></span>Media Tiering</span>
+            <span class="storage-legend-item"><span class="storage-legend-dot" style="background:#10b981;"></span>Backups &amp; DR</span>
+            <span class="storage-legend-item"><span class="storage-legend-dot" style="background:#f59e0b;"></span>Guardrails</span>
+            <span class="storage-node-tag info" id="flow-active-count">-- Active Pipelines</span>
+          </div>
         </div>
 
         <div class="storage-flow-stage" id="storage-flow-stage">
@@ -431,16 +436,16 @@
             <div class="storage-tier-col" data-tier="0">
               <div class="storage-tier-header">
                 <span class="storage-tier-badge tier-0">TIER 0</span>
-                <span class="storage-tier-title">Workstation &amp; Ingest</span>
+                <span class="storage-tier-title">Workstation &amp; Ingest &rarr;</span>
               </div>
 
               <button type="button" class="storage-node-card" data-node-id="desktop-drives" data-category="backup">
                 <div class="storage-node-top">
-                  <span class="storage-node-name">Desktop C: / D: / F:</span>
+                  <span class="storage-node-name">Desktop NVMe + 6 TB HDD</span>
                   <span class="storage-node-tag" id="node-tag-desktop-drives">--</span>
                 </div>
-                <div class="storage-node-meta" id="node-meta-desktop-drives">NVMe + HDD Array &bull; Workstation</div>
-                <div class="storage-node-desc" id="node-desc-desktop-drives">Primary workstation ingest, NVMe thermals &amp; bare-metal snapshot source.</div>
+                <div class="storage-node-meta" id="node-meta-desktop-drives">C:/F: NVMe SSDs + D: 6 TB HDD</div>
+                <div class="storage-node-desc" id="node-desc-desktop-drives">Samsung 970 EVO (C:), WD SN750 (F:) NVMe &amp; WD Black 6 TB HDD (D:).</div>
               </button>
 
               <button type="button" class="storage-node-card" data-node-id="desktop-qbit" data-category="media">
@@ -448,26 +453,26 @@
                   <span class="storage-node-name">qBittorrent :8080</span>
                   <span class="storage-node-tag info" id="node-tag-desktop-qbit">Ingest</span>
                 </div>
-                <div class="storage-node-meta" id="node-meta-desktop-qbit">Desktop Port 8080 &bull; Active Swarm</div>
+                <div class="storage-node-meta" id="node-meta-desktop-qbit">Workstation Port 8080 &bull; Swarm</div>
                 <div class="storage-node-desc">High-speed desktop torrent ingest staging before archive extraction.</div>
               </button>
 
               <button type="button" class="storage-node-card" data-node-id="postprocess-7z" data-category="media">
                 <div class="storage-node-top">
-                  <span class="storage-node-name">PostProcess 7z</span>
+                  <span class="storage-node-name">PostProcess 7z Hook</span>
                   <span class="storage-node-tag ok" id="node-tag-postprocess-7z">Ready</span>
                 </div>
-                <div class="storage-node-meta" id="node-meta-postprocess-7z">7-Zip Archive Extractor</div>
-                <div class="storage-node-desc">Unpacks completed release archives for Sonarr, Radarr, and Readarr import.</div>
+                <div class="storage-node-meta" id="node-meta-postprocess-7z">7z / RAR / ZIP Unpacker</div>
+                <div class="storage-node-desc">Validates &amp; extracts completed archives for Sonarr, Radarr, and Audiobookshelf.</div>
               </button>
 
               <button type="button" class="storage-node-card" data-node-id="audible-sync" data-category="media">
                 <div class="storage-node-top">
-                  <span class="storage-node-name">Audible Sync</span>
-                  <span class="storage-node-tag ok" id="node-tag-audible-sync">Scheduled</span>
+                  <span class="storage-node-name">Audible Cloud Sync</span>
+                  <span class="storage-node-tag ok" id="node-tag-audible-sync">Daily 05:00</span>
                 </div>
-                <div class="storage-node-meta" id="node-meta-audible-sync">Audiobookshelf Pipeline</div>
-                <div class="storage-node-desc">Converts &amp; syncs Audible library titles into NUC Audiobookshelf vault.</div>
+                <div class="storage-node-meta" id="node-meta-audible-sync">AAXC &rarr; DRM-Free M4B</div>
+                <div class="storage-node-desc">Downloads &amp; decrypts Audible titles directly into QNAP SMB audiobook library.</div>
               </button>
             </div>
 
@@ -475,33 +480,33 @@
             <div class="storage-tier-col" data-tier="1">
               <div class="storage-tier-header">
                 <span class="storage-tier-badge tier-1">TIER 1</span>
-                <span class="storage-tier-title">Intel NUC 24/7 Hot Media</span>
+                <span class="storage-tier-title">NUC 24/7 Hot Tier &rarr;</span>
               </div>
 
-              <button type="button" class="storage-node-card" data-node-id="nuc-c" data-category="backup">
+              <button type="button" class="storage-node-card" data-node-id="nuc-c" data-category="backup,guardrail">
                 <div class="storage-node-top">
-                  <span class="storage-node-name">NUC C: NVMe OS</span>
+                  <span class="storage-node-name">NUC C: 1 TB NVMe SSD</span>
                   <span class="storage-node-tag" id="node-tag-nuc-c">--</span>
                 </div>
-                <div class="storage-node-meta" id="node-meta-nuc-c">NUC Core &bull; Gateway &amp; Services</div>
-                <div class="storage-node-desc" id="node-desc-nuc-c">24/7 homelab gateway, go2rtc, Jellyfin, Arr stack &amp; Antigravity configs.</div>
+                <div class="storage-node-meta" id="node-meta-nuc-c">Crucial P1 NVMe &bull; OS &amp; Core</div>
+                <div class="storage-node-desc" id="node-desc-nuc-c">24/7 gateway, go2rtc, Jellyfin, Arr DBs &amp; 20% SSD free-space guardrail.</div>
               </button>
 
               <button type="button" class="storage-node-card" data-node-id="nuc-d" data-category="media,guardrail">
                 <div class="storage-node-top">
-                  <span class="storage-node-name">NUC D: 1.86 TB FireCuda SSHD</span>
+                  <span class="storage-node-name">NUC D: 2 TB SATA Hybrid HDD</span>
                   <span class="storage-node-tag info" id="node-tag-nuc-d">--</span>
                 </div>
-                <div class="storage-node-meta" id="node-meta-nuc-d">Hot Media Buffer &bull; 30% Offload Guardrail</div>
+                <div class="storage-node-meta" id="node-meta-nuc-d">FireCuda 2.5&quot; SSHD (1.86 TiB) &bull; 30% Guard</div>
                 <div class="storage-threshold-track" title="30% Free Space Offload Threshold (70% Used)">
                   <div class="storage-threshold-fill" id="nuc-d-threshold-fill" style="width: 0%;"></div>
                   <div class="storage-threshold-marker" title="30% Free Offload Threshold"></div>
                 </div>
                 <div class="storage-threshold-label">
                   <span id="nuc-d-used-lbl">--</span>
-                  <span style="color: #fbbf24;">30% Free Threshold</span>
+                  <span style="color: #fbbf24;">30% Free Offload Trigger</span>
                 </div>
-                <div class="storage-node-desc">Hot seeding &amp; streaming buffer; auto-tiers to QNAP SMB below 30% free.</div>
+                <div class="storage-node-desc">Mechanical 2.5&quot; SATA SSHD hot buffer (not NVMe); auto-offloads to QNAP SMB below 30% free.</div>
               </button>
 
               <button type="button" class="storage-node-card" data-node-id="nuc-qbit" data-category="media,guardrail">
@@ -509,8 +514,8 @@
                   <span class="storage-node-name">qBittorrent :8081</span>
                   <span class="storage-node-tag info" id="node-tag-nuc-qbit">24/7 Seed</span>
                 </div>
-                <div class="storage-node-meta" id="node-meta-nuc-qbit">NUC Port 8081 &bull; Automated Arr</div>
-                <div class="storage-node-desc">24/7 seeding &amp; hot media queue monitored by space guardrails.</div>
+                <div class="storage-node-meta" id="node-meta-nuc-qbit">NUC Port 8081 &bull; Mullvad WireGuard</div>
+                <div class="storage-node-desc">24/7 automated Arr &amp; RSS seeding queue staged on NUC D: &amp; QNAP.</div>
               </button>
             </div>
 
@@ -518,25 +523,25 @@
             <div class="storage-tier-col" data-tier="2">
               <div class="storage-tier-header">
                 <span class="storage-tier-badge tier-2">TIER 2</span>
-                <span class="storage-tier-title">QNAP TS-639 NAS</span>
+                <span class="storage-tier-title">QNAP TS-639 NAS &rarr;</span>
               </div>
 
               <button type="button" class="storage-node-card" data-node-id="qnap-smb" data-category="media">
                 <div class="storage-node-top">
-                  <span class="storage-node-name">SMB Cold Archive</span>
+                  <span class="storage-node-name">QNAP SMB Archive (Q:)</span>
                   <span class="storage-node-tag info" id="node-tag-qnap-smb">--</span>
                 </div>
                 <div class="storage-node-meta" id="node-meta-qnap-smb">SMB Share (Q:) &bull; --</div>
-                <div class="storage-node-desc">Primary cold media archive receiving automated NUC D: tiering offloads.</div>
+                <div class="storage-node-desc">RAID cold media archive storing tiered movies, TV series, and M4B audiobooks.</div>
               </button>
 
-              <button type="button" class="storage-node-card" data-node-id="qnap-iscsi-nuc" data-category="backup">
+              <button type="button" class="storage-node-card" data-node-id="qnap-iscsi-nuc" data-category="backup,guardrail">
                 <div class="storage-node-top">
                   <span class="storage-node-name">NUC iSCSI LUN (E:)</span>
                   <span class="storage-node-tag info" id="node-tag-qnap-iscsi-nuc">--</span>
                 </div>
-                <div class="storage-node-meta" id="node-meta-qnap-iscsi-nuc">E: &bull; -- &bull; Homelab Resilience &amp; WindowsImageBackup</div>
-                <div class="storage-node-desc">Dedicated iSCSI block target for NUC bare-metal images &amp; state snapshots.</div>
+                <div class="storage-node-meta" id="node-meta-qnap-iscsi-nuc">E: &bull; -- &bull; NUC Resilience &amp; Bare-Metal</div>
+                <div class="storage-node-desc">2 TB block LUN for NUC WindowsImageBackup, resilience snapshots &amp; RSS staging.</div>
               </button>
 
               <button type="button" class="storage-node-card" data-node-id="qnap-iscsi-desktop" data-category="backup">
@@ -544,8 +549,8 @@
                   <span class="storage-node-name">Desktop iSCSI LUN (E:)</span>
                   <span class="storage-node-tag info" id="node-tag-qnap-iscsi-desktop">--</span>
                 </div>
-                <div class="storage-node-meta" id="node-meta-qnap-iscsi-desktop">E: &bull; -- &bull; Mirrored Snapshots &amp; Bare-Metal</div>
-                <div class="storage-node-desc">Dedicated iSCSI block target for Desktop mirrored snapshots &amp; bare-metal DR.</div>
+                <div class="storage-node-meta" id="node-meta-qnap-iscsi-desktop">E: &bull; -- &bull; Mirrored DR &amp; Bare-Metal</div>
+                <div class="storage-node-desc">2 TB block LUN for Desktop bare-metal images and daily mirrored NUC backups.</div>
               </button>
             </div>
 
@@ -561,12 +566,14 @@
                   <span class="storage-node-name">OneDrive Cloud Vault</span>
                   <span class="storage-node-tag info" id="node-tag-onedrive-vault">--</span>
                 </div>
-                <div class="storage-node-meta" id="node-meta-onedrive-vault">%OneDriveCommercial%\Antigravity-Backups</div>
-                <div class="storage-node-desc">Offsite encrypted cloud mirror for critical homelab scripts, configs, and website backups.</div>
+                <div class="storage-node-meta" id="node-meta-onedrive-vault">M365 OneDrive &bull; Offsite Sync</div>
+                <div class="storage-node-desc">Offsite Microsoft 365 cloud mirror for homelab scripts, SQLite DBs, and website backups.</div>
               </button>
             </div>
           </div>
         </div>
+
+        <div class="storage-pipe-selector-bar" id="storage-pipe-selector-bar" aria-label="Quick Pipeline Route Selector"></div>
       </section>
 
       <!-- Graphics Row (2 Cards) -->
@@ -698,12 +705,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.86</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.8.87</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 35,573 Lines of Code (HTML: 19,914 lines | CSS: 7,227 lines | JS: 8,431 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 35,817 Lines of Code (HTML: 20,017 lines | CSS: 7,319 lines | JS: 8,480 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">35,573</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">35,817</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1299,10 +1306,22 @@
       </div>
 
             <div class="changelog-body">
-                                                                                                        <!-- Version v2.8.86 (Current) -->
+                                                                                                                <!-- Version v2.8.87 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.8.86 | Current</span>
+            <span class="ver-tag current">v2.8.87 | Current</span>
+            <span class="ver-date">November 24, 2026</span>
+          </div>
+          <h4 class="ver-title">Storage Flow Schematic Readability Overhaul &amp; Physical Drive Accuracy</h4>
+          <ul class="ver-list">
+            <li><strong>Storage Schematic Readability Overhaul:</strong> Replaced clipped floating gutter pills and 9-color curve clutter on storage.html with a clickable 12-pipeline Route Selector bar, 3 semantic category colors (Media, Backup/DR, Guardrails), calm background traces, and highlighted source/destination node rings.</li>
+            <li><strong>Accurate Physical Drive Hardware Labels:</strong> Clarified NUC D: as a 2 TB 2.5&quot; SATA Hybrid HDD (Seagate FireCuda ST2000LX001 SSHD, not NVMe), NUC C: as 1 TB Crucial P1 NVMe SSD, Desktop C:/F: NVMe + D: 6 TB WD Black HDD, and wired ssd-guard to NUC C: NVMe.</li>
+          </ul>
+        </div>
+        <!-- Version v2.8.86 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.8.86</span>
             <span class="ver-date">November 24, 2026</span>
           </div>
           <h4 class="ver-title">Round 2 Audit Hardening: Standby Telemetry, Feeder Cache TTL &amp; Ingest Resilience</h4>
@@ -1944,7 +1963,7 @@
       </div>
     </div>
   </div>
-  <script src="app.js?v=2.8.86"></script>
-  <script src="storage-flow.js?v=2.8.86"></script>
+  <script src="app.js?v=2.8.87"></script>
+  <script src="storage-flow.js?v=2.8.87"></script>
 </body>
 </html>

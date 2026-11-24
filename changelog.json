@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-24T12:32:57Z",
-    "currentVersion":  "v2.8.86",
+    "updatedAt":  "2026-11-24T13:16:12Z",
+    "currentVersion":  "v2.8.87",
     "releases":  [
+                     {
+                         "version":  "v2.8.87",
+                         "date":  "November 24, 2026",
+                         "title":  "Storage Flow Schematic Readability Overhaul \u0026 Physical Drive Accuracy",
+                         "changes":  [
+                                         {
+                                             "label":  "Storage Schematic Readability Overhaul",
+                                             "text":  "Replaced clipped floating gutter pills and 9-color curve clutter on storage.html with a clickable 12-pipeline Route Selector bar, 3 semantic category colors (Media, Backup/DR, Guardrails), calm background traces, and highlighted source/destination node rings."
+                                         },
+                                         {
+                                             "label":  "Accurate Physical Drive Hardware Labels",
+                                             "text":  "Clarified NUC D: as a 2 TB 2.5\" SATA Hybrid HDD (Seagate FireCuda ST2000LX001 SSHD, not NVMe), NUC C: as 1 TB Crucial P1 NVMe SSD, Desktop C:/F: NVMe + D: 6 TB WD Black HDD, and wired ssd-guard to NUC C: NVMe."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.86",
                          "date":  "November 24, 2026",
