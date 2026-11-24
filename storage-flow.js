@@ -245,7 +245,7 @@
             renderOfflineFallback();
             return;
           }
-        } else if (isHttps && err && err.name === 'TypeError') {
+        } else if (isHttps && err && err.name === 'TypeError' && !(typeof window.isSSOAuthenticated === 'function' && window.isSSOAuthenticated())) {
           state.unauthenticated = true;
           renderAuthFallback();
           return;
@@ -361,6 +361,9 @@
 
   function renderOfflineFallback() {
     state.data = null;
+    state.unauthenticated = false;
+    const banner = document.getElementById('storage-sso-banner');
+    if (banner) banner.style.display = 'none';
     setText('storage-route-text', 'Gateway Offline');
     setText('storage-updated-text', 'Retrying Telemetry');
     setText('kpi-last-sync', 'Offline');
@@ -583,8 +586,27 @@
     setText('flow-active-count', hasLive ? `${filtered.length} Active Pipelines` : '--');
     renderPipeSelectorBar(pipelines, hasLive);
 
+    const activePipeId = state.selectedType === 'pipeline'
+      ? state.selectedId
+      : ((NODE_DETAILS[state.selectedId] && NODE_DETAILS[state.selectedId].pipelineId) || '');
+    const selectedNodeId = state.selectedType === 'node' ? state.selectedId : '';
+    const activePipeObj = pipelines.find(item => item.id === activePipeId) || null;
+    const activeCfg = (activePipeObj && matchesFilter(activePipeObj.category, state.filter))
+      ? (PIPE_NODE_MAP[activePipeId] || null)
+      : null;
+
+    const docEl = document.documentElement;
+    const isForcedDesktop = docEl.classList.contains('desktop-forced');
+    const isMobileLayout = docEl.classList.contains('mobile-layout') || (!isForcedDesktop && window.innerWidth <= 1024);
+
+    document.querySelectorAll('.storage-node-card').forEach(card => {
+      const nid = card.getAttribute('data-node-id');
+      const isEp = Boolean(!isMobileLayout && activeCfg && (nid === activeCfg.from || nid === activeCfg.to) && nid !== selectedNodeId);
+      card.classList.toggle('is-route-endpoint', isEp);
+    });
+
     const stageRect = stage.getBoundingClientRect();
-    if (stageRect.width < 100 || window.innerWidth <= 1024) {
+    if (stageRect.width < 100 || isMobileLayout) {
       svg.innerHTML = '';
       return;
     }
@@ -597,17 +619,6 @@
         <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
       </filter>
     </defs>`;
-
-    const activePipeId = state.selectedType === 'pipeline'
-      ? state.selectedId
-      : ((NODE_DETAILS[state.selectedId] && NODE_DETAILS[state.selectedId].pipelineId) || '');
-    const selectedNodeId = state.selectedType === 'node' ? state.selectedId : '';
-    const activeCfg = PIPE_NODE_MAP[activePipeId] || null;
-    document.querySelectorAll('.storage-node-card').forEach(card => {
-      const nid = card.getAttribute('data-node-id');
-      const isEp = Boolean(activeCfg && (nid === activeCfg.from || nid === activeCfg.to) && nid !== selectedNodeId);
-      card.classList.toggle('is-route-endpoint', isEp);
-    });
 
     const pipeItems = pipelines.map(p => ({ p, cfg: PIPE_NODE_MAP[p.id], structural: false }));
     if (pipelines.length > 0) {
@@ -657,7 +668,7 @@
       const isVisible = matchesFilter(p.category, state.filter);
       const isHighlighted = !structural
         ? (p.id === activePipeId || (selectedNodeId && (cfg.from === selectedNodeId || cfg.to === selectedNodeId)))
-        : (selectedNodeId === 'desktop-qbit' || selectedNodeId === 'postprocess-7z');
+        : (activePipeId === 'postprocess-torrent' || selectedNodeId === 'desktop-qbit' || selectedNodeId === 'postprocess-7z');
       const isCategoryFiltered = state.filter !== 'all' && isVisible;
       const showFlowAnim = isVisible && (isHighlighted || isCategoryFiltered);
       const opacity = !isVisible ? 0.06 : (isHighlighted ? 0.98 : (isCategoryFiltered ? 0.72 : 0.28));
@@ -1152,6 +1163,10 @@
     }
 
     window.addEventListener('resize', () => {
+      renderPipesSVG(state.data);
+      renderWaveform();
+    });
+    window.addEventListener('dr:layoutmodechange', () => {
       renderPipesSVG(state.data);
       renderWaveform();
     });

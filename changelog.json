@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-24T13:16:12Z",
-    "currentVersion":  "v2.8.87",
+    "updatedAt":  "2026-11-24T14:35:02Z",
+    "currentVersion":  "v2.8.88",
     "releases":  [
+                     {
+                         "version":  "v2.8.88",
+                         "date":  "November 24, 2026",
+                         "title":  "Round 3 Zero-Bug Convergence: Storage Telemetry Integrity, 3-Drive Desktop Unification, Layout Mode \u0026 Episodic Audible Ingest",
+                         "changes":  [
+                                         {
+                                             "label":  "Storage Schematic \u0026 Activity Integrity",
+                                             "text":  "Restricted storage activity byte extraction to true transfer events, promoted untagged WARNING logs to amber WARN badges, fixed structural curve click highlighting, guarded route-endpoint rings under category filters, and added full Mobile/Desktop layout toggle support on storage.html."
+                                         },
+                                         {
+                                             "label":  "Unified 3-Drive Desktop Storage \u0026 Honest Defaults",
+                                             "text":  "Added F: NVMe (465.7 GB) to Sync-AgyTranscript.ps1, wol-listener.ps1, and app.js so all pages consistently report C: + D: + F: (6.52 TB), hid offline feeder false-alarm banners, persisted standby cache state, and wrapped feeder refill/dispense caches in TTL envelopes."
+                                         },
+                                         {
+                                             "label":  "Daemon Self-Healing \u0026 Episodic Audible Automation",
+                                             "text":  "Fixed NUC AGY-Session-Daemon interactive principal and Sentinel Session-0 guard to halt 3-minute restart alerts, guarded YoLink offline alerts against transient API timeouts, routed ChatOps StreamHub probes via LAN TLS, unified cross-node /add JSON keys, and added multi-episode Audible subdirectory decryption and ingestion."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.87",
                          "date":  "November 24, 2026",

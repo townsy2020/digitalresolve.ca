@@ -6610,15 +6610,19 @@ a:focus-visible {
 }
 
 @media (max-width: 1200px) {
-  .storage-kpi-strip {
+  html:not(.desktop-forced) .storage-kpi-strip {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 680px) {
-  .storage-kpi-strip {
+  html:not(.desktop-forced) .storage-kpi-strip {
     grid-template-columns: repeat(1, minmax(0, 1fr));
   }
+}
+
+html.mobile-layout .storage-kpi-strip {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
 }
 
 .storage-kpi-card {
@@ -6851,11 +6855,6 @@ a:focus-visible {
   cursor: pointer;
 }
 
-.storage-flow-svg .storage-pipe-pill-group {
-  pointer-events: all;
-  cursor: pointer;
-}
-
 .storage-flow-grid {
   position: relative;
   z-index: 2;
@@ -6867,16 +6866,27 @@ a:focus-visible {
 }
 
 @media (max-width: 1024px) {
-  .storage-flow-stage {
+  html:not(.desktop-forced) .storage-flow-stage {
     min-height: auto;
   }
-  .storage-flow-svg {
+  html:not(.desktop-forced) .storage-flow-svg {
     display: none;
   }
-  .storage-flow-grid {
+  html:not(.desktop-forced) .storage-flow-grid {
     grid-template-columns: 1fr;
     gap: 20px;
   }
+}
+
+html.mobile-layout .storage-flow-stage {
+  min-height: auto;
+}
+html.mobile-layout .storage-flow-svg {
+  display: none;
+}
+html.mobile-layout .storage-flow-grid {
+  grid-template-columns: 1fr;
+  gap: 20px;
 }
 
 .storage-tier-col {
@@ -7056,24 +7066,6 @@ a:focus-visible {
   }
 }
 
-.storage-pipe-pill-bg {
-  fill: rgba(13, 17, 23, 0.94);
-  stroke: rgba(56, 189, 248, 0.45);
-  stroke-width: 1;
-}
-
-.storage-pipe-pill-group.is-selected .storage-pipe-pill-bg {
-  stroke: #38bdf8;
-  stroke-width: 1.8;
-}
-
-.storage-pipe-pill-text {
-  fill: #e2e8f0;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 600;
-}
-
 /* Graphics Row (2 Cards) */
 .storage-graphics-row {
   display: grid;
@@ -7083,9 +7075,13 @@ a:focus-visible {
 }
 
 @media (max-width: 1024px) {
-  .storage-graphics-row {
+  html:not(.desktop-forced) .storage-graphics-row {
     grid-template-columns: 1fr;
   }
+}
+
+html.mobile-layout .storage-graphics-row {
+  grid-template-columns: 1fr;
 }
 
 .storage-card {
@@ -7188,15 +7184,20 @@ a:focus-visible {
 }
 
 @media (max-width: 960px) {
-  .storage-inspector-grid {
+  html:not(.desktop-forced) .storage-inspector-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 560px) {
-  .storage-inspector-grid {
+  html:not(.desktop-forced) .storage-inspector-grid {
     grid-template-columns: 1fr;
   }
+}
+
+html.mobile-layout .storage-inspector-grid,
+html.mobile-layout .storage-matrix-grid {
+  grid-template-columns: 1fr;
 }
 
 .storage-inspector-item {

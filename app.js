@@ -164,16 +164,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.87';
+          const activeVer = match ? match[0] : 'v2.8.88';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 20017;
-      const baseCssLines = 7319;
-      const baseJsLines = 8480;
+      const baseHtmlLines = 20121;
+      const baseCssLines = 7320;
+      const baseJsLines = 8535;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -295,6 +295,7 @@
       }
 
       updateLayoutToggleButtons(mode);
+      try { window.dispatchEvent(new CustomEvent('dr:layoutmodechange', { detail: { mode } })); } catch (e) {}
     }
 
     function toggleLayoutMode() {
@@ -1169,6 +1170,20 @@
           };
           localStorage.setItem('dr_telemetry_cache', JSON.stringify(cache));
         } catch(e) {}
+      } else {
+        try {
+          const raw = localStorage.getItem('dr_telemetry_cache');
+          const cache = raw ? JSON.parse(raw) : {};
+          const prevTarget = (cache && cache[target]) || {};
+          cache[target] = {
+            online: false,
+            latencyMs: null,
+            disk: disk || prevTarget.disk || null,
+            torrent: null,
+            vitals: null
+          };
+          localStorage.setItem('dr_telemetry_cache', JSON.stringify(cache));
+        } catch(e) {}
       }
 
       // Update NUC D: drive widgets
@@ -1395,7 +1410,8 @@
         }
         document.querySelectorAll('#stat-desktop-pool-tag').forEach(el => {
           const poolTbStr = (disk && Number.isFinite(Number(disk.totalGB)) && Number(disk.totalGB) > 0) ? ` (${(Number(disk.totalGB) / 1000).toFixed(2)} TB)` : '';
-          el.textContent = isOnline ? `Dual Drive${poolTbStr}` : `Standby Pool${poolTbStr}`;
+          const poolLabel = (disk && Number(disk.fTotalGB) > 0) ? '3-Drive Pool' : 'Dual Drive';
+          el.textContent = isOnline ? `${poolLabel}${poolTbStr}` : `Standby Pool${poolTbStr}`;
           el.className = isOnline ? 'item-tag online' : 'item-tag';
         });
         const uptimeScaleToday = document.getElementById('uptime-desktop-scale-today');
@@ -1429,34 +1445,40 @@
           if (segs.length >= 4) {
             const hasC = (disk.cTotalGB !== undefined && disk.cTotalGB !== null && disk.cFreeGB !== undefined && disk.cFreeGB !== null);
             const hasD = (disk.dTotalGB !== undefined && disk.dTotalGB !== null && disk.dFreeGB !== undefined && disk.dFreeGB !== null);
-            const cUsed = hasC ? Math.max(0, Math.round(Number(disk.cTotalGB) - Number(disk.cFreeGB))) : 0;
-            const cFree = (disk.cFreeGB !== undefined && disk.cFreeGB !== null) ? Math.max(0, Math.round(Number(disk.cFreeGB))) : 0;
+            const hasF = (disk.fTotalGB !== undefined && disk.fTotalGB !== null && Number(disk.fTotalGB) > 0 && disk.fFreeGB !== undefined && disk.fFreeGB !== null);
+            const cUsedOnly = hasC ? Math.max(0, Math.round(Number(disk.cTotalGB) - Number(disk.cFreeGB))) : 0;
+            const cFreeOnly = (disk.cFreeGB !== undefined && disk.cFreeGB !== null) ? Math.max(0, Math.round(Number(disk.cFreeGB))) : 0;
+            const fUsedOnly = hasF ? Math.max(0, Math.round(Number(disk.fTotalGB) - Number(disk.fFreeGB))) : 0;
+            const fFreeOnly = hasF ? Math.max(0, Math.round(Number(disk.fFreeGB))) : 0;
+            const nvmeUsed = cUsedOnly + fUsedOnly;
+            const nvmeFree = cFreeOnly + fFreeOnly;
             const dUsed = hasD ? Math.max(0, Math.round(Number(disk.dTotalGB) - Number(disk.dFreeGB))) : 0;
             const dFree = (disk.dFreeGB !== undefined && disk.dFreeGB !== null) ? Math.max(0, Math.round(Number(disk.dFreeGB))) : 0;
-            const computedTotal = cUsed + cFree + dUsed + dFree;
+            const computedTotal = nvmeUsed + nvmeFree + dUsed + dFree;
             const total = (disk.totalGB !== undefined && disk.totalGB !== null && Number(disk.totalGB) > 0) ? Number(disk.totalGB) : computedTotal;
             const safeTot = (Number.isFinite(Number(total)) && Number(total) > 0) ? Number(total) : 1;
 
-            const cUsedPct = ((cUsed / safeTot) * 100).toFixed(1);
-            const cFreePct = ((cFree / safeTot) * 100).toFixed(1);
+            const cUsedPct = ((nvmeUsed / safeTot) * 100).toFixed(1);
+            const cFreePct = ((nvmeFree / safeTot) * 100).toFixed(1);
             const dUsedPct = ((dUsed / safeTot) * 100).toFixed(1);
             const dFreePct = ((dFree / safeTot) * 100).toFixed(1);
 
+            const nvmeLbl = hasF ? 'NVMe (C:+F:)' : 'C: NVMe';
             segs[0].style.width = `${cUsedPct}%`;
-            segs[0].title = `C: NVMe Used: ${cUsed} GB`;
+            segs[0].title = `${nvmeLbl} Used: ${nvmeUsed} GB`;
             segs[1].style.width = `${cFreePct}%`;
-            segs[1].title = `C: NVMe Free: ${cFree} GB`;
+            segs[1].title = `${nvmeLbl} Free: ${nvmeFree} GB`;
             segs[2].style.width = `${dUsedPct}%`;
-            segs[2].title = `D: Apps Used: ${dUsed} GB`;
+            segs[2].title = `D: HDD Used: ${dUsed} GB`;
             segs[3].style.width = `${dFreePct}%`;
-            segs[3].title = `D: Apps Free: ${dFree} GB`;
+            segs[3].title = `D: HDD Free: ${dFree} GB`;
 
             const cUsedEl = document.getElementById('stat-desktop-c-used');
             const cFreeEl = document.getElementById('stat-desktop-c-free');
             const dUsedEl = document.getElementById('stat-desktop-d-used');
             const dFreeEl = document.getElementById('stat-desktop-d-free');
-            if (cUsedEl) cUsedEl.innerHTML = `<span class="legend-dot" style="background: #38bdf8;"></span> C: ${cUsed}G Used`;
-            if (cFreeEl) cFreeEl.innerHTML = `<span class="legend-dot" style="background: rgba(56, 189, 248, 0.45);"></span> C: ${cFree}G Free`;
+            if (cUsedEl) cUsedEl.innerHTML = `<span class="legend-dot" style="background: #38bdf8;"></span> ${hasF ? 'NVMe' : 'C'}: ${nvmeUsed}G Used`;
+            if (cFreeEl) cFreeEl.innerHTML = `<span class="legend-dot" style="background: rgba(56, 189, 248, 0.45);"></span> ${hasF ? 'NVMe' : 'C'}: ${nvmeFree}G Free`;
             if (dUsedEl) dUsedEl.innerHTML = `<span class="legend-dot" style="background: #10b981;"></span> D: ${dUsed}G Used`;
             if (dFreeEl) dFreeEl.innerHTML = `<span class="legend-dot" style="background: rgba(16, 185, 129, 0.35);"></span> D: ${(dFree / 1000).toFixed(2)}T Free`;
           }
@@ -1506,20 +1528,23 @@
             const freeGB = safeNum(disk.freeGB, 0);
             const cFree = (disk.cFreeGB !== undefined && disk.cFreeGB !== null) ? Math.round(safeNum(disk.cFreeGB, 0)) : '--';
             const dFree = (disk.dFreeGB !== undefined && disk.dFreeGB !== null) ? (safeNum(disk.dFreeGB, 0) / 1000).toFixed(1) : '--';
+            const fFreeVal = (disk.fFreeGB !== undefined && disk.fFreeGB !== null && Number(disk.fTotalGB) > 0) ? Math.round(safeNum(disk.fFreeGB, 0)) : null;
+            const fPipe = fFreeVal !== null ? ` | F: ${fFreeVal}G` : '';
+            const fBull = fFreeVal !== null ? ` &bull; F: ${fFreeVal}G` : '';
 
             const fStorage = document.getElementById('fleet-storage-desktop');
             const fBar = document.getElementById('fleet-bar-desktop');
-            const freePct = Math.round(100 - usedPercent); if (fStorage) fStorage.innerHTML = `${freeGB.toLocaleString()} GB Free (${freePct}% free) &bull; C: ${cFree}G | D: ${dFree}T`;
+            const freePct = Math.round(100 - usedPercent); if (fStorage) fStorage.innerHTML = `${freeGB.toLocaleString()} GB Free (${freePct}% free) &bull; C: ${cFree}G | D: ${dFree}T${fPipe}`;
             if (fBar) fBar.style.width = `${usedPercent}%`;
             
             const dTag = document.getElementById('desktop-disk-tag');
             const dVal = document.getElementById('desktop-disk-val');
             const dBar = document.getElementById('desktop-disk-bar');
             const dSub = document.getElementById('desktop-disk-sub');
-            if (dTag) dTag.innerHTML = `C: ${cFree}G &bull; D: ${dFree}T`;
+            if (dTag) dTag.innerHTML = `C: ${cFree}G &bull; D: ${dFree}T${fBull}`;
             if (dVal) dVal.textContent = `${freeGB.toLocaleString()} GB Free`;
             if (dBar) dBar.style.width = `${usedPercent}%`;
-            if (dSub) dSub.innerHTML = `${usedGB} GB used of ${totalGB.toLocaleString()} GB (${usedPercent}% used &bull; ${freePct}% free) &bull; C: ${cFree}G | D: ${dFree}T`;
+            if (dSub) dSub.innerHTML = `${usedGB} GB used of ${totalGB.toLocaleString()} GB (${usedPercent}% used &bull; ${freePct}% free) &bull; C: ${cFree}G | D: ${dFree}T${fPipe}`;
             
             const sDeskFree = document.getElementById('stat-desktop-disk-free');
             const sDeskSub = document.getElementById('stat-desktop-disk-sub');
@@ -1527,7 +1552,7 @@
             if (sDeskSub) sDeskSub.innerHTML = `<span>Total ${totalGB.toLocaleString()} GB (${freePct}% Free &bull; ${usedPercent}% Used &bull; ${usedGB} GB)</span>`;
 
             const rDeskStorage = document.getElementById('ribbon-desktop-storage');
-            if (rDeskStorage) rDeskStorage.textContent = `${(freeGB / 1000).toFixed(2)} TB Free (${freePct}% free \u2022 C: ${cFree}G | D: ${dFree}T)`;
+            if (rDeskStorage) rDeskStorage.textContent = `${(freeGB / 1000).toFixed(2)} TB Free (${freePct}% free \u2022 C: ${cFree}G | D: ${dFree}T${fPipe})`;
           }
 
           const fVitals = document.getElementById('fleet-vitals-desktop');
@@ -1559,6 +1584,14 @@
           const sDeskRam = document.getElementById('stat-desktop-ram-sub');
           if (sDeskCpu) sDeskCpu.innerHTML = `--% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>`;
           if (sDeskRam) sDeskRam.textContent = 'Memory: Standby / Sleep';
+          const sDeskFree = document.getElementById('stat-desktop-disk-free');
+          if (sDeskFree) {
+            if (disk && Number.isFinite(Number(disk.freeGB)) && Number(disk.freeGB) > 0) {
+              sDeskFree.innerHTML = `${Math.round(Number(disk.freeGB)).toLocaleString()} GB <span style="font-size: 0.9rem; color: #8b949e;">Free (Standby)</span>`;
+            } else {
+              sDeskFree.innerHTML = `-- <span style="font-size: 0.9rem; color: #8b949e;">Standby</span>`;
+            }
+          }
           const sDeskSub = document.getElementById('stat-desktop-disk-sub');
           if (sDeskSub) {
             if (disk && Number.isFinite(Number(disk.totalGB)) && Number(disk.totalGB) > 0) {
@@ -3298,10 +3331,12 @@
 
     function fetchClusterStats() {
       const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-      const timeoutId = controller ? setTimeout(() => controller.abort(), 6000) : null;
+      const timeoutId = controller ? setTimeout(() => controller.abort(), 12000) : null;
+      const primaryStatsUrl = `${GATEWAY}/stats`;
+      const lanStatsUrl = 'http://192.168.2.35:8082/stats';
       
       // Primary Route: Query ${GATEWAY}/stats with cache: no-store
-      return fetch(`${GATEWAY}/stats`, controller ? { credentials: 'include', signal: controller.signal, cache: 'no-store' } : { credentials: 'include', cache: 'no-store' })
+      return fetch(primaryStatsUrl, controller ? { credentials: 'include', signal: controller.signal, cache: 'no-store' } : { credentials: 'include', cache: 'no-store' })
         .then(r => {
           if (!r.ok) throw new Error('HTTP ' + r.status);
           return r.json();
@@ -3313,12 +3348,13 @@
         .catch(() => {
           if (timeoutId) clearTimeout(timeoutId);
           if (typeof fetchClimateData === 'function') fetchClimateData();
-          // Failover Method 1: Alternate endpoint or direct LAN
+          // Failover Method 1: Alternate endpoint or direct LAN (avoid repeating identical LAN URL)
           const isHttps = typeof window !== 'undefined' && window.location && window.location.protocol === 'https:';
-          const altStatsUrl = isHttps ? `${GATEWAY}/status?target=all` : `http://192.168.2.35:8082/stats`;
-          const altOpts = isHttps
-            ? { credentials: 'include', cache: 'no-store', signal: _fetchSig(5000) }
-            : { cache: 'no-store', signal: _fetchSig(5000) };
+          const useStatusFallback = isHttps || primaryStatsUrl === lanStatsUrl;
+          const altStatsUrl = useStatusFallback ? `${GATEWAY}/status?target=all` : lanStatsUrl;
+          const altOpts = useStatusFallback
+            ? { credentials: 'include', cache: 'no-store', signal: _fetchSig(6000) }
+            : { cache: 'no-store', signal: _fetchSig(8000) };
           return fetch(altStatsUrl, altOpts)
             .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(altData => {
@@ -7148,6 +7184,9 @@
             setOfflineText('feeder-nuc-hopper-sub', '(Telemetry Offline)');
             setOfflineText('feeder-card-kibble', 'Telemetry Offline');
             setOfflineText('feeder-last-time', 'Offline');
+            setOfflineText('feeder-iot-last-time', 'Offline');
+            const warnEl = document.getElementById('feeder-low-warning');
+            if (warnEl) warnEl.style.display = 'none';
             const stagFeeder = document.getElementById('stag-feeder');
             if (stagFeeder) {
               stagFeeder.className = 'item-tag offline';
@@ -7208,7 +7247,7 @@
             throw new Error((data && data.message) || 'Gateway rejected request');
           }
           if (data.feeder) {
-            try { localStorage.setItem('dr_feeder_cache', JSON.stringify(data.feeder)); } catch (e) {}
+            try { localStorage.setItem('dr_feeder_cache', JSON.stringify({ ts: Date.now(), feeder: data.feeder })); } catch (e) {}
             updateFeederUI(data.feeder);
           }
           showToast('success', "Hopper Refilled", "Kibble hopper reset to 100% (1,500g / ~18.7 days).");
@@ -7253,6 +7292,7 @@
             }
             showToast('success', "Penny's Smart Feeder Actuated", `192.168.2.22 dispensed ${portionLabel}. Optical Watchdog: Kibble verified.`);
             if (data.feeder) {
+              try { localStorage.setItem('dr_feeder_cache', JSON.stringify({ ts: Date.now(), feeder: data.feeder })); } catch (e) {}
               updateFeederUI(data.feeder);
             } else {
               fetchFeederStatus();
