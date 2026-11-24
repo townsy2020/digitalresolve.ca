@@ -164,16 +164,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.90';
+          const activeVer = match ? match[0] : 'v2.8.91';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 20321;
+      const baseHtmlLines = 20417;
       const baseCssLines = 7320;
-      const baseJsLines = 8618;
+      const baseJsLines = 8651;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -1737,7 +1737,8 @@
         selectSchematicNode('cf', true);
       }
       fetchAgySessionInfo();
-      if (typeof fetchFeederStatus === 'function' && (document.getElementById('feeder-hopper-pct') || document.getElementById('feeder-card-kibble') || document.getElementById('stag-feeder') || document.getElementById('feeder-nuc-hopper-pct') || document.querySelector('.feeder-live-status-badge') || document.querySelector('.feeder-nav-status-badge'))) {
+      const hasFeederDom = () => Boolean(document.getElementById('feeder-hopper-pct') || document.getElementById('feeder-card-kibble') || document.getElementById('stag-feeder') || document.getElementById('feeder-nuc-hopper-pct') || document.querySelector('.feeder-live-status-badge') || document.querySelector('.feeder-nav-status-badge'));
+      if (typeof fetchFeederStatus === 'function' && hasFeederDom()) {
         fetchFeederStatus();
       }
 
@@ -1885,6 +1886,9 @@
         fetchServicesHealth();
         setInterval(() => { if (!document.hidden) fetchServicesHealth(); }, 15000);
       }
+      if (hasFeederDom() && typeof fetchFeederStatus === 'function') {
+        setInterval(() => { if (!document.hidden) fetchFeederStatus(); }, 30000);
+      }
 
       document.addEventListener('visibilitychange', () => {
         if (!document.hidden) {
@@ -1892,6 +1896,7 @@
           if (hasClimateDom() && typeof fetchClimateData === 'function') fetchClimateData();
           if (hasIspDom()) fetchISPHistory();
           if (hasServicesDom()) fetchServicesHealth();
+          if (hasFeederDom() && typeof fetchFeederStatus === 'function') fetchFeederStatus();
           if (hasTermDom() && currentLogTab && isSSOAuthenticated()) loadLog(currentLogTab);
         }
       });
@@ -2554,10 +2559,11 @@
         if (data.status === 'success') {
           const newCid = data.conversationId;
           const newName = data.sessionName || ('session-' + data.shortId);
+          const resolvedHost = data.hostNode || data.target || target || null;
           window.AGY_SESSION_ID = newCid;
           window.AGY_SESSION_NAME = newName;
-          window.AGY_SESSION_HOST = data.hostNode || null;
-          updateAgySessionDisplay(newCid, newName, data.hostNode || null);
+          window.AGY_SESSION_HOST = resolvedHost;
+          updateAgySessionDisplay(newCid, newName, resolvedHost);
 
           if (screen) {
             const activeLine = document.createElement('div');
@@ -4328,7 +4334,7 @@
     }
     window.deactivateMaintenanceMode = deactivateMaintenanceMode;
 
-    function updateMaintenanceVisualStates() {
+    function updateMaintenanceVisualStates(skipUptimeRender = false) {
       const active = isNucMaintenanceActive();
       const data = getNucMaintenanceData();
 
@@ -4374,7 +4380,7 @@
       }
 
       // 5. Re-render Uptime Matrix
-      if (typeof hasUptimeDom === 'function' && hasUptimeDom() && window._uptimeInitialized) {
+      if (!skipUptimeRender && typeof hasUptimeDom === 'function' && hasUptimeDom() && window._uptimeInitialized) {
         try { renderUptimeMatrix(); } catch(e) {}
       }
     }
@@ -4655,6 +4661,25 @@
         const handleUptimePayload = (data) => {
           if (data && data.status === 'success') {
             try { localStorage.setItem('dr_uptime_cache', JSON.stringify(data)); } catch (e) {}
+            if (data.maintenance && typeof data.maintenance === 'object') {
+              try {
+                if (data.maintenance.active === true) {
+                  const expMs = data.maintenance.expiresAt ? Date.parse(data.maintenance.expiresAt) : NaN;
+                  localStorage.setItem('dr_nuc_maintenance', JSON.stringify({
+                    active: true,
+                    reason: data.maintenance.reason || 'Scheduled Maintenance',
+                    expiresAt: Number.isFinite(expMs) ? expMs : null
+                  }));
+                } else if (data.maintenance.active === false) {
+                  localStorage.removeItem('dr_nuc_maintenance');
+                }
+              } catch (e) {}
+              try { updateMaintenanceVisualStates(true); } catch (e) {}
+              const nucScaleEl = document.getElementById('uptime-nuc-scale-today');
+              if (nucScaleEl) {
+                nucScaleEl.textContent = isNucMaintenanceActive() ? 'Today (Scheduled Maintenance)' : (window.NUC_IS_ONLINE === false ? 'Today (Offline)' : 'Today (Operational)');
+              }
+            }
             applyUptimeHistoryToBars(data.dailyHistory || window.UPTIME_DAILY_HISTORY || {}, data.incidents || []);
             applyUptimeMetrics(data);
           }
@@ -5075,6 +5100,8 @@
         })
         .catch(err => {
           if (timeoutId) clearTimeout(timeoutId);
+          window.LAST_SERVICES_HEALTH = null;
+          window._hasLiveServicesHealth = false;
           document.querySelectorAll('#dash-global-status').forEach(dashGlobal => {
             dashGlobal.textContent = 'Telemetry Unavailable';
             dashGlobal.className = 'item-tag offline';
@@ -7220,14 +7247,16 @@
       return null;
     }
 
+    let _feederFetchInFlight = null;
     function fetchFeederStatus() {
+      if (_feederFetchInFlight) return _feederFetchInFlight;
       if (!_feederWarmHydrated) {
         _feederWarmHydrated = true;
         const warmFeeder = _readValidFeederCache();
         if (warmFeeder) updateFeederUI(warmFeeder);
       }
       const ctrl = (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(4000) : undefined;
-      return fetch(`${GATEWAY}/api/feeder/status`, { credentials: 'include', signal: ctrl })
+      _feederFetchInFlight = fetch(`${GATEWAY}/api/feeder/status`, { credentials: 'include', signal: ctrl })
         .then(r => r.ok ? r.json() : null)
         .then(data => {
           if (data && data.status === 'success' && data.feeder) {
@@ -7307,7 +7336,11 @@
               applyCachedOrOffline();
               return null;
             });
+        })
+        .finally(() => {
+          _feederFetchInFlight = null;
         });
+      return _feederFetchInFlight;
     }
     window.fetchFeederStatus = fetchFeederStatus;
 

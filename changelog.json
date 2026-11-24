@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-24T23:27:28Z",
-    "currentVersion":  "v2.8.90",
+    "updatedAt":  "2026-11-24T23:52:01Z",
+    "currentVersion":  "v2.8.91",
     "releases":  [
+                     {
+                         "version":  "v2.8.91",
+                         "date":  "November 24, 2026",
+                         "title":  "Live State Sync, Feeder Polling \u0026 Session Host Fixes",
+                         "changes":  [
+                                         {
+                                             "label":  "Live Sync \u0026 Offline Accuracy",
+                                             "text":  "Cleared stale services health cache on error and synced server-authoritative NUC maintenance state from /uptime."
+                                         },
+                                         {
+                                             "label":  "Feeder Polling \u0026 AGY Host",
+                                             "text":  "Added 30s + visibilitychange feeder telemetry polling and fixed /api/agy/launch target host resolution."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.90",
                          "date":  "November 24, 2026",
