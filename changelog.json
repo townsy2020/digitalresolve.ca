@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-24T14:35:02Z",
-    "currentVersion":  "v2.8.88",
+    "updatedAt":  "2026-11-24T15:07:42Z",
+    "currentVersion":  "v2.8.89",
     "releases":  [
+                     {
+                         "version":  "v2.8.89",
+                         "date":  "November 24, 2026",
+                         "title":  "Round 4 Zero-Bug Convergence: Mixed Hashtable/Object Event Sorting, Standby Disk Hydration \u0026 Daemon Memory Parity",
+                         "changes":  [
+                                         {
+                                             "label":  "Cross-Node Storage Event Sorting \u0026 Zero-Byte Filtering",
+                                             "text":  "Fixed PowerShell 5.1 mixed hashtable vs PSCustomObject Sort-Object ordering in /api/storage-flow so today\u0027s NUC transfer events sort chronologically alongside Desktop events, and stripped free-space/zero-byte suffixes from Parse-StorageLogEvents."
+                                         },
+                                         {
+                                             "label":  "Standby Desktop Disk Preservation \u0026 Schematic Filter Polish",
+                                             "text":  "Preserved cached 6.52 TB Desktop disk telemetry across offline polls and standby widgets, added media category membership to nuc-c on storage.html with dimmed-card selection/endpoint guards, and dynamically formatted low-hopper vs empty-hopper feeder alerts."
+                                         },
+                                         {
+                                             "label":  "Full Persistent Daemon Memory Parity",
+                                             "text":  "Flushed Audiobookshelf RAMDisk state and refreshed NUC StreamHub and Audiobookshelf wrapper processes so 100% of Desktop and NUC persistent daemons match on-disk scripts, enforced in test-homelab.ps1."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.88",
                          "date":  "November 24, 2026",

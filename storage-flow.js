@@ -544,6 +544,11 @@
       const cats = (card.getAttribute('data-category') || '').split(',');
       const visible = state.filter === 'all' || cats.some(c => matchesFilter(c, state.filter));
       card.classList.toggle('is-dimmed', !visible);
+      if (!visible) {
+        card.classList.remove('is-selected', 'is-route-endpoint');
+      } else if (state.selectedType === 'node') {
+        card.classList.toggle('is-selected', card.getAttribute('data-node-id') === state.selectedId);
+      }
     });
   }
 
@@ -601,7 +606,9 @@
 
     document.querySelectorAll('.storage-node-card').forEach(card => {
       const nid = card.getAttribute('data-node-id');
-      const isEp = Boolean(!isMobileLayout && activeCfg && (nid === activeCfg.from || nid === activeCfg.to) && nid !== selectedNodeId);
+      const isDimmed = card.classList.contains('is-dimmed');
+      if (isDimmed) card.classList.remove('is-selected');
+      const isEp = Boolean(!isMobileLayout && !isDimmed && activeCfg && (nid === activeCfg.from || nid === activeCfg.to) && nid !== selectedNodeId);
       card.classList.toggle('is-route-endpoint', isEp);
     });
 

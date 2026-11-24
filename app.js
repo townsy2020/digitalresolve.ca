@@ -164,16 +164,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.88';
+          const activeVer = match ? match[0] : 'v2.8.89';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 20121;
+      const baseHtmlLines = 20225;
       const baseCssLines = 7320;
-      const baseJsLines = 8535;
+      const baseJsLines = 8577;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -519,7 +519,7 @@
             updateStatusUI(target, true, data.latencyMs, data.disk, data.torrent, data.vitals);
           } else {
             showToast('error', `${dev.name} is Offline`, `No ping response from ${ip}`, 5000);
-            updateStatusUI(target, false);
+            updateStatusUI(target, false, null, data && data.disk);
           }
         })
         .catch(() => {
@@ -1157,6 +1157,10 @@
         }
       }
 
+      if (target === 'desktop' && disk) {
+        window.LAST_DESKTOP_DISK = disk;
+      }
+
       if (isOnline) {
         try {
           const raw = localStorage.getItem('dr_telemetry_cache');
@@ -1175,6 +1179,11 @@
           const raw = localStorage.getItem('dr_telemetry_cache');
           const cache = raw ? JSON.parse(raw) : {};
           const prevTarget = (cache && cache[target]) || {};
+          if (target === 'desktop' && !disk) {
+            disk = window.LAST_DESKTOP_DISK || prevTarget.disk || null;
+          } else if (target === 'nuc' && !disk) {
+            disk = window.LAST_NUC_DISK || prevTarget.disk || null;
+          }
           cache[target] = {
             online: false,
             latencyMs: null,
@@ -1584,23 +1593,41 @@
           const sDeskRam = document.getElementById('stat-desktop-ram-sub');
           if (sDeskCpu) sDeskCpu.innerHTML = `--% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>`;
           if (sDeskRam) sDeskRam.textContent = 'Memory: Standby / Sleep';
+          const fStorage = document.getElementById('fleet-storage-desktop');
+          const fBar = document.getElementById('fleet-bar-desktop');
+          const dTag = document.getElementById('desktop-disk-tag');
+          const dVal = document.getElementById('desktop-disk-val');
+          const dBar = document.getElementById('desktop-disk-bar');
+          const dSub = document.getElementById('desktop-disk-sub');
+          const rDeskStorage = document.getElementById('ribbon-desktop-storage');
           const sDeskFree = document.getElementById('stat-desktop-disk-free');
-          if (sDeskFree) {
-            if (disk && Number.isFinite(Number(disk.freeGB)) && Number(disk.freeGB) > 0) {
-              sDeskFree.innerHTML = `${Math.round(Number(disk.freeGB)).toLocaleString()} GB <span style="font-size: 0.9rem; color: #8b949e;">Free (Standby)</span>`;
-            } else {
-              sDeskFree.innerHTML = `-- <span style="font-size: 0.9rem; color: #8b949e;">Standby</span>`;
-            }
-          }
           const sDeskSub = document.getElementById('stat-desktop-disk-sub');
-          if (sDeskSub) {
-            if (disk && Number.isFinite(Number(disk.totalGB)) && Number(disk.totalGB) > 0) {
-              const totFmt = Math.round(Number(disk.totalGB)).toLocaleString();
-              const pctTxt = (disk.usedPercent !== undefined && disk.usedPercent !== null) ? `${disk.usedPercent}% Used` : 'Standby';
-              sDeskSub.innerHTML = `<span>Total ${totFmt} GB (${pctTxt} &bull; Standby)</span>`;
-            } else {
-              sDeskSub.innerHTML = '<span>Storage Standby &bull; Sleep Mode</span>';
-            }
+          if (disk && Number.isFinite(Number(disk.totalGB)) && Number(disk.totalGB) > 0) {
+            const totalGB = safeNum(disk.totalGB, 0);
+            const usedPercent = safeNum(disk.usedPercent, 0);
+            const usedGB = safeNum(disk.usedGB, 0);
+            const freeGB = safeNum(disk.freeGB, 0);
+            const freePct = Math.round(100 - usedPercent);
+            const totFmt = Math.round(totalGB).toLocaleString();
+            if (sDeskFree) sDeskFree.innerHTML = `${Math.round(freeGB).toLocaleString()} GB <span style="font-size: 0.9rem; color: #8b949e;">Free (Standby)</span>`;
+            if (sDeskSub) sDeskSub.innerHTML = `<span>Total ${totFmt} GB (${usedPercent}% Used &bull; Standby)</span>`;
+            if (fStorage) fStorage.textContent = `${freeGB.toLocaleString()} GB Free (${freePct}% free \u2022 Standby)`;
+            if (fBar) fBar.style.width = `${usedPercent}%`;
+            if (dTag) dTag.textContent = 'Standby';
+            if (dVal) dVal.textContent = `${freeGB.toLocaleString()} GB (Standby)`;
+            if (dBar) dBar.style.width = `${usedPercent}%`;
+            if (dSub) dSub.textContent = `${usedGB} GB used of ${totalGB.toLocaleString()} GB (Standby)`;
+            if (rDeskStorage) rDeskStorage.textContent = `${(freeGB / 1000).toFixed(2)} TB Free (Standby)`;
+          } else {
+            if (sDeskFree) sDeskFree.innerHTML = `-- <span style="font-size: 0.9rem; color: #8b949e;">Standby</span>`;
+            if (sDeskSub) sDeskSub.innerHTML = '<span>Storage Standby &bull; Sleep Mode</span>';
+            if (fStorage) fStorage.textContent = 'Standby \u2022 Sleep Mode';
+            if (fBar) fBar.style.width = '0%';
+            if (dTag) dTag.textContent = 'Standby';
+            if (dVal) dVal.textContent = 'Standby';
+            if (dBar) dBar.style.width = '0%';
+            if (dSub) dSub.textContent = 'Storage Standby \u2022 Sleep Mode';
+            if (rDeskStorage) rDeskStorage.textContent = 'Standby';
           }
         }
       }
@@ -1716,7 +1743,7 @@
           if (d && d.online !== false) {
             updateStatusUI('nuc', true, d.latencyMs, d.disk, d.torrent, d.vitals);
           } else {
-            updateStatusUI('nuc', false);
+            updateStatusUI('nuc', false, null, d && d.disk);
           }
         })
         .catch(() => {
@@ -1728,7 +1755,7 @@
           if (d && d.online !== false) {
             updateStatusUI('desktop', true, d.latencyMs, d.disk, d.torrent, d.vitals);
           } else {
-            updateStatusUI('desktop', false);
+            updateStatusUI('desktop', false, null, d && d.disk);
           }
         })
         .catch(() => {
@@ -7013,7 +7040,15 @@
         }
       }
       if (warnEl) {
-        warnEl.style.display = (pct !== null && pct <= 20) ? 'flex' : 'none';
+        if (pct !== null && pct <= 20) {
+          warnEl.style.display = 'flex';
+          const warnBody = pct === 0
+            ? 'Feeder Empty Warning: Refill Hopper Immediately (0g Remaining)'
+            : `Low Hopper Warning: Refill Soon (${remText} / ${pct}% Remaining)`;
+          warnEl.innerHTML = `<span class="badge-alert">[ALERT]</span> ${escapeHtml(warnBody)}`;
+        } else {
+          warnEl.style.display = 'none';
+        }
       }
       if (watchEl) {
         watchEl.textContent = pct === 0 ? "Alert - Empty Hopper Detected" : (state.opticalWatchdog || "Unknown");
