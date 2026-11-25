@@ -79,6 +79,7 @@
     window.scrollToSection = scrollToSection;
 
     const safeNum = (v, fb = 0) => (v !== null && v !== undefined && v !== '' && Number.isFinite(Number(v))) ? Number(v) : fb;
+    const clampPct = (v, fb = 0) => { const n = safeNum(v, null); return n !== null ? Math.max(0, Math.min(100, n)) : fb; };
 
     // Universal Safe Metric Formatter & Null-to-Check Architecture
     function safeMetric(val, unit = '', target = 'nuc') {
@@ -165,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.16';
+          const activeVer = match ? match[0] : 'v2.9.17';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 22952;
+      const baseHtmlLines = 23048;
       const baseCssLines = 7566;
-      const baseJsLines = 9185;
+      const baseJsLines = 9191;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -935,7 +936,7 @@
               statusSpan.textContent = computedPct !== null ? `${free} GB Free (${computedPct}% Used)` : `${free} GB Free`;
             }
             if (fillBar) {
-              fillBar.style.width = computedPct !== null ? `${computedPct}%` : '0%';
+              fillBar.style.width = computedPct !== null ? `${clampPct(computedPct)}%` : '0%';
             }
             if (subText) {
               subText.textContent = totalG !== null
@@ -1260,7 +1261,7 @@
         // Update NUC Storage Segments Bar (media.html & index.html)
         const nSegWrap = document.querySelector('.node-deck-card.nuc-deck .storage-segments-bar');
         if (nSegWrap && disk) {
-          const freePct = nPct !== null ? Math.max(0, 100 - nPct).toFixed(1) : '26.6';
+          const freePct = nPct !== null ? clampPct(100 - nPct).toFixed(1) : '26.6';
           const segFree = nSegWrap.querySelector('.seg-free');
           if (segFree) {
             segFree.style.width = `${freePct}%`;
@@ -1268,7 +1269,7 @@
           }
         }
         if (diskBar && nPct !== null) {
-          diskBar.style.width = `${nPct}%`;
+          diskBar.style.width = `${clampPct(nPct)}%`;
           if (nPct > 85) {
             diskBar.classList.add('warning');
           } else {
@@ -1339,7 +1340,7 @@
           const fStorage = document.getElementById('fleet-storage-nuc');
           const fBar = document.getElementById('fleet-bar-nuc');
           if (fStorage) fStorage.textContent = nFree !== null ? `${nFree} GB Free (${nPct !== null ? nPct + '%' : '--'})` : '--';
-          if (fBar && nPct !== null) fBar.style.width = `${nPct}%`;
+          if (fBar && nPct !== null) fBar.style.width = `${clampPct(nPct)}%`;
           const nFreeEl = document.getElementById('stat-nuc-free-legend');
           if (nFreeEl && nFree !== null) {
             nFreeEl.innerHTML = `<span class="legend-dot seg-free"></span> Free (${Math.round(nFree)} GB)`;
@@ -1524,10 +1525,10 @@
             const total = (disk.totalGB !== undefined && disk.totalGB !== null && Number(disk.totalGB) > 0) ? Number(disk.totalGB) : computedTotal;
             const safeTot = (Number.isFinite(Number(total)) && Number(total) > 0) ? Number(total) : 1;
 
-            const cUsedPct = ((nvmeUsed / safeTot) * 100).toFixed(1);
-            const cFreePct = ((nvmeFree / safeTot) * 100).toFixed(1);
-            const dUsedPct = ((dUsed / safeTot) * 100).toFixed(1);
-            const dFreePct = ((dFree / safeTot) * 100).toFixed(1);
+            const cUsedPct = clampPct((nvmeUsed / safeTot) * 100).toFixed(1);
+            const cFreePct = clampPct((nvmeFree / safeTot) * 100).toFixed(1);
+            const dUsedPct = clampPct((dUsed / safeTot) * 100).toFixed(1);
+            const dFreePct = clampPct((dFree / safeTot) * 100).toFixed(1);
 
             const nvmeLbl = hasF ? 'NVMe (C:+F:)' : 'C: NVMe';
             segs[0].style.width = `${cUsedPct}%`;
@@ -1600,8 +1601,9 @@
 
             const fStorage = document.getElementById('fleet-storage-desktop');
             const fBar = document.getElementById('fleet-bar-desktop');
-            const freePct = Math.round(100 - usedPercent); if (fStorage) fStorage.innerHTML = `${freeGB.toLocaleString()} GB Free (${freePct}% free) &bull; C: ${cFree}G | D: ${dFree}T${fPipe}`;
-            if (fBar) fBar.style.width = `${usedPercent}%`;
+            const clampedUsedPct = clampPct(usedPercent);
+            const freePct = Math.round(clampPct(100 - clampedUsedPct)); if (fStorage) fStorage.innerHTML = `${freeGB.toLocaleString()} GB Free (${freePct}% free) &bull; C: ${cFree}G | D: ${dFree}T${fPipe}`;
+            if (fBar) fBar.style.width = `${clampedUsedPct}%`;
             
             const dTag = document.getElementById('desktop-disk-tag');
             const dVal = document.getElementById('desktop-disk-val');
@@ -1609,7 +1611,7 @@
             const dSub = document.getElementById('desktop-disk-sub');
             if (dTag) dTag.innerHTML = `C: ${cFree}G &bull; D: ${dFree}T${fBull}`;
             if (dVal) dVal.textContent = `${freeGB.toLocaleString()} GB Free`;
-            if (dBar) dBar.style.width = `${usedPercent}%`;
+            if (dBar) dBar.style.width = `${clampedUsedPct}%`;
             if (dSub) dSub.innerHTML = `${usedGB} GB used of ${totalGB.toLocaleString()} GB (${usedPercent}% used &bull; ${freePct}% free) &bull; C: ${cFree}G | D: ${dFree}T${fPipe}`;
             
             const sDeskFree = document.getElementById('stat-desktop-disk-free');
@@ -1664,15 +1666,16 @@
             const usedPercent = safeNum(disk.usedPercent, 0);
             const usedGB = safeNum(disk.usedGB, 0);
             const freeGB = safeNum(disk.freeGB, 0);
-            const freePct = Math.round(100 - usedPercent);
+            const clampedUsedPct = clampPct(usedPercent);
+            const freePct = Math.round(clampPct(100 - clampedUsedPct));
             const totFmt = Math.round(totalGB).toLocaleString();
             if (sDeskFree) sDeskFree.innerHTML = `${Math.round(freeGB).toLocaleString()} GB <span style="font-size: 0.9rem; color: #8b949e;">Free (Standby)</span>`;
             if (sDeskSub) sDeskSub.innerHTML = `<span>Total ${totFmt} GB (${usedPercent}% Used &bull; Standby)</span>`;
             if (fStorage) fStorage.textContent = `${freeGB.toLocaleString()} GB Free (${freePct}% free \u2022 Standby)`;
-            if (fBar) fBar.style.width = `${usedPercent}%`;
+            if (fBar) fBar.style.width = `${clampedUsedPct}%`;
             if (dTag) dTag.textContent = 'Standby';
             if (dVal) dVal.textContent = `${freeGB.toLocaleString()} GB (Standby)`;
-            if (dBar) dBar.style.width = `${usedPercent}%`;
+            if (dBar) dBar.style.width = `${clampedUsedPct}%`;
             if (dSub) dSub.textContent = `${usedGB} GB used of ${totalGB.toLocaleString()} GB (Standby)`;
             if (rDeskStorage) rDeskStorage.textContent = `${(freeGB / 1000).toFixed(2)} TB Free (Standby)`;
           } else {
@@ -3071,13 +3074,13 @@
 
       // Decouple model bars: wire model breakdown bars explicitly to breakdown percentages
       document.querySelectorAll('.model-bar-flash, #model-bar-flash, [data-model="flash"]').forEach(el => {
-        el.style.width = `${flashPct}%`;
+        el.style.width = `${clampPct(flashPct)}%`;
       });
       document.querySelectorAll('.model-bar-pro, #model-bar-pro, [data-model="pro"]').forEach(el => {
-        el.style.width = `${proPct}%`;
+        el.style.width = `${clampPct(proPct)}%`;
       });
       document.querySelectorAll('.model-bar-cache, #model-bar-cache, [data-model="cache"]').forEach(el => {
-        el.style.width = `${cachePct}%`;
+        el.style.width = `${clampPct(cachePct)}%`;
       });
 
       document.querySelectorAll('#menu-claude-pct').forEach(el => {
@@ -3348,17 +3351,17 @@
           }
         }
 
-        if (nuc.storage && nuc.storage.totalGB) {
+        if (nuc.storage && Number(nuc.storage.totalGB) > 0) {
           const st = nuc.storage;
           const stTot = safeNum(st.totalGB, 1);
           const stMov = safeNum(st.moviesGB, 0);
           const stTv = safeNum(st.tvSeriesGB, 0);
           const stMix = safeNum(st.mixesGB, 0);
           const stFree = safeNum(st.freeGB, 0);
-          const moviesPct = ((stMov / stTot) * 100).toFixed(1);
-          const tvPct = ((stTv / stTot) * 100).toFixed(1);
-          const mixesPct = ((stMix / stTot) * 100).toFixed(1);
-          const freePct = ((stFree / stTot) * 100).toFixed(1);
+          const moviesPct = clampPct((stMov / stTot) * 100).toFixed(1);
+          const tvPct = clampPct((stTv / stTot) * 100).toFixed(1);
+          const mixesPct = clampPct((stMix / stTot) * 100).toFixed(1);
+          const freePct = clampPct((stFree / stTot) * 100).toFixed(1);
 
           document.querySelectorAll('.storage-segments-bar .seg-movies').forEach(el => {
             el.style.width = `${moviesPct}%`;
@@ -3446,8 +3449,8 @@
       const rawTempF = safeNum(climate.tempF, null);
       const rawTempC = safeNum(climate.tempC, null);
       const rawHum = safeNum(climate.humidity, null);
-      const tempF = rawTempF !== null ? rawTempF.toFixed(1) : null;
-      const tempC = rawTempC !== null ? rawTempC.toFixed(1) : null;
+      const tempF = rawTempF !== null ? (Math.abs(rawTempF) < 0.05 ? 0 : rawTempF).toFixed(1) : null;
+      const tempC = rawTempC !== null ? (Math.abs(rawTempC) < 0.05 ? 0 : rawTempC).toFixed(1) : null;
       const hum = rawHum !== null ? Math.round(rawHum) : null;
       const isOnline = climate.online !== false;
       const rawState = (climate.state !== undefined && climate.state !== null && String(climate.state).trim() !== '') ? String(climate.state).trim() : '';
@@ -7045,8 +7048,8 @@
       }
       const edgeBar = document.getElementById('edge-cache-bar');
       if (edgeBar) {
-        const hrStr = isZoneScope ? String(cur.hitRatio).trim() : '0%';
-        edgeBar.style.width = hrStr.includes('%') ? hrStr : `${hrStr}%`;
+        const hrNum = isZoneScope ? clampPct(parseFloat(String(cur.hitRatio)), 0) : 0;
+        edgeBar.style.width = `${hrNum}%`;
       }
 
       const edgeThreats = document.getElementById('edge-threats-val');
@@ -7473,12 +7476,13 @@
 
       if (pctEl) pctEl.textContent = pct !== null ? `${pct}%` : '--';
       if (subEl) subEl.textContent = pct === null ? "(Awaiting telemetry)" : (pct === 0 ? "(0g - EMPTY - Refill Needed)" : `(${remText} - ${daysText})`);
+      const barPct = pct !== null ? clampPct(pct) : 0;
       if (barEl) {
         if (pct === null) {
           barEl.style.width = '0%';
           barEl.style.background = 'linear-gradient(90deg, #475569, #64748b)';
         } else {
-          barEl.style.width = `${pct}%`;
+          barEl.style.width = `${barPct}%`;
           if (pct <= 15) {
             barEl.style.background = 'linear-gradient(90deg, #ef4444, #f87171)';
           } else if (pct <= 30) {
@@ -7517,7 +7521,7 @@
       if (nucPctEl) nucPctEl.textContent = pct !== null ? `${pct}%` : '--';
       if (nucSubEl) nucSubEl.textContent = pct === null ? "(Awaiting telemetry)" : (pct === 0 ? "(0g - EMPTY - Refill Needed)" : `(${remText} - ${daysText})`);
       if (nucBarEl) {
-        nucBarEl.style.width = pct !== null ? `${pct}%` : '0%';
+        nucBarEl.style.width = pct !== null ? `${barPct}%` : '0%';
         nucBarEl.style.background = pct === null ? 'linear-gradient(90deg, #475569, #64748b)' : (pct <= 15 ? 'linear-gradient(90deg, #ef4444, #f87171)' : (pct <= 30 ? 'linear-gradient(90deg, #f59e0b, #fbbf24)' : 'linear-gradient(90deg, #ec4899, #f472b6)'));
       }
       if (nucWatchEl) {

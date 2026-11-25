@@ -218,11 +218,13 @@
   }
 
   function escapeHtml(str) {
-    return String(str || '')
+    if (str === null || str === undefined) return '';
+    return String(str)
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   async function fetchStorageFlow() {
@@ -407,22 +409,22 @@
   function renderKPIs(data) {
     const t = data.tiers || {};
     const totalGB =
-      safeNum(t.desktop_hot && t.desktop_hot.totalGB) +
-      safeNum(t.nuc_hot && t.nuc_hot.totalGB) +
-      safeNum(t.qnap_smb && t.qnap_smb.totalGB) +
-      safeNum(t.qnap_iscsi_nuc && t.qnap_iscsi_nuc.totalGB) +
-      safeNum(t.qnap_iscsi_desktop && t.qnap_iscsi_desktop.totalGB);
+      Math.max(0, safeNum(t.desktop_hot && t.desktop_hot.totalGB)) +
+      Math.max(0, safeNum(t.nuc_hot && t.nuc_hot.totalGB)) +
+      Math.max(0, safeNum(t.qnap_smb && t.qnap_smb.totalGB)) +
+      Math.max(0, safeNum(t.qnap_iscsi_nuc && t.qnap_iscsi_nuc.totalGB)) +
+      Math.max(0, safeNum(t.qnap_iscsi_desktop && t.qnap_iscsi_desktop.totalGB));
 
     setText('kpi-total-capacity', totalGB > 0 ? fmtGB(totalGB) : '--');
     setText('kpi-total-capacity-sub', 'Desktop + NUC + QNAP SMB & Dual iSCSI (+ Offsite Cloud)');
 
     const qOnline = Boolean(data.qnapOnline);
-    const lat = safeNum(data.qnapLatencyMs, 0);
+    const lat = Math.max(0, safeNum(data.qnapLatencyMs, 0));
     setText('kpi-qnap-link', qOnline ? `Online (${lat.toFixed(1)} ms)` : 'Standby');
     setText('kpi-qnap-sub', `SMB :445 ${data.qnapSmbOnline ? 'OK' : 'Offline'} • iSCSI :3260 ${data.qnapIscsiOnline ? 'OK' : 'Offline'}`);
 
     const lf = data.liveFlow || {};
-    const totalFlow = safeNum(lf.totalFlowMBps, 0);
+    const totalFlow = Math.max(0, safeNum(lf.totalFlowMBps, 0));
     const pipelines = Array.isArray(data && data.pipelines) ? data.pipelines.filter(p => p && typeof p === 'object') : [];
     const bestRate = pipelines.reduce((m, p) => Math.max(m, safeNum(p.rateMBps, 0)), 0);
     const displayRate = totalFlow > 0 ? totalFlow : bestRate;
@@ -800,44 +802,44 @@
     const rows = [
       {
         label: 'QNAP SMB Cold Archive (Q:)',
-        used: safeNum(t.qnap_smb && t.qnap_smb.usedGB),
-        total: safeNum(t.qnap_smb && t.qnap_smb.totalGB, 0),
+        used: Math.max(0, safeNum(t.qnap_smb && t.qnap_smb.usedGB)),
+        total: Math.max(0, safeNum(t.qnap_smb && t.qnap_smb.totalGB, 0)),
         color: '#10b981'
       },
       {
         label: 'Desktop NVMe (C:/F:) + 6 TB HDD (D:)',
-        used: safeNum(t.desktop_hot && t.desktop_hot.usedGB),
-        total: safeNum(t.desktop_hot && t.desktop_hot.totalGB, 0),
+        used: Math.max(0, safeNum(t.desktop_hot && t.desktop_hot.usedGB)),
+        total: Math.max(0, safeNum(t.desktop_hot && t.desktop_hot.totalGB, 0)),
         color: '#3b82f6'
       },
       {
         label: 'NUC C: 1 TB NVMe SSD (OS)',
-        used: nucCUsed,
-        total: nucCTotal,
+        used: Math.max(0, nucCUsed),
+        total: Math.max(0, nucCTotal),
         color: '#ec4899'
       },
       {
         label: 'NUC D: 2 TB SATA Hybrid HDD (30% Marker)',
-        used: safeNum(nucHot.dDriveUsedGB, Math.max(0, nucDTotal - nucDFree)),
-        total: nucDTotal,
+        used: Math.max(0, safeNum(nucHot.dDriveUsedGB, Math.max(0, nucDTotal - nucDFree))),
+        total: Math.max(0, nucDTotal),
         color: '#a855f7',
         marker70: true
       },
       {
         label: 'NUC iSCSI LUN (E:)',
-        used: safeNum(t.qnap_iscsi_nuc && t.qnap_iscsi_nuc.usedGB),
-        total: safeNum(t.qnap_iscsi_nuc && t.qnap_iscsi_nuc.totalGB, 0),
+        used: Math.max(0, safeNum(t.qnap_iscsi_nuc && t.qnap_iscsi_nuc.usedGB)),
+        total: Math.max(0, safeNum(t.qnap_iscsi_nuc && t.qnap_iscsi_nuc.totalGB, 0)),
         color: '#38bdf8'
       },
       {
         label: 'Desktop iSCSI LUN (E:)',
-        used: safeNum(t.qnap_iscsi_desktop && t.qnap_iscsi_desktop.usedGB),
-        total: safeNum(t.qnap_iscsi_desktop && t.qnap_iscsi_desktop.totalGB, 0),
+        used: Math.max(0, safeNum(t.qnap_iscsi_desktop && t.qnap_iscsi_desktop.usedGB)),
+        total: Math.max(0, safeNum(t.qnap_iscsi_desktop && t.qnap_iscsi_desktop.totalGB, 0)),
         color: '#60a5fa'
       },
       {
         label: 'OneDrive Cloud Vault (Offsite)',
-        used: safeNum(t.cloud_onedrive && t.cloud_onedrive.totalGB),
+        used: Math.max(0, safeNum(t.cloud_onedrive && t.cloud_onedrive.totalGB)),
         total: 0,
         color: '#f59e0b',
         isCloud: true
@@ -1073,7 +1075,7 @@
           <td><strong>${escapeHtml(safeStr(p.name, ev.pipelineId))}</strong></td>
           <td class="mono" style="font-size:0.75rem;">${escapeHtml(safeStr(ev.host, 'NUC'))}</td>
           <td class="mono" style="font-size:0.76rem;">${ev.bytesFormatted ? escapeHtml(ev.bytesFormatted) : '--'}</td>
-          <td class="mono" style="font-size:0.76rem;">${ev.rateMBps != null ? safeNum(ev.rateMBps, 0).toFixed(1) + ' MB/s' : '--'}</td>
+          <td class="mono" style="font-size:0.76rem;">${ev.rateMBps != null ? Math.max(0, safeNum(ev.rateMBps, 0)).toFixed(1) + ' MB/s' : '--'}</td>
           <td><span class="storage-node-tag ${tagCls}">${escapeHtml(safeStr(ev.level, 'INFO').toUpperCase())}</span> <span style="font-size:0.76rem;color:#cbd5e1;margin-left:6px;">${escapeHtml(safeStr(ev.message, ''))}</span></td>
         </tr>`;
     }).join('');

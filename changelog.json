@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-25T13:15:38Z",
-    "currentVersion":  "v2.9.16",
+    "updatedAt":  "2026-11-25T13:48:40Z",
+    "currentVersion":  "v2.9.17",
     "releases":  [
+                     {
+                         "version":  "v2.9.17",
+                         "date":  "November 25, 2026",
+                         "title":  "Progress Bar Clamping, Negative-Zero \u0026 EscapeHardening",
+                         "changes":  [
+                                         {
+                                             "label":  "Progress Bar Clamping",
+                                             "text":  "Added clampPct(0..100) across all storage, disk, token, cache, and feeder bar widths in app.js and storage-flow.js"
+                                         },
+                                         {
+                                             "label":  "Negative-Zero \u0026 Escape Fixes",
+                                             "text":  "Eliminated -0.0 climate/latency/rate formatting glitches and preserved numeric 0 plus single-quote escaping in storage-flow.js escapeHtml()"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.16",
                          "date":  "November 25, 2026",
