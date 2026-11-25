@@ -165,16 +165,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.14';
+          const activeVer = match ? match[0] : 'v2.9.15';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 22752;
+      const baseHtmlLines = 22856;
       const baseCssLines = 7566;
-      const baseJsLines = 9116;
+      const baseJsLines = 9173;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -1768,15 +1768,25 @@
       document.body.style.overflow = '';
       document.documentElement.style.overflow = '';
       initLayoutMode();
-      if (window.location.hash === '#fleet-quick-controls') {
-        setTimeout(() => {
+      const handleRouteHash = () => {
+        const h = window.location.hash;
+        if (h === '#fleet-quick-controls') {
           if (typeof scrollToPowerControls === 'function') scrollToPowerControls();
-        }, 350);
-      } else if (window.location.hash && window.location.hash.startsWith('#pane-')) {
-        const tabKey = window.location.hash.replace('#pane-', '');
-        setTimeout(() => {
+        } else if (h && h.startsWith('#pane-')) {
+          const tabKey = h.slice(6);
+          if (!tabKey) return;
+          const hasLocalTarget = Boolean(document.getElementById(`tab-btn-${tabKey}`) || document.getElementById(`pane-${tabKey}`) || document.getElementById('nuc-services'));
+          const knownPaneKeys = ['speedtest', 'dns', 'books', 'iot', 'kuma', 'ai'];
+          if (!hasLocalTarget && !knownPaneKeys.includes(tabKey)) return;
           if (typeof switchNucTab === 'function') switchNucTab(tabKey);
-        }, 350);
+        }
+      };
+      if (window.location.hash === '#fleet-quick-controls' || (window.location.hash && window.location.hash.startsWith('#pane-'))) {
+        setTimeout(handleRouteHash, 350);
+      }
+      if (!window._drHashChangeBound) {
+        window._drHashChangeBound = true;
+        window.addEventListener('hashchange', handleRouteHash);
       }
       updateTokenCounterUI();
       updateSslCertExpiryUI();
@@ -4054,12 +4064,33 @@
       });
     }
 
+    // Shared modal trigger focus-restoration helpers
+    const _modalTriggerMap = Object.create(null);
+    function _saveModalTrigger(overlayId) {
+      try {
+        const el = document.activeElement;
+        if (el && el !== document.body && el !== document.documentElement && (!el.closest || !el.closest('[role="dialog"][aria-modal="true"]'))) {
+          _modalTriggerMap[overlayId] = el;
+        }
+      } catch (e) {}
+    }
+    function _restoreModalTrigger(overlayId) {
+      try {
+        const el = _modalTriggerMap[overlayId];
+        delete _modalTriggerMap[overlayId];
+        if (el && el.isConnected && typeof el.focus === 'function') {
+          el.focus();
+        }
+      } catch (e) {}
+    }
+
     // Remote Magnet Ingestion Handlers
     function openMagnetModal() {
       if (!isSSOAuthenticated()) {
         openGlobalSSOModal('Remote Torrent Magnet Ingestion', openMagnetModal);
         return;
       }
+      _saveModalTrigger('magnet-modal-overlay');
       const modal = document.getElementById('magnet-modal-overlay');
       if (modal) {
         modal.style.display = 'flex';
@@ -4075,6 +4106,7 @@
         modal.style.display = 'none';
       }
       document.body.style.overflow = '';
+      _restoreModalTrigger('magnet-modal-overlay');
     }
     function closeMagnetModalOnBackdrop(e) {
       if (e.target && e.target.id === 'magnet-modal-overlay') closeMagnetModal();
@@ -4317,6 +4349,7 @@
         openGlobalSSOModal('NUC Maintenance Window Control', openMaintenanceModal);
         return;
       }
+      _saveModalTrigger('maintenance-modal-overlay');
       updateMaintenanceModalUI();
       const modal = document.getElementById('maintenance-modal-overlay');
       if (modal) {
@@ -4339,6 +4372,7 @@
         clearInterval(maintCountdownInterval);
         maintCountdownInterval = null;
       }
+      _restoreModalTrigger('maintenance-modal-overlay');
     }
     window.closeMaintenanceModal = closeMaintenanceModal;
 
@@ -5465,6 +5499,7 @@
         openGlobalSSOModal('Antigravity Autonomous Terminal', () => openEmbeddedConsole(fullscreen));
         return;
       }
+      _saveModalTrigger('agy-console-modal-overlay');
       const modal = document.getElementById('agy-console-modal-overlay');
       const win = document.getElementById('agy-console-window');
       if (modal) {
@@ -5491,6 +5526,7 @@
       }
       document.body.style.overflow = '';
       stopConsoleAutoPoll();
+      _restoreModalTrigger('agy-console-modal-overlay');
     }
 
     function closeAgyConsoleOnBackdrop(event) {
@@ -5755,6 +5791,7 @@
 
     // System Release Changelog Modal Controllers
     function openChangelogModal() {
+      _saveModalTrigger('changelog-modal-overlay');
       try { fetchAndRenderChangelog(); } catch(e) {}
       const modal = document.getElementById('changelog-modal-overlay');
       if (modal) {
@@ -5771,6 +5808,7 @@
         modal.style.display = 'none';
       }
       document.body.style.overflow = '';
+      _restoreModalTrigger('changelog-modal-overlay');
     }
 
     function closeChangelogModalOnBackdrop(e) {
@@ -5785,6 +5823,7 @@
         openGlobalSSOModal('Cluster Health Radar & Scorecard', openHealthModal);
         return;
       }
+      _saveModalTrigger('health-modal-overlay');
       const modal = document.getElementById('health-modal-overlay');
       if (modal) {
         modal.style.display = 'flex';
@@ -5801,6 +5840,7 @@
         modal.style.display = 'none';
       }
       document.body.style.overflow = '';
+      _restoreModalTrigger('health-modal-overlay');
     }
 
     function closeHealthModalOnBackdrop(e) {
@@ -6066,6 +6106,7 @@
         openGlobalSSOModal('Disaster Recovery & Chaos Lab', openDisasterModal);
         return;
       }
+      _saveModalTrigger('disaster-modal-overlay');
       const modal = document.getElementById('disaster-modal-overlay') || document.getElementById('chaos-modal-overlay');
       if (modal) {
         modal.style.setProperty('display', 'flex', 'important');
@@ -6084,6 +6125,7 @@
         chaosState.audioCtx.suspend().catch(() => {});
       }
       document.body.style.overflow = '';
+      _restoreModalTrigger('disaster-modal-overlay');
     }
 
     function closeDisasterModalOnBackdrop(e) {
@@ -6410,12 +6452,17 @@
         return;
       }
 
+      if (!tabKey) return;
       const btn = document.getElementById(`tab-btn-${tabKey}`);
       const pane = document.getElementById(`pane-${tabKey}`);
       const container = document.getElementById('nuc-services');
 
-      if (!btn && !pane && !container) {
-        window.location.href = `index.html#pane-${tabKey}`;
+      if (!btn && !pane) {
+        if (container) {
+          container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else if (['speedtest', 'dns', 'books', 'iot', 'kuma'].includes(tabKey)) {
+          window.location.href = `index.html#pane-${tabKey}`;
+        }
         return;
       }
 
@@ -6439,6 +6486,7 @@
     let isSpeedtesting = false;
 
     function openGlobalSSOModal(actionName = 'Protected System Operation', callback = null) {
+      _saveModalTrigger('speedtest-sso-modal-overlay');
       window.pendingSSOCallback = callback;
       const modal = document.getElementById('speedtest-sso-modal-overlay');
       const actionEl = document.getElementById('sso-gate-action-name');
@@ -6446,6 +6494,7 @@
       if (modal) {
         modal.style.display = 'flex';
         modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
       }
     }
     window.openGlobalSSOModal = openGlobalSSOModal;
@@ -6457,7 +6506,9 @@
       if (modal) {
         modal.classList.remove('active');
         modal.style.display = 'none';
+        document.body.style.overflow = '';
       }
+      _restoreModalTrigger('speedtest-sso-modal-overlay');
     }
     window.closeSpeedtestSSOModal = closeSpeedtestSSOModal;
     window.closeGlobalSSOModal = closeSpeedtestSSOModal;
@@ -6997,6 +7048,7 @@
 
     // --- 3. Penny's Feeder IoT Snack & Meal Dispenser ---
     function openCloudflareStatsModal() {
+      _saveModalTrigger('cloudflare-stats-modal-overlay');
       updateCloudflareStatsUI();
       const modal = document.getElementById('cloudflare-stats-modal-overlay');
       if (modal) {
@@ -7031,6 +7083,7 @@
         modal.style.display = 'none';
         document.body.style.overflow = '';
       }
+      _restoreModalTrigger('cloudflare-stats-modal-overlay');
     }
     window.closeCloudflareStatsModal = closeCloudflareStatsModal;
 
@@ -7055,6 +7108,7 @@
     }
 
     function openAdGuardConfigModal() {
+      _saveModalTrigger('adguard-modal-overlay');
       ensureAdGuardModalDOM();
       const modal = document.getElementById('adguard-modal-overlay');
       if (modal) {
@@ -7072,12 +7126,13 @@
         modal.style.display = 'none';
         document.body.style.overflow = '';
       }
+      _restoreModalTrigger('adguard-modal-overlay');
     }
     window.closeAdGuardConfigModal = closeAdGuardConfigModal;
 
     function copyAdguardDeployCommand() {
       const cmd = 'git clone https://github.com/townsy2020/digitalresolve.ca.git && cd digitalresolve.ca/deploy/adguard && docker compose up -d';
-      if (navigator.clipboard) {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
         navigator.clipboard.writeText(cmd).then(() => {
           showToast('success', 'Command Copied', 'AdGuard Docker Compose command copied for NUC deployment.');
           const btn = document.getElementById('btn-copy-adguard');
@@ -7107,7 +7162,7 @@
     // Tailscale Mesh VPN Client Modal & Platform Auto-Detection
     // ========================================================
     function copySnippetText(text, btn) {
-      if (navigator.clipboard) {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
         navigator.clipboard.writeText(text).then(() => {
           if (btn) {
             if (!btn.dataset.origHtml) btn.dataset.origHtml = btn.innerHTML;
@@ -7339,6 +7394,7 @@
     window.ensureTailscaleModalDOM = ensureTailscaleModalDOM;
 
     function openTailscaleModal() {
+      _saveModalTrigger('tailscale-modal-overlay');
       ensureTailscaleModalDOM();
       const modal = document.getElementById('tailscale-modal-overlay');
       if (modal) {
@@ -7379,6 +7435,7 @@
         modal.style.display = 'none';
         document.body.style.overflow = '';
       }
+      _restoreModalTrigger('tailscale-modal-overlay');
     }
     window.closeTailscaleModal = closeTailscaleModal;
 

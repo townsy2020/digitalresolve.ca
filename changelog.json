@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-25T12:24:16Z",
-    "currentVersion":  "v2.9.14",
+    "updatedAt":  "2026-11-25T12:49:05Z",
+    "currentVersion":  "v2.9.15",
     "releases":  [
+                     {
+                         "version":  "v2.9.15",
+                         "date":  "November 25, 2026",
+                         "title":  "Modal Focus Restoration, Hashchange Routing \u0026 Clipboard Guard",
+                         "changes":  [
+                                         {
+                                             "label":  "Modal Focus Restoration",
+                                             "text":  "Saved and restored keyboard focus across all 10 modals on close and added body scroll lock to the SSO modal"
+                                         },
+                                         {
+                                             "label":  "Hash Routing \u0026 Fallback",
+                                             "text":  "Added hashchange listener for #pane-* tabs and guarded unknown #pane-* hashes from blanking #nuc-services"
+                                         },
+                                         {
+                                             "label":  "Clipboard Function Guard",
+                                             "text":  "Checked typeof navigator.clipboard.writeText before calling in AdGuard and snippet copy helpers"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.14",
                          "date":  "November 25, 2026",
