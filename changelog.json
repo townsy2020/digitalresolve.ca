@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-25T11:28:18Z",
-    "currentVersion":  "v2.9.11",
+    "updatedAt":  "2026-11-25T11:45:33Z",
+    "currentVersion":  "v2.9.12",
     "releases":  [
+                     {
+                         "version":  "v2.9.12",
+                         "date":  "November 25, 2026",
+                         "title":  "Mobile Landscape Fit, Pipeline Trigger \u0026 Keyboard A11y",
+                         "changes":  [
+                                         {
+                                             "label":  "Mobile Landscape Layout",
+                                             "text":  "Fixed AGY console, magnet, and speedtest modal clipping plus 844x390 header overflow in short landscape viewports"
+                                         },
+                                         {
+                                             "label":  "Storage Pipeline Button State",
+                                             "text":  "Synced #insp-trigger-btn disabled state via updateInspector() so non-triggerable pipelines stay disabled"
+                                         },
+                                         {
+                                             "label":  "Storage Keyboard Operability",
+                                             "text":  "Disabled dimmed storage tier cards and added keyboard Enter/Space activation to SVG flow pipes"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.11",
                          "date":  "November 25, 2026",

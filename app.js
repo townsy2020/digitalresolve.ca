@@ -165,16 +165,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.11';
+          const activeVer = match ? match[0] : 'v2.9.12';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 22464;
-      const baseCssLines = 7381;
-      const baseJsLines = 9096;
+      const baseHtmlLines = 22568;
+      const baseCssLines = 7492;
+      const baseJsLines = 9109;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -213,7 +213,11 @@
     /* Mobile Device Detection & Adaptive Layout Mode Switcher (dr_layout_mode) */
     function detectMobileDevice() {
       try {
-        return (window.matchMedia && window.matchMedia('(max-width: 768px)').matches) || window.innerWidth <= 768;
+        if (window.matchMedia) {
+          if (window.matchMedia('(max-width: 768px)').matches) return true;
+          if (window.matchMedia('(max-height: 500px) and (pointer: coarse)').matches) return true;
+        }
+        return window.innerWidth <= 768;
       } catch (e) {
         return false;
       }

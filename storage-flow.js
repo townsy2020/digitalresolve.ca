@@ -550,6 +550,8 @@
       const cats = (card.getAttribute('data-category') || '').split(',');
       const visible = state.filter === 'all' || cats.some(c => matchesFilter(c, state.filter));
       card.classList.toggle('is-dimmed', !visible);
+      card.disabled = !visible;
+      card.setAttribute('aria-disabled', visible ? 'false' : 'true');
       if (!visible) {
         card.classList.remove('is-selected', 'is-route-endpoint');
       } else if (state.selectedType === 'node') {
@@ -695,7 +697,7 @@
       const animDur = rate > 50 ? '0.9s' : rate > 10 ? '1.4s' : rate > 1 ? '2.0s' : '2.8s';
 
       html += `
-        <g opacity="${opacity}" ${isVisible ? `data-pipe-id="${escapeHtml(p.id)}"` : 'style="pointer-events:none;"'}>
+        <g opacity="${opacity}" ${isVisible ? `data-pipe-id="${escapeHtml(p.id)}" role="button" tabindex="0" aria-label="${escapeHtml(p.name)}"` : 'style="pointer-events:none;"'}>
           <title>${escapeHtml(p.name)} (${escapeHtml(safeStr(p.bytesCopiedFormatted, '0 B'))} • ${rate.toFixed(1)} MB/s)</title>
           <path d="${dStr}" class="storage-pipe-path" stroke="${cfg.color}" stroke-width="${strokeW}" ${isHighlighted ? 'filter="url(#pipe-glow)"' : ''} />
           ${showFlowAnim ? `<path d="${dStr}" class="storage-pipe-dashed" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.75" style="animation-duration: ${animDur};" />` : ''}
@@ -713,6 +715,13 @@
       g.addEventListener('click', () => {
         const id = g.getAttribute('data-pipe-id');
         selectItem('pipeline', id);
+      });
+      g.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          const id = g.getAttribute('data-pipe-id');
+          selectItem('pipeline', id);
+        }
       });
     });
   }
@@ -903,7 +912,7 @@
       const trigBtn = document.getElementById('insp-trigger-btn');
       if (trigBtn) {
         if (p && p.triggerAction) {
-          trigBtn.disabled = false;
+          trigBtn.disabled = state.triggerInFlight.has(String(p.triggerAction));
           trigBtn.textContent = 'Run Pipeline Now (M365 SSO)';
           trigBtn.onclick = () => triggerPipeline(p);
         } else {
@@ -971,7 +980,7 @@
     const trigBtn = document.getElementById('insp-trigger-btn');
     if (trigBtn) {
       if (p.triggerAction) {
-        trigBtn.disabled = false;
+        trigBtn.disabled = state.triggerInFlight.has(String(p.triggerAction));
         trigBtn.textContent = 'Run Pipeline Now (M365 SSO)';
         trigBtn.onclick = () => triggerPipeline(p);
       } else {
@@ -1143,7 +1152,7 @@
       }
     } finally {
       state.triggerInFlight.delete(actionKey);
-      if (triggerBtn) triggerBtn.disabled = false;
+      updateInspector();
     }
   }
 
