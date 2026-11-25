@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-25T08:55:18Z",
-    "currentVersion":  "v2.9.4",
+    "updatedAt":  "2026-11-25T09:09:32Z",
+    "currentVersion":  "v2.9.5",
     "releases":  [
+                     {
+                         "version":  "v2.9.5",
+                         "date":  "November 25, 2026",
+                         "title":  "Mobile Nav Scroll Fix, Anchor Offset \u0026 ARIA Sync",
+                         "changes":  [
+                                         {
+                                             "label":  "Mobile Nav Drawer Scroll",
+                                             "text":  "Bounded expanded mobile nav drawer height with internal scrolling so all dropdown items stay reachable"
+                                         },
+                                         {
+                                             "label":  "Sticky Header Anchor Offset",
+                                             "text":  "Raised scroll-margin-top to 132px desktop and 104px mobile so anchor targets clear the sticky header"
+                                         },
+                                         {
+                                             "label":  "Dropdown ARIA State Sync",
+                                             "text":  "Added aria-expanded attributes to #wol-btn and #ops-menu-btn across all 8 pages and synced setDropdownOpen()"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.4",
                          "date":  "November 25, 2026",

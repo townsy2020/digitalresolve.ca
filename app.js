@@ -165,15 +165,15 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.4';
+          const activeVer = match ? match[0] : 'v2.9.5';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 21729;
-      const baseCssLines = 7357;
+      const baseHtmlLines = 21833;
+      const baseCssLines = 7381;
       const baseJsLines = 8871;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
@@ -369,7 +369,7 @@
       if (!dd) return;
       const isOpen = Boolean(open);
       dd.classList.toggle('is-open', isOpen);
-      dd.querySelectorAll('[aria-expanded]').forEach(el => {
+      dd.querySelectorAll('[aria-haspopup="true"], [aria-expanded]').forEach(el => {
         el.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
       });
     }

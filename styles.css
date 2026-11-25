@@ -41,7 +41,7 @@ body {
 
 /* Scroll Offset for Fixed/Sticky Header */
 section[id], div[id], #deck, #ops, #fleet, #uptime, #camera-feed-card {
-  scroll-margin-top: 84px;
+  scroll-margin-top: 132px;
 }
 
 .background-glow {
@@ -3923,6 +3923,23 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
     box-sizing: border-box !important;
   }
 
+  html:not(.desktop-layout) section[id],
+  html:not(.desktop-layout) div[id],
+  html:not(.desktop-layout) #deck,
+  html:not(.desktop-layout) #ops,
+  html:not(.desktop-layout) #fleet,
+  html:not(.desktop-layout) #uptime,
+  html:not(.desktop-layout) #camera-feed-card,
+  html.mobile-layout section[id],
+  html.mobile-layout div[id],
+  html.mobile-layout #deck,
+  html.mobile-layout #ops,
+  html.mobile-layout #fleet,
+  html.mobile-layout #uptime,
+  html.mobile-layout #camera-feed-card {
+    scroll-margin-top: 104px;
+  }
+
   /* Header & Mobile Nav Drawer */
   html:not(.desktop-layout) .header,
   html.mobile-layout .header {
@@ -4028,6 +4045,11 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
   html:not(.desktop-layout) .nav-container.nav-open .nav-links,
   html.mobile-layout .nav-container.nav-open .nav-links {
     display: flex !important;
+    max-height: calc(100vh - 84px) !important;
+    max-height: calc(100dvh - 84px) !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
     animation: fadeInDown 0.2s ease-out;
   }
 
@@ -4073,6 +4095,8 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
     width: 100% !important;
     min-width: 100% !important;
     max-width: 100% !important;
+    max-height: none !important;
+    overflow-y: visible !important;
     box-shadow: none !important;
     border: 1px solid rgba(59, 130, 246, 0.25) !important;
     border-radius: 8px !important;
