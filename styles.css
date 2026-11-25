@@ -4044,6 +4044,8 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
     width: 100% !important;
     display: none !important;
     flex-direction: column !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
     gap: 8px !important;
     padding: 12px 0 6px 0 !important;
     border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -4058,6 +4060,11 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
     animation: fadeInDown 0.2s ease-out;
+  }
+
+  html:not(.desktop-layout) .nav-links > *,
+  html.mobile-layout .nav-links > * {
+    flex-shrink: 0 !important;
   }
 
   html:not(.desktop-layout) .nav-links > .btn-nav,

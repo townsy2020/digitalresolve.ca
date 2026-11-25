@@ -1,7 +1,18 @@
 {
-    "updatedAt":  "2026-11-25T12:11:29Z",
-    "currentVersion":  "v2.9.13",
+    "updatedAt":  "2026-11-25T12:24:16Z",
+    "currentVersion":  "v2.9.14",
     "releases":  [
+                     {
+                         "version":  "v2.9.14",
+                         "date":  "November 25, 2026",
+                         "title":  "Portrait Mobile Nav Drawer Flex-Wrap Fix",
+                         "changes":  [
+                                         {
+                                             "label":  "Portrait Mobile Nav Drawer",
+                                             "text":  "Set flex-wrap: nowrap and flex-shrink: 0 on \u003c=768px mobile nav drawers so expanded dropdown accordions scroll vertically instead of wrapping off-screen right"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.13",
                          "date":  "November 25, 2026",
