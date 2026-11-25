@@ -166,14 +166,14 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.18';
+          const activeVer = match ? match[0] : 'v2.9.19';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 23136;
+      const baseHtmlLines = 23238;
       const baseCssLines = 7588;
       const baseJsLines = 9191;
       const baseCnameLines = 1;
@@ -454,7 +454,7 @@
                       const node = data2.nodes.find(n => n.id === target);
                       if (node) {
                         return {
-                          online: node.status !== 'offline',
+                          online: /^(operational|online)$/i.test(String(node.status || '').trim()),
                           latencyMs: null,
                           disk: null,
                           vitals: null,

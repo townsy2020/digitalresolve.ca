@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-25T14:03:23Z",
-    "currentVersion":  "v2.9.18",
+    "updatedAt":  "2026-11-25T14:19:24Z",
+    "currentVersion":  "v2.9.19",
     "releases":  [
+                     {
+                         "version":  "v2.9.19",
+                         "date":  "November 25, 2026",
+                         "title":  "Uptime Fallback Status \u0026 WebRTC Standby HUD Clearance",
+                         "changes":  [
+                                         {
+                                             "label":  "Uptime Fallback Online Check",
+                                             "text":  "Fixed case-sensitive node.status check in fetchTelemetryWithFallback() so Offline and Standby / Offline nodes report offline accurately"
+                                         },
+                                         {
+                                             "label":  "WebRTC Standby HUD Layout",
+                                             "text":  "Added vertical scroll and top/bottom HUD clearance to webrtc.html #terminal-hud so standby fallback buttons stay clickable at small viewports"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.18",
                          "date":  "November 25, 2026",
