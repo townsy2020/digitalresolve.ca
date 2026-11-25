@@ -567,10 +567,15 @@
       }
     }
 
-    function toggleAudio() {
-      video.muted = !video.muted;
+    function syncAudioBtn() {
+      if (!btnAudio) return;
       btnAudio.innerHTML = video.muted ? '&#128263; Audio' : '&#128266; Audio ON';
       btnAudio.classList.toggle('active', !video.muted);
+    }
+
+    function toggleAudio() {
+      video.muted = !video.muted;
+      syncAudioBtn();
     }
 
     function toggleNight() {
@@ -583,10 +588,19 @@
 
     function toggleFullscreen() {
       const wrap = document.getElementById('player-wrap');
-      if (!document.fullscreenElement) {
-        wrap.requestFullscreen().catch(e => console.warn(e));
+      const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+      if (!fsEl) {
+        const req = wrap && (wrap.requestFullscreen || wrap.webkitRequestFullscreen);
+        if (typeof req === 'function') {
+          try { Promise.resolve(req.call(wrap)).catch(e => console.warn(e)); } catch (e) { console.warn(e); }
+        } else if (video && typeof video.webkitEnterFullscreen === 'function') {
+          try { video.webkitEnterFullscreen(); } catch (e) { console.warn(e); }
+        }
       } else {
-        document.exitFullscreen().catch(() => {});
+        const exit = document.exitFullscreen || document.webkitExitFullscreen;
+        if (typeof exit === 'function') {
+          try { Promise.resolve(exit.call(document)).catch(() => {}); } catch (e) {}
+        }
       }
     }
 
@@ -773,6 +787,7 @@
         const fallbackToWebRTC = (reason) => {
           if (handled || ws !== sock) return;
           handled = true;
+          streamConnected = false;
           clearTimeout(connTimeout);
           if (frameTimeout) { clearTimeout(frameTimeout); frameTimeout = null; }
           try { sock.close(); } catch (e) {}
@@ -864,6 +879,7 @@
                           }
                           video.play().catch(() => {
                             video.muted = true;
+                            syncAudioBtn();
                             video.play().catch(() => {});
                           });
                         }
@@ -963,6 +979,7 @@
         }
         video.play().catch(() => {
           video.muted = true;
+          syncAudioBtn();
           video.play().catch(er => console.warn('Autoplay error:', er));
         });
       };
@@ -973,8 +990,13 @@
       activePc.addEventListener('connectionstatechange', () => {
         if (pc !== activePc) return;
         if (activePc.connectionState === 'connected') {
+          if (reconnectTimeout) {
+            clearTimeout(reconnectTimeout);
+            reconnectTimeout = null;
+          }
           video.play().catch(() => {
             video.muted = true;
+            syncAudioBtn();
             video.play().catch(er => console.warn('Autoplay error:', er));
           });
         } else if (activePc.connectionState === 'failed' || activePc.connectionState === 'disconnected') {

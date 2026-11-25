@@ -743,6 +743,7 @@
         const fallbackToWebRTC = (reason) => {
           if (handled || ws !== sock) return;
           handled = true;
+          streamConnected = false;
           clearTimeout(connTimeout);
           if (frameTimeout) { clearTimeout(frameTimeout); frameTimeout = null; }
           try { sock.close(); } catch (e) {}
@@ -828,7 +829,7 @@
                         const start0 = sourceBuffer.buffered.start(0);
                         if (video.paused) {
                           if (video.currentTime < start0) video.currentTime = start0;
-                          video.play().catch(() => { video.muted = true; video.play().catch(() => {}); });
+                          video.play().catch(() => { video.muted = true; syncAudioBtn(); video.play().catch(() => {}); });
                         }
                         const latency = end - video.currentTime;
                         if (latency > 5.0) {
@@ -845,6 +846,7 @@
 
                   video.play().catch(() => {
                     video.muted = true;
+                    syncAudioBtn();
                     video.play().catch(er => console.warn(er));
                   });
                   flushMseQueue();
@@ -926,8 +928,13 @@
       activePc.addEventListener('connectionstatechange', () => {
         if (pc !== activePc) return;
         if (activePc.connectionState === 'connected') {
+          if (reconnectTimeout) {
+            clearTimeout(reconnectTimeout);
+            reconnectTimeout = null;
+          }
           video.play().catch(e => {
             video.muted = true;
+            syncAudioBtn();
             video.play().catch(er => console.warn(er));
           });
         }
@@ -1477,18 +1484,32 @@
       }
     }
 
-    function toggleAudio() {
-      video.muted = !video.muted;
+    function syncAudioBtn() {
+      if (!btnToggleAudio) return;
       btnToggleAudio.innerHTML = video.muted ? '&#128263; Audio' : '&#128266; Audio ON';
       btnToggleAudio.classList.toggle('active', !video.muted);
     }
 
+    function toggleAudio() {
+      video.muted = !video.muted;
+      syncAudioBtn();
+    }
+
     function toggleFullscreen() {
       const elem = document.getElementById('viewport-container');
-      if (!document.fullscreenElement) {
-        elem.requestFullscreen().catch(err => console.warn(err));
+      const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+      if (!fsEl) {
+        const req = elem && (elem.requestFullscreen || elem.webkitRequestFullscreen);
+        if (typeof req === 'function') {
+          try { Promise.resolve(req.call(elem)).catch(err => console.warn(err)); } catch (err) { console.warn(err); }
+        } else if (video && typeof video.webkitEnterFullscreen === 'function') {
+          try { video.webkitEnterFullscreen(); } catch (err) { console.warn(err); }
+        }
       } else {
-        document.exitFullscreen().catch(() => {});
+        const exit = document.exitFullscreen || document.webkitExitFullscreen;
+        if (typeof exit === 'function') {
+          try { Promise.resolve(exit.call(document)).catch(() => {}); } catch (err) {}
+        }
       }
     }
 

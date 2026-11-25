@@ -1,7 +1,30 @@
 {
-    "updatedAt":  "2026-11-25T15:53:02Z",
-    "currentVersion":  "v2.9.26",
+    "updatedAt":  "2026-11-25T16:02:07Z",
+    "currentVersion":  "v2.9.27",
     "releases":  [
+                     {
+                         "version":  "v2.9.27",
+                         "date":  "November 25, 2026",
+                         "title":  "WebRTC \u0026 AI Camera Stream Fallback, Fullscreen \u0026 Audio Sync Hardening",
+                         "changes":  [
+                                         {
+                                             "label":  "MSE-to-WebRTC Fallback Deadlock Fix",
+                                             "text":  "Reset streamConnected=false inside fallbackToWebRTC() in webrtc.html and ai.html so post-connect MSE errors cleanly transition to WebRTC without leaving video opacity stuck at 0 or deadlocking reconnect timers."
+                                         },
+                                         {
+                                             "label":  "iOS Safari \u0026 WebKit Fullscreen Guard",
+                                             "text":  "Added feature detection for requestFullscreen, webkitRequestFullscreen, video.webkitEnterFullscreen, and exitFullscreen/webkitExitFullscreen in webrtc.html and ai.html to prevent uncaught synchronous TypeErrors on mobile Safari."
+                                         },
+                                         {
+                                             "label":  "WebRTC Transient Disconnect Recovery",
+                                             "text":  "Cleared pending reconnectTimeout whenever RTCPeerConnection recovers to connectionState===\u0027connected\u0027 in webrtc.html and ai.html so brief ICE hiccups no longer tear down recovered streams."
+                                         },
+                                         {
+                                             "label":  "Autoplay Mute Button State Sync",
+                                             "text":  "Added syncAudioBtn() helper in webrtc.html and ai.html so autoplay-rejection mute fallbacks keep the Audio toolbar button label and active state synchronized."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.26",
                          "date":  "November 25, 2026",
