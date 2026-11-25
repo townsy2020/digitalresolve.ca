@@ -1905,6 +1905,8 @@ button.dropdown-item:active,
   font-weight: 700;
   color: #f8fafc;
   margin-bottom: 8px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .app-card-desc {
@@ -2443,6 +2445,9 @@ button.dropdown-item:active,
   line-height: 1.5;
   margin-top: auto;
   padding-top: 6px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 /* Multi-Segment Storage Bar */
@@ -5443,6 +5448,7 @@ html.mobile-layout .agy-inline-chips {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  min-width: 0;
   transition: transform 0.2s, border-color 0.2s;
 }
 
@@ -5467,6 +5473,9 @@ html.mobile-layout .agy-inline-chips {
   flex-direction: column;
   gap: 6px;
   flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 /* IoT Power & Temperature Grid */
@@ -5484,6 +5493,9 @@ html.mobile-layout .agy-inline-chips {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 /* Kuma Table */
@@ -6752,6 +6764,9 @@ html.mobile-layout .storage-kpi-strip {
   font-size: 0.76rem;
   color: #64748b;
   line-height: 1.35;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 /* Toolbar */
@@ -6835,6 +6850,9 @@ html.mobile-layout .storage-kpi-strip {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .storage-panel-sub {
@@ -7068,6 +7086,9 @@ html.mobile-layout .storage-flow-grid {
   font-weight: 700;
   color: #f8fafc;
   line-height: 1.3;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .storage-node-tag {
@@ -7330,6 +7351,7 @@ html.mobile-layout .storage-matrix-grid {
   flex-direction: column;
   justify-content: space-between;
   gap: 12px;
+  min-width: 0;
   transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
