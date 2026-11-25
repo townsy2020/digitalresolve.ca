@@ -3432,6 +3432,16 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
   gap: 4px;
 }
 
+#terminal-token-pill {
+  flex-wrap: wrap;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+#terminal-token-pill .token-breakdown-tags {
+  flex-wrap: wrap;
+}
+
 .item-tag.tag-flash {
   background: rgba(56, 189, 248, 0.2);
   color: #38bdf8;

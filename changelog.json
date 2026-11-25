@@ -1,7 +1,18 @@
 {
-    "updatedAt":  "2026-11-25T00:22:59Z",
-    "currentVersion":  "v2.8.93",
+    "updatedAt":  "2026-11-25T00:31:15Z",
+    "currentVersion":  "v2.8.94",
     "releases":  [
+                     {
+                         "version":  "v2.8.94",
+                         "date":  "November 24, 2026",
+                         "title":  "Mobile Terminal Token Pill Wrapping",
+                         "changes":  [
+                                         {
+                                             "label":  "Mobile Token Pill",
+                                             "text":  "Added flex-wrap and max-width constraints to #terminal-token-pill and .token-breakdown-tags so live AGY token breakdowns never clip on 375px viewports."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.93",
                          "date":  "November 24, 2026",
