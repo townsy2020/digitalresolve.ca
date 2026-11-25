@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.22';
+          const activeVer = match ? match[0] : 'v2.9.23';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 23599;
+      const baseHtmlLines = 23759;
       const baseCssLines = 7591;
-      const baseJsLines = 9218;
+      const baseJsLines = 9251;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -1996,9 +1996,14 @@
               if (reqTab !== currentLogTab || reqSeq !== _logReqSeq) return;
               const body = document.getElementById('terminal-content');
               if (body && data && data.lines) {
-                const isAtBottom = body.scrollHeight - body.scrollTop - body.clientHeight < 80;
-                body.textContent = data.lines.join('\n');
-                if (isAtBottom) body.scrollTop = body.scrollHeight;
+                const nextText = data.lines.join('\n');
+                const sel = typeof window.getSelection === 'function' ? window.getSelection() : null;
+                const hasSelectionInBody = Boolean(sel && !sel.isCollapsed && sel.anchorNode && body.contains(sel.anchorNode));
+                if (!hasSelectionInBody && body.textContent !== nextText) {
+                  const isAtBottom = body.scrollHeight - body.scrollTop - body.clientHeight < 80;
+                  body.textContent = nextText;
+                  if (isAtBottom) body.scrollTop = body.scrollHeight;
+                }
               }
             })
             .catch(() => {
@@ -3610,8 +3615,18 @@
             updateAgySessionDisplay(data.conversationId || '', data.sessionName || null, data.hostNode || null);
           }
           if (body && data && Array.isArray(data.lines)) {
-            body.textContent = data.lines.join('\n');
-            body.scrollTop = body.scrollHeight;
+            const nextText = data.lines.join('\n');
+            const sel = typeof window.getSelection === 'function' ? window.getSelection() : null;
+            const hasSelectionInBody = Boolean(silent && sel && !sel.isCollapsed && sel.anchorNode && body.contains(sel.anchorNode));
+            if (!hasSelectionInBody) {
+              const isAtBottom = body.scrollHeight - body.scrollTop - body.clientHeight < 80;
+              if (body.textContent !== nextText) {
+                body.textContent = nextText;
+              }
+              if (!silent || isAtBottom) {
+                body.scrollTop = body.scrollHeight;
+              }
+            }
           } else if (body) {
             body.textContent = '[No log entries available]';
           }
@@ -6481,10 +6496,16 @@
         return;
       }
 
-      document.querySelectorAll('.nuc-tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.nuc-tab-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
       document.querySelectorAll('.nuc-pane').forEach(p => p.classList.remove('active'));
 
-      if (btn) btn.classList.add('active');
+      if (btn) {
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+      }
       if (pane) {
         pane.classList.add('active');
         pane.style.transition = 'box-shadow 0.4s ease, border-color 0.4s ease';

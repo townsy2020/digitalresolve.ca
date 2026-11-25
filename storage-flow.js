@@ -1026,7 +1026,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
               <button type="button" class="btn btn-secondary" data-inspect-id="${escapeHtml(p.id)}" style="padding: 5px 10px; font-size: 0.75rem;">Inspect</button>
               ${p.triggerAction
-                ? `<button type="button" class="btn btn-primary" data-trigger-id="${escapeHtml(p.id)}" style="padding: 5px 12px; font-size: 0.75rem;">Run Now</button>`
+                ? `<button type="button" class="btn btn-primary" data-trigger-id="${escapeHtml(p.id)}"${state.triggerInFlight.has(String(p.triggerAction)) ? ' disabled' : ''} style="padding: 5px 12px; font-size: 0.75rem;">Run Now</button>`
                 : `<span style="font-size: 0.72rem; color: #64748b; font-family: var(--font-mono);">Hook / Scheduled</span>`}
             </div>
           </div>
@@ -1131,9 +1131,20 @@
   async function executePipelineTrigger(pipeline, retried = false) {
     const actionKey = pipeline && pipeline.triggerAction ? String(pipeline.triggerAction) : '';
     if (!actionKey || state.triggerInFlight.has(actionKey)) return;
+    const escPipeId = (pipeline && pipeline.id)
+      ? ((typeof CSS !== 'undefined' && typeof CSS.escape === 'function')
+        ? CSS.escape(pipeline.id)
+        : String(pipeline.id).replace(/["\\]/g, '\\$&'))
+      : '';
+    const setMatrixBtnDisabled = (disabled) => {
+      if (!escPipeId) return;
+      document.querySelectorAll(`#storage-matrix-grid [data-trigger-id="${escPipeId}"]`).forEach(btn => {
+        btn.disabled = disabled;
+      });
+    };
     state.triggerInFlight.add(actionKey);
-    const triggerBtn = document.getElementById('insp-trigger-btn');
-    if (triggerBtn) triggerBtn.disabled = true;
+    setMatrixBtnDisabled(true);
+    updateInspector();
 
     const base = isHttps ? GATEWAY : LAN_BASE;
     const url = `${base}/api/storage-flow/trigger`;
@@ -1177,6 +1188,7 @@
       }
     } finally {
       state.triggerInFlight.delete(actionKey);
+      setMatrixBtnDisabled(false);
       updateInspector();
     }
   }

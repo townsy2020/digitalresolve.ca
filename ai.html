@@ -482,10 +482,34 @@
       }
     }
 
+    let spinnerHideTimer = null;
+
     function hideSpinner() {
+      if (spinnerHideTimer) {
+        clearTimeout(spinnerHideTimer);
+        spinnerHideTimer = null;
+      }
       if (loadingOverlay && loadingOverlay.style.display !== 'none') {
         loadingOverlay.style.opacity = '0';
-        setTimeout(() => { loadingOverlay.style.display = 'none'; }, 300);
+        spinnerHideTimer = setTimeout(() => {
+          spinnerHideTimer = null;
+          loadingOverlay.style.display = 'none';
+        }, 300);
+      }
+    }
+
+    function showSpinner(text) {
+      if (spinnerHideTimer) {
+        clearTimeout(spinnerHideTimer);
+        spinnerHideTimer = null;
+      }
+      if (loadingOverlay) {
+        if (text) {
+          const msgEl = loadingOverlay.querySelector('div:nth-child(2)');
+          if (msgEl) msgEl.textContent = text;
+        }
+        loadingOverlay.style.display = 'flex';
+        loadingOverlay.style.opacity = '1';
       }
     }
 
@@ -582,6 +606,29 @@
         video.srcObject = null;
         video.load();
       } catch (e) {}
+      try {
+        ctx.clearRect(0, 0, container.clientWidth, container.clientHeight);
+      } catch (e) {}
+      trackedPenny.active = false;
+      trackedPenny.rawBbox = null;
+      trackedPenny.displayBbox = null;
+      trackedPenny.score = 0;
+      trackedPenny.lastSeen = 0;
+      if (Array.isArray(redBlinkSamples)) redBlinkSamples = [];
+      isFeederFoodLow = false;
+      if (catBadge) catBadge.className = 'hud-badge cat-scanning';
+      if (catPulse) {
+        catPulse.style.background = '#38bdf8';
+        catPulse.style.boxShadow = '0 0 8px #38bdf8';
+      }
+      if (catStatusText) catStatusText.textContent = aiModel ? 'Cat: 0% (Scanning)' : 'AI Initializing...';
+      if (personBadge) personBadge.style.display = 'none';
+      if (hopperBeaconBadge) hopperBeaconBadge.style.display = 'none';
+      if (inferenceTimeEl) inferenceTimeEl.textContent = '-- ms';
+      if (detectedFeedEl) {
+        detectedFeedEl.textContent = 'Scanning';
+        detectedFeedEl.title = '';
+      }
       streamConnected = false;
     }
     window.cleanupStream = cleanupStream;
@@ -612,6 +659,7 @@
 
     function initStream() {
       cleanupStream();
+      showSpinner('Connecting Live Feed...');
 
       const params = new URLSearchParams(window.location.search);
       let src = (params.get('src') || 'pennys_feeder').toLowerCase();

@@ -1,7 +1,30 @@
 {
-    "updatedAt":  "2026-11-25T15:02:53Z",
-    "currentVersion":  "v2.9.22",
+    "updatedAt":  "2026-11-25T15:16:28Z",
+    "currentVersion":  "v2.9.23",
     "releases":  [
+                     {
+                         "version":  "v2.9.23",
+                         "date":  "November 25, 2026",
+                         "title":  "AI Stream Reset, Terminal Selection \u0026 Storage Trigger Fixes",
+                         "changes":  [
+                                         {
+                                             "label":  "AI Stream Reconnect Reset",
+                                             "text":  "Cleared stale canvas/badges/telemetry in ai.html cleanupStream() and added cancellable showSpinner/hideSpinner on reconnect"
+                                         },
+                                         {
+                                             "label":  "Ops Terminal Selection \u0026 Scroll",
+                                             "text":  "Skipped unchanged DOM writes and preserved text selection and scroll position during silent log refreshes"
+                                         },
+                                         {
+                                             "label":  "Storage Matrix Trigger State",
+                                             "text":  "Scoped disabled state to the clicked Matrix button and synced Inspector via updateInspector()"
+                                         },
+                                         {
+                                             "label":  "NUC Tabs ARIA",
+                                             "text":  "Added role=tab and synced aria-selected on .nuc-tab-btn tabs"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.22",
                          "date":  "November 25, 2026",
