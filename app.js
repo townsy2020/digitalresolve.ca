@@ -164,16 +164,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.92';
+          const activeVer = match ? match[0] : 'v2.8.93';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 20513;
+      const baseHtmlLines = 20609;
       const baseCssLines = 7327;
-      const baseJsLines = 8659;
+      const baseJsLines = 8660;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -7442,6 +7442,7 @@
         closeAdGuardConfigModal();
         closeCloudflareStatsModal();
         if (typeof closeTailscaleModal === 'function') closeTailscaleModal();
+        if (typeof closeMobileNav === 'function') closeMobileNav();
         document.querySelectorAll('.dropdown.is-open').forEach(dd => dd.classList.remove('is-open'));
         document.body.style.overflow = '';
         document.documentElement.style.overflow = '';
