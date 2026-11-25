@@ -165,16 +165,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.12';
+          const activeVer = match ? match[0] : 'v2.9.13';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 22568;
-      const baseCssLines = 7492;
-      const baseJsLines = 9109;
+      const baseHtmlLines = 22664;
+      const baseCssLines = 7559;
+      const baseJsLines = 9116;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -1826,10 +1826,17 @@
       setTimeout(auditAndAttachCheckButtons, 3500);
 
       // Smooth dropdown hover & focus management with zero flicker and viewport clamping
+      const isCompactNavDrawer = () => (
+        document.documentElement.classList.contains('mobile-layout') ||
+        window.innerWidth <= 768 ||
+        (!document.documentElement.classList.contains('desktop-forced') &&
+          Boolean(window.matchMedia && window.matchMedia('(max-height: 500px) and (max-width: 960px) and (orientation: landscape)').matches))
+      );
+
       const positionDropdownMenu = (dd) => {
         const menu = dd.querySelector('.dropdown-menu');
         if (!menu) return;
-        if (document.documentElement.classList.contains('mobile-layout') || window.innerWidth <= 768) {
+        if (isCompactNavDrawer()) {
           menu.style.left = '';
           menu.style.right = '';
           menu.style.maxHeight = '';
@@ -1863,7 +1870,7 @@
         const trigger = dd.querySelector('.btn-nav, .btn-torrent, .btn-gemini, .btn-wol, #wol-btn');
         if (trigger) {
           trigger.addEventListener('click', (e) => {
-            if (trigger.tagName === 'BUTTON' || trigger.getAttribute('href') === 'javascript:void(0)' || document.documentElement.classList.contains('mobile-layout') || window.innerWidth <= 768) {
+            if (trigger.tagName === 'BUTTON' || trigger.getAttribute('href') === 'javascript:void(0)' || isCompactNavDrawer()) {
               e.preventDefault();
               const willOpen = !dd.classList.contains('is-open');
               document.querySelectorAll('.dropdown').forEach(other => {
@@ -1879,7 +1886,7 @@
       // Mobile nav item auto-dismiss & backdrop click handlers
       document.querySelectorAll('.nav-links a:not(.dropdown > a), .nav-links button:not(.dropdown > button)').forEach(item => {
         item.addEventListener('click', () => {
-          if (document.documentElement.classList.contains('mobile-layout') || window.innerWidth <= 768) {
+          if (isCompactNavDrawer()) {
             closeMobileNav();
           }
         });

@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-25T11:45:33Z",
-    "currentVersion":  "v2.9.12",
+    "updatedAt":  "2026-11-25T12:11:29Z",
+    "currentVersion":  "v2.9.13",
     "releases":  [
+                     {
+                         "version":  "v2.9.13",
+                         "date":  "November 25, 2026",
+                         "title":  "Landscape Nav Accordion \u0026 Mobile Portrait Console Fit",
+                         "changes":  [
+                                         {
+                                             "label":  "Landscape Nav Accordion",
+                                             "text":  "Made mobile-landscape nav dropdowns expand inline inside the scrollable drawer without clipping"
+                                         },
+                                         {
+                                             "label":  "Mobile Portrait Console Fit",
+                                             "text":  "Made AGY console header actions and meta bar horizontally scrollable on \u003c=768px viewports so terminal screen and input bar stay visible"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.12",
                          "date":  "November 25, 2026",
