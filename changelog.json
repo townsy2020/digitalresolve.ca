@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-25T01:04:12Z",
-    "currentVersion":  "v2.8.95",
+    "updatedAt":  "2026-11-25T01:23:01Z",
+    "currentVersion":  "v2.8.96",
     "releases":  [
+                     {
+                         "version":  "v2.8.96",
+                         "date":  "November 24, 2026",
+                         "title":  "Strict Null/NaN Coercion \u0026 Valid-Date Sorting",
+                         "changes":  [
+                                         {
+                                             "label":  "Storage Flow Precision",
+                                             "text":  "Fixed safeNum(null) fallback handling and invalid-date sorting in storage-flow.js."
+                                         },
+                                         {
+                                             "label":  "NaN-Free Telemetry",
+                                             "text":  "Hardened updateTokenCounterUI, updateClusterPowerAndThermalsUI, updateServiceDashboardUI, and Cloudflare formatSub against NaN and non-string fields."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.95",
                          "date":  "November 24, 2026",

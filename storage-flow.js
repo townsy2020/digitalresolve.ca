@@ -162,6 +162,7 @@
   }
 
   function safeNum(val, fallback = 0) {
+    if (val === null || val === undefined || val === '') return fallback;
     const n = Number(val);
     return Number.isFinite(n) ? n : fallback;
   }
@@ -428,8 +429,8 @@
     setText('kpi-flowrate-sub', totalFlow > 0 ? 'Active live disk & network I/O' : 'Peak measured pipeline rate');
 
     const sortedRuns = pipelines
-      .filter(p => p.lastRunAt)
-      .sort((a, b) => new Date(b.lastRunAt) - new Date(a.lastRunAt));
+      .filter(p => p.lastRunAt && Number.isFinite(Date.parse(p.lastRunAt)))
+      .sort((a, b) => Date.parse(b.lastRunAt) - Date.parse(a.lastRunAt));
     if (sortedRuns.length > 0) {
       const latest = sortedRuns[0];
       setText('kpi-last-sync', fmtRelativeTime(latest.lastRunAt));
@@ -803,7 +804,7 @@
       },
       {
         label: 'NUC D: 2 TB SATA Hybrid HDD (30% Marker)',
-        used: safeNum(nucHot.dDriveUsedGB),
+        used: safeNum(nucHot.dDriveUsedGB, Math.max(0, nucDTotal - nucDFree)),
         total: nucDTotal,
         color: '#a855f7',
         marker70: true

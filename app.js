@@ -164,16 +164,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.95';
+          const activeVer = match ? match[0] : 'v2.8.96';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 20793;
+      const baseHtmlLines = 20889;
       const baseCssLines = 7337;
-      const baseJsLines = 8708;
+      const baseJsLines = 8715;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -1035,10 +1035,10 @@
         }
       });
       document.querySelectorAll('#schematic-storage-capacity').forEach(el => {
-        if (window.LAST_NUC_DISK && typeof window.LAST_NUC_DISK.freeGB === 'number') {
-          const freeG = window.LAST_NUC_DISK.freeGB;
-          const usedP = (typeof window.LAST_NUC_DISK.usedPercent === 'number') ? window.LAST_NUC_DISK.usedPercent : '--';
-          el.textContent = `Capacity: ${freeG} GB Free (${usedP}% Used)`;
+        const freeG = window.LAST_NUC_DISK ? safeNum(window.LAST_NUC_DISK.freeGB, null) : null;
+        if (freeG !== null) {
+          const usedP = safeNum(window.LAST_NUC_DISK.usedPercent, null);
+          el.textContent = `Capacity: ${freeG} GB Free (${usedP !== null ? usedP + '% Used' : '--'})`;
         } else if (!el.textContent || el.textContent.includes('--') || el.textContent.includes('Capacity:')) {
           el.textContent = 'Awaiting telemetry...';
         }
@@ -2991,8 +2991,9 @@
         el.title = `Claude/3p Weekly: ${claudePct !== null ? claudePct + '%' : '--'}${fmtLocalReset(metrics.claudeWeeklyResetTime)} | 5-Hour: ${claude5h !== null ? claude5h + '%' : '--'}${fmtLocalReset(metrics.claudeFiveHourResetTime)}`;
       });
       document.querySelectorAll('#menu-account-user').forEach(el => {
-        if (metrics.account) {
-          el.textContent = metrics.account.includes('@') ? metrics.account.split('@')[0] : metrics.account;
+        if (metrics.account !== undefined && metrics.account !== null && String(metrics.account).trim() !== '') {
+          const acct = String(metrics.account);
+          el.textContent = acct.includes('@') ? acct.split('@')[0] : acct;
         } else {
           el.textContent = '';
         }
@@ -5000,7 +5001,7 @@
       if (!health || !health.services) return;
       window._hasLiveServicesHealth = true;
       const s = health.services;
-      const count = (typeof health.onlineCount === 'number') ? health.onlineCount : Object.values(s).filter(item => item && item.online).length;
+      const count = (typeof health.onlineCount === 'number' && Number.isFinite(health.onlineCount)) ? health.onlineCount : Object.values(s).filter(item => item && item.online).length;
 
       function setStatus(tagId, metaId, svc, defaultActiveText, defaultActiveDesc) {
         const tagEl = document.getElementById(tagId);
@@ -5014,7 +5015,8 @@
         }
         if (metaEl) {
           if (isOnline) {
-            const lat = (svc.latencyMs !== null && svc.latencyMs !== undefined) ? `${svc.latencyMs}ms • ` : '';
+            const latVal = safeNum(svc.latencyMs, null);
+            const lat = latVal !== null ? `${latVal}ms • ` : '';
             metaEl.textContent = `${lat}${defaultActiveDesc || 'Sentinel Verified'}`;
             metaEl.style.color = '#34d399';
           } else {
@@ -5042,7 +5044,8 @@
             dtTag.textContent = s.torrents.statusText || 'Operational';
           }
           if (dtMeta) {
-            const lat = (s.torrents.latencyMs !== null && s.torrents.latencyMs !== undefined) ? `${s.torrents.latencyMs}ms • ` : '';
+            const latVal = safeNum(s.torrents.latencyMs, null);
+            const lat = latVal !== null ? `${latVal}ms • ` : '';
             dtMeta.textContent = `${lat}Active Node`;
             dtMeta.style.color = '#34d399';
           }
@@ -5070,7 +5073,8 @@
             cfTag.style.color = '#fb923c';
           }
           if (cfMeta) {
-            const lat = (s.cf.latencyMs !== null && s.cf.latencyMs !== undefined) ? `${s.cf.latencyMs}ms • ` : '';
+            const latVal = safeNum(s.cf.latencyMs, null);
+            const lat = latVal !== null ? `${latVal}ms • ` : '';
             cfMeta.textContent = `${lat}Tunnel Active`;
             cfMeta.style.color = '#fb923c';
           }
@@ -6663,7 +6667,9 @@
 
       const formatSub = (val, def) => {
         if (val === undefined || val === null || val === '' || val === '--') return def;
-        return typeof val === 'number' ? val.toLocaleString() : String(val);
+        if (typeof val === 'number') return Number.isFinite(val) ? val.toLocaleString() : def;
+        const s = String(val).trim();
+        return (!s || s === 'NaN') ? def : s;
       };
       const rawSub = cur.subRequests || {};
       const sub = {
