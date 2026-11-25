@@ -1,7 +1,18 @@
 {
-    "updatedAt":  "2026-11-25T03:28:28Z",
-    "currentVersion":  "v2.8.98",
+    "updatedAt":  "2026-11-25T03:42:53Z",
+    "currentVersion":  "v2.8.99",
     "releases":  [
+                     {
+                         "version":  "v2.8.99",
+                         "date":  "November 24, 2026",
+                         "title":  "Clickable Camera HUD CF Access SSO Link",
+                         "changes":  [
+                                         {
+                                             "label":  "Camera HUD Auth Link",
+                                             "text":  "Added pointer-events: auto to #loading-overlay a in ai.html so the CF Access SSO sign-in link is clickable when streams require authentication."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.98",
                          "date":  "November 24, 2026",
