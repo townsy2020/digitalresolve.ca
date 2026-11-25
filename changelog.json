@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-25T03:57:32Z",
-    "currentVersion":  "v2.9.0",
+    "updatedAt":  "2026-11-25T07:49:46Z",
+    "currentVersion":  "v2.9.1",
     "releases":  [
+                     {
+                         "version":  "v2.9.1",
+                         "date":  "November 25, 2026",
+                         "title":  "Speedtest Poll, Feeder Rollback, Storage Safety \u0026 Chaos Honesty",
+                         "changes":  [
+                                         {
+                                             "label":  "Speedtest \u0026 Route Safety",
+                                             "text":  "Prevented stale isp-health.json fallback from ending live speedtest polls early, invoked onError on SSO bailout, and guarded localStorage.getItem in media routing."
+                                         },
+                                         {
+                                             "label":  "Honest Error \u0026 Recovery UI",
+                                             "text":  "Fixed stuck optimistic UI in triggerCatTreat(), surfaced resumeAgySessionOnDesktop() errors, and replaced hardcoded Chaos Lab recovery strings with live telemetry."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.0",
                          "date":  "November 24, 2026",

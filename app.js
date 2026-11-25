@@ -164,16 +164,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.0';
+          const activeVer = match ? match[0] : 'v2.9.1';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 21292;
+      const baseHtmlLines = 21388;
       const baseCssLines = 7337;
-      const baseJsLines = 8765;
+      const baseJsLines = 8796;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -2544,11 +2544,15 @@
       })
       .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(data => {
-        if (data.status === 'success') {
+        if (data && data.status === 'success') {
           showToast('success', 'Session Resumed on Desktop', data.message || `Antigravity ${sName} active in Windows Terminal.`);
+        } else {
+          showToast('error', 'Resume Failed', (data && data.message) || 'Could not resume AGY session on Desktop.');
         }
       })
-      .catch(() => {});
+      .catch(err => {
+        showToast('error', 'Resume Failed', (err && err.message) || `Could not reach ${GATEWAY}`);
+      });
 
       // 2. Also invoke native protocol link for instant local spawn
       if (cid) {
@@ -2647,6 +2651,7 @@
 
     function sendControl(action, target = 'nuc', opts = {}) {
       if (!isSSOAuthenticated()) {
+        if (opts && typeof opts.onError === 'function') opts.onError(new Error('SSO required'));
         openGlobalSSOModal(`Remote Command: ${action.toUpperCase()}`, () => sendControl(action, target, opts));
         return;
       }
@@ -3761,7 +3766,7 @@
                 const snapDateLabel = Number.isFinite(snapTs) ? new Date(snapTs).toISOString().slice(0, 10) : 'Unknown';
                 const snapTag = isStaleSnap ? ` [Snapshot: ${snapDateLabel}]` : '';
                 applyIspTelemetry(sList, sLat, { snapTag });
-                return sData;
+                return Object.assign({}, sData, { _fromFallback: true });
               }
               throw new Error('Static snapshot empty');
             })
@@ -3854,8 +3859,12 @@
           pollInFlight = true;
           Promise.resolve(fetchISPHistory()).then((data) => {
             if (gen !== _ispPollGen) return;
+            if (!data || data._fromFallback) return;
             const curTs = getIspSampleTimestamp((data && data.latest) || window.ISP_LATEST) || getIspSampleTimestamp(data);
-            if (curTs && curTs !== prevTs) {
+            const curMs = curTs ? Date.parse(curTs) : NaN;
+            const prevMs = prevTs ? Date.parse(prevTs) : NaN;
+            const isNewer = (Number.isFinite(curMs) && Number.isFinite(prevMs)) ? (curMs > prevMs) : (Boolean(curTs) && curTs !== prevTs);
+            if (isNewer) {
               clearIspSpeedtestPoll();
               if (typeof opts.onComplete === 'function') opts.onComplete(window.ISP_LATEST || {});
             }
@@ -6026,7 +6035,7 @@
           btn.innerHTML = 'Pull Desktop Plug';
           btn.className = 'chaos-card-trigger';
           nodeDesktop.className = 'chaos-node node-ok';
-          nodeDesktop.querySelector('.chaos-node-status').textContent = 'Online (2.5 GbE)';
+          nodeDesktop.querySelector('.chaos-node-status').textContent = window.DESKTOP_IS_ONLINE ? 'Online (2.5 GbE)' : 'Standby (Eco Mode)';
           nodeDesktop.querySelector('.chaos-node-status').className = 'chaos-node-status ok';
           nodeNuc.className = 'chaos-node node-ok';
           nodeNuc.querySelector('.chaos-node-status').textContent = 'Online (24/7 Node)';
@@ -6101,7 +6110,7 @@
           btn.innerHTML = 'Fill Disk to 99.8%';
           btn.className = 'chaos-card-trigger';
           nodeStorage.className = 'chaos-node node-ok';
-          nodeStorage.querySelector('.chaos-node-status').textContent = 'Healthy (42% Pool)';
+          nodeStorage.querySelector('.chaos-node-status').textContent = (window.LAST_NUC_DISK && Number.isFinite(Number(window.LAST_NUC_DISK.usedPercent))) ? `Healthy (${Math.round(Number(window.LAST_NUC_DISK.usedPercent))}% Pool)` : 'Healthy (Pool Online)';
           nodeStorage.querySelector('.chaos-node-status').className = 'chaos-node-status ok';
           card.classList.remove('active-fault');
 
@@ -6236,10 +6245,12 @@
     // ==========================================
     // LOCAL LAN & MEDIA ROUTING ENGINE
     // ==========================================
+    const safeGetLS = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+
     function resolveMediaUrl(url) {
       if (!url || typeof url !== 'string') return url;
 
-      const routeSetting = localStorage.getItem('dr_media_route') || 'auto';
+      const routeSetting = safeGetLS('dr_media_route') || 'auto';
       if (routeSetting === 'wan') {
         return url;
       }
@@ -6250,10 +6261,10 @@
       const isFileProtocol = (typeof window !== 'undefined' && window.location && window.location.protocol === 'file:');
       const isDirectHost = isFileProtocol || (isLocalHostPage || hostname === 'nuc' || /^192\.168\./.test(hostname));
 
-      const isNucLocal = (hostname === 'nuc') || ((hostname === 'localhost' || hostname === '127.0.0.1') && (window.location.port === '8088' || window.location.port === '3333' || window.location.port === '8085' || window.location.port === '8990' || window.location.port === '7878' || window.location.port === '9696' || window.location.port === '8787' || window.location.port === '8081' || localStorage.getItem('dr_is_nuc') === 'true'));
+      const isNucLocal = (hostname === 'nuc') || ((hostname === 'localhost' || hostname === '127.0.0.1') && (window.location.port === '8088' || window.location.port === '3333' || window.location.port === '8085' || window.location.port === '8990' || window.location.port === '7878' || window.location.port === '9696' || window.location.port === '8787' || window.location.port === '8081' || safeGetLS('dr_is_nuc') === 'true'));
       const nucHost = isNucLocal ? 'localhost' : '192.168.2.35';
 
-      const isDeskLocal = (hostname === 'desktop' || hostname === 'cory-desktop') || ((hostname === 'localhost' || hostname === '127.0.0.1') && !isNucLocal) || (isFileProtocol && localStorage.getItem('dr_is_nuc') !== 'true') || localStorage.getItem('dr_is_desktop') === 'true' || window.location.port === '8080';
+      const isDeskLocal = (hostname === 'desktop' || hostname === 'cory-desktop') || ((hostname === 'localhost' || hostname === '127.0.0.1') && !isNucLocal) || (isFileProtocol && safeGetLS('dr_is_nuc') !== 'true') || safeGetLS('dr_is_desktop') === 'true' || window.location.port === '8080';
       const deskHost = isDeskLocal ? 'localhost' : '192.168.2.62';
 
       if (routeSetting === 'tailscale') {
@@ -6292,7 +6303,7 @@
       let isHomeNet = (typeof window !== 'undefined' && (window.dr_is_home_network === true || window.isHomeNetwork === true));
       const homeNetKnownFalse = (typeof window !== 'undefined' && window.dr_is_home_network === false);
       if (!isHomeNet && !homeNetKnownFalse) {
-        if (localStorage.getItem('dr_is_home_network') === 'true') isHomeNet = true;
+        if (safeGetLS('dr_is_home_network') === 'true') isHomeNet = true;
         try {
           const raw = localStorage.getItem('dr_telemetry_cache');
           if (raw) {
@@ -6342,7 +6353,7 @@
     window.resolveMediaUrl = resolveMediaUrl;
 
     function getMediaRouteMode() {
-      return localStorage.getItem('dr_media_route') || 'auto';
+      return safeGetLS('dr_media_route') || 'auto';
     }
 
     function updateMediaRoutePillUI() {
@@ -6513,6 +6524,10 @@
 
     function runLiveSpeedtestBenchmark() {
       if (isSpeedtesting) return;
+      if (!isSSOAuthenticated()) {
+        openGlobalSSOModal('Gigabit Speedtest (WAN Saturation Prevention)', runLiveSpeedtestBenchmark);
+        return;
+      }
       setSpeedtestButtonsState(true);
       const gaugeNum = document.getElementById('gauge-live-num');
       const gaugeNeedle = document.getElementById('speed-dial-needle');
@@ -7490,11 +7505,27 @@
             }
           } else {
             showToast('warning', "Penny's Smart Feeder", (data && data.message) || `Dispense rejected.`);
+            if (data && data.feeder) {
+              updateFeederUI(data.feeder);
+            } else if (window.LAST_FEEDER_STATE) {
+              updateFeederUI(window.LAST_FEEDER_STATE);
+            } else {
+              if (timeEl) timeEl.textContent = 'Dispense rejected';
+              if (iotTimeEl) iotTimeEl.textContent = 'Dispense rejected';
+              if (dishEl) dishEl.textContent = 'Unknown (Dispense Rejected)';
+            }
             if (watchEl) watchEl.textContent = 'Alert: Check feeder hopper';
           }
         })
         .catch(err => {
           showToast('error', "Penny's Smart Feeder", `Gateway error: ${err.message}`);
+          if (window.LAST_FEEDER_STATE) {
+            updateFeederUI(window.LAST_FEEDER_STATE);
+          } else {
+            if (timeEl) timeEl.textContent = 'Dispense failed';
+            if (iotTimeEl) iotTimeEl.textContent = 'Offline';
+            if (dishEl) dishEl.textContent = 'Gateway Offline';
+          }
           if (watchEl) watchEl.textContent = 'Gateway Offline';
         });
     }
