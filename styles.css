@@ -245,7 +245,7 @@ section[id], div[id], #deck, #ops, #fleet, #uptime, #camera-feed-card {
 .btn-gemini,
 .btn-wol {
   background: rgba(59, 130, 246, 0.12);
-  color: #60a5fa !important;
+  color: #60a5fa;
   border: 1px solid rgba(59, 130, 246, 0.35);
   padding: 8px 15px;
   font-size: 0.88rem;
@@ -1819,7 +1819,7 @@ button.dropdown-item:active,
 
 .pill-outline {
   background: rgba(255, 255, 255, 0.05);
-  color: #e2e8f0 !important;
+  color: #e2e8f0;
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
@@ -3927,7 +3927,7 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
     padding: 8px 14px !important;
     font-size: 0.82rem !important;
     flex-shrink: 0 !important;
-    display: inline-flex !important;
+    display: inline-flex;
     align-items: center !important;
     justify-content: center !important;
     white-space: nowrap !important;
@@ -4638,7 +4638,7 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
     padding: 8px 14px !important;
     font-size: 0.82rem !important;
     flex-shrink: 0 !important;
-    display: inline-flex !important;
+    display: inline-flex;
     align-items: center !important;
     justify-content: center !important;
     white-space: nowrap !important;

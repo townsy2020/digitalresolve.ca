@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-25T15:40:15Z",
-    "currentVersion":  "v2.9.25",
+    "updatedAt":  "2026-11-25T15:53:02Z",
+    "currentVersion":  "v2.9.26",
     "releases":  [
+                     {
+                         "version":  "v2.9.26",
+                         "date":  "November 25, 2026",
+                         "title":  "Mobile SSO Lock Visibility \u0026 CSS Cascade Polish",
+                         "changes":  [
+                                         {
+                                             "label":  "Mobile Terminal Lock Gate",
+                                             "text":  "Removed !important from mobile .terminal-tab display rules so the SSO-gated Lock button stays hidden when signed out on mobile viewports while visible tabs remain inline-flex."
+                                         },
+                                         {
+                                             "label":  "Action Button Contrast",
+                                             "text":  "Removed !important from .btn-nav base text color so Send and Pop Out buttons render their crisp white and emerald inline text colors instead of being overridden to blue."
+                                         },
+                                         {
+                                             "label":  "Hero Pill Accent Fidelity",
+                                             "text":  "Removed !important from .pill-outline base text color so Terminal \u0026 Ops and NUC Services hero pills display their purple and cyan accent colors."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.25",
                          "date":  "November 25, 2026",
