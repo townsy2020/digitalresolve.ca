@@ -133,8 +133,9 @@
           if (window.DESKTOP_IS_ONLINE === false && el.id && el.id.includes('desktop')) return;
           if (el.querySelector('.btn-check-inline')) return;
           const txt = (el.textContent ? el.textContent.trim() : '').toLowerCase();
+          const isOnlyPlaceholder = !/\d/.test(txt) && (/^(--|—|n\/a)(\s*(ms|%|gb|mb|tb|°[cf]|w|v|hours?|days?))?$/i.test(txt) || txt.includes('--'));
           const isStuck = txt === '' ||
-            txt.includes('--') ||
+            isOnlyPlaceholder ||
             txt.includes('null') ||
             txt.includes('undefined') ||
             /\bnan\b/.test(txt) ||
@@ -164,16 +165,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.2';
+          const activeVer = match ? match[0] : 'v2.9.3';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 21492;
+      const baseHtmlLines = 21617;
       const baseCssLines = 7357;
-      const baseJsLines = 8839;
+      const baseJsLines = 8840;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();

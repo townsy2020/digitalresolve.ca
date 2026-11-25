@@ -205,7 +205,7 @@
     const b = safeNum(bytes, 0);
     if (b <= 0) return '0 B';
     const units = ['B', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.min(units.length - 1, Math.floor(Math.log(b) / Math.log(1024)));
+    const i = Math.max(0, Math.min(units.length - 1, Math.floor(Math.log(b) / Math.log(1024))));
     return (b / Math.pow(1024, i)).toFixed(i >= 2 ? 2 : 0) + ' ' + units[i];
   }
 

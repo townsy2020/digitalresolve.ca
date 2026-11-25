@@ -522,14 +522,27 @@
     setInterval(updateClock, 1000);
     updateClock();
 
+    let spinnerHideTimer = null;
+
     function hideSpinner() {
+      if (spinnerHideTimer) {
+        clearTimeout(spinnerHideTimer);
+        spinnerHideTimer = null;
+      }
       if (spinner && spinner.style.display !== 'none') {
         spinner.style.opacity = '0';
-        setTimeout(() => { spinner.style.display = 'none'; }, 250);
+        spinnerHideTimer = setTimeout(() => {
+          spinnerHideTimer = null;
+          spinner.style.display = 'none';
+        }, 250);
       }
     }
 
     function showSpinner(text) {
+      if (spinnerHideTimer) {
+        clearTimeout(spinnerHideTimer);
+        spinnerHideTimer = null;
+      }
       if (spinner) {
         if (text) {
           const t = spinner.querySelector('div:nth-child(2)');

@@ -536,7 +536,7 @@
       cleanupStream();
 
       const params = new URLSearchParams(window.location.search);
-      let src = params.get('src') || 'pennys_feeder';
+      let src = (params.get('src') || 'pennys_feeder').toLowerCase();
       if (src.includes('bedroom') || src.includes('cam2')) {
         src = src.includes('sd') ? 'bedroom_sd' : 'bedroom';
       } else {

@@ -1,7 +1,30 @@
 {
-    "updatedAt":  "2026-11-25T08:22:46Z",
-    "currentVersion":  "v2.9.2",
+    "updatedAt":  "2026-11-25T08:39:57Z",
+    "currentVersion":  "v2.9.3",
     "releases":  [
+                     {
+                         "version":  "v2.9.3",
+                         "date":  "November 25, 2026",
+                         "title":  "Telemetry Guard, Camera Spinner \u0026 Stream Query Fixes",
+                         "changes":  [
+                                         {
+                                             "label":  "Telemetry Check Guard",
+                                             "text":  "Stopped partial \u0027--\u0027 sub-metrics from wiping live multi-field telemetry in auditAndAttachCheckButtons"
+                                         },
+                                         {
+                                             "label":  "WebRTC Spinner Timer",
+                                             "text":  "Cancelled pending hideSpinner timeout on reconnect so active connecting spinners stay visible"
+                                         },
+                                         {
+                                             "label":  "AI Camera Query Parity",
+                                             "text":  "Normalized ?src= query parsing to lowercase in ai.html for consistent camera and SD selection"
+                                         },
+                                         {
+                                             "label":  "Storage Flow Formatter",
+                                             "text":  "Clamped fmtBytes unit index in storage-flow.js for sub-byte values"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.2",
                          "date":  "November 25, 2026",
