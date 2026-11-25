@@ -164,16 +164,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.1';
+          const activeVer = match ? match[0] : 'v2.9.2';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 21388;
-      const baseCssLines = 7337;
-      const baseJsLines = 8796;
+      const baseHtmlLines = 21492;
+      const baseCssLines = 7357;
+      const baseJsLines = 8839;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -5918,6 +5918,9 @@
       div.className = `chaos-line ${type}`;
       div.textContent = `[${timeStr}] [SIMULATED] ${msg}`;
       feed.appendChild(div);
+      while (feed.children.length > 100) {
+        feed.removeChild(feed.firstElementChild);
+      }
       feed.scrollTop = feed.scrollHeight;
     }
 
@@ -7534,8 +7537,48 @@
     setTimeout(() => { if (typeof auditAndAttachCheckButtons === 'function') auditAndAttachCheckButtons(); }, 1600);
     setInterval(() => { if (document.hidden) return; if (typeof auditAndAttachCheckButtons === 'function') auditAndAttachCheckButtons(); }, 5000);
 
-    // Global Escape Key Handler to dismiss all modals & restore scroll
+    // Global Keyboard Handler: Tab focus trap inside open aria-modal dialogs & Escape to dismiss all modals
     document.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        const dialogs = Array.from(document.querySelectorAll('[role="dialog"][aria-modal="true"]')).filter(dlg => {
+          const cs = getComputedStyle(dlg);
+          if (cs.display === 'none' || cs.visibility === 'hidden') return false;
+          const ov = dlg.parentElement;
+          if (ov) {
+            const ocs = getComputedStyle(ov);
+            if (ocs.display === 'none' || ocs.visibility === 'hidden') return false;
+          }
+          const r = dlg.getBoundingClientRect();
+          return r.width > 0 && r.height > 0;
+        });
+        if (dialogs.length > 0) {
+          const activeDlg = dialogs[dialogs.length - 1];
+          const focusables = Array.from(activeDlg.querySelectorAll(
+            'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+          )).filter(el => {
+            const cs = getComputedStyle(el);
+            if (cs.display === 'none' || cs.visibility === 'hidden') return false;
+            const r = el.getBoundingClientRect();
+            return r.width > 0 && r.height > 0;
+          });
+          if (focusables.length > 0) {
+            const first = focusables[0];
+            const last = focusables[focusables.length - 1];
+            const cur = document.activeElement;
+            if (!activeDlg.contains(cur)) {
+              e.preventDefault();
+              (e.shiftKey ? last : first).focus();
+            } else if (e.shiftKey && cur === first) {
+              e.preventDefault();
+              last.focus();
+            } else if (!e.shiftKey && cur === last) {
+              e.preventDefault();
+              first.focus();
+            }
+          }
+        }
+        return;
+      }
       if (e.key === 'Escape') {
         closeSpeedtestSSOModal();
         closeDisasterModal();

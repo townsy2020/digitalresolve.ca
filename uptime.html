@@ -8,8 +8,8 @@
   <meta http-equiv="Expires" content="0">
   <title>Uptime & SLA Matrix - Homelab Operations</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b0f17'/%3E%3Cpath d='M8 22V10h7a6 6 0 0 1 0 12H8zm4-3.5h3a2.5 2.5 0 0 0 0-5h-3v5z' fill='%2338bdf8'/%3E%3C/svg%3E">
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.9.1 - Uptime & SLA Matrix - Homelab Operations">
-  <link rel="stylesheet" href="styles.css?v=2.9.1">
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.9.2 - Uptime & SLA Matrix - Homelab Operations">
+  <link rel="stylesheet" href="styles.css?v=2.9.2">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -262,7 +262,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.9.1</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.9.2</span>)</span>
             </button>
             <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO(true, event)" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -934,12 +934,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.9.1</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.9.2</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 37,522 Lines of Code (HTML: 21,388 lines | CSS: 7,337 lines | JS: 8,796 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 37,689 Lines of Code (HTML: 21,492 lines | CSS: 7,357 lines | JS: 8,839 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">37,522</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">37,689</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -1534,10 +1534,23 @@
       </div>
 
             <div class="changelog-body">
-                                                                                                                                                                                                                                <!-- Version v2.9.1 (Current) -->
+                                                                                                                                                                                                                                        <!-- Version v2.9.2 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.9.1 | Current</span>
+            <span class="ver-tag current">v2.9.2 | Current</span>
+            <span class="ver-date">November 25, 2026</span>
+          </div>
+          <h4 class="ver-title">320px Mobile Fit, Modal Focus Trap &amp; Chaos Feed Cap</h4>
+          <ul class="ver-list">
+            <li><strong>320px Mobile Fit:</strong> Wrapped power gateway bar, stats grid, dashboard card rows, and media filter bar so 320px viewports render with 0px horizontal overflow</li>
+            <li><strong>Modal Focus Trap:</strong> Added Tab and Shift+Tab keyboard focus trapping across all modal overlays in app.js</li>
+            <li><strong>Chaos Console Cap:</strong> Capped #chaos-console-feed to 100 DOM entries to prevent unbounded memory/DOM growth during repeated Chaos Lab runs</li>
+          </ul>
+        </div>
+        <!-- Version v2.9.1 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.9.1</span>
             <span class="ver-date">November 25, 2026</span>
           </div>
           <h4 class="ver-title">Speedtest Poll, Feeder Rollback, Storage Safety &amp; Chaos Honesty</h4>
@@ -2358,6 +2371,6 @@
       </div>
     </div>
   </div>
-  <script src="app.js?v=2.9.1"></script>
+  <script src="app.js?v=2.9.2"></script>
 </body>
 </html>

@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-25T07:49:46Z",
-    "currentVersion":  "v2.9.1",
+    "updatedAt":  "2026-11-25T08:22:46Z",
+    "currentVersion":  "v2.9.2",
     "releases":  [
+                     {
+                         "version":  "v2.9.2",
+                         "date":  "November 25, 2026",
+                         "title":  "320px Mobile Fit, Modal Focus Trap \u0026 Chaos Feed Cap",
+                         "changes":  [
+                                         {
+                                             "label":  "320px Mobile Fit",
+                                             "text":  "Wrapped power gateway bar, stats grid, dashboard card rows, and media filter bar so 320px viewports render with 0px horizontal overflow"
+                                         },
+                                         {
+                                             "label":  "Modal Focus Trap",
+                                             "text":  "Added Tab and Shift+Tab keyboard focus trapping across all modal overlays in app.js"
+                                         },
+                                         {
+                                             "label":  "Chaos Console Cap",
+                                             "text":  "Capped #chaos-console-feed to 100 DOM entries to prevent unbounded memory/DOM growth during repeated Chaos Lab runs"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.1",
                          "date":  "November 25, 2026",

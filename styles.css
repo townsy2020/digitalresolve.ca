@@ -2383,7 +2383,7 @@ button.dropdown-item:active,
 
 @media (max-width: 640px) {
   .stats-grid-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -4261,7 +4261,7 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
 
   html:not(.desktop-layout) .stats-grid-row,
   html.mobile-layout .stats-grid-row {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: minmax(0, 1fr) !important;
     gap: 12px !important;
   }
 
@@ -4606,6 +4606,17 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
   .power-gateway-bar {
     flex-wrap: wrap !important;
     gap: 8px !important;
+  }
+
+  .power-gateway-bar > div {
+    flex-wrap: wrap !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  #pwr-feedback-text {
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
 
   html:not(.desktop-layout) .footer-meta,
@@ -5706,12 +5717,21 @@ html.mobile-layout .penny-hub-grid {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
+.dash-card-meta-row > * {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .dash-card-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
   padding-top: 8px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
