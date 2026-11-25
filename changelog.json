@@ -1,7 +1,30 @@
 {
-    "updatedAt":  "2026-11-25T08:39:57Z",
-    "currentVersion":  "v2.9.3",
+    "updatedAt":  "2026-11-25T08:55:18Z",
+    "currentVersion":  "v2.9.4",
     "releases":  [
+                     {
+                         "version":  "v2.9.4",
+                         "date":  "November 25, 2026",
+                         "title":  "Offline Resilience \u0026 Malformed Payload Hardening",
+                         "changes":  [
+                                         {
+                                             "label":  "Swarm Tag Fallback",
+                                             "text":  "Reset #swarm-tag from green Checking... to Offline when /stats fails or omits nuc.swarm"
+                                         },
+                                         {
+                                             "label":  "Storage Flow Guard",
+                                             "text":  "Reject empty {} or [] payloads in storage-flow.js so storage.html renders offline fallback instead of false-healthy telemetry"
+                                         },
+                                         {
+                                             "label":  "Log Stream Guards",
+                                             "text":  "Added Array.isArray and empty-payload fallbacks in loadLog() and refreshAgyConsole() to prevent stuck streaming states"
+                                         },
+                                         {
+                                             "label":  "Changelog Payload Guard",
+                                             "text":  "Guarded missing release version fields in fetchAndRenderChangelog() to prevent undefined labels"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.3",
                          "date":  "November 25, 2026",

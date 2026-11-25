@@ -273,7 +273,7 @@
         renderOfflineFallback();
         return;
       }
-      if (!json || typeof json !== 'object') {
+      if (!json || typeof json !== 'object' || Array.isArray(json) || (json.status !== 'success' && !json.tiers && !Array.isArray(json.pipelines))) {
         renderOfflineFallback();
         return;
       }

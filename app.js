@@ -165,16 +165,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.3';
+          const activeVer = match ? match[0] : 'v2.9.4';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 21617;
+      const baseHtmlLines = 21729;
       const baseCssLines = 7357;
-      const baseJsLines = 8840;
+      const baseJsLines = 8871;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -3213,7 +3213,10 @@
               ? `${safeActiveDl} DL | ${safeActiveUp} Seed`
               : (safeTotalTorrents !== null ? `${safeActiveDl} Active | ${safeTotalTorrents} Total` : `${safeActiveDl} Active | -- Seed`);
           }
-          if (swTag) swTag.textContent = safeTotalTorrents !== null ? `${safeTotalTorrents} Managed` : '-- Managed';
+          if (swTag) {
+            swTag.textContent = safeTotalTorrents !== null ? `${safeTotalTorrents} Managed` : '-- Managed';
+            swTag.className = 'item-tag online';
+          }
           if (dht) dht.textContent = (sw.dhtNodes !== null && sw.dhtNodes !== undefined && !isNaN(sw.dhtNodes)) ? `DHT: ${sw.dhtNodes} Nodes` : 'DHT: --';
           if (vpnIp) vpnIp.textContent = sw.vpnExitIp ? `VPN: ${sw.vpnExitIp}` : 'VPN: --';
           document.querySelectorAll('#schematic-vpn-throughput').forEach(el => {
@@ -3241,6 +3244,12 @@
               throttleTag.style.background = 'rgba(59, 130, 246, 0.2)';
               throttleTag.style.color = '#60a5fa';
             }
+          }
+        } else {
+          const swTag = document.getElementById('swarm-tag');
+          if (swTag && (swTag.textContent === 'Checking...' || !nuc.online)) {
+            swTag.textContent = 'Offline';
+            swTag.className = 'item-tag offline';
           }
         }
 
@@ -3300,6 +3309,12 @@
           if (tvLeg) tvLeg.innerHTML = `<span class="legend-dot seg-tv"></span> Series (${stTv} GB)`;
           const mixesLeg = document.getElementById('stat-nuc-mixes-legend');
           if (mixesLeg) mixesLeg.innerHTML = `<span class="legend-dot seg-mixes"></span> Mixes (${Math.round(stMix)} GB)`;
+        }
+      } else {
+        const swTag = document.getElementById('swarm-tag');
+        if (swTag && swTag.textContent === 'Checking...') {
+          swTag.textContent = 'Offline';
+          swTag.className = 'item-tag offline';
         }
       }
       if (data.cloudflare) {
@@ -3473,6 +3488,11 @@
                 if (cached) return applyClusterStatsPayload(JSON.parse(cached));
               } catch (e) {}
               try { updateCloudflareStatsUI(); } catch (e) {}
+              const swTag = document.getElementById('swarm-tag');
+              if (swTag && swTag.textContent === 'Checking...') {
+                swTag.textContent = 'Offline';
+                swTag.className = 'item-tag offline';
+              }
               return null;
             });
         })
@@ -3510,9 +3530,11 @@
           if (reqTab === 'agy' && data && (data.conversationId || data.hostNode || data.sessionName)) {
             updateAgySessionDisplay(data.conversationId || '', data.sessionName || null, data.hostNode || null);
           }
-          if (body && data.lines) {
+          if (body && data && Array.isArray(data.lines)) {
             body.textContent = data.lines.join('\n');
             body.scrollTop = body.scrollHeight;
+          } else if (body) {
+            body.textContent = '[No log entries available]';
           }
         })
         .catch(() => {
@@ -5395,29 +5417,30 @@
           if (data && (data.conversationId || data.hostNode || data.sessionName)) {
             updateAgySessionDisplay(data.conversationId || '', data.sessionName || null, data.hostNode || null);
           }
-          if (data && data.lines && screen) {
+          if (data && Array.isArray(data.lines) && screen) {
             const isNearBottom = screen.scrollHeight - screen.scrollTop - screen.clientHeight < 80;
             
             screen.innerHTML = '';
             data.lines.forEach(line => {
+              const lineStr = String(line ?? '');
               const div = document.createElement('div');
               div.className = 'agy-line';
-              if (line.includes('[USER]') || line.includes('[USER_EXPLICIT]')) {
+              if (lineStr.includes('[USER]') || lineStr.includes('[USER_EXPLICIT]')) {
                 div.className += ' user';
-                div.innerHTML = `<span style="color:#38bdf8; font-weight:700;">[USER]</span> ${escapeHtml(line.replace(/\[\d\d:\d\d:\d\d\]\s*\[(USER|USER_EXPLICIT)\]\s*/, ''))}`;
-              } else if (line.includes('[AGENT]') || line.includes('[MODEL]')) {
+                div.innerHTML = `<span style="color:#38bdf8; font-weight:700;">[USER]</span> ${escapeHtml(lineStr.replace(/\[\d\d:\d\d:\d\d\]\s*\[(USER|USER_EXPLICIT)\]\s*/, ''))}`;
+              } else if (lineStr.includes('[AGENT]') || lineStr.includes('[MODEL]')) {
                 div.className += ' model';
-                div.innerHTML = `<span style="color:#60a5fa; font-weight:700;">[AGENT]</span> ${escapeHtml(line.replace(/\[\d\d:\d\d:\d\d\]\s*\[(AGENT|MODEL)\]\s*/, ''))}`;
-              } else if (line.includes('[TOOL]') || line.includes('Tool Call')) {
+                div.innerHTML = `<span style="color:#60a5fa; font-weight:700;">[AGENT]</span> ${escapeHtml(lineStr.replace(/\[\d\d:\d\d:\d\d\]\s*\[(AGENT|MODEL)\]\s*/, ''))}`;
+              } else if (lineStr.includes('[TOOL]') || lineStr.includes('Tool Call')) {
                 div.className += ' tool';
-                div.innerHTML = `<span style="color:#fbbf24; font-weight:700;">[TOOL]</span> <span style="color:#cbd5e1;">${escapeHtml(line.replace(/\[\d\d:\d\d:\d\d\]\s*\[TOOL\]\s*/, ''))}</span>`;
-              } else if (line.includes('[OUTPUT]')) {
+                div.innerHTML = `<span style="color:#fbbf24; font-weight:700;">[TOOL]</span> <span style="color:#cbd5e1;">${escapeHtml(lineStr.replace(/\[\d\d:\d\d:\d\d\]\s*\[TOOL\]\s*/, ''))}</span>`;
+              } else if (lineStr.includes('[OUTPUT]')) {
                 div.className += ' system';
                 div.style.color = '#94a3b8';
-                div.innerHTML = `<span style="color:#10b981; font-weight:600;">[OUTPUT]</span> ${escapeHtml(line.replace(/\[\d\d:\d\d:\d\d\]\s*\[OUTPUT\]\s*/, ''))}`;
+                div.innerHTML = `<span style="color:#10b981; font-weight:600;">[OUTPUT]</span> ${escapeHtml(lineStr.replace(/\[\d\d:\d\d:\d\d\]\s*\[OUTPUT\]\s*/, ''))}`;
               } else {
                 div.className += ' system';
-                div.textContent = line;
+                div.textContent = lineStr;
               }
               screen.appendChild(div);
             });
@@ -5433,6 +5456,9 @@
             if (typeof updateQuotaHistorySparkline === 'function') {
               updateQuotaHistorySparkline();
             }
+          } else if (statusTag) {
+            statusTag.textContent = 'NO LOG DATA';
+            statusTag.className = 'item-tag';
           }
         })
         .catch(err => {
@@ -5535,22 +5561,27 @@
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(data => {
           if (!data || !Array.isArray(data.releases) || data.releases.length === 0) return;
-          const latestVer = data.releases[0].version;
+          const validReleases = data.releases.filter(rel => rel && typeof rel === 'object');
+          if (validReleases.length === 0) return;
+          const latestVer = validReleases[0].version ? String(validReleases[0].version).trim() : '';
 
-          const menuVer = document.getElementById('menu-changelog-ver');
-          if (menuVer) menuVer.textContent = latestVer;
-          const footerVer = document.getElementById('footer-version-tag');
-          if (footerVer) footerVer.textContent = latestVer;
+          if (latestVer) {
+            const menuVer = document.getElementById('menu-changelog-ver');
+            if (menuVer) menuVer.textContent = latestVer;
+            const footerVer = document.getElementById('footer-version-tag');
+            if (footerVer) footerVer.textContent = latestVer;
+          }
 
           if (container) {
             let html = '';
-            data.releases.forEach((rel, idx) => {
+            validReleases.forEach((rel, idx) => {
               const isCurrent = idx === 0;
               const tagClass = isCurrent ? 'ver-tag current' : 'ver-tag';
-              const tagLabel = isCurrent ? (rel.version + ' | Current') : rel.version;
+              const verText = rel.version ? String(rel.version).trim() : 'Release';
+              const tagLabel = isCurrent ? (verText + ' | Current') : verText;
               let listItems = '';
               if (Array.isArray(rel.changes)) {
-                listItems = rel.changes.map(ch => {
+                listItems = rel.changes.filter(ch => ch && typeof ch === 'object').map(ch => {
                   const boldPrefix = ch.label ? ('<strong>' + escapeHtml(ch.label) + ':</strong> ') : '';
                   return '<li>' + boldPrefix + escapeHtml(ch.text) + '</li>';
                 }).join('');
