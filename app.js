@@ -165,16 +165,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.10';
+          const activeVer = match ? match[0] : 'v2.9.11';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 22360;
+      const baseHtmlLines = 22464;
       const baseCssLines = 7381;
-      const baseJsLines = 9012;
+      const baseJsLines = 9096;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -1726,8 +1726,10 @@
         document.querySelector('#chaos-modal-overlay .node-fault, #chaos-modal-overlay .node-rerouted, .chaos-node.node-fault, .chaos-node.node-rerouted, .chaos-node.severed')
       );
       if (!anyChaosActive) {
+        const chaosScoreCls = score >= 90 ? 'ok' : (score >= 45 ? 'warning' : 'critical');
         document.querySelectorAll('#chaos-score-val').forEach(el => {
           el.textContent = `${score}% ${statusText}`;
+          el.className = `chaos-score-val ${chaosScoreCls}`;
         });
       }
       const heroBtn = document.getElementById('hero-health-radar-text');
@@ -2240,6 +2242,21 @@
         if (magUnlocked && magGate) {
           magUnlocked.style.display = 'none';
           magGate.style.display = 'flex';
+        }
+
+        // Stop AGY console auto-poll and close open SSO-gated modals on re-lock
+        if (typeof stopConsoleAutoPoll === 'function') stopConsoleAutoPoll();
+        const chaosModalEl = document.getElementById('disaster-modal-overlay') || document.getElementById('chaos-modal-overlay');
+        if (chaosModalEl && chaosModalEl.classList.contains('active') && typeof closeDisasterModal === 'function') {
+          closeDisasterModal();
+        }
+        const maintModalEl = document.getElementById('maintenance-modal-overlay');
+        if (maintModalEl && maintModalEl.classList.contains('active') && typeof closeMaintenanceModal === 'function') {
+          closeMaintenanceModal();
+        }
+        const agyModalEl = document.getElementById('agy-console-modal-overlay');
+        if (agyModalEl && agyModalEl.classList.contains('active')) {
+          document.body.style.overflow = 'hidden';
         }
       }
     }
@@ -5117,6 +5134,17 @@
     window.addEventListener('resize', () => {
       initSparklineHeartbeat();
     });
+    let _sparklineDprMq = null;
+    (function watchSparklineDpr() {
+      if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+      _sparklineDprMq = window.matchMedia(`(resolution: ${window.devicePixelRatio || 1}dppx)`);
+      const onChange = () => {
+        initSparklineHeartbeat();
+        watchSparklineDpr();
+      };
+      if (typeof _sparklineDprMq.addEventListener === 'function') _sparklineDprMq.addEventListener('change', onChange, { once: true });
+      else if (typeof _sparklineDprMq.addListener === 'function') _sparklineDprMq.addListener(onChange);
+    })();
     function filterServiceDashboard(category, btn) {
       document.querySelectorAll('.dash-filter-btn').forEach(b => b.classList.remove('active'));
       if (btn) btn.classList.add('active');
@@ -5507,6 +5535,7 @@
     let _agyConsoleInFlight = false;
     function refreshAgyConsole(isSilent = false) {
       if (!isSSOAuthenticated()) {
+        stopConsoleAutoPoll();
         updateSSOGateUI(); try { updateMaintenanceVisualStates(); } catch(e) {}
         return;
       }
@@ -5959,6 +5988,7 @@
     const chaosState = {
       soundEnabled: false,
       audioCtx: null,
+      faultTimers: {},
       faults: {
         bellFiber: false,
         desktopPower: false,
@@ -5968,12 +5998,12 @@
     };
 
     function getChaosAudioCtx() {
-      if (!chaosState.audioCtx && typeof (window.AudioContext || window.webkitAudioContext) !== 'undefined') {
+      if ((!chaosState.audioCtx || chaosState.audioCtx.state === 'closed') && typeof (window.AudioContext || window.webkitAudioContext) !== 'undefined') {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
         chaosState.audioCtx = new AudioCtx();
       }
       if (chaosState.audioCtx && chaosState.audioCtx.state === 'suspended') {
-        chaosState.audioCtx.resume();
+        chaosState.audioCtx.resume().catch(() => {});
       }
       return chaosState.audioCtx;
     }
@@ -6013,6 +6043,9 @@
         playChaosTone(587, 880, 'triangle', 0.18);
         addChaosLog('info', '[AUDIO] Procedural Web Audio synth initialized. Acoustic telemetry active.');
       } else {
+        if (chaosState.audioCtx && chaosState.audioCtx.state === 'running') {
+          chaosState.audioCtx.suspend().catch(() => {});
+        }
         addChaosLog('sys', '[AUDIO] Audio feedback muted.');
       }
     }
@@ -6035,6 +6068,9 @@
       if (modal) {
         modal.classList.remove('active');
         modal.style.setProperty('display', 'none', 'important');
+      }
+      if (chaosState.audioCtx && chaosState.audioCtx.state === 'running') {
+        chaosState.audioCtx.suspend().catch(() => {});
       }
       document.body.style.overflow = '';
     }
@@ -6070,9 +6106,20 @@
       const scoreEl = document.getElementById('chaos-score-val');
       const badgeEl = document.getElementById('chaos-fault-counter');
 
-      const baseScore = window.DESKTOP_IS_ONLINE ? '100% Optimal' : '98% Optimal (Eco)';
-      let label = baseScore;
+      const nucOn = window.NUC_IS_ONLINE !== undefined ? window.NUC_IS_ONLINE : true;
+      const deskOn = window.DESKTOP_IS_ONLINE !== undefined ? window.DESKTOP_IS_ONLINE : false;
+      let label = '100% Optimal';
       let stateClass = 'ok';
+      if (!nucOn && !deskOn) {
+        label = '0% Critical';
+        stateClass = 'critical';
+      } else if (!nucOn) {
+        label = '45% Degraded';
+        stateClass = 'warning';
+      } else if (!deskOn) {
+        label = '98% Optimal (Eco)';
+        stateClass = 'ok';
+      }
 
       if (activeCount === 1) {
         label = '76% Degraded';
@@ -6103,6 +6150,10 @@
         openGlobalSSOModal('Chaos Engineering Fault Injection', () => triggerChaosFault(type));
         return;
       }
+      if (chaosState.faultTimers && chaosState.faultTimers[type]) {
+        clearTimeout(chaosState.faultTimers[type]);
+        delete chaosState.faultTimers[type];
+      }
       if (type === 'bellFiber') {
         chaosState.faults.bellFiber = !chaosState.faults.bellFiber;
         const isFault = chaosState.faults.bellFiber;
@@ -6127,7 +6178,9 @@
 
           addChaosLog('fault', '[FAULT INJECTED] Physical link carrier lost on eth0 (Bell GigaHub 1.5G).');
           addChaosLog('warn', '[SENTINEL] Upstream gateway 192.168.2.1 unreachable (100% loss). Initiating multi-WAN failover...');
-          setTimeout(() => {
+          chaosState.faultTimers.bellFiber = setTimeout(() => {
+            delete chaosState.faultTimers.bellFiber;
+            if (!chaosState.faults.bellFiber) return;
             addChaosLog('heal', '[AUTONOMOUS FAILOVER] Mullvad WireGuard tunnel re-established via secondary cellular uplink in 1.14s.');
             addChaosLog('info', '[UPTIME PRESERVED] Edge tunnels YUL/YYZ rerouted. Zero dropped client sessions.');
           }, 350);
@@ -6170,7 +6223,9 @@
 
           addChaosLog('fault', '[FAULT INJECTED] Hard power outage detected on 192.168.2.62 (Desktop Workstation).');
           addChaosLog('warn', '[HEARTBEAT] Ping timeout on TCP:9090. Active background agent and torrent tasks stalled.');
-          setTimeout(() => {
+          chaosState.faultTimers.desktopPower = setTimeout(() => {
+            delete chaosState.faultTimers.desktopPower;
+            if (!chaosState.faults.desktopPower) return;
             addChaosLog('heal', '[NUC TAKEOVER] Intel NUC gateway absorbed queued torrent state and proxy ingest.');
             addChaosLog('info', '[SENTINEL] Node marked for automated Wake-on-LAN reboot cycle.');
           }, 350);
@@ -6209,7 +6264,9 @@
 
           addChaosLog('fault', '[FAULT INJECTED] High-velocity SYN/HTTP flood: 52,840 req/s targeting digitalresolve.ca.');
           addChaosLog('warn', '[EDGE ALERT] Sudden variance spike across Montreal (YUL) & Toronto (YYZ) edge PoPs.');
-          setTimeout(() => {
+          chaosState.faultTimers.ddosFlood = setTimeout(() => {
+            delete chaosState.faultTimers.ddosFlood;
+            if (!chaosState.faults.ddosFlood) return;
             addChaosLog('heal', '[SHIELD ACTIVE] Cloudflare Zero Trust rate-limiting and challenge mode deployed.');
             addChaosLog('heal', '[MITIGATED] 99.82% malicious packets dropped at edge. NUC origin CPU unaffected (14%).');
           }, 350);
@@ -6244,7 +6301,9 @@
 
           addChaosLog('fault', '[FAULT INJECTED] Storage pool /storage/torrents hit critical threshold: 99.8% capacity!');
           addChaosLog('warn', '[DISK LOCK] Only 284 MB free space remaining. Torrent ingestion paused.');
-          setTimeout(() => {
+          chaosState.faultTimers.diskFull = setTimeout(() => {
+            delete chaosState.faultTimers.diskFull;
+            if (!chaosState.faults.diskFull) return;
             addChaosLog('heal', '[SENTINEL PRUNE] Autonomous cleaner purged 12.6 GB temporary torrent buffers.');
             addChaosLog('heal', '[SMB EVACUATION] Completed media archives relocated to Desktop secondary array.');
             addChaosLog('info', '[HEADROOM RESTORED] Storage pool dropped to 42% healthy.');
@@ -6269,6 +6328,12 @@
       if (!isSSOAuthenticated()) {
         openGlobalSSOModal('Chaos Engineering Recovery', restoreAllChaos);
         return;
+      }
+      if (chaosState.faultTimers) {
+        Object.keys(chaosState.faultTimers).forEach(k => {
+          clearTimeout(chaosState.faultTimers[k]);
+          delete chaosState.faultTimers[k];
+        });
       }
       const hadFaults = Object.values(chaosState.faults).some(Boolean);
       chaosState.faults.bellFiber = false;

@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-25T11:13:35Z",
-    "currentVersion":  "v2.9.10",
+    "updatedAt":  "2026-11-25T11:28:18Z",
+    "currentVersion":  "v2.9.11",
     "releases":  [
+                     {
+                         "version":  "v2.9.11",
+                         "date":  "November 25, 2026",
+                         "title":  "Chaos Lab Timers, Canvas DPI \u0026 SSO Re-Lock Cleanup",
+                         "changes":  [
+                                         {
+                                             "label":  "Chaos Lab State \u0026 Audio",
+                                             "text":  "Cancelled pending Chaos Lab fault timers on restore, suspended AudioContext on mute/close, and synced #chaos-score-val severity class"
+                                         },
+                                         {
+                                             "label":  "High-DPI Canvas Resize",
+                                             "text":  "Observed #storage-waveform-canvas container resizes and added DPR change listeners for storage waveform and uptime sparkline canvases"
+                                         },
+                                         {
+                                             "label":  "SSO Re-Lock Cleanup",
+                                             "text":  "Stopped AGY console auto-poll and closed open Chaos/Maintenance modals when SSO session locks"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.10",
                          "date":  "November 25, 2026",

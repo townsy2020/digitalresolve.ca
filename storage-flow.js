@@ -723,7 +723,7 @@
     const rect = canvas.getBoundingClientRect();
     if (rect.width < 10 || rect.height < 10) return;
 
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = Math.min(window.devicePixelRatio || 1, 3);
     canvas.width = Math.round(rect.width * dpr);
     canvas.height = Math.round(rect.height * dpr);
     const ctx = canvas.getContext('2d');
@@ -1238,7 +1238,26 @@
         });
         ro.observe(stageEl);
       }
+      const wfCanvas = document.getElementById('storage-waveform-canvas');
+      if (wfCanvas) {
+        const wfRo = new ResizeObserver(() => {
+          renderWaveform();
+        });
+        wfRo.observe(wfCanvas);
+      }
     }
+
+    let _waveformDprMq = null;
+    (function watchWaveformDpr() {
+      if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+      _waveformDprMq = window.matchMedia(`(resolution: ${window.devicePixelRatio || 1}dppx)`);
+      const onChange = () => {
+        renderWaveform();
+        watchWaveformDpr();
+      };
+      if (typeof _waveformDprMq.addEventListener === 'function') _waveformDprMq.addEventListener('change', onChange, { once: true });
+      else if (typeof _waveformDprMq.addListener === 'function') _waveformDprMq.addListener(onChange);
+    })();
 
     renderPipesSVG(null);
     updateInspector();
