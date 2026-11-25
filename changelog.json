@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-25T00:31:15Z",
-    "currentVersion":  "v2.8.94",
+    "updatedAt":  "2026-11-25T01:04:12Z",
+    "currentVersion":  "v2.8.95",
     "releases":  [
+                     {
+                         "version":  "v2.8.95",
+                         "date":  "November 24, 2026",
+                         "title":  "Defensive Telemetry Parsing \u0026 Null-Safe Rendering",
+                         "changes":  [
+                                         {
+                                             "label":  "Null-Safe Telemetry",
+                                             "text":  "Hardened updateStatusUI, updateHealthRadarUI, updateClimateUI, renderUptimeMatrix, Cloudflare, ABS, and Feeder renderers against partial or null API payloads."
+                                         },
+                                         {
+                                             "label":  "Storage Flow Guards",
+                                             "text":  "Filtered null pipeline/event records and validated timestamps in storage-flow.js to eliminate Invalid Date and unhandled rejections."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.94",
                          "date":  "November 24, 2026",

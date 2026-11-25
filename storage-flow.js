@@ -272,6 +272,10 @@
         renderOfflineFallback();
         return;
       }
+      if (!json || typeof json !== 'object') {
+        renderOfflineFallback();
+        return;
+      }
       state.unauthenticated = false;
       state.data = json;
       const banner = document.getElementById('storage-sso-banner');
@@ -417,7 +421,7 @@
 
     const lf = data.liveFlow || {};
     const totalFlow = safeNum(lf.totalFlowMBps, 0);
-    const pipelines = Array.isArray(data.pipelines) ? data.pipelines : [];
+    const pipelines = Array.isArray(data && data.pipelines) ? data.pipelines.filter(p => p && typeof p === 'object') : [];
     const bestRate = pipelines.reduce((m, p) => Math.max(m, safeNum(p.rateMBps, 0)), 0);
     const displayRate = totalFlow > 0 ? totalFlow : bestRate;
     setText('kpi-flowrate', displayRate.toFixed(2) + ' MB/s');
@@ -585,8 +589,9 @@
     const stage = document.getElementById('storage-flow-stage');
     if (!svg || !stage) return;
 
-    const hasLive = Boolean(data && Array.isArray(data.pipelines) && data.pipelines.length > 0);
-    const pipelines = hasLive ? data.pipelines : Object.values(PIPELINE_FALLBACKS);
+    const livePipelines = Array.isArray(data && data.pipelines) ? data.pipelines.filter(p => p && typeof p === 'object') : [];
+    const hasLive = livePipelines.length > 0;
+    const pipelines = hasLive ? livePipelines : Object.values(PIPELINE_FALLBACKS);
     const filtered = pipelines.filter(p => matchesFilter(p.category, state.filter));
     setText('flow-active-count', hasLive ? `${filtered.length} Active Pipelines` : '--');
     renderPipeSelectorBar(pipelines, hasLive);
@@ -857,8 +862,8 @@
   }
 
   function updateInspector() {
-    const hasLiveData = Boolean(state.data && Array.isArray(state.data.pipelines) && state.data.pipelines.length > 0);
-    const pipelines = hasLiveData ? state.data.pipelines : [];
+    const pipelines = Array.isArray(state.data && state.data.pipelines) ? state.data.pipelines.filter(item => item && typeof item === 'object') : [];
+    const hasLiveData = pipelines.length > 0;
     let p = null;
     let nodeInfo = null;
 
@@ -938,7 +943,9 @@
     setText('insp-route', `${safeStr(p.sourceTier, 'source')} -> ${safeStr(p.targetTier, 'target')}`);
     const nextStr = (hasLiveData && p.nextRunAt) ? ` (Next: ${fmtNextTime(p.nextRunAt)})` : '';
     setText('insp-schedule', safeStr(p.schedule, 'Scheduled') + nextStr);
-    setText('insp-last-sync', hasLiveData ? (p.lastRunAt ? `${fmtRelativeTime(p.lastRunAt)} (${new Date(p.lastRunAt).toLocaleTimeString()})` : 'Scheduled') : '--');
+    const lastRunDate = p.lastRunAt ? new Date(p.lastRunAt) : null;
+    const lastRunValid = Boolean(lastRunDate && Number.isFinite(lastRunDate.getTime()));
+    setText('insp-last-sync', hasLiveData ? (lastRunValid ? `${fmtRelativeTime(p.lastRunAt)} (${lastRunDate.toLocaleTimeString()})` : 'Scheduled') : '--');
     setText('insp-bytes', hasLiveData ? `${safeStr(p.bytesCopiedFormatted, fmtBytes(p.bytesCopied))} (${safeNum(p.filesMoved, 0)} files)` : '--');
     setText('insp-rate', hasLiveData ? `${safeNum(p.durationSec, 0)}s • ${safeNum(p.rateMBps, 0).toFixed(2)} MB/s` : '--');
     setText('insp-exit', hasLiveData ? safeStr(p.summary, safeStr(p.status, 'Healthy')) : offlineStatusLabel);
@@ -972,7 +979,7 @@
   function renderMatrix(data) {
     const grid = document.getElementById('storage-matrix-grid');
     if (!grid) return;
-    const pipelines = Array.isArray(data && data.pipelines) ? data.pipelines : [];
+    const pipelines = Array.isArray(data && data.pipelines) ? data.pipelines.filter(p => p && typeof p === 'object') : [];
     const filtered = pipelines.filter(p => matchesFilter(p.category, state.filter));
     const maxRate = Math.max(10, ...pipelines.map(p => safeNum(p.rateMBps, 0)));
 
@@ -1029,13 +1036,13 @@
   function renderActivityTable(data) {
     const tbody = document.getElementById('storage-activity-tbody');
     if (!tbody) return;
-    const events = Array.isArray(data && data.recentEvents) ? data.recentEvents : [];
+    const events = Array.isArray(data && data.recentEvents) ? data.recentEvents.filter(ev => ev && typeof ev === 'object') : [];
     if (events.length === 0) {
       tbody.innerHTML = '<tr><td colspan="6" style="color:#94a3b8;text-align:center;">No recent transfer events recorded yet.</td></tr>';
       return;
     }
 
-    const pipelines = Array.isArray(data && data.pipelines) ? data.pipelines : [];
+    const pipelines = Array.isArray(data && data.pipelines) ? data.pipelines.filter(p => p && typeof p === 'object') : [];
     const pipeById = {};
     pipelines.forEach(p => { pipeById[p.id] = p; });
 
@@ -1043,7 +1050,8 @@
       const p = pipeById[ev.pipelineId] || {};
       const lvl = String(ev.level || 'info').toLowerCase();
       const tagCls = lvl === 'error' || lvl === 'warn' || lvl === 'warning' ? 'warn' : 'ok';
-      const ts = ev.timestamp ? new Date(ev.timestamp).toLocaleString() : 'Recent';
+      const evDate = ev.timestamp ? new Date(ev.timestamp) : null;
+      const ts = (evDate && Number.isFinite(evDate.getTime())) ? evDate.toLocaleString() : 'Recent';
       return `
         <tr>
           <td class="mono" style="font-size:0.76rem;color:#94a3b8;">${escapeHtml(ts)}</td>
