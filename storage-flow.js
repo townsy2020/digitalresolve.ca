@@ -586,6 +586,10 @@
     });
   }
 
+  function prefersReducedMotion() {
+    return typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
   function renderPipesSVG(data) {
     const svg = document.getElementById('storage-flow-svg');
     const stage = document.getElementById('storage-flow-stage');
@@ -695,7 +699,7 @@
           <title>${escapeHtml(p.name)} (${escapeHtml(safeStr(p.bytesCopiedFormatted, '0 B'))} • ${rate.toFixed(1)} MB/s)</title>
           <path d="${dStr}" class="storage-pipe-path" stroke="${cfg.color}" stroke-width="${strokeW}" ${isHighlighted ? 'filter="url(#pipe-glow)"' : ''} />
           ${showFlowAnim ? `<path d="${dStr}" class="storage-pipe-dashed" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.75" style="animation-duration: ${animDur};" />` : ''}
-          ${hasLive && showFlowAnim && !state.animPaused ? `
+          ${hasLive && showFlowAnim && !state.animPaused && !prefersReducedMotion() ? `
           <circle r="3.6" fill="${cfg.color}" filter="url(#pipe-glow)">
             <animateMotion dur="${animDur}" repeatCount="indefinite" path="${dStr}" />
           </circle>` : ''}
@@ -1193,8 +1197,14 @@
       });
     });
 
-    // Wire Pause/Play animation
+    // Wire Pause/Play animation (honor prefers-reduced-motion on init)
     const animBtn = document.getElementById('btn-toggle-flow-anim');
+    if (prefersReducedMotion()) {
+      state.animPaused = true;
+      const stage = document.getElementById('storage-flow-stage');
+      if (stage) stage.classList.add('is-paused');
+      if (animBtn) animBtn.textContent = 'Resume Flow Animation';
+    }
     if (animBtn) {
       animBtn.addEventListener('click', () => {
         state.animPaused = !state.animPaused;

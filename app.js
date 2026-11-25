@@ -165,16 +165,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.9';
+          const activeVer = match ? match[0] : 'v2.9.10';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 22248;
+      const baseHtmlLines = 22360;
       const baseCssLines = 7381;
-      const baseJsLines = 8990;
+      const baseJsLines = 9012;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -1099,7 +1099,7 @@
         document.querySelectorAll('#' + id + ', .' + id).forEach(el => el.textContent = ms === '--' ? '--' : `${ms} ms`);
         document.querySelectorAll('#' + statusId + ', .' + statusId).forEach(st => {
           if (svcObj.unknown) {
-            st.textContent = 'Checking...';
+            st.textContent = window._servicesHealthFailed ? 'Unavailable' : 'Checking...';
             st.className = 'item-tag';
           } else {
             st.textContent = svcObj.ok ? goodTxt : badTxt;
@@ -5264,16 +5264,24 @@
       _servicesHealthCtrl = controller;
       const timeoutId = controller ? setTimeout(() => controller.abort(), 4000) : null;
 
-      return fetch(`${GATEWAY}/services-health`, {
-        credentials: 'include',
-        signal: controller ? controller.signal : undefined
-      })
-        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      const isHttps = typeof window !== 'undefined' && window.location && window.location.protocol === 'https:';
+      const sig = controller ? controller.signal : undefined;
+      const parseHealth = r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); };
+
+      return fetch(`${GATEWAY}/services-health`, { credentials: 'include', signal: sig })
+        .then(parseHealth)
+        .catch(gwErr => {
+          if (!isHttps && (!sig || !sig.aborted)) {
+            return fetch('http://192.168.2.35:8082/services-health', { signal: sig }).then(parseHealth);
+          }
+          throw gwErr;
+        })
         .then(data => {
           if (timeoutId) clearTimeout(timeoutId);
           if (_servicesHealthCtrl === controller) _servicesHealthCtrl = null;
           if (reqSeq !== _servicesHealthSeq) return null;
           if (data && (data.services || data.status === 'success')) {
+            window._servicesHealthFailed = false;
             window.LAST_SERVICES_HEALTH = data;
             updateServiceDashboardUI(data);
             if (typeof updateClusterPowerAndThermalsUI === 'function') {
@@ -5288,6 +5296,7 @@
           if (reqSeq !== _servicesHealthSeq) return null;
           window.LAST_SERVICES_HEALTH = null;
           window._hasLiveServicesHealth = false;
+          window._servicesHealthFailed = true;
           document.querySelectorAll('#dash-global-status').forEach(dashGlobal => {
             dashGlobal.textContent = 'Telemetry Unavailable';
             dashGlobal.className = 'item-tag offline';
@@ -5295,6 +5304,9 @@
             dashGlobal.style.background = 'rgba(148, 163, 184, 0.15)';
             dashGlobal.style.borderColor = 'rgba(148, 163, 184, 0.3)';
           });
+          if (typeof updateClusterPowerAndThermalsUI === 'function') {
+            try { updateClusterPowerAndThermalsUI(Boolean(window.DESKTOP_IS_ONLINE)); } catch (e) {}
+          }
           return null;
         });
     }

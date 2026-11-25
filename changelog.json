@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-25T10:52:33Z",
-    "currentVersion":  "v2.9.9",
+    "updatedAt":  "2026-11-25T11:13:35Z",
+    "currentVersion":  "v2.9.10",
     "releases":  [
+                     {
+                         "version":  "v2.9.10",
+                         "date":  "November 25, 2026",
+                         "title":  "Service Badge Fallback \u0026 Reduced-Motion Support",
+                         "changes":  [
+                                         {
+                                             "label":  "Service Health Fallback",
+                                             "text":  "Added LAN fallback and Unavailable state for #kuma-status-* badges when /services-health is unreachable"
+                                         },
+                                         {
+                                             "label":  "Reduced-Motion SVG \u0026 Cameras",
+                                             "text":  "Honored prefers-reduced-motion in storage-flow.js SVG animateMotion and standalone webrtc.html / ai.html camera HUDs"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.9",
                          "date":  "November 25, 2026",
