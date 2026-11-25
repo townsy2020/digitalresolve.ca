@@ -165,16 +165,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.7';
+          const activeVer = match ? match[0] : 'v2.9.8';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 22056;
+      const baseHtmlLines = 22152;
       const baseCssLines = 7381;
-      const baseJsLines = 8908;
+      const baseJsLines = 8990;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -648,11 +648,15 @@
     }
     window.triggerBroadcastWoL = triggerBroadcastWoL;
     let _powerPollSeq = 0;
+    const _powerCmdInFlight = new Set();
     function sendWol(target) {
       if (!isSSOAuthenticated()) {
         openGlobalSSOModal(`Wake-on-LAN: ${target.toUpperCase()}`, () => sendWol(target));
         return;
       }
+      const cmdKey = `wake:${target}`;
+      if (_powerCmdInFlight.has(cmdKey)) return;
+      _powerCmdInFlight.add(cmdKey);
       const pollToken = ++_powerPollSeq;
       clearInterval(pollInterval);
       const dev = devices[target] || devices.both;
@@ -711,6 +715,9 @@
         .catch(() => {
           if (pollToken !== _powerPollSeq) return;
           showToast('error', 'Transmit Failed', `Could not reach ${GATEWAY}`, 5000);
+        })
+        .finally(() => {
+          _powerCmdInFlight.delete(cmdKey);
         });
     }
 
@@ -719,6 +726,9 @@
         openGlobalSSOModal(`Sleep Standby: ${target.toUpperCase()}`, () => sendSleep(target));
         return;
       }
+      const cmdKey = `sleep:${target}`;
+      if (_powerCmdInFlight.has(cmdKey)) return;
+      _powerCmdInFlight.add(cmdKey);
       const pollToken = ++_powerPollSeq;
       clearInterval(pollInterval);
       const dev = devices[target] || devices.nuc;
@@ -777,6 +787,9 @@
         .catch(() => {
           if (pollToken !== _powerPollSeq) return;
           showToast('error', 'Sleep Command Failed', `Unable to reach ${GATEWAY}`, 5000);
+        })
+        .finally(() => {
+          _powerCmdInFlight.delete(cmdKey);
         });
     }
 
@@ -2531,11 +2544,14 @@
         });
     }
 
+    let _agyLaunchInFlight = false;
     function resumeAgySessionOnDesktop() {
       if (!isSSOAuthenticated()) {
         openGlobalSSOModal('Resume Active AGY Session on Desktop', resumeAgySessionOnDesktop);
         return;
       }
+      if (_agyLaunchInFlight) return;
+      _agyLaunchInFlight = true;
       const sName = window.AGY_SESSION_NAME || 'webdev';
       const cid = window.AGY_SESSION_ID || '';
       showToast('loading', `Resuming ${sName} on Desktop...`, `Opening Windows Terminal: agy --conversation ${cid ? cid.substring(0,8) : 'active'}...`, 4000);
@@ -2558,6 +2574,9 @@
       })
       .catch(err => {
         showToast('error', 'Resume Failed', (err && err.message) || `Could not reach ${GATEWAY}`);
+      })
+      .finally(() => {
+        _agyLaunchInFlight = false;
       });
 
       // 2. Also invoke native protocol link for instant local spawn
@@ -2573,6 +2592,8 @@
         openGlobalSSOModal(`Start New AGY Session (${target.toUpperCase()})`, () => startNewAgySession(target));
         return;
       }
+      if (_agyLaunchInFlight) return;
+      _agyLaunchInFlight = true;
       const hostLabel = target === 'nuc' ? 'NUC Server' : 'Desktop Workstation';
 
       // 1. Immediately wipe console screen and in-page terminal
@@ -2633,6 +2654,9 @@
       .catch(err => {
         showToast('error', 'Gateway Offline', `Could not reach ${GATEWAY}`);
         startConsoleAutoPoll();
+      })
+      .finally(() => {
+        _agyLaunchInFlight = false;
       });
     }
 
@@ -2655,6 +2679,7 @@
       }
     }
 
+    const _controlInFlight = new Set();
     function sendControl(action, target = 'nuc', opts = {}) {
       if (!isSSOAuthenticated()) {
         if (opts && typeof opts.onError === 'function') opts.onError(new Error('SSO required'));
@@ -2667,6 +2692,9 @@
         testISPNow();
         return;
       }
+      const ctrlKey = `${action}:${target}`;
+      if (_controlInFlight.has(ctrlKey)) return;
+      _controlInFlight.add(ctrlKey);
 
       const targetLabel = (target === 'desktop') ? 'Desktop PC' : 'NUC Server';
       showToast('loading', `Executing [${targetLabel}]...`, isSpeed ? 'Probing Bell Gigabit connection & jitter...' : `Action: ${action.toUpperCase()}`, 0);
@@ -2691,6 +2719,9 @@
         .catch(err => {
           showToast('error', 'Gateway Offline', `Could not reach ${GATEWAY}`);
           if (opts && typeof opts.onError === 'function') opts.onError(err);
+        })
+        .finally(() => {
+          _controlInFlight.delete(ctrlKey);
         });
     }
 
@@ -3841,6 +3872,7 @@
     let _ispPollGen = 0;
 
     function clearIspSpeedtestPoll() {
+      _ispPollGen++;
       if (_ispPollInterval) { clearInterval(_ispPollInterval); _ispPollInterval = null; }
       if (_ispPollTimeout) { clearTimeout(_ispPollTimeout); _ispPollTimeout = null; }
     }
@@ -3888,6 +3920,7 @@
             }
           });
         }
+        if (gen !== _ispPollGen) return;
 
         let stage2Fired = false;
         let pollInFlight = false;
@@ -3954,11 +3987,13 @@
     }
 
     // Inline Quick Magnet Submission Handler
+    let _quickMagnetInFlight = false;
     function submitQuickMagnet() {
       if (!isSSOAuthenticated()) {
         openGlobalSSOModal('Torrent Magnet Ingestion', submitQuickMagnet);
         return;
       }
+      if (_quickMagnetInFlight) return;
       const input = document.getElementById('quick-magnet-input');
       const targetSelect = document.getElementById('quick-magnet-target');
       const val = input ? input.value.trim() : '';
@@ -3966,6 +4001,7 @@
         showToast('error', 'Invalid URL', 'Please paste a valid magnet:? link or http(s):// .torrent URL.');
         return;
       }
+      _quickMagnetInFlight = true;
       const target = targetSelect ? targetSelect.value : 'nuc';
       showToast('loading', 'Injecting Torrent...', `Target: ${target.toUpperCase()}`, 0);
 
@@ -3984,6 +4020,9 @@
       })
       .catch(err => {
         showToast('error', 'Dispatch Failed', (err && err.message) || `Could not reach ${GATEWAY} to inject torrent.`);
+      })
+      .finally(() => {
+        _quickMagnetInFlight = false;
       });
     }
 
@@ -4355,11 +4394,22 @@
     }
     window.activateMaintenanceWithUpdate = activateMaintenanceWithUpdate;
 
+    let _maintToggleInFlight = false;
+    function setMaintButtonsDisabled(disabled) {
+      const b1 = document.getElementById('btn-maint-toggle-action');
+      const b2 = document.getElementById('btn-maint-trigger-update');
+      if (b1) b1.disabled = disabled;
+      if (b2) b2.disabled = disabled;
+    }
+
     function activateMaintenanceMode(durationMinutes = 30, reason = 'Windows Updates & Optimization', autoRunUpdate = false) {
       if (!isSSOAuthenticated()) {
         openGlobalSSOModal('Maintenance Mode Control', () => activateMaintenanceMode(durationMinutes, reason, autoRunUpdate));
         return;
       }
+      if (_maintToggleInFlight) return;
+      _maintToggleInFlight = true;
+      setMaintButtonsDisabled(true);
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 6000);
       fetch(`${GATEWAY}/api/control?action=maintenance&target=nuc&enable=true&duration=${durationMinutes}`, {
@@ -4397,7 +4447,11 @@
         .catch(err => {
           showToast('error', 'Maintenance Mode Failed', `Gateway rejected or failed request (${err && err.message ? err.message : 'unreachable'}).`);
         })
-        .finally(() => clearTimeout(timeoutId));
+        .finally(() => {
+          clearTimeout(timeoutId);
+          _maintToggleInFlight = false;
+          setMaintButtonsDisabled(false);
+        });
     }
     window.activateMaintenanceMode = activateMaintenanceMode;
 
@@ -4406,6 +4460,9 @@
         openGlobalSSOModal('Maintenance Mode Control', () => deactivateMaintenanceMode());
         return;
       }
+      if (_maintToggleInFlight) return;
+      _maintToggleInFlight = true;
+      setMaintButtonsDisabled(true);
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 6000);
       fetch(`${GATEWAY}/api/control?action=maintenance&target=nuc&enable=false`, {
@@ -4432,7 +4489,11 @@
         .catch(err => {
           showToast('error', 'Disable Maintenance Failed', `Gateway rejected or failed request (${err && err.message ? err.message : 'unreachable'}).`);
         })
-        .finally(() => clearTimeout(timeoutId));
+        .finally(() => {
+          clearTimeout(timeoutId);
+          _maintToggleInFlight = false;
+          setMaintButtonsDisabled(false);
+        });
     }
     window.deactivateMaintenanceMode = deactivateMaintenanceMode;
 
@@ -7512,11 +7573,14 @@
     }
     window.fetchFeederStatus = fetchFeederStatus;
 
+    let _feederActionInFlight = false;
     function refillFeederHopper() {
       if (!isSSOAuthenticated()) {
         openGlobalSSOModal("Penny's Feeder Hopper Refill", refillFeederHopper);
         return;
       }
+      if (_feederActionInFlight) return;
+      _feederActionInFlight = true;
       fetch(`${GATEWAY}/api/feeder/refill`, { method: 'POST', credentials: 'include', headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }), body: '{}', signal: _fetchSig(10000) })
         .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
         .then(data => {
@@ -7531,6 +7595,9 @@
         })
         .catch(err => {
           showToast('error', "Hopper Refill Error", err.message);
+        })
+        .finally(() => {
+          _feederActionInFlight = false;
         });
     }
     window.refillFeederHopper = refillFeederHopper;
@@ -7540,6 +7607,8 @@
         openGlobalSSOModal("Penny's Smart Feeder IoT Dispenser (192.168.2.22)", () => triggerCatTreat(portionLabel));
         return;
       }
+      if (_feederActionInFlight) return;
+      _feederActionInFlight = true;
       const timeEl = document.getElementById('feeder-last-time');
       const iotTimeEl = document.getElementById('feeder-iot-last-time');
       const logEl = document.getElementById('feeder-log-list');
@@ -7598,6 +7667,9 @@
             if (dishEl) dishEl.textContent = 'Gateway Offline';
           }
           if (watchEl) watchEl.textContent = 'Gateway Offline';
+        })
+        .finally(() => {
+          _feederActionInFlight = false;
         });
     }
     window.triggerCatTreat = triggerCatTreat;

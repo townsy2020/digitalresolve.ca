@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-25T10:22:08Z",
-    "currentVersion":  "v2.9.7",
+    "updatedAt":  "2026-11-25T10:37:53Z",
+    "currentVersion":  "v2.9.8",
     "releases":  [
+                     {
+                         "version":  "v2.9.8",
+                         "date":  "November 25, 2026",
+                         "title":  "Double-Submit Action Guards \u0026 Speedtest Poll Race Fix",
+                         "changes":  [
+                                         {
+                                             "label":  "Speedtest Poll Guard",
+                                             "text":  "Incremented _ispPollGen on clearIspSpeedtestPoll() so synchronous or async sendControl errors cannot leave orphaned pollers"
+                                         },
+                                         {
+                                             "label":  "Action Double-Submit Guards",
+                                             "text":  "Added in-flight guards to quick magnet, maintenance toggle, WoL/sleep/control, AGY session launch, feeder dispense/refill, and storage pipeline trigger"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.7",
                          "date":  "November 25, 2026",

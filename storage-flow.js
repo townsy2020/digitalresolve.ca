@@ -18,7 +18,8 @@
     waveformHistory: [],
     maxWaveformPoints: 40,
     pollTimer: null,
-    unauthenticated: false
+    unauthenticated: false,
+    triggerInFlight: new Set()
   };
 
   // Semantic category-colored node-to-node routing (#a855f7 Media, #10b981 Backup/DR, #f59e0b Guardrail)
@@ -1090,6 +1091,12 @@
   }
 
   async function executePipelineTrigger(pipeline, retried = false) {
+    const actionKey = pipeline && pipeline.triggerAction ? String(pipeline.triggerAction) : '';
+    if (!actionKey || state.triggerInFlight.has(actionKey)) return;
+    state.triggerInFlight.add(actionKey);
+    const triggerBtn = document.getElementById('insp-trigger-btn');
+    if (triggerBtn) triggerBtn.disabled = true;
+
     const base = isHttps ? GATEWAY : LAN_BASE;
     const url = `${base}/api/storage-flow/trigger`;
     const headers = typeof window.getAdminAuthHeaders === 'function'
@@ -1130,6 +1137,9 @@
       if (typeof window.showToast === 'function') {
         window.showToast('error', 'Trigger Error', err.message || 'Gateway unreachable', 4500);
       }
+    } finally {
+      state.triggerInFlight.delete(actionKey);
+      if (triggerBtn) triggerBtn.disabled = false;
     }
   }
 
