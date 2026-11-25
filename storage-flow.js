@@ -570,16 +570,17 @@
       ? state.selectedId
       : ((NODE_DETAILS[state.selectedId] && NODE_DETAILS[state.selectedId].pipelineId) || '');
     bar.innerHTML = visiblePipes.map(p => {
-      const cfg = PIPE_NODE_MAP[p.id] || { color: '#38bdf8', shortLabel: p.name };
+      const pName = safeStr(p.name, safeStr(p.id, 'Pipeline'));
+      const cfg = PIPE_NODE_MAP[p.id] || { color: '#38bdf8', shortLabel: pName };
       const isSel = p.id === activePipeId;
       const rate = safeNum(p.rateMBps, 0);
       const hasBytes = safeNum(p.bytesCopied, 0) > 0;
       const metricTxt = hasLive
         ? (rate > 0 ? `${rate.toFixed(1)} MB/s` : (hasBytes ? safeStr(p.bytesCopiedFormatted, 'Ready') : safeStr(p.schedule, 'Ready')))
         : safeStr(p.schedule, 'Scheduled');
-      return `<button type="button" class="storage-pipe-chip ${isSel ? 'is-selected' : ''}" aria-pressed="${isSel ? 'true' : 'false'}" data-chip-pipe-id="${escapeHtml(p.id)}" title="${escapeHtml(p.name)} — Click to highlight route &amp; inspect">
+      return `<button type="button" class="storage-pipe-chip ${isSel ? 'is-selected' : ''}" aria-pressed="${isSel ? 'true' : 'false'}" data-chip-pipe-id="${escapeHtml(p.id)}" title="${escapeHtml(pName)} — Click to highlight route &amp; inspect">
         <span class="storage-pipe-chip-dot" style="background:${cfg.color};box-shadow:0 0 6px ${cfg.color};"></span>
-        <span class="storage-pipe-chip-name">${escapeHtml(cfg.shortLabel || p.name)}</span>
+        <span class="storage-pipe-chip-name">${escapeHtml(cfg.shortLabel || pName)}</span>
         <span class="storage-pipe-chip-meta">${escapeHtml(metricTxt)}</span>
       </button>`;
     }).join('');
@@ -598,6 +599,31 @@
     const svg = document.getElementById('storage-flow-svg');
     const stage = document.getElementById('storage-flow-stage');
     if (!svg || !stage) return;
+
+    const activeEl = document.activeElement;
+    let restoreKind = null;
+    let restoreId = null;
+    if (activeEl && activeEl.hasAttribute) {
+      if (activeEl.hasAttribute('data-chip-pipe-id')) {
+        restoreKind = 'chip';
+        restoreId = activeEl.getAttribute('data-chip-pipe-id');
+      } else if (activeEl.hasAttribute('data-pipe-id') && activeEl.closest && activeEl.closest('#storage-flow-svg')) {
+        restoreKind = 'svg';
+        restoreId = activeEl.getAttribute('data-pipe-id');
+      }
+    }
+    const restorePipeFocus = () => {
+      if (!restoreKind || !restoreId) return;
+      const escId = (typeof CSS !== 'undefined' && typeof CSS.escape === 'function')
+        ? CSS.escape(restoreId)
+        : restoreId.replace(/["\\]/g, '\\$&');
+      const target = restoreKind === 'chip'
+        ? document.querySelector(`#storage-pipe-selector-bar [data-chip-pipe-id="${escId}"]`)
+        : document.querySelector(`#storage-flow-svg [data-pipe-id="${escId}"]`);
+      if (target && typeof target.focus === 'function') {
+        try { target.focus({ preventScroll: true }); } catch (e) { target.focus(); }
+      }
+    };
 
     const livePipelines = Array.isArray(data && data.pipelines) ? data.pipelines.filter(p => p && typeof p === 'object') : [];
     const hasLive = livePipelines.length > 0;
@@ -630,6 +656,7 @@
     const stageRect = stage.getBoundingClientRect();
     if (stageRect.width < 100 || isMobileLayout) {
       svg.innerHTML = '';
+      if (restoreKind === 'chip') restorePipeFocus();
       return;
     }
 
@@ -698,9 +725,10 @@
       const rate = safeNum(p.rateMBps, 0);
       const animDur = rate > 50 ? '0.9s' : rate > 10 ? '1.4s' : rate > 1 ? '2.0s' : '2.8s';
 
+      const pipeName = safeStr(p.name, safeStr(p.id, 'Pipeline'));
       html += `
-        <g opacity="${opacity}" ${isVisible ? `data-pipe-id="${escapeHtml(p.id)}" role="button" tabindex="0" aria-label="${escapeHtml(p.name)}"` : 'style="pointer-events:none;"'}>
-          <title>${escapeHtml(p.name)} (${escapeHtml(safeStr(p.bytesCopiedFormatted, '0 B'))} • ${rate.toFixed(1)} MB/s)</title>
+        <g opacity="${opacity}" ${isVisible ? `data-pipe-id="${escapeHtml(p.id)}" role="button" tabindex="0" aria-label="${escapeHtml(pipeName)}"` : 'style="pointer-events:none;"'}>
+          <title>${escapeHtml(pipeName)} (${escapeHtml(safeStr(p.bytesCopiedFormatted, '0 B'))} • ${rate.toFixed(1)} MB/s)</title>
           <path d="${dStr}" class="storage-pipe-path" stroke="${cfg.color}" stroke-width="${strokeW}" ${isHighlighted ? 'filter="url(#pipe-glow)"' : ''} />
           ${showFlowAnim ? `<path d="${dStr}" class="storage-pipe-dashed" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.75" style="animation-duration: ${animDur};" />` : ''}
           ${hasLive && showFlowAnim && !state.animPaused && !prefersReducedMotion() ? `
@@ -726,6 +754,8 @@
         }
       });
     });
+
+    restorePipeFocus();
   }
 
   function renderWaveform() {
@@ -953,7 +983,8 @@
 
     if (!p) return;
 
-    setText('insp-title', nodeInfo ? `${nodeInfo.title} — ${p.name}` : p.name);
+    const pipeName = safeStr(p.name, safeStr(p.id, 'Storage Pipeline'));
+    setText('insp-title', nodeInfo ? `${nodeInfo.title} — ${pipeName}` : pipeName);
     setText('insp-desc', safeStr(p.description || p.summary, 'Automated storage pipeline.'));
     setText('insp-script-name', safeStr(p.id, 'pipeline'));
     setText('insp-script-path', safeStr(p.scriptPath, 'C:\\ProgramData\\digitalresolve\\'));
@@ -1072,28 +1103,16 @@
       return `
         <tr>
           <td class="mono" style="font-size:0.76rem;color:#94a3b8;">${escapeHtml(ts)}</td>
-          <td><strong>${escapeHtml(safeStr(p.name, ev.pipelineId))}</strong></td>
+          <td><strong>${escapeHtml(safeStr(p.name, safeStr(ev.pipelineId, 'Pipeline')))}</strong></td>
           <td class="mono" style="font-size:0.75rem;">${escapeHtml(safeStr(ev.host, 'NUC'))}</td>
           <td class="mono" style="font-size:0.76rem;">${ev.bytesFormatted ? escapeHtml(ev.bytesFormatted) : '--'}</td>
-          <td class="mono" style="font-size:0.76rem;">${ev.rateMBps != null ? Math.max(0, safeNum(ev.rateMBps, 0)).toFixed(1) + ' MB/s' : '--'}</td>
+          <td class="mono" style="font-size:0.76rem;">${isValidNum(ev.rateMBps) ? Math.max(0, safeNum(ev.rateMBps, 0)).toFixed(1) + ' MB/s' : '--'}</td>
           <td><span class="storage-node-tag ${tagCls}">${escapeHtml(safeStr(ev.level, 'INFO').toUpperCase())}</span> <span style="font-size:0.76rem;color:#cbd5e1;margin-left:6px;">${escapeHtml(safeStr(ev.message, ''))}</span></td>
         </tr>`;
     }).join('');
   }
 
   function selectItem(type, id) {
-    const activeEl = document.activeElement;
-    let restoreKind = null;
-    let restoreId = null;
-    if (activeEl && activeEl.hasAttribute) {
-      if (activeEl.hasAttribute('data-chip-pipe-id')) {
-        restoreKind = 'chip';
-        restoreId = activeEl.getAttribute('data-chip-pipe-id');
-      } else if (activeEl.hasAttribute('data-pipe-id') && activeEl.closest && activeEl.closest('#storage-flow-svg')) {
-        restoreKind = 'svg';
-        restoreId = activeEl.getAttribute('data-pipe-id');
-      }
-    }
     state.selectedType = type;
     state.selectedId = id;
     document.querySelectorAll('.storage-node-card').forEach(card => {
@@ -1101,17 +1120,6 @@
     });
     renderPipesSVG(state.data);
     updateInspector();
-    if (restoreKind && restoreId) {
-      const escId = (typeof CSS !== 'undefined' && typeof CSS.escape === 'function')
-        ? CSS.escape(restoreId)
-        : restoreId.replace(/["\\]/g, '\\$&');
-      const target = restoreKind === 'chip'
-        ? document.querySelector(`#storage-pipe-selector-bar [data-chip-pipe-id="${escId}"]`)
-        : document.querySelector(`#storage-flow-svg [data-pipe-id="${escId}"]`);
-      if (target && typeof target.focus === 'function') {
-        try { target.focus({ preventScroll: true }); } catch (e) { target.focus(); }
-      }
-    }
   }
 
   function triggerPipeline(pipeline) {

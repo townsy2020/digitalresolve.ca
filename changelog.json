@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-25T16:02:07Z",
-    "currentVersion":  "v2.9.27",
+    "updatedAt":  "2026-11-25T16:14:52Z",
+    "currentVersion":  "v2.9.28",
     "releases":  [
+                     {
+                         "version":  "v2.9.28",
+                         "date":  "November 25, 2026",
+                         "title":  "Storage Flow Focus/ARIA \u0026 Error Sanitization",
+                         "changes":  [
+                                         {
+                                             "label":  "Storage Flow ARIA \u0026 Focus Retention",
+                                             "text":  "Removed aria-hidden=true from interactive #storage-flow-svg (role=group) and moved chip/pipe keyboard focus preservation into renderPipesSVG() so 10s telemetry polls and resizes never drop focus."
+                                         },
+                                         {
+                                             "label":  "Malformed Payload \u0026 Rate Guards",
+                                             "text":  "Hardened storage-flow.js pipeline/event names with safeStr() and switched activity rate checks to isValidNum() so missing/non-numeric fields never render undefined or fake 0.0 MB/s."
+                                         },
+                                         {
+                                             "label":  "Toast \u0026 Service Error Sanitization",
+                                             "text":  "Sanitized showToast(), updateServiceDashboardUI(), refillFeederHopper(), and triggerCatTreat() in app.js so object/missing error payloads never render [object Object] or undefined."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.27",
                          "date":  "November 25, 2026",

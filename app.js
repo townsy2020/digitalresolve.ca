@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.27';
+          const activeVer = match ? match[0] : 'v2.9.28';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 24226;
+      const baseHtmlLines = 24330;
       const baseCssLines = 7621;
-      const baseJsLines = 9277;
+      const baseJsLines = 9303;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -384,10 +384,18 @@
       const dot = document.getElementById('toast-dot');
       const text = document.getElementById('toast-message');
       const sub = document.getElementById('toast-subtext');
+      const normToastStr = (v) => {
+        if (v === null || v === undefined) return '';
+        if (typeof v === 'object') {
+          const picked = v.message || v.error || v.statusText || '';
+          return typeof picked === 'string' ? picked : '';
+        }
+        return String(v);
+      };
       if (toast && text) {
         if (dot) dot.className = `toast-dot ${statusType}`;
-        text.textContent = msg;
-        if (sub) sub.textContent = subtext;
+        text.textContent = normToastStr(msg);
+        if (sub) sub.textContent = normToastStr(subtext);
         toast.classList.add('show');
         clearTimeout(window.toastTimer);
         if (duration > 0) {
@@ -5251,6 +5259,16 @@
       const s = health.services;
       const count = (typeof health.onlineCount === 'number' && Number.isFinite(health.onlineCount)) ? health.onlineCount : Object.values(s).filter(item => item && item.online).length;
 
+      const fmtSvcErr = (err, fallback) => {
+        if (!err) return fallback;
+        if (typeof err === 'string') return err.trim() || fallback;
+        if (typeof err === 'object') {
+          const picked = err.message || err.error || err.statusText || '';
+          return (typeof picked === 'string' && picked.trim()) ? picked.trim() : fallback;
+        }
+        return String(err) || fallback;
+      };
+
       function setStatus(tagId, metaId, svc, defaultActiveText, defaultActiveDesc) {
         const tagEl = document.getElementById(tagId);
         const metaEl = document.getElementById(metaId);
@@ -5268,7 +5286,7 @@
             metaEl.textContent = `${lat}${defaultActiveDesc || 'Sentinel Verified'}`;
             metaEl.style.color = '#34d399';
           } else {
-            metaEl.textContent = svc.error || 'Connection Failed';
+            metaEl.textContent = fmtSvcErr(svc.error, 'Connection Failed');
             metaEl.style.color = '#ef4444';
           }
         }
@@ -5304,7 +5322,7 @@
             dtTag.textContent = isSleeping ? 'Eco Standby' : 'Offline';
           }
           if (dtMeta) {
-            dtMeta.textContent = isSleeping ? 'Desktop Sleeping' : (s.torrents.error || 'Node Offline');
+            dtMeta.textContent = isSleeping ? 'Desktop Sleeping' : fmtSvcErr(s.torrents.error, 'Node Offline');
             dtMeta.style.color = isSleeping ? '#818cf8' : '#ef4444';
           }
         }
@@ -5334,7 +5352,7 @@
             cfTag.style.color = '';
           }
           if (cfMeta) {
-            cfMeta.textContent = s.cf.error || 'Tunnel Warning';
+            cfMeta.textContent = fmtSvcErr(s.cf.error, 'Tunnel Warning');
             cfMeta.style.color = '#ef4444';
           }
         }
@@ -7804,7 +7822,7 @@
           showToast('success', "Hopper Refilled", "Kibble hopper reset to 100% (1,500g / ~18.7 days).");
         })
         .catch(err => {
-          showToast('error', "Hopper Refill Error", err.message);
+          showToast('error', "Hopper Refill Error", (err && err.message) || 'Gateway unreachable');
         })
         .finally(() => {
           _feederActionInFlight = false;
@@ -7868,7 +7886,7 @@
           }
         })
         .catch(err => {
-          showToast('error', "Penny's Smart Feeder", `Gateway error: ${err.message}`);
+          showToast('error', "Penny's Smart Feeder", `Gateway error: ${(err && err.message) || 'unreachable'}`);
           if (window.LAST_FEEDER_STATE) {
             updateFeederUI(window.LAST_FEEDER_STATE);
           } else {
