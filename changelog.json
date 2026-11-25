@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-25T15:16:28Z",
-    "currentVersion":  "v2.9.23",
+    "updatedAt":  "2026-11-25T15:29:52Z",
+    "currentVersion":  "v2.9.24",
     "releases":  [
+                     {
+                         "version":  "v2.9.24",
+                         "date":  "November 25, 2026",
+                         "title":  "AGY Console Selection Guard, Active Button Contrast \u0026 ARIA State Sync",
+                         "changes":  [
+                                         {
+                                             "label":  "AGY Console Poll Guard",
+                                             "text":  "Preserved active text selection and skipped redundant DOM rebuilds in refreshAgyConsole() when log output is unchanged during 2.5s auto-polling."
+                                         },
+                                         {
+                                             "label":  "Active Toggle Styling Fix",
+                                             "text":  "Added dedicated CSS active classes overriding .btn-secondary !important rules so Penny\u0027s camera/quality/AI toggles and Maintenance duration chips render distinct active states."
+                                         },
+                                         {
+                                             "label":  "Circuit Flow \u0026 ARIA Sync",
+                                             "text":  "Synced initial pulse-active state on #btn-toggle-flow and wired aria-pressed / role=tablist + aria-selected across service filters, Tailscale OS tabs, terminal tabs, storage chips, camera controls, maintenance chips, console auto-stream, and chaos audio toggles."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.23",
                          "date":  "November 25, 2026",

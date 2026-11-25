@@ -210,6 +210,36 @@ section[id], div[id], #deck, #ops, #fleet, #uptime, #camera-feed-card {
   box-shadow: 0 0 8px rgba(59, 130, 246, 0.2);
 }
 
+.btn-secondary.maint-dur-btn.active {
+  background: rgba(245, 158, 11, 0.15) !important;
+  border-color: #f59e0b !important;
+  color: #fef08a !important;
+}
+
+.btn-secondary.cam-active-green {
+  background: rgba(16, 185, 129, 0.25) !important;
+  border-color: #10b981 !important;
+  color: #6ee7b7 !important;
+}
+
+.btn-secondary.cam-active-cyan {
+  background: rgba(56, 189, 248, 0.25) !important;
+  border-color: #38bdf8 !important;
+  color: #93c5fd !important;
+}
+
+.btn-secondary.cam-active-purple {
+  background: rgba(168, 85, 247, 0.25) !important;
+  border-color: #a855f7 !important;
+  color: #d8b4fe !important;
+}
+
+.btn-secondary.cam-active-webrtc {
+  background: rgba(16, 185, 129, 0.15) !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
+  color: #6ee7b7 !important;
+}
+
 .btn-nav,
 .btn-torrent,
 .btn-gemini,

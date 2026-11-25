@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.23';
+          const activeVer = match ? match[0] : 'v2.9.24';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 23759;
-      const baseCssLines = 7591;
-      const baseJsLines = 9251;
+      const baseHtmlLines = 23863;
+      const baseCssLines = 7621;
+      const baseJsLines = 9271;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -3590,7 +3590,10 @@
       currentLogTab = name;
       ['agy', 'sentinel', 'power', 'report'].forEach(t => {
         const btn = document.getElementById(`tab-${t}`);
-        if (btn) btn.className = (t === name) ? 'terminal-tab active' : 'terminal-tab';
+        if (btn) {
+          btn.className = (t === name) ? 'terminal-tab active' : 'terminal-tab';
+          btn.setAttribute('aria-selected', (t === name) ? 'true' : 'false');
+        }
       });
 
       if (!isSSOAuthenticated()) {
@@ -4286,37 +4289,43 @@
       const bAi = document.getElementById('btn-cam-ai');
 
       [bFeeder, bBedroom].forEach(b => {
-        if (b) { b.style.background = ''; b.style.borderColor = ''; b.style.color = ''; }
+        if (b) {
+          b.classList.remove('cam-active-green');
+          b.style.removeProperty('background');
+          b.style.removeProperty('border-color');
+          b.style.removeProperty('color');
+          b.setAttribute('aria-pressed', 'false');
+        }
       });
       const activeCamBtn = currentCamTarget === 'bedroom' ? bBedroom : bFeeder;
       if (activeCamBtn) {
-        activeCamBtn.style.background = 'rgba(16, 185, 129, 0.25)';
-        activeCamBtn.style.borderColor = '#10b981';
-        activeCamBtn.style.color = '#6ee7b7';
+        activeCamBtn.classList.add('cam-active-green');
+        activeCamBtn.setAttribute('aria-pressed', 'true');
       }
 
       [bHd, bSd].forEach(b => {
-        if (b) { b.style.background = ''; b.style.borderColor = ''; b.style.color = ''; }
+        if (b) {
+          b.classList.remove('cam-active-cyan');
+          b.style.removeProperty('background');
+          b.style.removeProperty('border-color');
+          b.style.removeProperty('color');
+          b.setAttribute('aria-pressed', 'false');
+        }
       });
       const activeResBtn = currentCamRes === 'sd' ? bSd : bHd;
       if (activeResBtn) {
-        activeResBtn.style.background = 'rgba(56, 189, 248, 0.25)';
-        activeResBtn.style.borderColor = '#38bdf8';
-        activeResBtn.style.color = '#93c5fd';
+        activeResBtn.classList.add('cam-active-cyan');
+        activeResBtn.setAttribute('aria-pressed', 'true');
       }
 
       if (bAi) {
-        if (currentCamAi) {
-          bAi.style.background = 'rgba(168, 85, 247, 0.25)';
-          bAi.style.borderColor = '#a855f7';
-          bAi.style.color = '#d8b4fe';
-          bAi.innerHTML = 'AI Cat Vision: ON (TF)';
-        } else {
-          bAi.style.background = 'rgba(16, 185, 129, 0.15)';
-          bAi.style.borderColor = 'rgba(16, 185, 129, 0.35)';
-          bAi.style.color = '#6ee7b7';
-          bAi.innerHTML = 'Fast WebRTC (0% CPU)';
-        }
+        bAi.style.removeProperty('background');
+        bAi.style.removeProperty('border-color');
+        bAi.style.removeProperty('color');
+        bAi.classList.toggle('cam-active-purple', currentCamAi);
+        bAi.classList.toggle('cam-active-webrtc', !currentCamAi);
+        bAi.setAttribute('aria-pressed', currentCamAi ? 'true' : 'false');
+        bAi.innerHTML = currentCamAi ? 'AI Cat Vision: ON (TF)' : 'Fast WebRTC (0% CPU)';
       }
     }
 
@@ -4359,17 +4368,12 @@
       const btns = document.querySelectorAll('.maint-dur-btn');
       btns.forEach(b => {
         const dur = parseInt(b.getAttribute('data-dur'), 10);
-        if (dur === mins) {
-          b.classList.add('active');
-          b.style.borderColor = '#f59e0b';
-          b.style.color = '#fef08a';
-          b.style.background = 'rgba(245, 158, 11, 0.15)';
-        } else {
-          b.classList.remove('active');
-          b.style.borderColor = 'rgba(255, 255, 255, 0.15)';
-          b.style.color = '';
-          b.style.background = '';
-        }
+        const isActive = dur === mins;
+        b.classList.toggle('active', isActive);
+        b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        b.style.removeProperty('border-color');
+        b.style.removeProperty('color');
+        b.style.removeProperty('background');
       });
     }
     window.selectMaintDuration = selectMaintDuration;
@@ -5221,8 +5225,14 @@
       else if (typeof _sparklineDprMq.addListener === 'function') _sparklineDprMq.addListener(onChange);
     })();
     function filterServiceDashboard(category, btn) {
-      document.querySelectorAll('.dash-filter-btn').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active');
+      document.querySelectorAll('.dash-filter-btn').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed', 'false');
+      });
+      if (btn) {
+        btn.classList.add('active');
+        btn.setAttribute('aria-pressed', 'true');
+      }
       const cards = document.querySelectorAll('.dash-card');
       cards.forEach(card => {
         if (category === 'all' || card.dataset.category === category) {
@@ -5576,6 +5586,7 @@
       if (btn) {
         btn.textContent = consoleAutoPollActive ? 'Auto-Stream: ON' : 'Auto-Stream: OFF';
         btn.style.color = consoleAutoPollActive ? '#4ade80' : '#94a3b8';
+        btn.setAttribute('aria-pressed', consoleAutoPollActive ? 'true' : 'false');
       }
       if (consoleAutoPollActive) {
         startConsoleAutoPoll();
@@ -5610,6 +5621,7 @@
     }
 
     let _agyConsoleInFlight = false;
+    let _lastAgyConsoleText = '';
     function refreshAgyConsole(isSilent = false) {
       if (!isSSOAuthenticated()) {
         stopConsoleAutoPoll();
@@ -5633,35 +5645,40 @@
             updateAgySessionDisplay(data.conversationId || '', data.sessionName || null, data.hostNode || null);
           }
           if (data && Array.isArray(data.lines) && screen) {
-            const isNearBottom = screen.scrollHeight - screen.scrollTop - screen.clientHeight < 80;
-            
-            screen.innerHTML = '';
-            data.lines.forEach(line => {
-              const lineStr = String(line ?? '');
-              const div = document.createElement('div');
-              div.className = 'agy-line';
-              if (lineStr.includes('[USER]') || lineStr.includes('[USER_EXPLICIT]')) {
-                div.className += ' user';
-                div.innerHTML = `<span style="color:#38bdf8; font-weight:700;">[USER]</span> ${escapeHtml(lineStr.replace(/\[\d\d:\d\d:\d\d\]\s*\[(USER|USER_EXPLICIT)\]\s*/, ''))}`;
-              } else if (lineStr.includes('[AGENT]') || lineStr.includes('[MODEL]')) {
-                div.className += ' model';
-                div.innerHTML = `<span style="color:#60a5fa; font-weight:700;">[AGENT]</span> ${escapeHtml(lineStr.replace(/\[\d\d:\d\d:\d\d\]\s*\[(AGENT|MODEL)\]\s*/, ''))}`;
-              } else if (lineStr.includes('[TOOL]') || lineStr.includes('Tool Call')) {
-                div.className += ' tool';
-                div.innerHTML = `<span style="color:#fbbf24; font-weight:700;">[TOOL]</span> <span style="color:#cbd5e1;">${escapeHtml(lineStr.replace(/\[\d\d:\d\d:\d\d\]\s*\[TOOL\]\s*/, ''))}</span>`;
-              } else if (lineStr.includes('[OUTPUT]')) {
-                div.className += ' system';
-                div.style.color = '#94a3b8';
-                div.innerHTML = `<span style="color:#10b981; font-weight:600;">[OUTPUT]</span> ${escapeHtml(lineStr.replace(/\[\d\d:\d\d:\d\d\]\s*\[OUTPUT\]\s*/, ''))}`;
-              } else {
-                div.className += ' system';
-                div.textContent = lineStr;
-              }
-              screen.appendChild(div);
-            });
+            const nextText = data.lines.join('\n');
+            const sel = typeof window.getSelection === 'function' ? window.getSelection() : null;
+            const hasSelectionInScreen = Boolean(isSilent && sel && !sel.isCollapsed && sel.anchorNode && screen.contains(sel.anchorNode));
+            if (!hasSelectionInScreen && (!isSilent || nextText !== _lastAgyConsoleText)) {
+              const isNearBottom = screen.scrollHeight - screen.scrollTop - screen.clientHeight < 80;
+              screen.innerHTML = '';
+              data.lines.forEach(line => {
+                const lineStr = String(line ?? '');
+                const div = document.createElement('div');
+                div.className = 'agy-line';
+                if (lineStr.includes('[USER]') || lineStr.includes('[USER_EXPLICIT]')) {
+                  div.className += ' user';
+                  div.innerHTML = `<span style="color:#38bdf8; font-weight:700;">[USER]</span> ${escapeHtml(lineStr.replace(/\[\d\d:\d\d:\d\d\]\s*\[(USER|USER_EXPLICIT)\]\s*/, ''))}`;
+                } else if (lineStr.includes('[AGENT]') || lineStr.includes('[MODEL]')) {
+                  div.className += ' model';
+                  div.innerHTML = `<span style="color:#60a5fa; font-weight:700;">[AGENT]</span> ${escapeHtml(lineStr.replace(/\[\d\d:\d\d:\d\d\]\s*\[(AGENT|MODEL)\]\s*/, ''))}`;
+                } else if (lineStr.includes('[TOOL]') || lineStr.includes('Tool Call')) {
+                  div.className += ' tool';
+                  div.innerHTML = `<span style="color:#fbbf24; font-weight:700;">[TOOL]</span> <span style="color:#cbd5e1;">${escapeHtml(lineStr.replace(/\[\d\d:\d\d:\d\d\]\s*\[TOOL\]\s*/, ''))}</span>`;
+                } else if (lineStr.includes('[OUTPUT]')) {
+                  div.className += ' system';
+                  div.style.color = '#94a3b8';
+                  div.innerHTML = `<span style="color:#10b981; font-weight:600;">[OUTPUT]</span> ${escapeHtml(lineStr.replace(/\[\d\d:\d\d:\d\d\]\s*\[OUTPUT\]\s*/, ''))}`;
+                } else {
+                  div.className += ' system';
+                  div.textContent = lineStr;
+                }
+                screen.appendChild(div);
+              });
+              _lastAgyConsoleText = nextText;
 
-            if (isNearBottom || !isSilent) {
-              screen.scrollTop = screen.scrollHeight;
+              if (isNearBottom || !isSilent) {
+                screen.scrollTop = screen.scrollHeight;
+              }
             }
             if (statusTag) {
               const activeHost = (data && data.hostNode) || window.AGY_SESSION_HOST || 'desktop';
@@ -5733,6 +5750,7 @@
         userLine.innerHTML = `<span style="color:#38bdf8; font-weight:700;">[USER]</span> ${escapeHtml(text)}`;
         screen.appendChild(userLine);
         screen.scrollTop = screen.scrollHeight;
+        _lastAgyConsoleText = '';
       }
 
       if (input) input.value = '';
@@ -6055,6 +6073,7 @@
       if (btn) {
         btn.innerHTML = circuitFlowActive ? 'Flow: ON' : 'Flow: OFF';
         btn.classList.toggle('pulse-active', circuitFlowActive);
+        btn.setAttribute('aria-pressed', circuitFlowActive ? 'true' : 'false');
       }
       streams.forEach(s => {
         s.style.display = circuitFlowActive ? '' : 'none';
@@ -6117,6 +6136,7 @@
       const btn = document.getElementById('btn-chaos-sound');
       if (btn) {
         btn.classList.toggle('active', chaosState.soundEnabled);
+        btn.setAttribute('aria-pressed', chaosState.soundEnabled ? 'true' : 'false');
         btn.innerHTML = chaosState.soundEnabled ? 'Sound: ON' : 'Sound: OFF';
       }
       if (chaosState.soundEnabled) {
@@ -7241,11 +7261,9 @@
     function selectTailscaleTab(platform) {
       const tabs = document.querySelectorAll('#ts-platform-tabs .tailscale-tab-btn');
       tabs.forEach(t => {
-        if (t.getAttribute('data-platform') === platform) {
-          t.classList.add('active');
-        } else {
-          t.classList.remove('active');
-        }
+        const isMatch = t.getAttribute('data-platform') === platform;
+        t.classList.toggle('active', isMatch);
+        t.setAttribute('aria-selected', isMatch ? 'true' : 'false');
       });
       const panels = document.querySelectorAll('#tailscale-modal-overlay .tailscale-panel');
       panels.forEach(p => {
@@ -7293,12 +7311,12 @@
         <!-- Platform Switcher Tabs -->
         <div>
           <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 6px; font-weight: 600;">Choose Client Platform:</div>
-          <div style="display: flex; gap: 6px; flex-wrap: wrap;" id="ts-platform-tabs">
-            <button type="button" class="tailscale-tab-btn" data-platform="windows" onclick="selectTailscaleTab('windows')">🪟 Windows</button>
-            <button type="button" class="tailscale-tab-btn" data-platform="macos" onclick="selectTailscaleTab('macos')">🍎 macOS</button>
-            <button type="button" class="tailscale-tab-btn" data-platform="ios" onclick="selectTailscaleTab('ios')">📱 iOS / iPadOS</button>
-            <button type="button" class="tailscale-tab-btn" data-platform="android" onclick="selectTailscaleTab('android')">🤖 Android</button>
-            <button type="button" class="tailscale-tab-btn" data-platform="linux" onclick="selectTailscaleTab('linux')">🐧 Linux</button>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;" id="ts-platform-tabs" role="tablist" aria-label="Tailscale Client Platforms">
+            <button type="button" class="tailscale-tab-btn" role="tab" aria-selected="false" data-platform="windows" onclick="selectTailscaleTab('windows')">🪟 Windows</button>
+            <button type="button" class="tailscale-tab-btn" role="tab" aria-selected="false" data-platform="macos" onclick="selectTailscaleTab('macos')">🍎 macOS</button>
+            <button type="button" class="tailscale-tab-btn" role="tab" aria-selected="false" data-platform="ios" onclick="selectTailscaleTab('ios')">📱 iOS / iPadOS</button>
+            <button type="button" class="tailscale-tab-btn" role="tab" aria-selected="false" data-platform="android" onclick="selectTailscaleTab('android')">🤖 Android</button>
+            <button type="button" class="tailscale-tab-btn" role="tab" aria-selected="false" data-platform="linux" onclick="selectTailscaleTab('linux')">🐧 Linux</button>
           </div>
         </div>
 

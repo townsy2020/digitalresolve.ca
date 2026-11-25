@@ -8,8 +8,8 @@
   <meta http-equiv="Expires" content="0">
   <title>Penny's Cat Cam & Feeder IoT - Homelab</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b0f17'/%3E%3Cpath d='M8 22V10h7a6 6 0 0 1 0 12H8zm4-3.5h3a2.5 2.5 0 0 0 0-5h-3v5z' fill='%2338bdf8'/%3E%3C/svg%3E">
-  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.9.23 - Penny's Cat Cam & Feeder IoT - Homelab">
-  <link rel="stylesheet" href="styles.css?v=2.9.23">
+  <meta name="description" content="Digital Resolve Homelab Operations Deck v2.9.24 - Penny's Cat Cam & Feeder IoT - Homelab">
+  <link rel="stylesheet" href="styles.css?v=2.9.24">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://wake.digitalresolve.ca">
@@ -262,7 +262,7 @@
             </button>
             <button type="button" class="btn-action-item" onclick="openChangelogModal()" title="View System Release History">
               <span class="dropdown-dot dot-2"></span>
-              <span>Release Changelog (<span id="menu-changelog-ver">v2.9.23</span>)</span>
+              <span>Release Changelog (<span id="menu-changelog-ver">v2.9.24</span>)</span>
             </button>
             <button type="button" class="btn-action-item" id="menu-sso-auth-btn" onclick="lockSSO(true, event)" title="Sign out and refresh deck behind Microsoft 365 SSO">
               <span class="dropdown-dot" style="background-color: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
@@ -397,14 +397,14 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 0.8rem; color: #94a3b8;">
                   <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
                     <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700;">Cam:</span>
-                    <button type="button" class="btn btn-secondary" id="btn-cam-feeder" style="font-size: 0.75rem; padding: 4px 10px; background: rgba(16, 185, 129, 0.25); border-color: #10b981; color: #6ee7b7;" onclick="selectCamera('pennys_feeder')">Penny's Feeder</button>
-                    <button type="button" class="btn btn-secondary" id="btn-cam-bedroom" style="font-size: 0.75rem; padding: 4px 10px;" onclick="selectCamera('bedroom')">Bedroom</button>
+                    <button type="button" class="btn btn-secondary cam-active-green" id="btn-cam-feeder" aria-pressed="true" style="font-size: 0.75rem; padding: 4px 10px; background: rgba(16, 185, 129, 0.25); border-color: #10b981; color: #6ee7b7;" onclick="selectCamera('pennys_feeder')">Penny's Feeder</button>
+                    <button type="button" class="btn btn-secondary" id="btn-cam-bedroom" aria-pressed="false" style="font-size: 0.75rem; padding: 4px 10px;" onclick="selectCamera('bedroom')">Bedroom</button>
                     <span style="color: rgba(255,255,255,0.15); margin: 0 2px;">|</span>
                     <span style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700;">Res:</span>
-                    <button type="button" class="btn btn-secondary" id="btn-cam-hd" style="font-size: 0.75rem; padding: 4px 10px; background: rgba(56, 189, 248, 0.25); border-color: #38bdf8; color: #93c5fd;" onclick="selectCamQuality('hd')">HD</button>
-                    <button type="button" class="btn btn-secondary" id="btn-cam-sd" style="font-size: 0.75rem; padding: 4px 10px;" onclick="selectCamQuality('sd')">SD</button>
+                    <button type="button" class="btn btn-secondary cam-active-cyan" id="btn-cam-hd" aria-pressed="true" style="font-size: 0.75rem; padding: 4px 10px; background: rgba(56, 189, 248, 0.25); border-color: #38bdf8; color: #93c5fd;" onclick="selectCamQuality('hd')">HD</button>
+                    <button type="button" class="btn btn-secondary" id="btn-cam-sd" aria-pressed="false" style="font-size: 0.75rem; padding: 4px 10px;" onclick="selectCamQuality('sd')">SD</button>
                     <span style="color: rgba(255,255,255,0.15); margin: 0 2px;">|</span>
-                    <button type="button" class="btn btn-secondary" id="btn-cam-ai" style="font-size: 0.75rem; padding: 4px 10px; background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.35); color: #6ee7b7;" onclick="toggleCamAi()" title="Toggle WebRTC stream mode">Fast WebRTC (0% CPU)</button>
+                    <button type="button" class="btn btn-secondary cam-active-webrtc" id="btn-cam-ai" aria-pressed="false" style="font-size: 0.75rem; padding: 4px 10px; background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.35); color: #6ee7b7;" onclick="toggleCamAi()" title="Toggle WebRTC stream mode">Fast WebRTC (0% CPU)</button>
                     <button type="button" class="btn btn-secondary" id="btn-cam-stop" style="font-size: 0.75rem; padding: 4px 10px; border-color: rgba(239, 68, 68, 0.35); color: #f87171;" onclick="stopLiveCameraFeed()" title="Unload WebRTC stream to save bandwidth">Stop</button>
                   </div>
                   <div style="font-family: monospace; font-size: 0.73rem; color: #64748b;">
@@ -481,12 +481,12 @@
         </button>
         <button type="button" class="version-badge-btn" onclick="openChangelogModal()" title="View System Release Changelog">
           <span class="dropdown-dot" style="background-color: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
-          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.9.23</span>
+          <span class="mono" style="font-weight: 700; color: #38bdf8; font-size: 0.8rem;" id="footer-version-tag">v2.9.24</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">(Release Log &rarr;)</span>
         </button>
-        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 40,602 Lines of Code (HTML: 23,759 lines | CSS: 7,591 lines | JS: 9,251 lines | CNAME)">
+        <div class="footer-loc-badge" id="footer-loc-badge" title="Project Codebase Scale: 40,756 Lines of Code (HTML: 23,863 lines | CSS: 7,621 lines | JS: 9,271 lines | CNAME)">
           <span class="dropdown-dot" style="background-color: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
-          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">40,602</span>
+          <span class="mono" style="font-weight: 700; color: #c084fc; font-size: 0.8rem;" id="project-loc-count">40,756</span>
           <span style="color: #94a3b8; font-size: 0.75rem;">Lines of Code</span>
         </div>
         <div class="footer-links">
@@ -567,7 +567,7 @@
           <button type="button" class="btn-console-act" onclick="resumeAgySessionOnDesktop()" style="color: #34d399; border-color: rgba(52, 211, 153, 0.4);" title="Resume Session webdev in Windows Terminal on Desktop">Resume on Desktop &nearr;</button>
           <button type="button" class="btn-console-act" onclick="startNewAgySession('desktop')" style="color: #60a5fa; border-color: rgba(59, 130, 246, 0.4);" title="Start New AGY Session on Desktop: agy --dangerously-skip-permissions">+ New: Desktop</button>
           <button type="button" class="btn-console-act" onclick="startNewAgySession('nuc')" style="color: #c084fc; border-color: rgba(192, 132, 252, 0.4);" title="Start New AGY Session on NUC: agy --dangerously-skip-permissions">+ New: NUC</button>
-          <button type="button" class="btn-console-act" onclick="toggleConsoleAutoPoll()" id="btn-console-poll" title="Toggle 2s Live Auto-Polling">Auto-Stream: ON</button>
+          <button type="button" class="btn-console-act" onclick="toggleConsoleAutoPoll()" id="btn-console-poll" aria-pressed="true" title="Toggle 2s Live Auto-Polling">Auto-Stream: ON</button>
           <button type="button" class="btn-console-act" onclick="refreshAgyConsole()" title="Refresh Now" aria-label="Refresh terminal stream">&#x21bb;</button>
           <button type="button" class="btn-console-act" onclick="closeAgyConsole()" title="Close Fullscreen Terminal Console" aria-label="Close terminal console">&times;</button>
         </div>
@@ -892,7 +892,7 @@
             <span class="item-tag online" id="chaos-fault-counter">0 Outages Active</span>
           </div>
           <div class="chaos-actions-top">
-            <button type="button" class="btn-chaos-action btn-chaos-sound" id="btn-chaos-sound" onclick="toggleChaosSound()" title="Toggle Web Audio procedural synthesizer sound effects">
+            <button type="button" class="btn-chaos-action btn-chaos-sound" id="btn-chaos-sound" aria-pressed="false" onclick="toggleChaosSound()" title="Toggle Web Audio procedural synthesizer sound effects">
               Sound: OFF
             </button>
             <button type="button" class="btn-chaos-action btn-chaos-heal" onclick="restoreAllChaos()" title="Master Sentinel Override: Restore all nodes to 100% green">
@@ -1082,10 +1082,23 @@
       </div>
 
             <div class="changelog-body">
-                                                                                                                                                                                                                                                                                                                                                                                                                <!-- Version v2.9.23 (Current) -->
+                                                                                                                                                                                                                                                                                                                                                                                                                        <!-- Version v2.9.24 (Current) -->
         <div class="changelog-entry">
           <div class="changelog-ver-header">
-            <span class="ver-tag current">v2.9.23 | Current</span>
+            <span class="ver-tag current">v2.9.24 | Current</span>
+            <span class="ver-date">November 25, 2026</span>
+          </div>
+          <h4 class="ver-title">AGY Console Selection Guard, Active Button Contrast &amp; ARIA State Sync</h4>
+          <ul class="ver-list">
+            <li><strong>AGY Console Poll Guard:</strong> Preserved active text selection and skipped redundant DOM rebuilds in refreshAgyConsole() when log output is unchanged during 2.5s auto-polling.</li>
+            <li><strong>Active Toggle Styling Fix:</strong> Added dedicated CSS active classes overriding .btn-secondary !important rules so Penny&#39;s camera/quality/AI toggles and Maintenance duration chips render distinct active states.</li>
+            <li><strong>Circuit Flow &amp; ARIA Sync:</strong> Synced initial pulse-active state on #btn-toggle-flow and wired aria-pressed / role=tablist + aria-selected across service filters, Tailscale OS tabs, terminal tabs, storage chips, camera controls, maintenance chips, console auto-stream, and chaos audio toggles.</li>
+          </ul>
+        </div>
+        <!-- Version v2.9.23 -->
+        <div class="changelog-entry">
+          <div class="changelog-ver-header">
+            <span class="ver-tag">v2.9.23</span>
             <span class="ver-date">November 25, 2026</span>
           </div>
           <h4 class="ver-title">AI Stream Reset, Terminal Selection &amp; Storage Trigger Fixes</h4>
@@ -2133,11 +2146,11 @@
         <div>
           <label style="font-size: 0.8rem; font-weight: 700; color: #cbd5e1; display: block; margin-bottom: 8px;">Select Maintenance Window Duration:</label>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px;">
-            <button type="button" class="btn btn-secondary maint-dur-btn" data-dur="15" onclick="selectMaintDuration(15)" style="font-size: 0.78rem; padding: 8px; text-align: center; border-color: rgba(255,255,255,0.15);">15 Minutes<br><span style="font-size: 0.68rem; color: #94a3b8;">Quick Patch</span></button>
-            <button type="button" class="btn btn-secondary maint-dur-btn active" data-dur="30" onclick="selectMaintDuration(30)" style="font-size: 0.78rem; padding: 8px; text-align: center; border-color: #f59e0b; color: #fef08a !important; background: rgba(245, 158, 11, 0.15);">30 Minutes<br><span style="font-size: 0.68rem; color: #cbd5e1;">Windows Update</span></button>
-            <button type="button" class="btn btn-secondary maint-dur-btn" data-dur="60" onclick="selectMaintDuration(60)" style="font-size: 0.78rem; padding: 8px; text-align: center; border-color: rgba(255,255,255,0.15);">1 Hour<br><span style="font-size: 0.68rem; color: #94a3b8;">Deep Updates</span></button>
-            <button type="button" class="btn btn-secondary maint-dur-btn" data-dur="120" onclick="selectMaintDuration(120)" style="font-size: 0.78rem; padding: 8px; text-align: center; border-color: rgba(255,255,255,0.15);">2 Hours<br><span style="font-size: 0.68rem; color: #94a3b8;">Hardware/Driver</span></button>
-            <button type="button" class="btn btn-secondary maint-dur-btn" data-dur="0" onclick="selectMaintDuration(0)" style="font-size: 0.78rem; padding: 8px; text-align: center; border-color: rgba(255,255,255,0.15);">Manual Toggle<br><span style="font-size: 0.68rem; color: #94a3b8;">Until Closed</span></button>
+            <button type="button" class="btn btn-secondary maint-dur-btn" data-dur="15" aria-pressed="false" onclick="selectMaintDuration(15)" style="font-size: 0.78rem; padding: 8px; text-align: center; border-color: rgba(255,255,255,0.15);">15 Minutes<br><span style="font-size: 0.68rem; color: #94a3b8;">Quick Patch</span></button>
+            <button type="button" class="btn btn-secondary maint-dur-btn active" data-dur="30" aria-pressed="true" onclick="selectMaintDuration(30)" style="font-size: 0.78rem; padding: 8px; text-align: center; border-color: #f59e0b; color: #fef08a !important; background: rgba(245, 158, 11, 0.15);">30 Minutes<br><span style="font-size: 0.68rem; color: #cbd5e1;">Windows Update</span></button>
+            <button type="button" class="btn btn-secondary maint-dur-btn" data-dur="60" aria-pressed="false" onclick="selectMaintDuration(60)" style="font-size: 0.78rem; padding: 8px; text-align: center; border-color: rgba(255,255,255,0.15);">1 Hour<br><span style="font-size: 0.68rem; color: #94a3b8;">Deep Updates</span></button>
+            <button type="button" class="btn btn-secondary maint-dur-btn" data-dur="120" aria-pressed="false" onclick="selectMaintDuration(120)" style="font-size: 0.78rem; padding: 8px; text-align: center; border-color: rgba(255,255,255,0.15);">2 Hours<br><span style="font-size: 0.68rem; color: #94a3b8;">Hardware/Driver</span></button>
+            <button type="button" class="btn btn-secondary maint-dur-btn" data-dur="0" aria-pressed="false" onclick="selectMaintDuration(0)" style="font-size: 0.78rem; padding: 8px; text-align: center; border-color: rgba(255,255,255,0.15);">Manual Toggle<br><span style="font-size: 0.68rem; color: #94a3b8;">Until Closed</span></button>
           </div>
         </div>
 
@@ -2181,6 +2194,6 @@
       </div>
     </div>
   </div>
-  <script src="app.js?v=2.9.23"></script>
+  <script src="app.js?v=2.9.24"></script>
 </body>
 </html>

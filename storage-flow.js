@@ -577,7 +577,7 @@
       const metricTxt = hasLive
         ? (rate > 0 ? `${rate.toFixed(1)} MB/s` : (hasBytes ? safeStr(p.bytesCopiedFormatted, 'Ready') : safeStr(p.schedule, 'Ready')))
         : safeStr(p.schedule, 'Scheduled');
-      return `<button type="button" class="storage-pipe-chip ${isSel ? 'is-selected' : ''}" data-chip-pipe-id="${escapeHtml(p.id)}" title="${escapeHtml(p.name)} — Click to highlight route &amp; inspect">
+      return `<button type="button" class="storage-pipe-chip ${isSel ? 'is-selected' : ''}" aria-pressed="${isSel ? 'true' : 'false'}" data-chip-pipe-id="${escapeHtml(p.id)}" title="${escapeHtml(p.name)} — Click to highlight route &amp; inspect">
         <span class="storage-pipe-chip-dot" style="background:${cfg.color};box-shadow:0 0 6px ${cfg.color};"></span>
         <span class="storage-pipe-chip-name">${escapeHtml(cfg.shortLabel || p.name)}</span>
         <span class="storage-pipe-chip-meta">${escapeHtml(metricTxt)}</span>
@@ -1252,11 +1252,13 @@
       if (animBtn) animBtn.textContent = 'Resume Flow Animation';
     }
     if (animBtn) {
+      animBtn.setAttribute('aria-pressed', state.animPaused ? 'true' : 'false');
       animBtn.addEventListener('click', () => {
         state.animPaused = !state.animPaused;
         const stage = document.getElementById('storage-flow-stage');
         if (stage) stage.classList.toggle('is-paused', state.animPaused);
         animBtn.textContent = state.animPaused ? 'Resume Flow Animation' : 'Pause Flow Animation';
+        animBtn.setAttribute('aria-pressed', state.animPaused ? 'true' : 'false');
         renderPipesSVG(state.data);
       });
     }
