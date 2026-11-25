@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-24T23:52:01Z",
-    "currentVersion":  "v2.8.91",
+    "updatedAt":  "2026-11-25T00:11:43Z",
+    "currentVersion":  "v2.8.92",
     "releases":  [
+                     {
+                         "version":  "v2.8.92",
+                         "date":  "November 24, 2026",
+                         "title":  "Mobile Console Fit, WebRTC Fallback \u0026 Modal Polish",
+                         "changes":  [
+                                         {
+                                             "label":  "Mobile Console \u0026 Modals",
+                                             "text":  "Fixed AGY Console Execute button clipping on 375px mobile, removed 1s maintenance banner flash, and fixed double-click Copy button label overwrite."
+                                         },
+                                         {
+                                             "label":  "Camera HUD Resilience",
+                                             "text":  "Fixed webrtc.html pre-first-frame error handler to cleanly trigger WebRTC fallback and endpoint advance."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.91",
                          "date":  "November 24, 2026",

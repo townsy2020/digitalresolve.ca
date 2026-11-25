@@ -3070,6 +3070,7 @@ button.dropdown-item:active,
 
 .agy-modal-input {
   flex: 1;
+  min-width: 0;
   background: rgba(0, 0, 0, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
@@ -4503,8 +4504,14 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
     gap: 8px !important;
   }
 
+  html:not(.desktop-layout) .agy-prompt-label,
+  html.mobile-layout .agy-prompt-label {
+    display: none !important;
+  }
+
   html:not(.desktop-layout) .agy-modal-input,
   html.mobile-layout .agy-modal-input {
+    min-width: 0 !important;
     min-height: 44px !important;
     font-size: 0.9rem !important;
     box-sizing: border-box !important;

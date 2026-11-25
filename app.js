@@ -164,16 +164,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.91';
+          const activeVer = match ? match[0] : 'v2.8.92';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 20417;
-      const baseCssLines = 7320;
-      const baseJsLines = 8651;
+      const baseHtmlLines = 20513;
+      const baseCssLines = 7327;
+      const baseJsLines = 8659;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -4201,9 +4201,12 @@
         if (updateTriggerBtn) updateTriggerBtn.style.display = 'none';
 
         if (maintCountdownInterval) clearInterval(maintCountdownInterval);
-        maintCountdownInterval = setInterval(() => {
+        const renderMaintBanner = () => {
           if (!isNucMaintenanceActive()) {
-            clearInterval(maintCountdownInterval);
+            if (maintCountdownInterval) {
+              clearInterval(maintCountdownInterval);
+              maintCountdownInterval = null;
+            }
             updateMaintenanceModalUI();
             updateMaintenanceVisualStates();
             return;
@@ -4219,7 +4222,9 @@
             if (title) title.textContent = 'MAINTENANCE ACTIVE (Manual Mode)';
             if (sub) sub.textContent = `Reason: ${d && d.reason ? d.reason : 'Scheduled Maintenance'} | Running until manually exited`;
           }
-        }, 1000);
+        };
+        renderMaintBanner();
+        maintCountdownInterval = setInterval(renderMaintBanner, 1000);
       } else {
         if (banner) { banner.style.background = 'rgba(16, 185, 129, 0.1)'; banner.style.borderColor = 'rgba(16, 185, 129, 0.3)'; }
         if (dot) { dot.style.background = '#10b981'; dot.style.boxShadow = '0 0 8px #10b981'; }
@@ -6769,14 +6774,16 @@
           const btn = document.getElementById('btn-copy-adguard');
           const modalBtn = document.getElementById('btn-copy-modal-cmd');
           if (btn) {
-            const orig = btn.innerHTML;
+            if (!btn.dataset.origHtml) btn.dataset.origHtml = btn.innerHTML;
+            if (btn._copyResetTimer) clearTimeout(btn._copyResetTimer);
             btn.innerHTML = '<span>&check; Copied!</span>';
-            setTimeout(() => { btn.innerHTML = orig; }, 2000);
+            btn._copyResetTimer = setTimeout(() => { btn.innerHTML = btn.dataset.origHtml; btn._copyResetTimer = null; }, 2000);
           }
           if (modalBtn) {
-            const origM = modalBtn.innerHTML;
+            if (!modalBtn.dataset.origHtml) modalBtn.dataset.origHtml = modalBtn.innerHTML;
+            if (modalBtn._copyResetTimer) clearTimeout(modalBtn._copyResetTimer);
             modalBtn.innerHTML = '&check; Copied!';
-            setTimeout(() => { modalBtn.innerHTML = origM; }, 2000);
+            modalBtn._copyResetTimer = setTimeout(() => { modalBtn.innerHTML = modalBtn.dataset.origHtml; modalBtn._copyResetTimer = null; }, 2000);
           }
         }).catch(() => {
           prompt('Copy AdGuard install command:', cmd);
@@ -6794,9 +6801,10 @@
       if (navigator.clipboard) {
         navigator.clipboard.writeText(text).then(() => {
           if (btn) {
-            const orig = btn.innerHTML;
+            if (!btn.dataset.origHtml) btn.dataset.origHtml = btn.innerHTML;
+            if (btn._copyResetTimer) clearTimeout(btn._copyResetTimer);
             btn.innerHTML = 'Copied!';
-            setTimeout(() => { btn.innerHTML = orig; }, 2000);
+            btn._copyResetTimer = setTimeout(() => { btn.innerHTML = btn.dataset.origHtml; btn._copyResetTimer = null; }, 2000);
           }
           if (typeof showToast === 'function') showToast('success', 'Copied to Clipboard', text);
         }).catch(() => {

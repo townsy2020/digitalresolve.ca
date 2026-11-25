@@ -1098,8 +1098,8 @@
 
     video.addEventListener('error', () => {
       if (!streamConnected && ws) {
-        console.warn('Video element error before first frame, resetting stream');
-        reconnect();
+        console.warn('Video element error before first frame, closing signaling socket to trigger fallback');
+        try { ws.close(); } catch (e) {}
       }
     });
 
