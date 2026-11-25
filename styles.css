@@ -188,9 +188,9 @@ section[id], div[id], #deck, #ops, #fleet, #uptime, #camera-feed-card {
 }
 
 .btn-secondary {
-  background: rgba(59, 130, 246, 0.14) !important;
-  color: #93c5fd !important;
-  border: 1px solid rgba(96, 165, 250, 0.4) !important;
+  background: rgba(59, 130, 246, 0.14);
+  color: #93c5fd;
+  border: 1px solid rgba(96, 165, 250, 0.4);
   border-radius: 8px;
   font-weight: 600;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);

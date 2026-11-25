@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.24';
+          const activeVer = match ? match[0] : 'v2.9.25';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 23863;
+      const baseHtmlLines = 23967;
       const baseCssLines = 7621;
-      const baseJsLines = 9271;
+      const baseJsLines = 9277;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -1205,7 +1205,8 @@
       if (isOnline) {
         try {
           const raw = localStorage.getItem('dr_telemetry_cache');
-          const cache = raw ? JSON.parse(raw) : {};
+          const parsed = raw ? JSON.parse(raw) : null;
+          const cache = (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) ? parsed : {};
           cache[target] = {
             online: true,
             latencyMs: (latencyMs !== null && latencyMs !== undefined && Number.isFinite(Number(latencyMs))) ? Number(latencyMs) : null,
@@ -1218,7 +1219,8 @@
       } else {
         try {
           const raw = localStorage.getItem('dr_telemetry_cache');
-          const cache = raw ? JSON.parse(raw) : {};
+          const parsed = raw ? JSON.parse(raw) : null;
+          const cache = (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) ? parsed : {};
           const prevTarget = (cache && cache[target]) || {};
           if (target === 'desktop' && !disk) {
             disk = window.LAST_DESKTOP_DISK || prevTarget.disk || null;
@@ -5547,8 +5549,8 @@
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
       }
-      if (fullscreen && win && !win.classList.contains('fullscreen')) {
-        win.classList.add('fullscreen');
+      if (win) {
+        win.classList.toggle('fullscreen', Boolean(fullscreen));
       }
       updateSSOGateUI(); try { updateMaintenanceVisualStates(); } catch(e) {}
       fetchAgySessionInfo();
@@ -5560,6 +5562,10 @@
 
     function closeAgyConsole() {
       const modal = document.getElementById('agy-console-modal-overlay');
+      const win = document.getElementById('agy-console-window');
+      if (win) {
+        win.classList.remove('fullscreen');
+      }
       if (modal) {
         modal.classList.remove('active');
         modal.style.display = 'none';

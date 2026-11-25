@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-25T15:29:52Z",
-    "currentVersion":  "v2.9.24",
+    "updatedAt":  "2026-11-25T15:40:15Z",
+    "currentVersion":  "v2.9.25",
     "releases":  [
+                     {
+                         "version":  "v2.9.25",
+                         "date":  "November 25, 2026",
+                         "title":  "Button Cascade Polish, Telemetry Cache Self-Healing \u0026 Console Modal Reset",
+                         "changes":  [
+                                         {
+                                             "label":  "Secondary Button Accent Cascade",
+                                             "text":  "Removed base !important overrides on .btn-secondary in styles.css so custom inline accent colors, backgrounds, and borders render cleanly on Stop Feed, Refill Hopper, WAN Console, StreamHub, Audiobookshelf, and modal action buttons while preserving default blue and active chip styles."
+                                         },
+                                         {
+                                             "label":  "Telemetry Cache Self-Healing",
+                                             "text":  "Guarded dr_telemetry_cache JSON.parse writes in updateStatusUI() against non-object cached values (such as JSON null or primitives) so local cache writes recover automatically."
+                                         },
+                                         {
+                                             "label":  "AGY Console Modal Reset",
+                                             "text":  "Synchronized fullscreen state in openEmbeddedConsole() and cleared .fullscreen in closeAgyConsole() so reopening the console in standard mode never stays stuck maximized."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.24",
                          "date":  "November 25, 2026",
