@@ -661,7 +661,6 @@
           if (ws !== sock) return;
           hasOpened = true;
           clearTimeout(connTimeout);
-          reconnectAttempts = 0;
           frameTimeout = setTimeout(() => {
             if (!streamConnected && ws === sock && !handled) {
               fallbackToWebRTC('MSE first-frame timeout (10s), falling back to WebRTC');
@@ -807,6 +806,10 @@
           });
         }
         if (activePc.connectionState === 'failed' || activePc.connectionState === 'disconnected') {
+          if (!streamConnected && activePc.connectionState === 'failed') {
+            advanceEndpoint();
+            return;
+          }
           scheduleReconnect();
         }
       });
@@ -849,7 +852,6 @@
         if (ws !== sock) return;
         hasOpened = true;
         clearTimeout(timeout);
-        reconnectAttempts = 0;
         frameTimeout = setTimeout(() => {
           if (!streamConnected && ws === sock && !handled) {
             advanceEndpoint();
@@ -911,6 +913,7 @@
     function markStreamOnline() {
       if (streamConnected) return;
       streamConnected = true;
+      reconnectAttempts = 0;
       if (frameTimeout) {
         clearTimeout(frameTimeout);
         frameTimeout = null;

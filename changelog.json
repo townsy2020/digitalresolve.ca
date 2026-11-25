@@ -1,7 +1,30 @@
 {
-    "updatedAt":  "2026-11-25T09:23:51Z",
-    "currentVersion":  "v2.9.6",
+    "updatedAt":  "2026-11-25T10:22:08Z",
+    "currentVersion":  "v2.9.7",
     "releases":  [
+                     {
+                         "version":  "v2.9.7",
+                         "date":  "November 25, 2026",
+                         "title":  "Fetch Timeouts, Safari ISO Dates \u0026 WebRTC Fallback Fixes",
+                         "changes":  [
+                                         {
+                                             "label":  "Fetch Timeouts",
+                                             "text":  "Added 3s timeout to lockSSO() logout fetch and 15s timeout to storage-flow executePipelineTrigger()"
+                                         },
+                                         {
+                                             "label":  "Safari ISO Date Parsing",
+                                             "text":  "Normalized space-separated ISP timestamps to ISO-8601 in app.js so WebKit/Safari never parses NaN"
+                                         },
+                                         {
+                                             "label":  "WebRTC Reconnect \u0026 Fallback",
+                                             "text":  "Fixed ai.html reconnect backoff reset timing and advanced to fallback endpoints on pre-frame ICE failure in webrtc.html and ai.html"
+                                         },
+                                         {
+                                             "label":  "Visibilitychange Throttle",
+                                             "text":  "Added 3s cooldown and silent log refresh on tab return to stop burst fetches and terminal flicker"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.6",
                          "date":  "November 25, 2026",

@@ -1101,7 +1101,8 @@
         method: 'POST',
         credentials: 'include',
         headers,
-        body: JSON.stringify({ action: pipeline.triggerAction })
+        body: JSON.stringify({ action: pipeline.triggerAction }),
+        signal: (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(15000) : undefined
       });
       if (res.status === 401 || res.status === 403) {
         if (!retried && typeof window.openGlobalSSOModal === 'function') {

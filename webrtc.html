@@ -964,6 +964,10 @@
             video.play().catch(er => console.warn('Autoplay error:', er));
           });
         } else if (activePc.connectionState === 'failed' || activePc.connectionState === 'disconnected') {
+          if (!streamConnected && activePc.connectionState === 'failed') {
+            advanceEndpoint();
+            return;
+          }
           if (reconnectTimeout) clearTimeout(reconnectTimeout);
           reconnectTimeout = setTimeout(initStream, 4000);
         }

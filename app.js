@@ -165,16 +165,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.6';
+          const activeVer = match ? match[0] : 'v2.9.7';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 21937;
+      const baseHtmlLines = 22056;
       const baseCssLines = 7381;
-      const baseJsLines = 8896;
+      const baseJsLines = 8908;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -1924,14 +1924,18 @@
         setInterval(() => { if (!document.hidden) fetchFeederStatus(); }, 30000);
       }
 
+      let _lastVisRefreshAt = 0;
       document.addEventListener('visibilitychange', () => {
         if (!document.hidden) {
+          const now = Date.now();
+          if (now - _lastVisRefreshAt < 3000) return;
+          _lastVisRefreshAt = now;
           fetchClusterStats();
           if (hasClimateDom() && typeof fetchClimateData === 'function') fetchClimateData();
           if (hasIspDom()) fetchISPHistory();
           if (hasServicesDom()) fetchServicesHealth();
           if (hasFeederDom() && typeof fetchFeederStatus === 'function') fetchFeederStatus();
-          if (hasTermDom() && currentLogTab && isSSOAuthenticated()) loadLog(currentLogTab);
+          if (hasTermDom() && currentLogTab && isSSOAuthenticated()) loadLog(currentLogTab, true);
         }
       });
 
@@ -2284,7 +2288,7 @@
       window.pendingSSOCallback = null;
       if (typeof stopConsoleAutoPoll === 'function') stopConsoleAutoPoll();
       updateSSOGateUI();
-      await fetch('https://wake.digitalresolve.ca/cdn-cgi/access/logout', { mode: 'no-cors', credentials: 'include' }).catch(() => {});
+      await fetch('https://wake.digitalresolve.ca/cdn-cgi/access/logout', { mode: 'no-cors', credentials: 'include', signal: _fetchSig(3000) }).catch(() => {});
       const isShift = Boolean((evt && evt.shiftKey) || (typeof window !== 'undefined' && window.event && window.event.shiftKey));
       if (fullIdpLogout && isShift) {
         window.location.href = 'https://login.microsoftonline.com/common/oauth2/v2.0/logout?post_logout_redirect_uri=' + encodeURIComponent('https://digitalresolve.ca/cdn-cgi/access/logout');
@@ -3505,7 +3509,7 @@
     // Terminal Log Streamer
     // currentLogTab hoisted to global script top
     let _logReqSeq = 0;
-    function loadLog(name) {
+    function loadLog(name, silent = false) {
       currentLogTab = name;
       ['agy', 'sentinel', 'power', 'report'].forEach(t => {
         const btn = document.getElementById(`tab-${t}`);
@@ -3518,7 +3522,7 @@
       }
 
       const body = document.getElementById('terminal-content');
-      if (body) body.textContent = `Streaming ${name} log entries...`;
+      if (body && !silent) body.textContent = `Streaming ${name} log entries...`;
 
       const reqTab = currentLogTab;
       const reqSeq = ++_logReqSeq;
@@ -3619,7 +3623,7 @@
       };
       const sortIspChrono = (list) => {
         if (!Array.isArray(list) || list.length <= 1) return Array.isArray(list) ? list : [];
-        return list.map((item, idx) => ({ item, idx, ts: Date.parse((item && (item.timestamp || item.time)) || '') }))
+        return list.map((item, idx) => ({ item, idx, ts: parseIspTs((item && (item.timestamp || item.time)) || '') }))
           .sort((a, b) => {
             const aOk = Number.isFinite(a.ts);
             const bOk = Number.isFinite(b.ts);
@@ -3685,7 +3689,7 @@
         const computedStGrade = evaluateIspGrade(pingAvg, jitter, loss, grade !== '--' ? grade : null).grade;
         applyStValGrade(computedStGrade);
         const latestTsRaw = getIspSampleTimestamp(latest);
-        const latestTsMs = latestTsRaw ? Date.parse(latestTsRaw) : NaN;
+        const latestTsMs = latestTsRaw ? parseIspTs(latestTsRaw) : NaN;
         document.querySelectorAll('#st-next-probe-badge').forEach(el => {
           if (Number.isFinite(latestTsMs)) {
             const elapsedMin = Math.max(0, Math.floor((Date.now() - latestTsMs) / 60000));
@@ -3792,7 +3796,7 @@
                 const sList = Array.isArray(sData.history) ? sData.history : [];
                 const sLat = (sData.latest && sData.latest.pingAvgMs !== undefined) ? sData.latest : (sList.length > 0 ? sList[sList.length - 1] : null);
                 const snapTsRaw = (sLat && sLat.timestamp) || sData.timestamp || null;
-                const snapTs = snapTsRaw ? Date.parse(snapTsRaw) : NaN;
+                const snapTs = snapTsRaw ? parseIspTs(snapTsRaw) : NaN;
                 const isStaleSnap = !Number.isFinite(snapTs) || (Date.now() - snapTs) > (2 * 60 * 60 * 1000);
                 const snapDateLabel = Number.isFinite(snapTs) ? new Date(snapTs).toISOString().slice(0, 10) : 'Unknown';
                 const snapTag = isStaleSnap ? ` [Snapshot: ${snapDateLabel}]` : '';
@@ -3845,6 +3849,13 @@
       return (obj && (obj.timestamp || obj.lastChecked || obj.time)) ? String(obj.timestamp || obj.lastChecked || obj.time) : '';
     }
 
+    function parseIspTs(raw) {
+      if (!raw) return NaN;
+      const s = String(raw).trim();
+      const norm = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(s) ? s.replace(' ', 'T') : s;
+      return Date.parse(norm);
+    }
+
     function applyStValGrade(grade) {
       const colorMap = { 'A+': '#10b981', 'A': '#10b981', 'B': '#38bdf8', 'C': '#fbbf24', 'D': '#f97316', 'F': '#ef4444' };
       const gStr = (grade && grade !== '--') ? String(grade).trim() : '--';
@@ -3893,8 +3904,8 @@
             if (gen !== _ispPollGen) return;
             if (!data || data._fromFallback) return;
             const curTs = getIspSampleTimestamp((data && data.latest) || window.ISP_LATEST) || getIspSampleTimestamp(data);
-            const curMs = curTs ? Date.parse(curTs) : NaN;
-            const prevMs = prevTs ? Date.parse(prevTs) : NaN;
+            const curMs = curTs ? parseIspTs(curTs) : NaN;
+            const prevMs = prevTs ? parseIspTs(prevTs) : NaN;
             const isNewer = (Number.isFinite(curMs) && Number.isFinite(prevMs)) ? (curMs > prevMs) : (Boolean(curTs) && curTs !== prevTs);
             if (isNewer) {
               clearIspSpeedtestPoll();
