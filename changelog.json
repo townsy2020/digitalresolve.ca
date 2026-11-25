@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-25T12:49:05Z",
-    "currentVersion":  "v2.9.15",
+    "updatedAt":  "2026-11-25T13:15:38Z",
+    "currentVersion":  "v2.9.16",
     "releases":  [
+                     {
+                         "version":  "v2.9.16",
+                         "date":  "November 25, 2026",
+                         "title":  "Stacked Modal Scroll Lock \u0026 AGY Card Keyboard Guard",
+                         "changes":  [
+                                         {
+                                             "label":  "Stacked Modal Scroll Lock",
+                                             "text":  "Kept body scroll locked when closing a stacked modal while another dialog remains open"
+                                         },
+                                         {
+                                             "label":  "AGY Card Spacebar Guard",
+                                             "text":  "Added event.preventDefault() on Spacebar activation of the AGY console card in index.html and services.html"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.15",
                          "date":  "November 25, 2026",

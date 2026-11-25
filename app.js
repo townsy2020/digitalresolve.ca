@@ -165,16 +165,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.15';
+          const activeVer = match ? match[0] : 'v2.9.16';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 22856;
+      const baseHtmlLines = 22952;
       const baseCssLines = 7566;
-      const baseJsLines = 9173;
+      const baseJsLines = 9185;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -4083,6 +4083,18 @@
         }
       } catch (e) {}
     }
+    function _unlockBodyIfNoOpenModal() {
+      try {
+        const stillOpen = Array.from(document.querySelectorAll('[role="dialog"][aria-modal="true"]')).some(dlg => {
+          const ov = dlg.parentElement;
+          if (ov && getComputedStyle(ov).display === 'none') return false;
+          return getComputedStyle(dlg).display !== 'none';
+        });
+        if (!stillOpen) document.body.style.overflow = '';
+      } catch (e) {
+        document.body.style.overflow = '';
+      }
+    }
 
     // Remote Magnet Ingestion Handlers
     function openMagnetModal() {
@@ -4105,7 +4117,7 @@
         modal.classList.remove('active');
         modal.style.display = 'none';
       }
-      document.body.style.overflow = '';
+      _unlockBodyIfNoOpenModal();
       _restoreModalTrigger('magnet-modal-overlay');
     }
     function closeMagnetModalOnBackdrop(e) {
@@ -4367,7 +4379,7 @@
         modal.classList.remove('active');
         modal.style.display = 'none';
       }
-      document.body.style.overflow = '';
+      _unlockBodyIfNoOpenModal();
       if (maintCountdownInterval) {
         clearInterval(maintCountdownInterval);
         maintCountdownInterval = null;
@@ -5524,7 +5536,7 @@
         modal.classList.remove('active');
         modal.style.display = 'none';
       }
-      document.body.style.overflow = '';
+      _unlockBodyIfNoOpenModal();
       stopConsoleAutoPoll();
       _restoreModalTrigger('agy-console-modal-overlay');
     }
@@ -5807,7 +5819,7 @@
         modal.classList.remove('active');
         modal.style.display = 'none';
       }
-      document.body.style.overflow = '';
+      _unlockBodyIfNoOpenModal();
       _restoreModalTrigger('changelog-modal-overlay');
     }
 
@@ -5839,7 +5851,7 @@
         modal.classList.remove('active');
         modal.style.display = 'none';
       }
-      document.body.style.overflow = '';
+      _unlockBodyIfNoOpenModal();
       _restoreModalTrigger('health-modal-overlay');
     }
 
@@ -6124,7 +6136,7 @@
       if (chaosState.audioCtx && chaosState.audioCtx.state === 'running') {
         chaosState.audioCtx.suspend().catch(() => {});
       }
-      document.body.style.overflow = '';
+      _unlockBodyIfNoOpenModal();
       _restoreModalTrigger('disaster-modal-overlay');
     }
 
@@ -6506,7 +6518,7 @@
       if (modal) {
         modal.classList.remove('active');
         modal.style.display = 'none';
-        document.body.style.overflow = '';
+        _unlockBodyIfNoOpenModal();
       }
       _restoreModalTrigger('speedtest-sso-modal-overlay');
     }
@@ -7081,7 +7093,7 @@
       if (modal) {
         modal.classList.remove('active');
         modal.style.display = 'none';
-        document.body.style.overflow = '';
+        _unlockBodyIfNoOpenModal();
       }
       _restoreModalTrigger('cloudflare-stats-modal-overlay');
     }
@@ -7124,7 +7136,7 @@
       if (modal) {
         modal.classList.remove('active');
         modal.style.display = 'none';
-        document.body.style.overflow = '';
+        _unlockBodyIfNoOpenModal();
       }
       _restoreModalTrigger('adguard-modal-overlay');
     }
@@ -7433,7 +7445,7 @@
       if (modal) {
         modal.classList.remove('active');
         modal.style.display = 'none';
-        document.body.style.overflow = '';
+        _unlockBodyIfNoOpenModal();
       }
       _restoreModalTrigger('tailscale-modal-overlay');
     }
