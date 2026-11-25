@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-25T01:46:21Z",
-    "currentVersion":  "v2.8.97",
+    "updatedAt":  "2026-11-25T03:28:28Z",
+    "currentVersion":  "v2.8.98",
     "releases":  [
+                     {
+                         "version":  "v2.8.98",
+                         "date":  "November 24, 2026",
+                         "title":  "Dropdown ARIA Sync, Storage Inspector Filter \u0026 Input Validation",
+                         "changes":  [
+                                         {
+                                             "label":  "Dropdown \u0026 Filter UX",
+                                             "text":  "Synced aria-expanded across dropdown toggles, closed sibling menus, and prevented stale/dimmed selections in storage-flow.js Inspector."
+                                         },
+                                         {
+                                             "label":  "Client Input Guards",
+                                             "text":  "Validated magnet/http(s) schemes in Quick Magnet \u0026 Magnet Modal and fell back to default Maintenance reasons on whitespace-only input."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.97",
                          "date":  "November 24, 2026",

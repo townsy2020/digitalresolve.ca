@@ -1142,6 +1142,26 @@
           b.classList.toggle('active', active);
           b.setAttribute('aria-selected', active ? 'true' : 'false');
         });
+        const livePipes = Array.isArray(state.data && state.data.pipelines) ? state.data.pipelines.filter(p => p && typeof p === 'object') : [];
+        const allPipes = livePipes.length > 0 ? livePipes : Object.values(PIPELINE_FALLBACKS);
+        let selectionMatches = state.filter === 'all';
+        if (!selectionMatches) {
+          if (state.selectedType === 'node') {
+            const selCard = document.querySelector(`.storage-node-card[data-node-id="${state.selectedId}"]`);
+            const cats = selCard ? (selCard.getAttribute('data-category') || '').split(',') : [];
+            selectionMatches = cats.some(c => matchesFilter(c, state.filter));
+          } else {
+            const selPipe = allPipes.find(p => p.id === state.selectedId);
+            selectionMatches = Boolean(selPipe && matchesFilter(selPipe.category, state.filter));
+          }
+        }
+        if (!selectionMatches) {
+          const firstVisible = allPipes.find(p => matchesFilter(p.category, state.filter));
+          if (firstVisible) {
+            state.selectedType = 'pipeline';
+            state.selectedId = firstVisible.id;
+          }
+        }
         if (state.data) {
           renderTierNodes(state.data);
           renderPipesSVG(state.data);
@@ -1150,12 +1170,14 @@
           applyNodeCategoryFilter();
           renderPipesSVG(null);
         }
+        updateInspector();
       });
     });
 
     // Wire node clicks
     document.querySelectorAll('.storage-node-card').forEach(card => {
       card.addEventListener('click', () => {
+        if (card.classList.contains('is-dimmed')) return;
         selectItem('node', card.getAttribute('data-node-id'));
       });
     });

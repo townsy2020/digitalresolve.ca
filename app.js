@@ -164,16 +164,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.97';
+          const activeVer = match ? match[0] : 'v2.8.98';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 21017;
+      const baseHtmlLines = 21113;
       const baseCssLines = 7337;
-      const baseJsLines = 8730;
+      const baseJsLines = 8765;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -362,6 +362,15 @@
       navContainer.classList.remove('nav-open');
       if (menuToggle) menuToggle.setAttribute('aria-expanded', 'false');
       if (toggleIcon) toggleIcon.textContent = '=';
+    }
+
+    function setDropdownOpen(dd, open) {
+      if (!dd) return;
+      const isOpen = Boolean(open);
+      dd.classList.toggle('is-open', isOpen);
+      dd.querySelectorAll('[aria-expanded]').forEach(el => {
+        el.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      });
     }
 
     function showToast(statusType, msg, subtext = '', duration = 5000) {
@@ -1821,14 +1830,14 @@
         dd.addEventListener('mouseenter', () => {
           clearTimeout(timer);
           document.querySelectorAll('.dropdown').forEach(other => {
-            if (other !== dd) other.classList.remove('is-open');
+            if (other !== dd) setDropdownOpen(other, false);
           });
-          dd.classList.add('is-open');
+          setDropdownOpen(dd, true);
           positionDropdownMenu(dd);
         });
         dd.addEventListener('mouseleave', () => {
           timer = setTimeout(() => {
-            dd.classList.remove('is-open');
+            setDropdownOpen(dd, false);
           }, 200);
         });
         const trigger = dd.querySelector('.btn-nav, .btn-torrent, .btn-gemini, .btn-wol, #wol-btn');
@@ -1836,8 +1845,12 @@
           trigger.addEventListener('click', (e) => {
             if (trigger.tagName === 'BUTTON' || trigger.getAttribute('href') === 'javascript:void(0)' || document.documentElement.classList.contains('mobile-layout') || window.innerWidth <= 768) {
               e.preventDefault();
-              dd.classList.toggle('is-open');
-              if (dd.classList.contains('is-open')) positionDropdownMenu(dd);
+              const willOpen = !dd.classList.contains('is-open');
+              document.querySelectorAll('.dropdown').forEach(other => {
+                if (other !== dd) setDropdownOpen(other, false);
+              });
+              setDropdownOpen(dd, willOpen);
+              if (willOpen) positionDropdownMenu(dd);
             }
           });
         }
@@ -1855,13 +1868,13 @@
       document.addEventListener('click', (e) => {
         if (e.target.closest('.dropdown-menu button, .dropdown-menu a')) {
           setTimeout(() => {
-            document.querySelectorAll('.dropdown').forEach(dd => dd.classList.remove('is-open'));
+            document.querySelectorAll('.dropdown').forEach(dd => setDropdownOpen(dd, false));
             closeMobileNav();
           }, 80);
           return;
         }
         if (!e.target.closest('.dropdown')) {
-          document.querySelectorAll('.dropdown').forEach(dd => dd.classList.remove('is-open'));
+          document.querySelectorAll('.dropdown').forEach(dd => setDropdownOpen(dd, false));
         }
         if (!e.target.closest('.header')) {
           closeMobileNav();
@@ -2719,7 +2732,7 @@
         }
         showToast('info', 'Target Switched: Desktop', 'Actions will target Desktop PC (Core Workstation).');
       }
-      document.querySelectorAll('.dropdown').forEach(dd => dd.classList.remove('is-open'));
+      document.querySelectorAll('.dropdown').forEach(dd => setDropdownOpen(dd, false));
     }
 
     function executeNodeAction(action) {
@@ -3897,8 +3910,8 @@
       const input = document.getElementById('quick-magnet-input');
       const targetSelect = document.getElementById('quick-magnet-target');
       const val = input ? input.value.trim() : '';
-      if (!val) {
-        showToast('error', 'Invalid URL', 'Please paste a valid magnet link or URL.');
+      if (!val || !/^(magnet:\?|https?:\/\/.+)/i.test(val)) {
+        showToast('error', 'Invalid URL', 'Please paste a valid magnet:? link or http(s):// .torrent URL.');
         return;
       }
       const target = targetSelect ? targetSelect.value : 'nuc';
@@ -3954,8 +3967,8 @@
       }
       const input = document.getElementById('magnet-input');
       const val = input ? input.value.trim() : '';
-      if (!val) {
-        showToast('error', 'Invalid URL', 'Please paste a valid magnet link or URL.');
+      if (!val || !/^(magnet:\?|https?:\/\/.+)/i.test(val)) {
+        showToast('error', 'Invalid URL', 'Please paste a valid magnet:? link or http(s):// .torrent URL.');
         return;
       }
       const targetRadios = document.getElementsByName('magnet-target');
@@ -4277,7 +4290,7 @@
         deactivateMaintenanceMode();
       } else {
         const reasonInput = document.getElementById('maint-reason-input');
-        const reason = reasonInput ? reasonInput.value.trim() : 'Windows Updates & Optimization';
+        const reason = (reasonInput && reasonInput.value.trim()) || 'Windows Updates & Optimization';
         activateMaintenanceMode(selectedMaintDuration, reason, false);
       }
     }
@@ -4285,7 +4298,7 @@
 
     function activateMaintenanceWithUpdate() {
       const reasonInput = document.getElementById('maint-reason-input');
-      const reason = reasonInput ? reasonInput.value.trim() : 'Update-Computer & Windows Updates';
+      const reason = (reasonInput && reasonInput.value.trim()) || 'Update-Computer & Windows Updates';
       activateMaintenanceMode(selectedMaintDuration, reason, true);
     }
     window.activateMaintenanceWithUpdate = activateMaintenanceWithUpdate;
@@ -7504,7 +7517,7 @@
         closeCloudflareStatsModal();
         if (typeof closeTailscaleModal === 'function') closeTailscaleModal();
         if (typeof closeMobileNav === 'function') closeMobileNav();
-        document.querySelectorAll('.dropdown.is-open').forEach(dd => dd.classList.remove('is-open'));
+        document.querySelectorAll('.dropdown.is-open').forEach(dd => setDropdownOpen(dd, false));
         document.body.style.overflow = '';
         document.documentElement.style.overflow = '';
       }
