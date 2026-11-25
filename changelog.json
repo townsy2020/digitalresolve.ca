@@ -1,7 +1,18 @@
 {
-    "updatedAt":  "2026-11-25T14:32:26Z",
-    "currentVersion":  "v2.9.20",
+    "updatedAt":  "2026-11-25T14:43:49Z",
+    "currentVersion":  "v2.9.21",
     "releases":  [
+                     {
+                         "version":  "v2.9.21",
+                         "date":  "November 25, 2026",
+                         "title":  "Reduced-Motion Transition Specificity Fix",
+                         "changes":  [
+                                         {
+                                             "label":  "Reduced-Motion Specificity",
+                                             "text":  "Removed !important from 9 transition rules in styles.css so @media (prefers-reduced-motion: reduce) uniformly clamps all UI transitions"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.20",
                          "date":  "November 25, 2026",

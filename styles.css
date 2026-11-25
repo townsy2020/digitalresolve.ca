@@ -269,7 +269,7 @@ section[id], div[id], #deck, #ops, #fleet, #uptime, #camera-feed-card {
 .agy-send-btn:active,
 .version-badge-btn:active {
   transform: translateY(1px) scale(0.98) !important;
-  transition: transform 0.05s ease, box-shadow 0.05s ease !important;
+  transition: transform 0.05s ease, box-shadow 0.05s ease;
 }
 
 /* Accessible Focus Ring for Keyboard Navigation */
@@ -393,7 +393,7 @@ button.dropdown-item,
   font-size: 0.86rem !important;
   text-decoration: none !important;
   box-sizing: border-box !important;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
 }
 
@@ -3397,7 +3397,7 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
   border-radius: 8px !important;
   font-size: 0.82rem !important;
   cursor: pointer !important;
-  transition: all 0.2s ease !important;
+  transition: all 0.2s ease;
   box-shadow: 0 0 10px rgba(59, 130, 246, 0.15) !important;
   user-select: none;
   min-height: 44px;
@@ -3423,7 +3423,7 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
   color: #93c5fd !important;
   font-weight: 600 !important;
   cursor: pointer !important;
-  transition: all 0.2s ease !important;
+  transition: all 0.2s ease;
 }
 
 .token-counter-btn:hover {
@@ -3522,7 +3522,7 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
 .ribbon-health-radar {
   border-left: 2px solid #10b981 !important;
   background: rgba(16, 185, 129, 0.06) !important;
-  transition: all 0.2s ease !important;
+  transition: all 0.2s ease;
 }
 
 .ribbon-health-radar:hover {
@@ -4720,7 +4720,7 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
   .layout-toggle-btn:active {
     transform: scale(0.97) !important;
     filter: brightness(1.2) !important;
-    transition: transform 0.08s ease, filter 0.08s ease !important;
+    transition: transform 0.08s ease, filter 0.08s ease;
   }
 }
 
@@ -5816,7 +5816,7 @@ a.btn-schematic-chip {
   align-items: center !important;
   justify-content: center !important;
   gap: 5px !important;
-  transition: all 0.2s ease !important;
+  transition: all 0.2s ease;
   background: rgba(56, 189, 248, 0.1) !important;
   border: 1px solid rgba(56, 189, 248, 0.35) !important;
   border-radius: 8px !important;
@@ -6089,7 +6089,7 @@ a.btn-schematic-chip {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
   cursor: pointer !important;
   user-select: none !important;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-node-pill:hover {
@@ -6142,7 +6142,7 @@ a.btn-schematic-chip {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
   cursor: pointer !important;
   user-select: none !important;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .node-state-pill:hover {

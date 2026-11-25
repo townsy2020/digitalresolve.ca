@@ -166,14 +166,14 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.20';
+          const activeVer = match ? match[0] : 'v2.9.21';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 23409;
+      const baseHtmlLines = 23497;
       const baseCssLines = 7588;
       const baseJsLines = 9195;
       const baseCnameLines = 1;
