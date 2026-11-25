@@ -1082,6 +1082,18 @@
   }
 
   function selectItem(type, id) {
+    const activeEl = document.activeElement;
+    let restoreKind = null;
+    let restoreId = null;
+    if (activeEl && activeEl.hasAttribute) {
+      if (activeEl.hasAttribute('data-chip-pipe-id')) {
+        restoreKind = 'chip';
+        restoreId = activeEl.getAttribute('data-chip-pipe-id');
+      } else if (activeEl.hasAttribute('data-pipe-id') && activeEl.closest && activeEl.closest('#storage-flow-svg')) {
+        restoreKind = 'svg';
+        restoreId = activeEl.getAttribute('data-pipe-id');
+      }
+    }
     state.selectedType = type;
     state.selectedId = id;
     document.querySelectorAll('.storage-node-card').forEach(card => {
@@ -1089,6 +1101,17 @@
     });
     renderPipesSVG(state.data);
     updateInspector();
+    if (restoreKind && restoreId) {
+      const escId = (typeof CSS !== 'undefined' && typeof CSS.escape === 'function')
+        ? CSS.escape(restoreId)
+        : restoreId.replace(/["\\]/g, '\\$&');
+      const target = restoreKind === 'chip'
+        ? document.querySelector(`#storage-pipe-selector-bar [data-chip-pipe-id="${escId}"]`)
+        : document.querySelector(`#storage-flow-svg [data-pipe-id="${escId}"]`);
+      if (target && typeof target.focus === 'function') {
+        try { target.focus({ preventScroll: true }); } catch (e) { target.focus(); }
+      }
+    }
   }
 
   function triggerPipeline(pipeline) {

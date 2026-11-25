@@ -1084,7 +1084,13 @@
     function selectCam(targetSrc) {
       Object.assign(activeCam, getCamMeta(targetSrc));
       applyActiveCamUI();
+      if (valLatency) valLatency.textContent = '--';
+      if (valState) {
+        valState.textContent = 'PROBING...';
+        valState.style.color = '#94a3b8';
+      }
       reconnect();
+      pollStatus();
     }
     window.selectCamera = selectCam;
 

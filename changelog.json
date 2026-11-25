@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-25T14:43:49Z",
-    "currentVersion":  "v2.9.21",
+    "updatedAt":  "2026-11-25T15:02:53Z",
+    "currentVersion":  "v2.9.22",
     "releases":  [
+                     {
+                         "version":  "v2.9.22",
+                         "date":  "November 25, 2026",
+                         "title":  "Focus-Visible Rings, Pipeline Focus Retention \u0026 Cam Switch Reset",
+                         "changes":  [
+                                         {
+                                             "label":  "Focus-Visible \u0026 Pipeline Focus",
+                                             "text":  "Added #38bdf8 :focus-visible ring to [role=button], [tabindex=0], and SVG flow pipes, and preserved keyboard focus across storage-flow.js pipeline re-renders"
+                                         },
+                                         {
+                                             "label":  "WebRTC Camera Telemetry Reset",
+                                             "text":  "Cleared stale latency and status text and triggered fresh pollStatus() on camera switch in webrtc.html"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.21",
                          "date":  "November 25, 2026",
