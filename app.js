@@ -164,16 +164,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.8.96';
+          const activeVer = match ? match[0] : 'v2.8.97';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 20889;
+      const baseHtmlLines = 21017;
       const baseCssLines = 7337;
-      const baseJsLines = 8715;
+      const baseJsLines = 8730;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -2312,8 +2312,11 @@
           return;
         }
         if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(cid);
-          showToast('success', 'Copied to Clipboard', `Session ID: ${cid}`);
+          navigator.clipboard.writeText(cid).then(() => {
+            showToast('success', 'Copied to Clipboard', `Session ID: ${cid}`);
+          }).catch(() => {
+            prompt('Copy Conversation ID:', cid);
+          });
         } else {
           prompt('Copy Conversation ID:', cid);
         }
@@ -6364,13 +6367,21 @@
     }
 
     let __drWakeRetryTimer = null;
+    let __drProbeSeq = 0;
+    let __drProbeCtrl = null;
     function probeHomeLanRoute(allowWakeRetry) {
       if (typeof fetch !== 'function') return;
       if (__drWakeRetryTimer) {
         clearTimeout(__drWakeRetryTimer);
         __drWakeRetryTimer = null;
       }
+      if (__drProbeCtrl) {
+        try { __drProbeCtrl.abort(); } catch (e) {}
+        __drProbeCtrl = null;
+      }
+      const seq = ++__drProbeSeq;
       const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+      __drProbeCtrl = ctrl;
       const timer = ctrl ? setTimeout(() => ctrl.abort(), 1500) : null;
       fetch('https://stream-lan.digitalresolve.ca/api/route-info', {
         method: 'GET',
@@ -6381,6 +6392,8 @@
         .then((r) => (r && r.ok ? r.json() : null))
         .then((data) => {
           if (timer) clearTimeout(timer);
+          if (__drProbeCtrl === ctrl) __drProbeCtrl = null;
+          if (seq !== __drProbeSeq) return;
           const onHomeLan = Boolean(data && data.isDirectLan === true);
           window.dr_is_home_network = onHomeLan;
           try { localStorage.setItem('dr_is_home_network', onHomeLan ? 'true' : 'false'); } catch (e) {}
@@ -6389,6 +6402,8 @@
         })
         .catch(() => {
           if (timer) clearTimeout(timer);
+          if (__drProbeCtrl === ctrl) __drProbeCtrl = null;
+          if (seq !== __drProbeSeq) return;
           window.dr_is_home_network = false;
           try { localStorage.setItem('dr_is_home_network', 'false'); } catch (e) {}
           syncMediaRouteLinks();

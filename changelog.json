@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-25T01:23:01Z",
-    "currentVersion":  "v2.8.96",
+    "updatedAt":  "2026-11-25T01:46:21Z",
+    "currentVersion":  "v2.8.97",
     "releases":  [
+                     {
+                         "version":  "v2.8.97",
+                         "date":  "November 24, 2026",
+                         "title":  "WebRTC/MSE Stream Stability \u0026 LAN Probe Race Fixes",
+                         "changes":  [
+                                         {
+                                             "label":  "Camera Stream Stability",
+                                             "text":  "Eliminated RTCPeerConnection fallback leaks, MSE SourceBuffer InvalidStateError crashes, and 100s Cloudflare signaling WS disconnects in ai.html and webrtc.html."
+                                         },
+                                         {
+                                             "label":  "Promise \u0026 Route Safety",
+                                             "text":  "Fixed probeHomeLanRoute() stale-overwrite race and unhandled clipboard/fullscreen Promise rejections."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.96",
                          "date":  "November 24, 2026",

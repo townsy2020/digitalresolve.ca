@@ -559,7 +559,7 @@
       if (!document.fullscreenElement) {
         wrap.requestFullscreen().catch(e => console.warn(e));
       } else {
-        document.exitFullscreen();
+        document.exitFullscreen().catch(() => {});
       }
     }
 
@@ -702,6 +702,14 @@
     }
 
     function startMSE(wsUrl, endpoints, idx) {
+      if (pc) {
+        try {
+          pc.ontrack = null;
+          pc.onconnectionstatechange = null;
+          pc.close();
+        } catch (e) {}
+        pc = null;
+      }
       if (currentObjectUrl) {
         try { URL.revokeObjectURL(currentObjectUrl); } catch (e) {}
         currentObjectUrl = null;
@@ -762,13 +770,15 @@
             bufferQueue.shift();
           } catch (e) {
             mseAppendLock = false;
-            if (e && e.name === 'QuotaExceededError' && sourceBuffer.buffered && sourceBuffer.buffered.length > 0) {
+            if (e && e.name === 'QuotaExceededError' && activeMs.readyState === 'open' && sourceBuffer) {
               try {
-                const start0 = sourceBuffer.buffered.start(0);
-                const end = sourceBuffer.buffered.end(sourceBuffer.buffered.length - 1);
-                if (end - start0 > 1.5) {
-                  sourceBuffer.remove(start0, Math.max(start0 + 0.5, end - 3));
-                  return;
+                if (sourceBuffer.buffered && sourceBuffer.buffered.length > 0) {
+                  const start0 = sourceBuffer.buffered.start(0);
+                  const end = sourceBuffer.buffered.end(sourceBuffer.buffered.length - 1);
+                  if (end - start0 > 1.5) {
+                    sourceBuffer.remove(start0, Math.max(start0 + 0.5, end - 3));
+                    return;
+                  }
                 }
               } catch (remErr) {}
             }
@@ -813,36 +823,36 @@
                     fallbackToWebRTC('MSE SourceBuffer error, falling back to WebRTC');
                   });
                   sourceBuffer.addEventListener('updateend', () => {
-                    if (ws !== sock || ms !== activeMs || !sourceBuffer) return;
+                    if (ws !== sock || ms !== activeMs || !sourceBuffer || activeMs.readyState !== 'open') return;
                     mseAppendLock = false;
 
-                    if (!sourceBuffer.updating && sourceBuffer.buffered && sourceBuffer.buffered.length > 0) {
-                      const end = sourceBuffer.buffered.end(sourceBuffer.buffered.length - 1);
-                      const start0 = sourceBuffer.buffered.start(0);
+                    try {
+                      if (!sourceBuffer.updating && sourceBuffer.buffered && sourceBuffer.buffered.length > 0) {
+                        const end = sourceBuffer.buffered.end(sourceBuffer.buffered.length - 1);
+                        const start0 = sourceBuffer.buffered.start(0);
 
-                      if (video.paused) {
-                        if (video.currentTime < start0) {
-                          video.currentTime = start0;
+                        if (video.paused) {
+                          if (video.currentTime < start0) {
+                            video.currentTime = start0;
+                          }
+                          video.play().catch(() => {
+                            video.muted = true;
+                            video.play().catch(() => {});
+                          });
                         }
-                        video.play().catch(() => {
-                          video.muted = true;
-                          video.play().catch(() => {});
-                        });
-                      }
 
-                      const latency = end - video.currentTime;
-                      if (latency > 5.0) {
-                        video.currentTime = end - 0.5;
-                      }
+                        const latency = end - video.currentTime;
+                        if (latency > 5.0) {
+                          video.currentTime = end - 0.5;
+                        }
 
-                      // Prune older buffers on its own cycle; next updateend flushes queue
-                      if (end - start0 > 12) {
-                        try {
+                        // Prune older buffers on its own cycle; next updateend flushes queue
+                        if (end - start0 > 12) {
                           sourceBuffer.remove(start0, end - 8);
                           return;
-                        } catch (e) {}
+                        }
                       }
-                    }
+                    } catch (e) {}
                     flushMseQueue();
                   });
                   flushMseQueue();
@@ -962,6 +972,14 @@
         clearTimeout(timeout);
         if (frameTimeout) { clearTimeout(frameTimeout); frameTimeout = null; }
         try { sock.close(); } catch (e) {}
+        if (pc) {
+          try {
+            pc.ontrack = null;
+            pc.onconnectionstatechange = null;
+            pc.close();
+          } catch (e) {}
+          pc = null;
+        }
         connectEndpoint(endpoints, idx + 1);
       };
 
