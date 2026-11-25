@@ -159,28 +159,6 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    @media (max-width: 680px) {
-      .detected-feed-text {
-        display: none !important;
-      }
-      .hud-stats-separator {
-        display: none !important;
-      }
-      .hud-bottom-bar {
-        left: 8px;
-        right: 8px;
-        bottom: 8px;
-        flex-wrap: wrap;
-        gap: 6px;
-      }
-      .hud-controls {
-        gap: 5px;
-      }
-      .hud-btn {
-        padding: 5px 8px;
-        font-size: 0.7rem;
-      }
-    }
 
     .hud-bottom-bar {
       position: absolute;
@@ -224,7 +202,6 @@
       border-color: #10b981;
       color: #6ee7b7;
     }
-
     /* Ultra-Fast Non-Blocking Loading overlay */
     #loading-overlay {
       position: absolute;
@@ -252,6 +229,92 @@
     }
     @keyframes spin {
       to { transform: rotate(360deg); }
+    }
+    @media (max-width: 680px) {
+      .detected-feed-text {
+        display: none !important;
+      }
+      .hud-stats-separator {
+        display: none !important;
+      }
+      .hud-top-bar {
+        top: 8px;
+        left: 8px;
+        right: 8px;
+        gap: 6px;
+      }
+      .hud-badges-group {
+        gap: 5px;
+      }
+      .hud-badge {
+        padding: 4px 9px;
+        font-size: 0.7rem;
+        gap: 5px;
+      }
+      .hud-stats-group {
+        padding: 4px 9px;
+        font-size: 0.68rem;
+        gap: 5px;
+      }
+      .hud-bottom-bar {
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .hud-controls {
+        gap: 5px;
+      }
+      .hud-btn {
+        padding: 5px 8px;
+        font-size: 0.7rem;
+        gap: 4px;
+      }
+    }
+    @media (max-height: 300px) {
+      .hud-top-bar {
+        top: 6px;
+        left: 6px;
+        right: 6px;
+        gap: 4px;
+      }
+      .hud-badges-group {
+        gap: 4px;
+      }
+      .hud-badge {
+        padding: 2px 7px;
+        font-size: 0.64rem;
+        gap: 4px;
+      }
+      .hud-stats-group {
+        padding: 2px 7px;
+        font-size: 0.64rem;
+        gap: 4px;
+      }
+      .hud-bottom-bar {
+        left: 6px;
+        right: 6px;
+        bottom: 6px;
+        gap: 4px;
+      }
+      .hud-controls {
+        gap: 4px;
+      }
+      .hud-btn {
+        padding: 3px 6px;
+        font-size: 0.64rem;
+        gap: 3px;
+      }
+      #loading-overlay {
+        justify-content: flex-start;
+        padding-top: 40px;
+        gap: 4px;
+      }
+      .spinner {
+        width: 22px;
+        height: 22px;
+      }
     }
     :focus-visible { outline: 2px solid #38bdf8; outline-offset: 2px; }
     .skip-to-content {
@@ -375,6 +438,7 @@
     let showBoundingBoxes = true;
     let temporalTrackingEnabled = true;
     let isDetecting = false;
+    let detectionRafId = null;
     let lastInferenceTimestamp = 0;
     let reconnectTimeout = null;
     let reconnectAttempts = 0;
@@ -461,6 +525,7 @@
       canvas.height = container.clientHeight * dpr;
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(dpr, dpr);
+      trackedPenny.displayBbox = null;
     }
     window.addEventListener('resize', syncCanvasDimensions);
 
@@ -474,6 +539,11 @@
     let currentObjectUrl = null;
 
     function cleanupStream() {
+      isDetecting = false;
+      if (detectionRafId !== null) {
+        cancelAnimationFrame(detectionRafId);
+        detectionRafId = null;
+      }
       if (reconnectTimeout) {
         clearTimeout(reconnectTimeout);
         reconnectTimeout = null;
@@ -988,15 +1058,17 @@
       isDetecting = true;
 
       async function detectFrame() {
+        detectionRafId = null;
+        if (!isDetecting) return;
         if (!aiModel || video.readyState < 2 || video.paused || video.ended || video.videoWidth === 0) {
-          requestAnimationFrame(detectFrame);
+          detectionRafId = requestAnimationFrame(detectFrame);
           return;
         }
 
         const now = performance.now();
         // ~10 FPS loop maintains instantaneous responsiveness with 0% CPU strain
         if (now - lastInferenceTimestamp < 95) {
-          requestAnimationFrame(detectFrame);
+          detectionRafId = requestAnimationFrame(detectFrame);
           return;
         }
         lastInferenceTimestamp = now;
@@ -1004,6 +1076,7 @@
         const startTime = performance.now();
         try {
           const predictions = await aiModel.detect(video, 12, detectionThreshold);
+          if (!isDetecting) return;
           const duration = Math.round(performance.now() - startTime);
           inferenceTimeEl.textContent = `${duration} ms`;
 
@@ -1012,10 +1085,12 @@
           console.warn("Inference error:", e);
         }
 
-        requestAnimationFrame(detectFrame);
+        if (isDetecting) {
+          detectionRafId = requestAnimationFrame(detectFrame);
+        }
       }
 
-      requestAnimationFrame(detectFrame);
+      detectionRafId = requestAnimationFrame(detectFrame);
     }
 
     // Optical Feeder Food Level Red Beacon Detector state (module scope)

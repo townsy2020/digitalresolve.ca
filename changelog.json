@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-25T14:19:24Z",
-    "currentVersion":  "v2.9.19",
+    "updatedAt":  "2026-11-25T14:32:26Z",
+    "currentVersion":  "v2.9.20",
     "releases":  [
+                     {
+                         "version":  "v2.9.20",
+                         "date":  "November 25, 2026",
+                         "title":  "AI Camera HUD Cascade, rAF Leak \u0026 Feeder Status Fixes",
+                         "changes":  [
+                                         {
+                                             "label":  "AI Camera HUD \u0026 rAF Cleanup",
+                                             "text":  "Fixed @media (max-width: 680px) CSS cascade in ai.html, cancelled detectFrame rAF on stream cleanup, and reset trackedPenny.displayBbox on resize"
+                                         },
+                                         {
+                                             "label":  "Feeder Last-Dispense Fallback",
+                                             "text":  "Added Offline and No recent dispense fallbacks in updateFeederUI() so #feeder-last-time never sticks on Querying..."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.19",
                          "date":  "November 25, 2026",

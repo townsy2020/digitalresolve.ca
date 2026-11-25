@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.19';
+          const activeVer = match ? match[0] : 'v2.9.20';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 23238;
+      const baseHtmlLines = 23409;
       const baseCssLines = 7588;
-      const baseJsLines = 9191;
+      const baseJsLines = 9195;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -7614,6 +7614,10 @@
         if (iotTimeEl) {
           iotTimeEl.textContent = `${tStr} (${state.lastDispenseLabel || 'Dinner'})`;
         }
+      } else {
+        const fallbackText = state.online === false ? 'Offline' : 'No recent dispense';
+        if (timeEl) timeEl.textContent = fallbackText;
+        if (iotTimeEl) iotTimeEl.textContent = fallbackText;
       }
     }
     window.updateFeederUI = updateFeederUI;
