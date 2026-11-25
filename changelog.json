@@ -1,7 +1,18 @@
 {
-    "updatedAt":  "2026-11-25T03:42:53Z",
-    "currentVersion":  "v2.8.99",
+    "updatedAt":  "2026-11-25T03:57:32Z",
+    "currentVersion":  "v2.9.0",
     "releases":  [
+                     {
+                         "version":  "v2.9.0",
+                         "date":  "November 24, 2026",
+                         "title":  "Non-Interactive Filtered SVG Pipes \u0026 Multi-Wave Hardening Milestone",
+                         "changes":  [
+                                         {
+                                             "label":  "Storage Flow SVG Filter",
+                                             "text":  "Disabled pointer events and omitted hit targets on filtered-out SVG pipes in storage-flow.js so hidden pipelines cannot be clicked into the Inspector."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.8.99",
                          "date":  "November 24, 2026",

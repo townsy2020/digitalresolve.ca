@@ -690,7 +690,7 @@
       const animDur = rate > 50 ? '0.9s' : rate > 10 ? '1.4s' : rate > 1 ? '2.0s' : '2.8s';
 
       html += `
-        <g opacity="${opacity}" data-pipe-id="${escapeHtml(p.id)}">
+        <g opacity="${opacity}" ${isVisible ? `data-pipe-id="${escapeHtml(p.id)}"` : 'style="pointer-events:none;"'}>
           <title>${escapeHtml(p.name)} (${escapeHtml(safeStr(p.bytesCopiedFormatted, '0 B'))} • ${rate.toFixed(1)} MB/s)</title>
           <path d="${dStr}" class="storage-pipe-path" stroke="${cfg.color}" stroke-width="${strokeW}" ${isHighlighted ? 'filter="url(#pipe-glow)"' : ''} />
           ${showFlowAnim ? `<path d="${dStr}" class="storage-pipe-dashed" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.75" style="animation-duration: ${animDur};" />` : ''}
@@ -698,7 +698,7 @@
           <circle r="3.6" fill="${cfg.color}" filter="url(#pipe-glow)">
             <animateMotion dur="${animDur}" repeatCount="indefinite" path="${dStr}" />
           </circle>` : ''}
-          <path d="${dStr}" class="storage-pipe-hit" stroke="transparent" stroke-width="16" fill="none" />
+          ${isVisible ? `<path d="${dStr}" class="storage-pipe-hit" stroke="transparent" stroke-width="16" fill="none" />` : ''}
         </g>`;
     });
 
