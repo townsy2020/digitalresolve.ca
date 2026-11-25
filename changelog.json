@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-25T10:37:53Z",
-    "currentVersion":  "v2.9.8",
+    "updatedAt":  "2026-11-25T10:52:33Z",
+    "currentVersion":  "v2.9.9",
     "releases":  [
+                     {
+                         "version":  "v2.9.9",
+                         "date":  "November 25, 2026",
+                         "title":  "Nav ARIA Current \u0026 Cross-Page Tooltip Parity",
+                         "changes":  [
+                                         {
+                                             "label":  "Nav ARIA Current",
+                                             "text":  "Added aria-current=page to active navigation links across all 8 dashboard pages"
+                                         },
+                                         {
+                                             "label":  "Nav Tooltip Parity",
+                                             "text":  "Synced ops console dropdown tooltip on storage.html to match the other 7 pages"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.8",
                          "date":  "November 25, 2026",
