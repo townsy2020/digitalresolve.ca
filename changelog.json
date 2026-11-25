@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-25T09:09:32Z",
-    "currentVersion":  "v2.9.5",
+    "updatedAt":  "2026-11-25T09:23:51Z",
+    "currentVersion":  "v2.9.6",
     "releases":  [
+                     {
+                         "version":  "v2.9.6",
+                         "date":  "November 25, 2026",
+                         "title":  "Async Fetch Race Guards \u0026 Epoch-Zero Reset Guard",
+                         "changes":  [
+                                         {
+                                             "label":  "Log \u0026 Service Fetch Races",
+                                             "text":  "Added monotonic sequence guards to loadLog(), 3s terminal poller, and fetchServicesHealth() so stale responses or errors cannot clobber live UI"
+                                         },
+                                         {
+                                             "label":  "ISP \u0026 Uptime Fetch Races",
+                                             "text":  "Added monotonic sequence guards to fetchISPHistory() and renderUptimeMatrix() to prevent out-of-order telemetry overwrites"
+                                         },
+                                         {
+                                             "label":  "Epoch-Zero Reset Guard",
+                                             "text":  "Rejected epoch-zero timestamps in fmtLocalReset() so unset quota reset times never render fake Dec 31 tooltips"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.5",
                          "date":  "November 25, 2026",

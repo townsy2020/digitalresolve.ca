@@ -165,16 +165,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.5';
+          const activeVer = match ? match[0] : 'v2.9.6';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 21833;
+      const baseHtmlLines = 21937;
       const baseCssLines = 7381;
-      const baseJsLines = 8871;
+      const baseJsLines = 8896;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -1941,6 +1941,7 @@
         if (document.hidden || !hasTermDom() || _termPollInFlight) return;
         if (currentLogTab && isSSOAuthenticated()) {
           const reqTab = currentLogTab;
+          const reqSeq = ++_logReqSeq;
           _termPollInFlight = true;
           fetch(`${GATEWAY}/api/logs?name=${encodeURIComponent(reqTab)}`, {
             credentials: 'include',
@@ -1949,7 +1950,7 @@
           })
             .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(data => {
-              if (reqTab !== currentLogTab) return;
+              if (reqTab !== currentLogTab || reqSeq !== _logReqSeq) return;
               const body = document.getElementById('terminal-content');
               if (body && data && data.lines) {
                 const isAtBottom = body.scrollHeight - body.scrollTop - body.clientHeight < 80;
@@ -1958,7 +1959,7 @@
               }
             })
             .catch(() => {
-              if (reqTab !== currentLogTab) return;
+              if (reqTab !== currentLogTab || reqSeq !== _logReqSeq) return;
             })
             .finally(() => {
               _termPollInFlight = false;
@@ -2977,7 +2978,7 @@
       const fiveHourRef = metrics.fiveHourRefresh || "--";
       const fmtLocalReset = (iso) => {
         if (!iso) return '';
-        try { const d = new Date(iso); return isNaN(d) ? '' : ` • Resets ${d.toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}`; } catch { return ''; }
+        try { const d = new Date(iso); return (isNaN(d) || d.getTime() <= 0) ? '' : ` • Resets ${d.toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}`; } catch { return ''; }
       };
       if (menuVal) menuVal.textContent = weeklyLimit !== null ? `${weeklyLimit}% Weekly` : '-- Weekly';
       const barFlash = document.getElementById('menu-bar-flash');
@@ -3503,6 +3504,7 @@
     }
     // Terminal Log Streamer
     // currentLogTab hoisted to global script top
+    let _logReqSeq = 0;
     function loadLog(name) {
       currentLogTab = name;
       ['agy', 'sentinel', 'power', 'report'].forEach(t => {
@@ -3519,6 +3521,7 @@
       if (body) body.textContent = `Streaming ${name} log entries...`;
 
       const reqTab = currentLogTab;
+      const reqSeq = ++_logReqSeq;
       fetch(`${GATEWAY}/api/logs?name=${encodeURIComponent(reqTab)}`, {
         credentials: 'include',
         headers: getAdminAuthHeaders(),
@@ -3526,7 +3529,7 @@
       })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(data => {
-          if (reqTab !== currentLogTab) return;
+          if (reqTab !== currentLogTab || reqSeq !== _logReqSeq) return;
           if (reqTab === 'agy' && data && (data.conversationId || data.hostNode || data.sessionName)) {
             updateAgySessionDisplay(data.conversationId || '', data.sessionName || null, data.hostNode || null);
           }
@@ -3538,7 +3541,7 @@
           }
         })
         .catch(() => {
-          if (reqTab !== currentLogTab) return;
+          if (reqTab !== currentLogTab || reqSeq !== _logReqSeq) return;
           if (body) body.textContent = `[Failed to fetch ${reqTab} log from ${GATEWAY}]`;
         });
     }
@@ -3587,7 +3590,9 @@
     window.evaluateIspGrade = evaluateIspGrade;
 
     // ISP Diagnostics & History Poller
+    let _ispHistorySeq = 0;
     function fetchISPHistory() {
+      const reqSeq = ++_ispHistorySeq;
       const numField = (v, fb) => (v !== null && v !== undefined && v !== '' && Number.isFinite(Number(v))) ? Number(v) : fb;
       const fmtVal = (v, suffix = '') => (v !== null && v !== undefined && Number.isFinite(Number(v))) ? `${Number(v)}${suffix}` : '--';
       const renderIspRows = (tbody, list) => {
@@ -3766,6 +3771,7 @@
       return fetch(`${GATEWAY}/api/isp-health`, { credentials: 'include', signal: _fetchSig(6000) })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(data => {
+          if (reqSeq !== _ispHistorySeq) return null;
           if (data && data.status === 'success') {
             try { localStorage.setItem('dr_isp_history', JSON.stringify(data)); } catch (e) {}
             const rawList = Array.isArray(data.history)
@@ -3776,10 +3782,12 @@
           return data;
         })
         .catch(() => {
+          if (reqSeq !== _ispHistorySeq) return null;
           // Fallback 1: Fetch static snapshot isp-health.json from apex repository
           return fetch('isp-health.json', { signal: _fetchSig(5000) })
             .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(sData => {
+              if (reqSeq !== _ispHistorySeq) return null;
               if (sData && sData.status === 'success') {
                 const sList = Array.isArray(sData.history) ? sData.history : [];
                 const sLat = (sData.latest && sData.latest.pingAvgMs !== undefined) ? sData.latest : (sList.length > 0 ? sList[sList.length - 1] : null);
@@ -3794,6 +3802,7 @@
               throw new Error('Static snapshot empty');
             })
             .catch(() => {
+              if (reqSeq !== _ispHistorySeq) return null;
               let cList = [];
               let cLat = null;
               try {
@@ -4468,7 +4477,9 @@
     }
     window.updateMaintenanceVisualStates = updateMaintenanceVisualStates;
     // 90-Day Uptime Matrix & Sparkline Controller
+    let _uptimeReqSeq = 0;
     function renderUptimeMatrix() {
+      const reqSeq = ++_uptimeReqSeq;
       const nodes = [
         { id: 'bars-nuc', type: 'nuc', title: 'NUC 24/7 Core Server' },
         { id: 'bars-isp', type: 'isp', title: 'Bell Canada Gigabit Fiber' },
@@ -4745,6 +4756,7 @@
       // Dynamic SLA and uptime metrics from gateway (with LAN fallback)
       if (typeof fetch === 'function') {
         const handleUptimePayload = (data) => {
+          if (reqSeq !== _uptimeReqSeq) return null;
           if (data && data.status === 'success') {
             try { localStorage.setItem('dr_uptime_cache', JSON.stringify(data)); } catch (e) {}
             if (data.maintenance && typeof data.maintenance === 'object') {
@@ -4772,6 +4784,7 @@
           return data;
         };
         const applyUptimeSsoFallback = () => {
+          if (reqSeq !== _uptimeReqSeq) return null;
           if (cachedUptime) {
             applyUptimeHistoryToBars(cachedUptime.dailyHistory || window.UPTIME_DAILY_HISTORY || {}, cachedUptime.incidents || []);
             applyUptimeMetrics(cachedUptime);
@@ -5166,9 +5179,17 @@
     }
     window.updateServiceDashboardUI = updateServiceDashboardUI;
 
+    let _servicesHealthSeq = 0;
+    let _servicesHealthCtrl = null;
     function fetchServicesHealth() {
       if (typeof fetch !== 'function') return Promise.resolve(null);
+      if (_servicesHealthCtrl) {
+        try { _servicesHealthCtrl.abort(); } catch (e) {}
+        _servicesHealthCtrl = null;
+      }
+      const reqSeq = ++_servicesHealthSeq;
       const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      _servicesHealthCtrl = controller;
       const timeoutId = controller ? setTimeout(() => controller.abort(), 4000) : null;
 
       return fetch(`${GATEWAY}/services-health`, {
@@ -5178,6 +5199,8 @@
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(data => {
           if (timeoutId) clearTimeout(timeoutId);
+          if (_servicesHealthCtrl === controller) _servicesHealthCtrl = null;
+          if (reqSeq !== _servicesHealthSeq) return null;
           if (data && (data.services || data.status === 'success')) {
             window.LAST_SERVICES_HEALTH = data;
             updateServiceDashboardUI(data);
@@ -5189,6 +5212,8 @@
         })
         .catch(err => {
           if (timeoutId) clearTimeout(timeoutId);
+          if (_servicesHealthCtrl === controller) _servicesHealthCtrl = null;
+          if (reqSeq !== _servicesHealthSeq) return null;
           window.LAST_SERVICES_HEALTH = null;
           window._hasLiveServicesHealth = false;
           document.querySelectorAll('#dash-global-status').forEach(dashGlobal => {
