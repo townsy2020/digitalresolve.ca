@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.32';
+          const activeVer = match ? match[0] : 'v2.9.33';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 24739;
+      const baseHtmlLines = 24835;
       const baseCssLines = 7621;
-      const baseJsLines = 9389;
+      const baseJsLines = 9446;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -862,8 +862,8 @@
         }
         // 3. Mullvad WireGuard Privacy Shield
         else if (text.includes('Mullvad WireGuard')) {
-          const vpnIp = telemetry.vpnExitIp || (window.LAST_SWARM && window.LAST_SWARM.vpnExitIp);
           const nucOnline = window.NUC_IS_ONLINE !== false;
+          const vpnIp = nucOnline ? (telemetry.vpnExitIp || (window.LAST_SWARM && window.LAST_SWARM.vpnExitIp)) : null;
           if (vpnIp) {
             if (statusSpan) { statusSpan.style.color = '#34d399'; statusSpan.textContent = '100% (Protected)'; }
             if (fillBar) { fillBar.style.width = '100%'; fillBar.style.background = '#10b981'; }
@@ -1062,13 +1062,17 @@
         }
       });
       // Dynamic scale range managed by renderSparklineFrame
-      const hasNucLatGlobal = window.LAST_NUC_LATENCY !== undefined && window.LAST_NUC_LATENCY !== null && window.LAST_NUC_LATENCY !== '' && Number.isFinite(Number(window.LAST_NUC_LATENCY));
+      const hasNucLatGlobal = window.NUC_IS_ONLINE !== false && window.LAST_NUC_LATENCY !== undefined && window.LAST_NUC_LATENCY !== null && window.LAST_NUC_LATENCY !== '' && Number.isFinite(Number(window.LAST_NUC_LATENCY));
       document.querySelectorAll('#schematic-nuc-throughput').forEach(el => {
-        if (!el.textContent || el.textContent.includes('--')) el.textContent = hasNucLatGlobal ? `${window.LAST_NUC_LATENCY} ms` : '-- ms';
+        el.textContent = hasNucLatGlobal ? `${window.LAST_NUC_LATENCY} ms` : '-- ms';
       });
       document.querySelectorAll('#schematic-desktop-throughput').forEach(el => {
-        if (!el.textContent || el.textContent.includes('--')) {
-          el.textContent = window.DESKTOP_IS_ONLINE === true ? '2.5 Gbps' : (window.DESKTOP_IS_ONLINE === false ? 'Standby' : '--');
+        if (window.DESKTOP_IS_ONLINE === true) {
+          if (!el.textContent || el.textContent.includes('--') || el.textContent === 'Standby') el.textContent = '2.5 Gbps';
+        } else if (window.DESKTOP_IS_ONLINE === false) {
+          el.textContent = 'Standby';
+        } else {
+          el.textContent = '--';
         }
       });
       document.querySelectorAll('#schematic-storage-capacity').forEach(el => {
@@ -1396,7 +1400,15 @@
             if (el) { el.className = `item-tag ${isOnline ? 'online' : 'offline'}`; el.textContent = isOnline ? 'Operational' : 'Unreachable'; }
           });
           const stagCf = document.getElementById('stag-cf');
-          if (stagCf) { stagCf.className = `item-tag ${isOnline ? 'online' : 'offline'}`; stagCf.textContent = isOnline ? 'Shield Active' : 'Origin Standby'; }
+          if (stagCf) {
+            stagCf.className = `item-tag ${isOnline ? 'online' : 'offline'}`;
+            stagCf.textContent = isOnline ? 'Shield Active' : 'Origin Standby';
+            if (!isOnline) {
+              stagCf.style.background = '';
+              stagCf.style.color = '';
+              stagCf.style.borderColor = '';
+            }
+          }
         }
 
         const stNuc = document.getElementById('status-tag-nuc');
@@ -3311,11 +3323,13 @@
       }
       if ((data.status === 'success' || data.nuc) && data.nuc) {
         const nuc = data.nuc;
-        if (!isCached && nuc.swarm) {
+        if (!isCached && nuc.swarm && nuc.online !== false) {
           window.LAST_SWARM = nuc.swarm;
+        } else if (nuc.online === false || nuc.swarm === null) {
+          window.LAST_SWARM = null;
         }
         updateStatusUI('nuc', isCached ? false : Boolean(nuc.online), isCached ? null : nuc.latencyMs, nuc.disk, isCached ? null : nuc.swarm, isCached ? null : nuc.vitals);
-        if (nuc.swarm) {
+        if (nuc.swarm && nuc.online !== false) {
           const sw = nuc.swarm;
           if (typeof updateHealthRadarUI === 'function') {
             updateHealthRadarUI({ vpnExitIp: sw.vpnExitIp });
@@ -3369,10 +3383,32 @@
             }
           }
         } else {
+          if (nuc.online === false || nuc.swarm === null) window.LAST_SWARM = null;
           const swTag = document.getElementById('swarm-tag');
-          if (swTag && (swTag.textContent === 'Checking...' || !nuc.online)) {
+          if (swTag && (swTag.textContent === 'Checking...' || !nuc.online || nuc.swarm === null)) {
             swTag.textContent = 'Offline';
             swTag.className = 'item-tag offline';
+          }
+          if (!nuc.online || nuc.swarm === null) {
+            const swAct = document.getElementById('stat-swarm-active');
+            const dht = document.getElementById('stat-dht');
+            const vpnIp = document.getElementById('stat-vpn-ip');
+            const dlSpd = document.getElementById('stat-dl-speed');
+            const upSpd = document.getElementById('stat-up-speed');
+            const throttleTag = document.getElementById('stat-throttle-tag');
+            if (swAct) swAct.textContent = '--';
+            if (dht) dht.textContent = 'DHT: --';
+            if (vpnIp) vpnIp.textContent = 'VPN: --';
+            if (dlSpd) dlSpd.textContent = '--';
+            if (upSpd) upSpd.textContent = '--';
+            if (throttleTag) {
+              throttleTag.textContent = '--';
+              throttleTag.style.background = '';
+              throttleTag.style.color = '';
+            }
+            document.querySelectorAll('#schematic-vpn-throughput').forEach(el => {
+              el.textContent = 'WireGuard';
+            });
           }
         }
 
@@ -3380,21 +3416,28 @@
         const ramSub = document.getElementById('stat-ram-sub');
         const nucCpu = safeNum(nuc.cpuLoad, null);
         if (cpuVal) cpuVal.innerHTML = nucCpu !== null ? `${nucCpu}% <span style="font-size: 0.9rem; color: #8b949e;">CPU</span>` : `-- <span style="font-size: 0.9rem; color: #8b949e;">CPU</span>`;
-        if (ramSub && nuc.vitals) {
-          ramSub.textContent = `Memory: ${safeNum(nuc.vitals.ramUsedGB, 0)} GB / ${safeNum(nuc.vitals.ramTotalGB, 0)} GB (${safeNum(nuc.vitals.ramPercent, 0)}%) | ${nuc.vitals.uptime || '--'} up`;
+        if (ramSub) {
+          if (nuc.online !== false && nuc.vitals) {
+            ramSub.textContent = `Memory: ${safeNum(nuc.vitals.ramUsedGB, 0)} GB / ${safeNum(nuc.vitals.ramTotalGB, 0)} GB (${safeNum(nuc.vitals.ramPercent, 0)}%) | ${nuc.vitals.uptime || '--'} up`;
+          } else if (nuc.online === false || nuc.vitals === null) {
+            ramSub.textContent = 'Memory: --';
+          }
         }
 
-        if (nuc.disk) {
+        const dFree = document.getElementById('stat-disk-free');
+        const statDiskSub = document.getElementById('stat-disk-sub');
+        if (nuc.online !== false && nuc.disk) {
           const ndFree = safeNum(nuc.disk.freeGB, 0);
           const ndTot = safeNum(nuc.disk.totalGB, 0);
           const ndPct = safeNum(nuc.disk.usedPercent, 0);
           const ndUsed = safeNum(nuc.disk.usedGB, 0);
-          const dFree = document.getElementById('stat-disk-free');
           if (dFree) dFree.innerHTML = `${ndFree} GB <span style="font-size: 0.9rem; color: #8b949e;">Free</span>`;
-          const statDiskSub = document.getElementById('stat-disk-sub');
           if (statDiskSub) {
             statDiskSub.innerHTML = `<span>Total ${ndTot} GB (${ndPct}% Used &bull; ${ndUsed} GB)</span>`;
           }
+        } else if (nuc.online === false || nuc.disk === null) {
+          if (dFree) dFree.textContent = '--';
+          if (statDiskSub) statDiskSub.textContent = nuc.online === false ? 'Node Offline' : '--';
         }
 
         if (nuc.storage && Number(nuc.storage.totalGB) > 0) {
@@ -3510,6 +3553,8 @@
           ribbonClim.innerHTML = '<span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 6px #10b981;"></span> ' + tempF + '&deg;F &bull; ' + hum + '% RH';
         } else if (!isOnline) {
           ribbonClim.innerHTML = '<span class="dropdown-dot" style="background-color: #64748b; box-shadow: none;"></span> Offline';
+        } else {
+          ribbonClim.innerHTML = '<span class="dropdown-dot" style="background-color: #64748b; box-shadow: none;"></span> --';
         }
       }
 
@@ -3522,6 +3567,8 @@
             : (tempF + '\u00B0F \u2022 ' + hum + '% RH \u2022 ' + stateStr);
         } else if (!isOnline) {
           fleetClim.textContent = 'Offline';
+        } else {
+          fleetClim.textContent = 'Awaiting Telemetry';
         }
       }
 
@@ -3532,7 +3579,7 @@
           ambTemp.innerHTML = tempF !== null
             ? (tempC + '&deg;C <span style="font-size: 0.9rem; color: #94a3b8;">/ ' + hum + '% RH (' + tempF + '&deg;F)</span>')
             : (tempC + '&deg;C <span style="font-size: 0.9rem; color: #94a3b8;">/ ' + hum + '% RH</span>');
-        } else if (!isOnline) {
+        } else {
           ambTemp.innerHTML = '-- <span style="font-size: 0.9rem; color: #94a3b8;">/ --</span>';
         }
       }
@@ -3543,6 +3590,8 @@
           roomThermo.innerHTML = tempF + '&deg;F (' + tempC + '&deg;C)';
         } else if (!isOnline) {
           roomThermo.textContent = 'Offline';
+        } else {
+          roomThermo.textContent = 'Awaiting Telemetry';
         }
       }
 
@@ -3566,11 +3615,19 @@
 
       // 4. YoLink Water Leak Sensor
       const leakTag = document.getElementById('iot-leak-sensor-status');
-      if (leakTag && climate.leakSensor) {
-        const leakState = climate.leakSensor.state || 'normal';
-        const isLeakNormal = String(leakState).toLowerCase() === 'normal';
-        leakTag.textContent = isLeakNormal ? 'Normal (Dry)' : 'LEAK DETECTED';
-        leakTag.style.color = isLeakNormal ? '#34d399' : '#ef4444';
+      if (leakTag) {
+        if (!isOnline) {
+          leakTag.textContent = 'Offline';
+          leakTag.style.color = '';
+        } else if (climate.leakSensor) {
+          const leakState = climate.leakSensor.state || 'normal';
+          const isLeakNormal = String(leakState).toLowerCase() === 'normal';
+          leakTag.textContent = isLeakNormal ? 'Normal (Dry)' : 'LEAK DETECTED';
+          leakTag.style.color = isLeakNormal ? '#34d399' : '#ef4444';
+        } else {
+          leakTag.textContent = '--';
+          leakTag.style.color = '';
+        }
       }
     }
     window.updateClimateUI = updateClimateUI;
