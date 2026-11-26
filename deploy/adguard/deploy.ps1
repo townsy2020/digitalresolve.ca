@@ -38,7 +38,7 @@ $zipPath = Join-Path $env:TEMP "AdGuardHome_windows_amd64.zip"
 $extractTemp = Join-Path $env:TEMP "AdGuardHome_Extract"
 
 Write-Host "[*] Downloading AdGuard Home (Windows x64)..." -ForegroundColor Cyan
-Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath -UseBasicParsing
+Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath -UseBasicParsing -TimeoutSec 120
 
 Write-Host "[*] Extracting package..." -ForegroundColor Cyan
 if (Test-Path $extractTemp) { Remove-Item -Path $extractTemp -Recurse -Force }

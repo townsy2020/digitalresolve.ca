@@ -163,19 +163,20 @@
   }
 
   function safeNum(val, fallback = 0) {
-    if (val === null || val === undefined || val === '') return fallback;
+    if (val === null || val === undefined || (typeof val === 'string' && val.trim() === '')) return fallback;
     const n = Number(val);
     return Number.isFinite(n) ? n : fallback;
   }
 
   function isValidNum(val) {
-    return val !== null && val !== undefined && val !== '' && Number.isFinite(Number(val));
+    return val !== null && val !== undefined && !(typeof val === 'string' && val.trim() === '') && Number.isFinite(Number(val));
   }
 
   function fmtGB(gb) {
     if (!isValidNum(gb)) return '--';
     const n = Number(gb);
-    if (n >= 1024) return (n / 1024).toFixed(2) + ' TB';
+    if (n < 0) return '--';
+    if (n >= 1024 || Number(n.toFixed(1)) >= 1024) return (n / 1024).toFixed(2) + ' TB';
     return n.toFixed(1) + ' GB';
   }
 
@@ -203,11 +204,20 @@
   }
 
   function fmtBytes(bytes) {
-    const b = safeNum(bytes, 0);
-    if (b <= 0) return '0 B';
+    if (bytes === null || bytes === undefined || (typeof bytes === 'string' && bytes.trim() === '')) return '0 B';
+    const b = Number(bytes);
+    if (!Number.isFinite(b) || b < 0) return '--';
+    if (b === 0) return '0 B';
     const units = ['B', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.max(0, Math.min(units.length - 1, Math.floor(Math.log(b) / Math.log(1024))));
-    return (b / Math.pow(1024, i)).toFixed(i >= 2 ? 2 : 0) + ' ' + units[i];
+    let i = Math.max(0, Math.min(units.length - 1, Math.floor(Math.log(b) / Math.log(1024))));
+    let decimals = i >= 2 ? 2 : 0;
+    let val = b / Math.pow(1024, i);
+    if (i < units.length - 1 && Number(val.toFixed(decimals)) >= 1024) {
+      i += 1;
+      decimals = i >= 2 ? 2 : 0;
+      val = b / Math.pow(1024, i);
+    }
+    return val.toFixed(decimals) + ' ' + units[i];
   }
 
   function matchesFilter(category, filter) {
@@ -728,7 +738,7 @@
       const pipeName = safeStr(p.name, safeStr(p.id, 'Pipeline'));
       html += `
         <g opacity="${opacity}" ${isVisible ? `data-pipe-id="${escapeHtml(p.id)}" role="button" tabindex="0" aria-label="${escapeHtml(pipeName)}"` : 'style="pointer-events:none;"'}>
-          <title>${escapeHtml(pipeName)} (${escapeHtml(safeStr(p.bytesCopiedFormatted, '0 B'))} • ${rate.toFixed(1)} MB/s)</title>
+          <title>${escapeHtml(pipeName)} (${escapeHtml(safeStr(p.bytesCopiedFormatted, fmtBytes(p.bytesCopied)))} • ${rate.toFixed(1)} MB/s)</title>
           <path d="${dStr}" class="storage-pipe-path" stroke="${cfg.color}" stroke-width="${strokeW}" ${isHighlighted ? 'filter="url(#pipe-glow)"' : ''} />
           ${showFlowAnim ? `<path d="${dStr}" class="storage-pipe-dashed" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.75" style="animation-duration: ${animDur};" />` : ''}
           ${hasLive && showFlowAnim && !state.animPaused && !prefersReducedMotion() ? `

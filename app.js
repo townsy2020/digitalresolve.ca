@@ -78,7 +78,7 @@
     }
     window.scrollToSection = scrollToSection;
 
-    const safeNum = (v, fb = 0) => (v !== null && v !== undefined && v !== '' && Number.isFinite(Number(v))) ? Number(v) : fb;
+    const safeNum = (v, fb = 0) => (v !== null && v !== undefined && !(typeof v === 'string' && v.trim() === '') && Number.isFinite(Number(v))) ? Number(v) : fb;
     const clampPct = (v, fb = 0) => { const n = safeNum(v, null); return n !== null ? Math.max(0, Math.min(100, n)) : fb; };
 
     // Universal Safe Metric Formatter & Null-to-Check Architecture
@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.45';
+          const activeVer = match ? match[0] : 'v2.9.46';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 26089;
-      const baseCssLines = 7752;
-      const baseJsLines = 9803;
+      const baseHtmlLines = 26193;
+      const baseCssLines = 7764;
+      const baseJsLines = 9858;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -1323,31 +1323,50 @@
         // Update NUC Storage Segments Bar (media.html & index.html)
         const nSegWrap = document.querySelector('.node-deck-card.nuc-deck .storage-segments-bar');
         if (nSegWrap && disk) {
-          const freePct = nPct !== null ? clampPct(100 - nPct).toFixed(1) : '26.6';
           const segFree = nSegWrap.querySelector('.seg-free');
           if (segFree) {
-            segFree.style.width = `${freePct}%`;
-            segFree.title = nFree !== null ? `Free Space: ${nFree} GB (${freePct}%)` : `Free Space: -- (${freePct}%)`;
+            if (nPct !== null) {
+              const freePct = clampPct(100 - nPct).toFixed(1);
+              segFree.style.width = `${freePct}%`;
+              segFree.title = nFree !== null ? `Free Space: ${nFree} GB (${freePct}%)` : `Free Space: -- (${freePct}%)`;
+            } else {
+              segFree.style.width = '0%';
+              segFree.title = 'Free Space: -- (Telemetry unavailable)';
+            }
           }
         }
-        if (diskBar && nPct !== null) {
-          diskBar.style.width = `${clampPct(nPct)}%`;
-          if (nPct > 85) {
-            diskBar.classList.add('warning');
+        if (diskBar) {
+          if (nPct !== null) {
+            diskBar.style.width = `${clampPct(nPct)}%`;
+            if (nPct > 85) {
+              diskBar.classList.add('warning');
+            } else {
+              diskBar.classList.remove('warning');
+            }
           } else {
+            diskBar.style.width = '0%';
             diskBar.classList.remove('warning');
           }
         }
         const speedNote = (torrent && torrent.dlSpeed > 0 && torrent.dlSpeedText) ? ` | DL: ${String(torrent.dlSpeedText)}` : '';
-        const usedG = Number.isFinite(Number(disk.usedGB)) ? Number(disk.usedGB) : 0;
-        const totG = Number.isFinite(Number(disk.totalGB)) ? Number(disk.totalGB) : 0;
-        const pctG = Number.isFinite(Number(disk.usedPercent)) ? Number(disk.usedPercent) : 0;
+        const usedG = safeNum(disk.usedGB, null);
+        const totG = safeNum(disk.totalGB, null);
+        const pctG = safeNum(disk.usedPercent, null);
+        const hasDiskTotals = usedG !== null && totG !== null && pctG !== null;
         if (diskSub) {
-          diskSub.textContent = `${usedG} GB used of ${totG} GB (${pctG}%)${speedNote}`;
+          diskSub.textContent = hasDiskTotals
+            ? `${usedG} GB used of ${totG} GB (${pctG}%)${speedNote}`
+            : (usedG !== null || totG !== null || pctG !== null)
+              ? `${usedG !== null ? usedG + ' GB' : '--'} used of ${totG !== null ? totG + ' GB' : '--'} (${pctG !== null ? pctG + '%' : '--'})${speedNote}`
+              : `Storage telemetry unavailable (--)${speedNote}`;
         }
         const statDiskSub = document.getElementById('stat-disk-sub');
         if (statDiskSub) {
-          statDiskSub.innerHTML = `<span>Total ${totG} GB (${pctG}% Used &bull; ${usedG} GB)</span>`;
+          statDiskSub.innerHTML = hasDiskTotals
+            ? `<span>Total ${totG} GB (${pctG}% Used &bull; ${usedG} GB)</span>`
+            : (usedG !== null || totG !== null || pctG !== null)
+              ? `<span>Total ${totG !== null ? totG + ' GB' : '--'} (${pctG !== null ? pctG + '%' : '--'} Used &bull; ${usedG !== null ? usedG + ' GB' : '--'})</span>`
+              : `<span>Total -- (-- Used &bull; --)</span>`;
         }
       }
 
@@ -3021,11 +3040,24 @@
       return null; // Zero hardcoding: return null until live stream arrives
     }
     function formatTokenNumber(num) {
-      if (!num || isNaN(num)) return '0';
-      if (num >= 1000000000) return (num / 1000000000).toFixed(2) + 'B';
-      if (num >= 1000000) return (num / 1000000).toFixed(2) + 'M';
-      if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-      return Number(num).toLocaleString();
+      if (num === null || num === undefined || (typeof num === 'string' && num.trim() === '')) return '0';
+      const n = Number(num);
+      if (!Number.isFinite(n)) return '--';
+      if (n === 0) return '0';
+      const abs = Math.abs(n);
+      const sign = n < 0 ? '-' : '';
+      if (abs >= 1e9) return sign + (abs / 1e9).toFixed(2) + 'B';
+      if (abs >= 1e6) {
+        const m = Number((abs / 1e6).toFixed(2));
+        if (m >= 1000) return sign + (abs / 1e9).toFixed(2) + 'B';
+        return sign + m.toFixed(2) + 'M';
+      }
+      if (abs >= 1e3) {
+        const k = Number((abs / 1e3).toFixed(1));
+        if (k >= 1000) return sign + (abs / 1e6).toFixed(2) + 'M';
+        return sign + k.toFixed(1) + 'K';
+      }
+      return n.toLocaleString();
     }
 
     function updateTokenCounterUI(rawMetrics) {
@@ -3350,10 +3382,20 @@
         .catch(() => { _quotaSparklineInFlight = false; });
     }
     function _formatAbsCount(n) {
+      if (n === null || n === undefined || (typeof n === 'string' && n.trim() === '')) return '--';
       const v = Number(n);
-      if (n === null || n === undefined || !Number.isFinite(v) || v < 0) return '0';
-      if (v >= 1000000) return `${(v / 1000000).toFixed(1)}M`;
-      if (v >= 1000) return `${(v / 1000).toFixed(1)}K`;
+      if (!Number.isFinite(v) || v < 0) return '--';
+      if (v >= 1e9) return `${(v / 1e9).toFixed(1)}B`;
+      if (v >= 1e6) {
+        const m = Number((v / 1e6).toFixed(1));
+        if (m >= 1000) return `${(v / 1e9).toFixed(1)}B`;
+        return `${m.toFixed(1)}M`;
+      }
+      if (v >= 1e3) {
+        const k = Number((v / 1e3).toFixed(1));
+        if (k >= 1000) return `${(v / 1e6).toFixed(1)}M`;
+        return `${k.toFixed(1)}K`;
+      }
       return Math.round(v).toLocaleString();
     }
 
@@ -3366,8 +3408,9 @@
     }
 
     function _absNumOrNeg(val) {
+      if (val === null || val === undefined || (typeof val === 'string' && val.trim() === '')) return -1;
       const n = Number(val);
-      return (val !== null && val !== undefined && Number.isFinite(n)) ? n : -1;
+      return Number.isFinite(n) ? n : -1;
     }
 
     function renderAudiobookshelfGrid(absData, sortOverride) {
@@ -3494,17 +3537,19 @@
           const safeUrl = /^https?:\/\//i.test(rawUrl) ? rawUrl : 'https://audiobooks.digitalresolve.ca';
           const safeTitle = title || 'Audiobookshelf';
 
-          const hasRating = item && item.rating !== null && item.rating !== undefined && Number.isFinite(Number(item.rating));
+          const _isAbsNum = (v) => v !== null && v !== undefined && !(typeof v === 'string' && v.trim() === '') && Number.isFinite(Number(v));
+          const hasRating = Boolean(item && _isAbsNum(item.rating));
           const ratingVal = hasRating ? Number(item.rating) : null;
-          const hasRatingsCount = item && item.numRatings !== null && item.numRatings !== undefined && Number.isFinite(Number(item.numRatings));
-          const hasReviewsCount = item && item.numReviews !== null && item.numReviews !== undefined && Number.isFinite(Number(item.numReviews));
-          const hasScore = item && item.cohesiveScore !== null && item.cohesiveScore !== undefined && Number.isFinite(Number(item.cohesiveScore));
-          const hasRank = item && item.rank !== null && item.rank !== undefined && Number.isFinite(Number(item.rank));
+          const hasRatingsCount = Boolean(item && _isAbsNum(item.numRatings));
+          const hasReviewsCount = Boolean(item && _isAbsNum(item.numReviews));
+          const hasScore = Boolean(item && _isAbsNum(item.cohesiveScore));
+          const rankVal = (item && _isAbsNum(item.rank)) ? Math.round(Number(item.rank)) : null;
+          const hasRank = rankVal !== null && rankVal >= 1;
           const tierLabel = item && item.tier ? String(item.tier) : '';
 
           let rankRowHtml = '';
           if (isRankedMode) {
-            const rankNum = hasRank ? `#${Math.round(Number(item.rank))}` : `#${idx + 1}`;
+            const rankNum = hasRank ? `#${rankVal}` : `#${idx + 1}`;
             const tierBadge = tierLabel ? `<span class="abs-tier-pill ${_absTierClass(tierLabel)}">${escapeHtml(tierLabel)}</span>` : '';
             rankRowHtml = `<div class="abs-rank-row"><span class="abs-rank-num">${escapeHtml(rankNum)}</span>${tierBadge}</div>`;
           }

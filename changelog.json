@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-26T19:17:47Z",
-    "currentVersion":  "v2.9.45",
+    "updatedAt":  "2026-11-26T19:57:39Z",
+    "currentVersion":  "v2.9.46",
     "releases":  [
+                     {
+                         "version":  "v2.9.46",
+                         "date":  "November 26, 2026",
+                         "title":  "Mobile Console Close, Honest Telemetry \u0026 Formatter Precision",
+                         "changes":  [
+                                         {
+                                             "label":  "Mobile AGY Console Close",
+                                             "text":  "Pinned the AGY Console close button visible and clickable on 320px-390px viewports"
+                                         },
+                                         {
+                                             "label":  "Honest Null Disk Telemetry",
+                                             "text":  "Removed hardcoded 26.6% and null-to-0 GB fallbacks in updateStatusUI"
+                                         },
+                                         {
+                                             "label":  "Unit Formatter \u0026 Audible Guard Precision",
+                                             "text":  "Eliminated 1000.0K/1024 KB/InfinityB rounding overflows, empty-string #0 Audible ranks, and SVG pipe tooltip fallback mismatch"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.45",
                          "date":  "November 26, 2026",

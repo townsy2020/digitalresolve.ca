@@ -4561,6 +4561,18 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
     -webkit-overflow-scrolling: touch;
   }
 
+  html:not(.desktop-layout) .agy-console-header-actions .btn-console-act[onclick*="closeAgyConsole"],
+  html.mobile-layout .agy-console-header-actions .btn-console-act[onclick*="closeAgyConsole"] {
+    position: sticky !important;
+    right: 0 !important;
+    z-index: 5 !important;
+    min-width: 38px !important;
+    background: #0f172a !important;
+    border-color: rgba(248, 113, 113, 0.55) !important;
+    color: #fca5a5 !important;
+    box-shadow: -10px 0 12px rgba(15, 23, 42, 0.96) !important;
+  }
+
   html:not(.desktop-layout) .agy-session-meta-bar,
   html.mobile-layout .agy-session-meta-bar {
     flex-wrap: nowrap !important;
