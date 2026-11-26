@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-26T11:24:21Z",
-    "currentVersion":  "v2.9.40",
+    "updatedAt":  "2026-11-26T12:26:47Z",
+    "currentVersion":  "v2.9.41",
     "releases":  [
+                     {
+                         "version":  "v2.9.41",
+                         "date":  "November 26, 2026",
+                         "title":  "Sortable Cohesive Audible Ranking UI",
+                         "changes":  [
+                                         {
+                                             "label":  "Audible Ranking Sort Controls",
+                                             "text":  "Added accessible #abs-sort-select dropdown across media.html, ops.html, and index.html supporting Active Shelf, Cohesive Score, Audible Rating, Most Ratings, Most Reviews, and Title A-Z sorting with zero-network instant re-rendering."
+                                         },
+                                         {
+                                             "label":  "Tier Badges \u0026 Ranking Telemetry",
+                                             "text":  "Upgraded renderAudiobookshelfGrid() with S/A/B-Tier badges, #rank pills, formatted Audible ratings/reviews/cohesive scores, Show All toggle, and Audible-rated library summary subtitle."
+                                         },
+                                         {
+                                             "label":  "Mobile \u0026 Dark-Theme Styling",
+                                             "text":  "Added responsive dark-theme styles for sort controls, tier pills, and rating badges verified with 0 overflow across 320px to 1440px viewports."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.40",
                          "date":  "November 26, 2026",

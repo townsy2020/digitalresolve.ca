@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.40';
+          const activeVer = match ? match[0] : 'v2.9.41';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 25593;
-      const baseCssLines = 7630;
-      const baseJsLines = 9612;
+      const baseHtmlLines = 25721;
+      const baseCssLines = 7752;
+      const baseJsLines = 9784;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -3342,31 +3342,143 @@
         })
         .catch(() => { _quotaSparklineInFlight = false; });
     }
-    function renderAudiobookshelfGrid(absData) {
+    function _formatAbsCount(n) {
+      const v = Number(n);
+      if (n === null || n === undefined || !Number.isFinite(v) || v < 0) return '0';
+      if (v >= 1000000) return `${(v / 1000000).toFixed(1)}M`;
+      if (v >= 1000) return `${(v / 1000).toFixed(1)}K`;
+      return Math.round(v).toLocaleString();
+    }
+
+    function _absTierClass(tier) {
+      const t = String(tier || '').toUpperCase();
+      if (t.startsWith('S')) return 'abs-tier-s';
+      if (t.startsWith('A')) return 'abs-tier-a';
+      if (t.startsWith('B')) return 'abs-tier-b';
+      return 'abs-tier-c';
+    }
+
+    function _absNumOrNeg(val) {
+      const n = Number(val);
+      return (val !== null && val !== undefined && Number.isFinite(n)) ? n : -1;
+    }
+
+    function renderAudiobookshelfGrid(absData, sortOverride) {
       const grid = document.getElementById('abs-bookshelf-grid');
       const subEl = document.getElementById('abs-vault-subtitle');
+      const selectEl = document.getElementById('abs-sort-select');
       if (!grid) return;
 
-      if (absData && absData.online && Array.isArray(absData.items) && absData.items.length > 0) {
+      if (absData && absData.online && ((Array.isArray(absData.items) && absData.items.length > 0) || (Array.isArray(absData.rankedItems) && absData.rankedItems.length > 0))) {
         window._absHydrated = true;
-        const rawTotalBooks = (absData.totalBooks !== undefined && absData.totalBooks !== null) ? Number(absData.totalBooks) : absData.items.length;
-        const totalBooks = Number.isFinite(rawTotalBooks) ? rawTotalBooks : absData.items.length;
-        const inProgress = safeNum(absData.inProgressCount, 0);
-        if (subEl) {
-          subEl.innerHTML = `${escapeHtml(totalBooks.toLocaleString())} real audiobooks on NUC &bull; ${escapeHtml(String(inProgress))} in progress`;
+        const prev = window._lastAbsData;
+        const mergedData = Object.assign({}, absData);
+        if ((!Array.isArray(mergedData.rankedItems) || mergedData.rankedItems.length === 0) && prev && Array.isArray(prev.rankedItems) && prev.rankedItems.length > 0) {
+          mergedData.rankedItems = prev.rankedItems;
         }
+        if (!mergedData.rankingStats && prev && prev.rankingStats) {
+          mergedData.rankingStats = prev.rankingStats;
+        }
+        window._lastAbsData = mergedData;
+
+        const sortKey = sortOverride || (selectEl && selectEl.value) || window._absSortKey || 'shelf';
+        window._absSortKey = sortKey;
+        if (selectEl && selectEl.value !== sortKey) selectEl.value = sortKey;
+
+        const shelfItems = Array.isArray(mergedData.items) ? mergedData.items : [];
+        const rankedItems = Array.isArray(mergedData.rankedItems) ? mergedData.rankedItems : [];
+        const rawTotalBooks = (mergedData.totalBooks !== undefined && mergedData.totalBooks !== null) ? Number(mergedData.totalBooks) : shelfItems.length;
+        const totalBooks = Number.isFinite(rawTotalBooks) ? rawTotalBooks : shelfItems.length;
+        const inProgress = safeNum(mergedData.inProgressCount, 0);
+
+        if (subEl) {
+          const rs = mergedData.rankingStats;
+          if (rs && Number.isFinite(Number(rs.ratedCount)) && Number(rs.ratedCount) > 0) {
+            const ratedCount = Number(rs.ratedCount);
+            const sTier = rs.tierCounts && Number.isFinite(Number(rs.tierCounts['S-Tier'])) ? Number(rs.tierCounts['S-Tier']) : 0;
+            const sPart = sTier > 0 ? ` &bull; ${escapeHtml(sTier.toLocaleString())} S-Tier` : '';
+            subEl.innerHTML = `${escapeHtml(totalBooks.toLocaleString())} audiobooks &bull; ${escapeHtml(ratedCount.toLocaleString())} Audible-rated${sPart}`;
+          } else {
+            subEl.innerHTML = `${escapeHtml(totalBooks.toLocaleString())} real audiobooks on NUC &bull; ${escapeHtml(String(inProgress))} in progress`;
+          }
+        }
+
+        let displayList = [];
+        let totalMatched = 0;
+        const isRankedMode = sortKey !== 'shelf';
+
+        if (!isRankedMode) {
+          displayList = shelfItems.slice(0, 4);
+          totalMatched = displayList.length;
+        } else {
+          const byId = new Map();
+          rankedItems.forEach((it, idx) => {
+            if (!it) return;
+            const k = it.id || `${it.title || ''}|${it.author || ''}|r${idx}`;
+            byId.set(k, Object.assign({}, it));
+          });
+          shelfItems.forEach((it, idx) => {
+            if (!it) return;
+            const k = it.id || `${it.title || ''}|${it.author || ''}|s${idx}`;
+            if (byId.has(k)) {
+              const existing = byId.get(k);
+              byId.set(k, Object.assign({}, existing, {
+                progressPct: it.progressPct !== undefined ? it.progressPct : existing.progressPct,
+                remainingLabel: it.remainingLabel || existing.remainingLabel,
+                status: it.status || existing.status,
+                subtitle: it.subtitle || existing.subtitle
+              }));
+            } else {
+              byId.set(k, Object.assign({}, it));
+            }
+          });
+          const pool = Array.from(byId.values());
+          pool.sort((a, b) => {
+            if (sortKey === 'score') {
+              const diff = _absNumOrNeg(b.cohesiveScore) - _absNumOrNeg(a.cohesiveScore);
+              if (diff !== 0) return diff;
+              return _absNumOrNeg(b.numRatings) - _absNumOrNeg(a.numRatings);
+            }
+            if (sortKey === 'rating') {
+              const diff = _absNumOrNeg(b.rating) - _absNumOrNeg(a.rating);
+              if (diff !== 0) return diff;
+              const nr = _absNumOrNeg(b.numRatings) - _absNumOrNeg(a.numRatings);
+              if (nr !== 0) return nr;
+              return _absNumOrNeg(b.cohesiveScore) - _absNumOrNeg(a.cohesiveScore);
+            }
+            if (sortKey === 'ratings') {
+              const diff = _absNumOrNeg(b.numRatings) - _absNumOrNeg(a.numRatings);
+              if (diff !== 0) return diff;
+              return _absNumOrNeg(b.rating) - _absNumOrNeg(a.rating);
+            }
+            if (sortKey === 'reviews') {
+              const diff = _absNumOrNeg(b.numReviews) - _absNumOrNeg(a.numReviews);
+              if (diff !== 0) return diff;
+              return _absNumOrNeg(b.numRatings) - _absNumOrNeg(a.numRatings);
+            }
+            if (sortKey === 'title') {
+              return String(a.title || '').localeCompare(String(b.title || ''), undefined, { sensitivity: 'base' });
+            }
+            return 0;
+          });
+          totalMatched = pool.length;
+          const cap = window._absShowAll ? pool.length : 12;
+          displayList = pool.slice(0, cap);
+        }
+
         const palettes = [
           { cover: 'linear-gradient(135deg, #1e3a8a, #0f172a)', accent: '#60a5fa', bar: '#38bdf8' },
           { cover: 'linear-gradient(135deg, #065f46, #022c22)', accent: '#34d399', bar: '#10b981' },
           { cover: 'linear-gradient(135deg, #581c87, #2e1065)', accent: '#c084fc', bar: '#a855f7' },
           { cover: 'linear-gradient(135deg, #78350f, #451a03)', accent: '#fbbf24', bar: '#f59e0b' }
         ];
-        grid.innerHTML = absData.items.slice(0, 4).map((item, idx) => {
+
+        const cardsHtml = displayList.map((item, idx) => {
           const pal = palettes[idx % palettes.length];
           const status = item && item.status ? String(item.status) : 'Audiobook';
           const author = item && item.author ? String(item.author) : 'Unknown Author';
           const title = item && item.title ? String(item.title) : 'Untitled Audiobook';
-          const subtitle = item && item.subtitle ? String(item.subtitle) : '';
+          const subtitle = item && item.subtitle && item.subtitle !== author ? String(item.subtitle) : '';
           const pctRaw = Number(item && (item.progressPct !== undefined ? item.progressPct : item.progress));
           const pct = Number.isFinite(pctRaw) ? Math.max(0, Math.min(100, Math.round(pctRaw))) : 0;
           const progressText = pct > 0 ? `Progress: ${pct}%` : status;
@@ -3374,14 +3486,41 @@
           const rawUrl = item && item.url ? String(item.url) : 'https://audiobooks.digitalresolve.ca';
           const safeUrl = /^https?:\/\//i.test(rawUrl) ? rawUrl : 'https://audiobooks.digitalresolve.ca';
           const safeTitle = title || 'Audiobookshelf';
+
+          const hasRating = item && item.rating !== null && item.rating !== undefined && Number.isFinite(Number(item.rating));
+          const ratingVal = hasRating ? Number(item.rating) : null;
+          const hasRatingsCount = item && item.numRatings !== null && item.numRatings !== undefined && Number.isFinite(Number(item.numRatings));
+          const hasReviewsCount = item && item.numReviews !== null && item.numReviews !== undefined && Number.isFinite(Number(item.numReviews));
+          const hasScore = item && item.cohesiveScore !== null && item.cohesiveScore !== undefined && Number.isFinite(Number(item.cohesiveScore));
+          const hasRank = item && item.rank !== null && item.rank !== undefined && Number.isFinite(Number(item.rank));
+          const tierLabel = item && item.tier ? String(item.tier) : '';
+
+          let rankRowHtml = '';
+          if (isRankedMode) {
+            const rankNum = hasRank ? `#${Math.round(Number(item.rank))}` : `#${idx + 1}`;
+            const tierBadge = tierLabel ? `<span class="abs-tier-pill ${_absTierClass(tierLabel)}">${escapeHtml(tierLabel)}</span>` : '';
+            rankRowHtml = `<div class="abs-rank-row"><span class="abs-rank-num">${escapeHtml(rankNum)}</span>${tierBadge}</div>`;
+          }
+
+          let ratingPillHtml = '';
+          if (hasRating) {
+            const parts = [`<span class="abs-star">&#9733; ${escapeHtml(ratingVal.toFixed(2))}</span>`];
+            if (hasRatingsCount) parts.push(`<span>${escapeHtml(_formatAbsCount(item.numRatings))}${isRankedMode ? ' ratings' : ''}</span>`);
+            if (isRankedMode && hasReviewsCount) parts.push(`<span>${escapeHtml(_formatAbsCount(item.numReviews))} rev</span>`);
+            if (hasScore) parts.push(`<span class="abs-score-val">Score ${escapeHtml(Number(item.cohesiveScore).toFixed(isRankedMode ? 3 : 2))}</span>`);
+            ratingPillHtml = `<div class="abs-rating-pill">${parts.join(' <span class="abs-sep">&bull;</span> ')}</div>`;
+          }
+
           return `<div class="book-card" role="button" tabindex="0" style="cursor: pointer;" data-url="${escapeHtml(safeUrl)}" data-title="${escapeHtml(safeTitle)}" onclick="launchProtectedService(this.dataset.url, this.dataset.title)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
                 <div class="book-cover" style="background: ${pal.cover}; display: flex; align-items: center; justify-content: center;">
                   <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="${pal.accent}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.85;" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                 </div>
                 <div class="book-body">
+                  ${rankRowHtml}
                   <div style="font-size: 0.72rem; color: ${pal.accent}; font-weight: 700; text-transform: uppercase;">${escapeHtml(status)} &bull; ${escapeHtml(author)}</div>
                   <div style="font-weight: 800; color: #f8fafc; font-size: 0.92rem;">${escapeHtml(title)}</div>
-                  <div style="font-size: 0.76rem; color: #94a3b8;">${escapeHtml(subtitle)}</div>
+                  ${subtitle ? `<div style="font-size: 0.76rem; color: #94a3b8;">${escapeHtml(subtitle)}</div>` : ''}
+                  ${ratingPillHtml}
                   <div style="margin-top: auto; padding-top: 10px;">
                     <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #64748b; margin-bottom: 4px;">
                       <span>${escapeHtml(progressText)}</span>
@@ -3394,6 +3533,14 @@
                 </div>
               </div>`;
         }).join('');
+
+        let toggleHtml = '';
+        if (isRankedMode && totalMatched > 12) {
+          const btnLabel = window._absShowAll ? 'Show Top 12' : `Show All (${totalMatched})`;
+          toggleHtml = `<div class="abs-show-all-wrap"><button type="button" id="abs-show-all-btn" class="btn btn-secondary abs-show-all-btn" onclick="toggleAbsShowAll()">${escapeHtml(btnLabel)}</button></div>`;
+        }
+
+        grid.innerHTML = cardsHtml + toggleHtml;
       } else {
         if (subEl) {
           subEl.textContent = 'Audiobookshelf library unavailable or offline on NUC.';
@@ -3402,6 +3549,31 @@
       }
     }
     window.renderAudiobookshelfGrid = renderAudiobookshelfGrid;
+
+    function sortAbsBooks(sortKey) {
+      const key = sortKey || 'shelf';
+      window._absSortKey = key;
+      window._absShowAll = false;
+      if (window._lastAbsData) {
+        renderAudiobookshelfGrid(window._lastAbsData, key);
+        if (key !== 'shelf' && (!Array.isArray(window._lastAbsData.rankedItems) || window._lastAbsData.rankedItems.length === 0) && !window._absRankedFetched) {
+          window._absRankedFetched = true;
+          fetch(`${GATEWAY}/api/audiobooks`, { credentials: 'include', cache: 'no-store', signal: _fetchSig(5000) })
+            .then(r => (r.ok ? r.json() : null))
+            .then(d => { if (d && d.online) renderAudiobookshelfGrid(d, window._absSortKey); })
+            .catch(() => {});
+        }
+      }
+    }
+    window.sortAbsBooks = sortAbsBooks;
+
+    function toggleAbsShowAll() {
+      window._absShowAll = !window._absShowAll;
+      if (window._lastAbsData) {
+        renderAudiobookshelfGrid(window._lastAbsData, window._absSortKey || 'score');
+      }
+    }
+    window.toggleAbsShowAll = toggleAbsShowAll;
 
     function fetchAudiobookshelfFallback() {
       if (!document.getElementById('abs-bookshelf-grid') || window._absHydrated) return Promise.resolve(null);
