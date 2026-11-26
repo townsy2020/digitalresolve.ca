@@ -78,7 +78,7 @@
     }
     window.scrollToSection = scrollToSection;
 
-    const safeNum = (v, fb = 0) => (v !== null && v !== undefined && !(typeof v === 'string' && v.trim() === '') && Number.isFinite(Number(v))) ? Number(v) : fb;
+    const safeNum = (v, fb = 0) => (v !== null && v !== undefined && typeof v !== 'boolean' && !(typeof v === 'string' && v.trim() === '') && Number.isFinite(Number(v))) ? Number(v) : fb;
     const clampPct = (v, fb = 0) => { const n = safeNum(v, null); return n !== null ? Math.max(0, Math.min(100, n)) : fb; };
 
     // Universal Safe Metric Formatter & Null-to-Check Architecture
@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.47';
+          const activeVer = match ? match[0] : 'v2.9.48';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 26297;
+      const baseHtmlLines = 26401;
       const baseCssLines = 7764;
-      const baseJsLines = 9885;
+      const baseJsLines = 9991;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -428,10 +428,10 @@
             fetch(altUrl1, { credentials: 'include', signal: (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(3000) : undefined })
               .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
               .then(stats => {
-                if (stats && stats.desktop) {
+                if (stats && stats.desktop && stats.desktop.online !== false) {
                   if (stats.desktop.disk) data.disk = stats.desktop.disk;
                   if (stats.desktop.vitals) data.vitals = stats.desktop.vitals;
-                  updateStatusUI('desktop', true, data.latencyMs, data.disk, data.torrent, data.vitals);
+                  updateStatusUI('desktop', true, safeNum(data.latencyMs, null), data.disk, data.torrent, data.vitals);
                 }
               }).catch(() => {});
           }
@@ -446,7 +446,7 @@
                 const nodeData = stats[target];
                 return {
                   online: nodeData.online !== false,
-                  latencyMs: nodeData.latencyMs !== undefined ? nodeData.latencyMs : null,
+                  latencyMs: safeNum(nodeData.latencyMs, null),
                   disk: nodeData.disk || (target === 'nuc' ? stats.nuc && stats.nuc.disk : null),
                   vitals: nodeData.vitals || (target === 'nuc' ? stats.nuc && stats.nuc.vitals : null),
                   torrent: nodeData.torrent || (target === 'nuc' ? stats.nuc && stats.nuc.swarm : null)
@@ -458,7 +458,7 @@
               return fetch(altUrl2, { credentials: 'include', signal: (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(6000) : undefined })
                 .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
                 .then(data2 => {
-                  if (data2) {
+                  if (data2 && typeof data2 === 'object') {
                     if (data2.nodes && Array.isArray(data2.nodes)) {
                       const node = data2.nodes.find(n => n.id === target);
                       if (node) {
@@ -471,18 +471,19 @@
                         };
                       }
                     }
-                    if (data2[target] || data2.online !== undefined) {
-                      const nodeData = data2[target] || data2;
+                    const targetNode = (data2[target] && typeof data2[target] === 'object' && data2[target].online !== undefined) ? data2[target] : null;
+                    if (targetNode || data2.online !== undefined) {
+                      const nodeData = targetNode || data2;
                       return {
                         online: nodeData.online !== false,
-                  latencyMs: nodeData.latencyMs !== undefined ? nodeData.latencyMs : null,
+                        latencyMs: safeNum(nodeData.latencyMs, null),
                         disk: nodeData.disk || (target === 'nuc' ? (data2.nuc && data2.nuc.disk) : null),
                         vitals: nodeData.vitals || (target === 'nuc' ? (data2.nuc && data2.nuc.vitals) : null),
                         torrent: nodeData.torrent || (target === 'nuc' ? (data2.nuc && data2.nuc.swarm) : null)
                       };
                     }
                   }
-                  return data2;
+                  throw new Error('Missing target telemetry in fallback response');
                 })
                 .catch(() => {
                   throw err2;
@@ -547,31 +548,43 @@
     }
     window.hydrateTelemetryFromCache = hydrateTelemetryFromCache;
 
+    const _checkStatusInFlight = {};
+    const _statusUpdateSeq = { nuc: 0, desktop: 0 };
     function checkStatus(target) {
       if (target === 'both') {
         return Promise.allSettled([checkStatus('nuc'), checkStatus('desktop')]);
       }
+      if (_checkStatusInFlight[target]) return _checkStatusInFlight[target];
       const dev = devices[target] || devices.nuc;
       const ip = dev.ip || (target === 'desktop' ? '192.168.2.62' : '192.168.2.35');
       const dns = dev.dns || 'digitalresolve.ca';
       showToast('loading', `Pinging ${dev.name}...`, `${ip} | ${dns}`, 0);
 
-      return fetchTelemetryWithFallback(target)
+      const reqSeq = (_statusUpdateSeq[target] = (_statusUpdateSeq[target] || 0) + 1);
+      const p = fetchTelemetryWithFallback(target)
         .then(data => {
+          if (reqSeq !== _statusUpdateSeq[target]) return;
           if (data && data.online !== false) {
             const diskSub = (data.disk && data.disk.drive) ? ` | ${data.disk.drive} ${data.disk.freeGB} GB free (${data.disk.usedPercent}% used)` : '';
-            const latVal = (data.latencyMs !== null && data.latencyMs !== undefined && Number.isFinite(Number(data.latencyMs))) ? data.latencyMs : 0;
-            showToast('success', `${dev.name} is Online`, `${latVal} ms latency${diskSub}`, 5000);
-            updateStatusUI(target, true, data.latencyMs, data.disk, data.torrent, data.vitals);
+            const latVal = safeNum(data.latencyMs, null);
+            const latPart = latVal !== null ? `${latVal} ms latency` : 'Online';
+            showToast('success', `${dev.name} is Online`, `${latPart}${diskSub}`, 5000);
+            updateStatusUI(target, true, latVal, data.disk, data.torrent, data.vitals);
           } else {
             showToast('error', `${dev.name} is Offline`, `No ping response from ${ip}`, 5000);
             updateStatusUI(target, false, null, data && data.disk);
           }
         })
         .catch(() => {
+          if (reqSeq !== _statusUpdateSeq[target]) return;
           showToast('error', `${dev.name} Unreachable`, `Could not reach ${GATEWAY} or verify node status.`, 5000);
           updateStatusUI(target, false);
+        })
+        .finally(() => {
+          if (_checkStatusInFlight[target] === p) delete _checkStatusInFlight[target];
         });
+      _checkStatusInFlight[target] = p;
+      return p;
     }
 
     let currentPowerTarget = 'desktop';
@@ -721,13 +734,16 @@
           let attempts = 0;
           const maxAttempts = 12;
           let settled = false;
+          let pollInFlight = false;
           clearInterval(pollInterval);
           pollInterval = setInterval(() => {
             if (settled || pollToken !== _powerPollSeq || attempts >= maxAttempts) {
               clearInterval(pollInterval);
               return;
             }
-            attempts++;
+            if (pollInFlight) return;
+            const myAttempt = ++attempts;
+            pollInFlight = true;
             fetch(`${GATEWAY}/status?target=${encodeURIComponent(target)}`, { credentials: 'include', cache: 'no-store', signal: _fetchSig(5000) })
               .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
               .then(data => {
@@ -735,13 +751,14 @@
                 if (data.online) {
                   settled = true;
                   clearInterval(pollInterval);
-                  const latPart = (data.latencyMs !== null && data.latencyMs !== undefined && Number.isFinite(Number(data.latencyMs))) ? `${data.latencyMs} ms latency` : '';
+                  const latNum = safeNum(data.latencyMs, null);
+                  const latPart = latNum !== null ? `${latNum} ms latency` : '';
                   const diskPart = (data.disk && data.disk.drive) ? `${data.disk.drive} ${data.disk.freeGB} GB free` : '';
                   const toastBody = [latPart, diskPart].filter(Boolean).join(' | ') || 'Online';
                   if (feedbackEl) feedbackEl.textContent = `${dev.name} is Awake & Online (${toastBody}).`;
                   showToast('success', `${dev.name} is Awake & Online!`, toastBody, 6000);
-                  updateStatusUI(target, true, data.latencyMs, data.disk);
-                } else if (attempts >= maxAttempts) {
+                  updateStatusUI(target, true, latNum, data.disk);
+                } else if (myAttempt >= maxAttempts) {
                   settled = true;
                   clearInterval(pollInterval);
                   if (feedbackEl) feedbackEl.textContent = `${dev.name} not responding after WoL (may still be booting).`;
@@ -750,12 +767,15 @@
               })
               .catch(() => {
                 if (settled || pollToken !== _powerPollSeq) return;
-                if (attempts >= maxAttempts) {
+                if (myAttempt >= maxAttempts) {
                   settled = true;
                   clearInterval(pollInterval);
                   if (feedbackEl) feedbackEl.textContent = `${dev.name} not responding after WoL (may still be booting).`;
                   showToast('error', `${dev.name} Not Responding`, 'Machine may still be booting POST.', 6000);
                 }
+              })
+              .finally(() => {
+                pollInFlight = false;
               });
           }, 3000);
         })
@@ -798,13 +818,16 @@
           let consecutiveErrors = 0;
           const maxAttempts = 10;
           let settled = false;
+          let pollInFlight = false;
           clearInterval(pollInterval);
           pollInterval = setInterval(() => {
             if (settled || pollToken !== _powerPollSeq || attempts >= maxAttempts) {
               clearInterval(pollInterval);
               return;
             }
-            attempts++;
+            if (pollInFlight) return;
+            const myAttempt = ++attempts;
+            pollInFlight = true;
             fetch(`${GATEWAY}/status?target=${encodeURIComponent(target)}`, { credentials: 'include', cache: 'no-store', signal: _fetchSig(5000) })
               .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
               .then(data => {
@@ -816,7 +839,7 @@
                   if (feedbackEl) feedbackEl.textContent = `${dev.name} is now Asleep (standby mode).`;
                   showToast('success', `${dev.name} is now Asleep`, 'System in low-power standby mode.', 6000);
                   updateStatusUI(target, false);
-                } else if (attempts >= maxAttempts) {
+                } else if (myAttempt >= maxAttempts) {
                   settled = true;
                   clearInterval(pollInterval);
                   if (feedbackEl) feedbackEl.textContent = `Sleep signal dispatched to ${dev.name} (finalizing).`;
@@ -832,12 +855,15 @@
                   if (feedbackEl) feedbackEl.textContent = `${dev.name} is now Asleep (standby mode).`;
                   showToast('success', `${dev.name} is now Asleep`, 'Gateway offline / in standby.', 6000);
                   updateStatusUI(target, false);
-                } else if (attempts >= maxAttempts) {
+                } else if (myAttempt >= maxAttempts) {
                   settled = true;
                   clearInterval(pollInterval);
                   if (feedbackEl) feedbackEl.textContent = `Could not confirm ${dev.name} sleep state.`;
                   showToast('error', 'Status Check Interrupted', `Could not confirm ${dev.name} sleep state via gateway.`, 5000);
                 }
+              })
+              .finally(() => {
+                pollInFlight = false;
               });
           }, 2500);
         })
@@ -1197,6 +1223,7 @@
     window.updateSslCertExpiryUI = updateSslCertExpiryUI;
 
     function updateStatusUI(target, isOnline, latencyMs = null, disk = null, torrent = null, vitals = null) {
+      const latNum = safeNum(latencyMs, null);
       const dot = document.getElementById(`badge-${target}`);
       const tag = document.getElementById(`status-tag-${target}`);
       const lat = document.getElementById(`latency-${target}`);
@@ -1216,15 +1243,15 @@
             el.textContent = '--';
           });
           if (typeof initSparklineHeartbeat === 'function') initSparklineHeartbeat();
-        } else if (latencyMs !== null && latencyMs !== undefined && latencyMs !== '' && Number.isFinite(Number(latencyMs))) {
-          window.LAST_NUC_LATENCY = Number(latencyMs);
+        } else if (latNum !== null) {
+          window.LAST_NUC_LATENCY = latNum;
           document.querySelectorAll('#spark-leg-nuc').forEach(el => {
-            el.textContent = `${Number(latencyMs).toFixed(1)} ms`;
+            el.textContent = `${latNum.toFixed(1)} ms`;
           });
           if (typeof initSparklineHeartbeat === 'function') initSparklineHeartbeat();
         }
       } else if (lat) {
-        lat.textContent = latencyMs !== null ? `${latencyMs} ms` : (isOnline ? 'Online' : 'Standby');
+        lat.textContent = latNum !== null ? `${latNum} ms` : (isOnline ? 'Online' : 'Standby');
         lat.className = `item-tag ${isOnline ? 'online' : 'offline'}`;
       }
       // Update Node Deck Hardware Tags (index.html, media.html)
@@ -1268,7 +1295,7 @@
           cache.ts = Date.now();
           cache[target] = {
             online: true,
-            latencyMs: (latencyMs !== null && latencyMs !== undefined && Number.isFinite(Number(latencyMs))) ? Number(latencyMs) : null,
+            latencyMs: latNum,
             disk: disk || (cache[target] && cache[target].disk),
             torrent: torrent || (cache[target] && cache[target].torrent),
             vitals: vitals || (cache[target] && cache[target].vitals)
@@ -1387,8 +1414,8 @@
         fBadge.className = `item-tag ${isOnline ? 'online' : 'offline'}`;
       }
       if (fLat) {
-        if (isOnline && latencyMs !== null) {
-          fLat.textContent = `${latencyMs} ms (LAN)`;
+        if (isOnline && latNum !== null) {
+          fLat.textContent = `${latNum} ms (LAN)`;
           fLat.className = 'item-tag online';
         } else if (!isOnline) {
           fLat.textContent = 'Unreachable';
@@ -1441,10 +1468,10 @@
           if (schCap) schCap.textContent = nFree !== null ? `Capacity: ${nFree} GB Free (${nPct !== null ? nPct + '% Used' : '--'})` : 'Awaiting telemetry...';
         }
         const schNuc = document.getElementById('schematic-nuc-throughput');
-        if (schNuc) schNuc.textContent = (latencyMs !== null && latencyMs !== undefined) ? `${latencyMs} ms` : '-- ms';
+        if (schNuc) schNuc.textContent = latNum !== null ? `${latNum} ms` : '-- ms';
         try {
           if (typeof schematicNodesData !== 'undefined' && schematicNodesData.nuc) {
-            schematicNodesData.nuc.status = isOnline ? (latencyMs !== null && latencyMs !== undefined ? `Online (${latencyMs} ms LAN)` : 'Online (LAN)') : 'Offline (Unreachable)';
+            schematicNodesData.nuc.status = isOnline ? (latNum !== null ? `Online (${latNum} ms LAN)` : 'Online (LAN)') : 'Offline (Unreachable)';
             schematicNodesData.nuc.statusClass = isOnline ? 'online' : 'offline';
           }
           if (typeof schematicNodesData !== 'undefined' && schematicNodesData.storage && disk) {
@@ -1474,13 +1501,13 @@
         const stNuc = document.getElementById('status-tag-nuc');
         if (stNuc) { stNuc.textContent = isOnline ? '24/7 Core' : 'Offline'; stNuc.className = 'item-tag ' + (isOnline ? 'online' : 'offline'); }
         const latNuc = document.getElementById('latency-nuc');
-        if (latNuc) { latNuc.textContent = isOnline ? (latencyMs !== null ? `${latencyMs} ms (8.8.8.8)` : 'Online') : 'Offline'; latNuc.className = 'item-tag ' + (isOnline ? 'online' : 'offline'); }
+        if (latNuc) { latNuc.textContent = isOnline ? (latNum !== null ? `${latNum} ms (8.8.8.8)` : 'Online') : 'Offline'; latNuc.className = 'item-tag ' + (isOnline ? 'online' : 'offline'); }
         const fBadgeNuc = document.getElementById('fleet-badge-nuc');
         if (fBadgeNuc) { fBadgeNuc.className = `item-tag ${isOnline ? 'online' : 'offline'}`; fBadgeNuc.textContent = isOnline ? 'Online • 24/7 Core' : 'Offline • Unreachable'; }
         const fLatNuc = document.getElementById('fleet-latency-nuc');
-        if (fLatNuc) { fLatNuc.textContent = isOnline ? `192.168.2.35 • ${latencyMs !== null ? `${latencyMs} ms (8.8.8.8)` : 'Online'}` : `192.168.2.35 • Unreachable`; }
+        if (fLatNuc) { fLatNuc.textContent = isOnline ? `192.168.2.35 • ${latNum !== null ? `${latNum} ms (8.8.8.8)` : 'Online'}` : `192.168.2.35 • Unreachable`; }
 
-        const latS = safeNum(latencyMs, null);
+        const latS = latNum;
         if (!isOnline || !window._hasLiveServicesHealth) {
           const mStream = document.getElementById('meta-watch-streamhub');
           if (mStream) { mStream.style.color = ''; mStream.innerHTML = isOnline ? `${latS !== null ? latS + ' ms' : 'Online'} &bull; Sentinel Armed (3m)` : 'Unreachable &bull; Offline'; }
@@ -1542,7 +1569,7 @@
         if (typeof updateHealthRadarUI === 'function') {
           updateHealthRadarUI({
             nucOnline: isOnline,
-            nucLatency: latencyMs,
+            nucLatency: latNum,
             nucDisk: disk,
             vpnExitIp: (torrent && torrent.vpnExitIp) || (window.LAST_SWARM && window.LAST_SWARM.vpnExitIp)
           });
@@ -1599,20 +1626,27 @@
         if (dSegWrap && disk) {
           const segs = dSegWrap.children;
           if (segs.length >= 4) {
-            const hasC = (disk.cTotalGB !== undefined && disk.cTotalGB !== null && disk.cFreeGB !== undefined && disk.cFreeGB !== null);
-            const hasD = (disk.dTotalGB !== undefined && disk.dTotalGB !== null && disk.dFreeGB !== undefined && disk.dFreeGB !== null);
-            const hasF = (disk.fTotalGB !== undefined && disk.fTotalGB !== null && Number(disk.fTotalGB) > 0 && disk.fFreeGB !== undefined && disk.fFreeGB !== null);
-            const cUsedOnly = hasC ? Math.max(0, Math.round(Number(disk.cTotalGB) - Number(disk.cFreeGB))) : 0;
-            const cFreeOnly = (disk.cFreeGB !== undefined && disk.cFreeGB !== null) ? Math.max(0, Math.round(Number(disk.cFreeGB))) : 0;
-            const fUsedOnly = hasF ? Math.max(0, Math.round(Number(disk.fTotalGB) - Number(disk.fFreeGB))) : 0;
-            const fFreeOnly = hasF ? Math.max(0, Math.round(Number(disk.fFreeGB))) : 0;
+            const cTot = safeNum(disk.cTotalGB, null);
+            const cFr = safeNum(disk.cFreeGB, null);
+            const dTot = safeNum(disk.dTotalGB, null);
+            const dFr = safeNum(disk.dFreeGB, null);
+            const fTot = safeNum(disk.fTotalGB, null);
+            const fFr = safeNum(disk.fFreeGB, null);
+            const hasC = (cTot !== null && cFr !== null);
+            const hasD = (dTot !== null && dFr !== null);
+            const hasF = (fTot !== null && fTot > 0 && fFr !== null);
+            const cUsedOnly = hasC ? Math.max(0, Math.round(cTot - cFr)) : 0;
+            const cFreeOnly = cFr !== null ? Math.max(0, Math.round(cFr)) : 0;
+            const fUsedOnly = hasF ? Math.max(0, Math.round(fTot - fFr)) : 0;
+            const fFreeOnly = hasF ? Math.max(0, Math.round(fFr)) : 0;
             const nvmeUsed = cUsedOnly + fUsedOnly;
             const nvmeFree = cFreeOnly + fFreeOnly;
-            const dUsed = hasD ? Math.max(0, Math.round(Number(disk.dTotalGB) - Number(disk.dFreeGB))) : 0;
-            const dFree = (disk.dFreeGB !== undefined && disk.dFreeGB !== null) ? Math.max(0, Math.round(Number(disk.dFreeGB))) : 0;
+            const dUsed = hasD ? Math.max(0, Math.round(dTot - dFr)) : 0;
+            const dFree = dFr !== null ? Math.max(0, Math.round(dFr)) : 0;
             const computedTotal = nvmeUsed + nvmeFree + dUsed + dFree;
-            const total = (disk.totalGB !== undefined && disk.totalGB !== null && Number(disk.totalGB) > 0) ? Number(disk.totalGB) : computedTotal;
-            const safeTot = (Number.isFinite(Number(total)) && Number(total) > 0) ? Number(total) : 1;
+            const rawTotal = safeNum(disk.totalGB, null);
+            const total = (rawTotal !== null && rawTotal > 0) ? rawTotal : computedTotal;
+            const safeTot = (Number.isFinite(total) && total > 0) ? total : 1;
 
             const cUsedPct = clampPct((nvmeUsed / safeTot) * 100).toFixed(1);
             const cFreePct = clampPct((nvmeFree / safeTot) * 100).toFixed(1);
@@ -1645,7 +1679,7 @@
             stagTorrents.className = `item-tag ${isOnline ? 'online' : 'offline'}`;
             stagTorrents.textContent = isOnline ? 'Operational' : 'Standby';
           }
-          const dLatS = safeNum(latencyMs, null);
+          const dLatS = latNum;
           const metaTorrents = document.getElementById('meta-watch-torrents');
           if (metaTorrents) {
             metaTorrents.style.color = isOnline ? '#34d399' : '#94a3b8';
@@ -1655,13 +1689,13 @@
         const stDesk = document.getElementById('status-tag-desktop');
         if (stDesk) { stDesk.textContent = isOnline ? 'Active' : 'Standby'; stDesk.className = 'item-tag ' + (isOnline ? 'online' : 'offline'); }
         const latDesk = document.getElementById('latency-desktop');
-        if (latDesk) { latDesk.textContent = isOnline ? (latencyMs !== null ? `${latencyMs} ms (8.8.8.8)` : 'Online') : 'Standby'; latDesk.className = 'item-tag ' + (isOnline ? 'online' : 'offline'); }
+        if (latDesk) { latDesk.textContent = isOnline ? (latNum !== null ? `${latNum} ms (8.8.8.8)` : 'Online') : 'Standby'; latDesk.className = 'item-tag ' + (isOnline ? 'online' : 'offline'); }
         const fBadgeDesk = document.getElementById('fleet-badge-desktop');
         if (fBadgeDesk) { fBadgeDesk.className = `item-tag ${isOnline ? 'online' : 'offline'}`; fBadgeDesk.textContent = isOnline ? 'Online • Active' : 'Standby • Sleeping'; }
         const fLatDesk = document.getElementById('fleet-latency-desktop');
         if (fLatDesk) {
           fLatDesk.textContent = isOnline
-            ? `192.168.2.62 • ${latencyMs !== null ? `${latencyMs} ms (8.8.8.8)` : 'Online'}`
+            ? `192.168.2.62 • ${latNum !== null ? `${latNum} ms (8.8.8.8)` : 'Online'}`
             : '192.168.2.62 • Standby (WoL Ready)';
         }
         const schDesk = document.getElementById('schematic-desktop-throughput');
@@ -1682,9 +1716,13 @@
             const usedPercent = safeNum(disk.usedPercent, 0);
             const usedGB = safeNum(disk.usedGB, 0);
             const freeGB = safeNum(disk.freeGB, 0);
-            const cFree = (disk.cFreeGB !== undefined && disk.cFreeGB !== null) ? Math.round(safeNum(disk.cFreeGB, 0)) : '--';
-            const dFree = (disk.dFreeGB !== undefined && disk.dFreeGB !== null) ? (safeNum(disk.dFreeGB, 0) / 1000).toFixed(1) : '--';
-            const fFreeVal = (disk.fFreeGB !== undefined && disk.fFreeGB !== null && Number(disk.fTotalGB) > 0) ? Math.round(safeNum(disk.fFreeGB, 0)) : null;
+            const cFreeNum = safeNum(disk.cFreeGB, null);
+            const dFreeNum = safeNum(disk.dFreeGB, null);
+            const fTotNum = safeNum(disk.fTotalGB, null);
+            const fFreeNum = safeNum(disk.fFreeGB, null);
+            const cFree = cFreeNum !== null ? Math.round(cFreeNum) : '--';
+            const dFree = dFreeNum !== null ? (dFreeNum / 1000).toFixed(1) : '--';
+            const fFreeVal = (fFreeNum !== null && fTotNum !== null && fTotNum > 0) ? Math.round(fFreeNum) : null;
             const fPipe = fFreeVal !== null ? ` | F: ${fFreeVal}G` : '';
             const fBull = fFreeVal !== null ? ` &bull; F: ${fFreeVal}G` : '';
 
@@ -1845,8 +1883,8 @@
       const cStorage = document.getElementById('c-node-storage');
       if (cStorage && window.LAST_NUC_DISK) {
         const st = cStorage.querySelector('.chaos-node-status');
-        const usedPct = Number(window.LAST_NUC_DISK.usedPercent);
-        if (st && !isChaosFaultNode(cStorage)) st.textContent = Number.isFinite(usedPct) ? `Healthy (${Math.round(usedPct)}% Used)` : 'Healthy (Pool Online)';
+        const usedPct = safeNum(window.LAST_NUC_DISK.usedPercent, null);
+        if (st && !isChaosFaultNode(cStorage)) st.textContent = usedPct !== null ? `Healthy (${Math.round(usedPct)}% Used)` : 'Healthy (Pool Online)';
       }
     }
 
@@ -1900,27 +1938,33 @@
       });
 
       // Multi-tier Fallback Cluster Telemetry Engine with Resilient Timeouts & Cache Persistence
+      const nucBootSeq = (_statusUpdateSeq.nuc = (_statusUpdateSeq.nuc || 0) + 1);
       fetchTelemetryWithFallback('nuc')
         .then(d => {
+          if (nucBootSeq !== _statusUpdateSeq.nuc) return;
           if (d && d.online !== false) {
-            updateStatusUI('nuc', true, d.latencyMs, d.disk, d.torrent, d.vitals);
+            updateStatusUI('nuc', true, safeNum(d.latencyMs, null), d.disk, d.torrent, d.vitals);
           } else {
             updateStatusUI('nuc', false, null, d && d.disk);
           }
         })
         .catch(() => {
+          if (nucBootSeq !== _statusUpdateSeq.nuc) return;
           updateStatusUI('nuc', false);
         });
 
+      const deskBootSeq = (_statusUpdateSeq.desktop = (_statusUpdateSeq.desktop || 0) + 1);
       fetchTelemetryWithFallback('desktop')
         .then(d => {
+          if (deskBootSeq !== _statusUpdateSeq.desktop) return;
           if (d && d.online !== false) {
-            updateStatusUI('desktop', true, d.latencyMs, d.disk, d.torrent, d.vitals);
+            updateStatusUI('desktop', true, safeNum(d.latencyMs, null), d.disk, d.torrent, d.vitals);
           } else {
             updateStatusUI('desktop', false, null, d && d.disk);
           }
         })
         .catch(() => {
+          if (deskBootSeq !== _statusUpdateSeq.desktop) return;
           updateStatusUI('desktop', false);
         });
 
@@ -2071,7 +2115,7 @@
       // Auto-stream inline terminal every 3s
       let _termPollInFlight = false;
       setInterval(() => {
-        if (document.hidden || !hasTermDom() || _termPollInFlight) return;
+        if (document.hidden || !hasTermDom() || _termPollInFlight || _loadLogInFlight) return;
         if (currentLogTab && isSSOAuthenticated()) {
           const reqTab = currentLogTab;
           const reqSeq = ++_logReqSeq;
@@ -2112,6 +2156,9 @@
     // ==========================================
     let _cfAccessVerified = false;
     let _cfAccessEmail = '';
+    let _cfSyncInFlight = null;
+    let _cfSyncSeq = 0;
+    let _cfSyncAutoRedirect = false;
 
     function getAdminKey() {
       try {
@@ -2132,58 +2179,75 @@
       return Boolean(_cfAccessVerified || getAdminKey());
     }
 
-    async function syncCloudflareAccessSession(autoRedirect = true) {
-      try {
-        const res = await fetch(`${GATEWAY}/api/auth/verify`, {
-          credentials: 'include',
-          signal: _fetchSig(6000)
-        });
-        if (!res.ok) {
-          const httpErr = new Error('HTTP ' + res.status);
-          httpErr.status = res.status;
-          throw httpErr;
-        }
-        const contentType = (res.headers && typeof res.headers.get === 'function' ? (res.headers.get('content-type') || '') : '').toLowerCase();
-        if (contentType && !contentType.includes('application/json')) {
-          const redirectErr = new Error('CF Access HTML Redirect');
-          redirectErr.status = 401;
-          throw redirectErr;
-        }
-        const data = await res.json();
-        if (!data || data.status !== 'authorized') {
-          const authErr = new Error('Unauthorized');
-          authErr.status = 401;
-          throw authErr;
-        }
-        _cfAccessVerified = true;
-        _cfAccessEmail = data.email || 'cory.townsend@digitalresolve.ca';
-        try { sessionStorage.removeItem('dr_sso_sync_attempted'); } catch(e) {}
-        updateSSOGateUI();
-        try { updateMaintenanceVisualStates(); } catch(e) {}
-        try { fetchISPHistory(); } catch(e) {}
-        if (typeof loadLog === 'function' && typeof currentLogTab !== 'undefined' && document.getElementById('terminal-content')) {
-          try { loadLog(currentLogTab); } catch(e) {}
-        }
-        return true;
-      } catch (err) {
-        const status = err && err.status;
-        const isHttpsWan = window.location.protocol === 'https:' && /(^|\.)digitalresolve\.ca$/i.test(window.location.hostname);
-        const isCorsAuthBlock = isHttpsWan && err && err.name === 'TypeError' && !status;
-        const isTransient = !isCorsAuthBlock && ((err && (err.name === 'AbortError' || err.name === 'TimeoutError' || err.name === 'TypeError')) || [502, 503, 504, 530].includes(status));
-        const isSyntaxAuthRedirect = Boolean(err && err.name === 'SyntaxError');
-        const isAuthFailure = !isTransient && (status === 401 || status === 403 || isCorsAuthBlock || isSyntaxAuthRedirect);
-        let syncAttempted = false;
-        try { syncAttempted = Boolean(sessionStorage.getItem('dr_sso_sync_attempted')); } catch(e) {}
-        if (autoRedirect && isAuthFailure && /(^|\.)digitalresolve\.ca$/i.test(window.location.hostname) && !syncAttempted) {
-          try { sessionStorage.setItem('dr_sso_sync_attempted', '1'); } catch(e) {}
-          window.location.href = GATEWAY + '/api/sso/login?return=' + encodeURIComponent(window.location.href);
+    function syncCloudflareAccessSession(autoRedirect = true) {
+      _cfSyncAutoRedirect = _cfSyncAutoRedirect || Boolean(autoRedirect);
+      if (_cfSyncInFlight) return _cfSyncInFlight;
+      const reqSeq = ++_cfSyncSeq;
+      const p = (async () => {
+        try {
+          const res = await fetch(`${GATEWAY}/api/auth/verify`, {
+            credentials: 'include',
+            signal: _fetchSig(6000)
+          });
+          if (!res.ok) {
+            const httpErr = new Error('HTTP ' + res.status);
+            httpErr.status = res.status;
+            throw httpErr;
+          }
+          const contentType = (res.headers && typeof res.headers.get === 'function' ? (res.headers.get('content-type') || '') : '').toLowerCase();
+          if (contentType && !contentType.includes('application/json')) {
+            const redirectErr = new Error('CF Access HTML Redirect');
+            redirectErr.status = 401;
+            throw redirectErr;
+          }
+          const data = await res.json();
+          if (!data || data.status !== 'authorized') {
+            const authErr = new Error('Unauthorized');
+            authErr.status = 401;
+            throw authErr;
+          }
+          if (reqSeq !== _cfSyncSeq) return Boolean(_cfAccessVerified);
+          _cfAccessVerified = true;
+          _cfAccessEmail = data.email || 'cory.townsend@digitalresolve.ca';
+          try { sessionStorage.removeItem('dr_sso_sync_attempted'); } catch(e) {}
+          updateSSOGateUI();
+          try { updateMaintenanceVisualStates(); } catch(e) {}
+          try { fetchISPHistory(); } catch(e) {}
+          if (typeof loadLog === 'function' && typeof currentLogTab !== 'undefined' && document.getElementById('terminal-content')) {
+            try { loadLog(currentLogTab); } catch(e) {}
+          }
+          return true;
+        } catch (err) {
+          if (reqSeq !== _cfSyncSeq) return Boolean(_cfAccessVerified);
+          const status = err && err.status;
+          const isHttpsWan = window.location.protocol === 'https:' && /(^|\.)digitalresolve\.ca$/i.test(window.location.hostname);
+          const isCorsAuthBlock = isHttpsWan && err && err.name === 'TypeError' && !status;
+          const isTransient = !isCorsAuthBlock && ((err && (err.name === 'AbortError' || err.name === 'TimeoutError' || err.name === 'TypeError')) || [502, 503, 504, 530].includes(status));
+          const isSyntaxAuthRedirect = Boolean(err && err.name === 'SyntaxError');
+          const isAuthFailure = !isTransient && (status === 401 || status === 403 || isCorsAuthBlock || isSyntaxAuthRedirect);
+          let syncAttempted = false;
+          try { syncAttempted = Boolean(sessionStorage.getItem('dr_sso_sync_attempted')); } catch(e) {}
+          if (_cfSyncAutoRedirect && isAuthFailure && /(^|\.)digitalresolve\.ca$/i.test(window.location.hostname) && !syncAttempted) {
+            try { sessionStorage.setItem('dr_sso_sync_attempted', '1'); } catch(e) {}
+            window.location.href = GATEWAY + '/api/sso/login?return=' + encodeURIComponent(window.location.href);
+            return false;
+          }
+          if (isTransient && _cfAccessVerified) {
+            return true;
+          }
+          _cfAccessVerified = false;
+          _cfAccessEmail = '';
+          updateSSOGateUI();
           return false;
+        } finally {
+          if (_cfSyncInFlight === p) {
+            _cfSyncInFlight = null;
+            _cfSyncAutoRedirect = false;
+          }
         }
-        _cfAccessVerified = false;
-        _cfAccessEmail = '';
-        updateSSOGateUI();
-        return false;
-      }
+      })();
+      _cfSyncInFlight = p;
+      return p;
     }
     window.syncCloudflareAccessSession = syncCloudflareAccessSession;
 
@@ -2426,6 +2490,9 @@
 
     async function lockSSO(fullIdpLogout = false, evt = null) {
       showToast('info', 'Signing Out of Microsoft 365 SSO...', 'Clearing Cloudflare Access session and local caches...', 3000);
+      ++_cfSyncSeq;
+      _cfSyncInFlight = null;
+      _cfSyncAutoRedirect = false;
       _cfAccessVerified = false;
       _cfAccessEmail = '';
       _feederWarmHydrated = false;
@@ -3027,7 +3094,7 @@
             return null;
           }
         } else {
-          const hasValidNumeric = Number.isFinite(Number(parsed.inputTokens)) && Number.isFinite(Number(parsed.outputTokens));
+          const hasValidNumeric = safeNum(parsed.inputTokens, null) !== null && safeNum(parsed.outputTokens, null) !== null;
           if (!hasValidNumeric) {
             localStorage.removeItem(TOKEN_METRICS_KEY);
             return null;
@@ -3066,16 +3133,18 @@
         metrics = getLiveTokenMetrics();
       } else {
         const defMetrics = getLiveTokenMetrics() || {};
-        const inResolved = Number(metrics.input !== undefined ? metrics.input : (metrics.inputTokens ?? defMetrics.inputTokens)) || 0;
-        const outResolved = Number(metrics.output !== undefined ? metrics.output : (metrics.outputTokens ?? defMetrics.outputTokens)) || 0;
-        const cacheResolved = Number(metrics.cache !== undefined ? metrics.cache : (metrics.cacheTokens ?? defMetrics.cacheTokens)) || 0;
+        const inResolved = safeNum(metrics.input, safeNum(metrics.inputTokens, safeNum(defMetrics.inputTokens, 0)));
+        const outResolved = safeNum(metrics.output, safeNum(metrics.outputTokens, safeNum(defMetrics.outputTokens, 0)));
+        const cacheResolved = safeNum(metrics.cache, safeNum(metrics.cacheTokens, safeNum(defMetrics.cacheTokens, 0)));
+        const uncachedResolved = safeNum(metrics.uncachedTotal, inResolved + outResolved);
+        const grandResolved = safeNum(metrics.grandTotal, inResolved + outResolved + cacheResolved);
         const parsed = {
           inputTokens: inResolved,
           outputTokens: outResolved,
           cacheTokens: cacheResolved,
-          uncachedTokens: metrics.uncachedTotal !== undefined ? Number(metrics.uncachedTotal) : (inResolved + outResolved),
-          grandTotalTokens: metrics.grandTotal !== undefined ? Number(metrics.grandTotal) : (inResolved + outResolved + cacheResolved),
-          totalTokens: metrics.grandTotal !== undefined ? Number(metrics.grandTotal) : (inResolved + outResolved + cacheResolved),
+          uncachedTokens: uncachedResolved,
+          grandTotalTokens: grandResolved,
+          totalTokens: grandResolved,
           model: metrics.model || defMetrics.model,
           efficiency: metrics.efficiency || defMetrics.efficiency,
           breakdown: metrics.breakdown || defMetrics.breakdown,
@@ -3249,7 +3318,7 @@
 
       // Update Header Dropdown Progress Bar
       const menuVal = document.getElementById('menu-token-val');
-      const clampPct = (v) => { const n = Number(v); return (v != null && v !== '' && !isNaN(n)) ? Math.max(0, Math.min(100, n)) : null; };
+      const clampPct = (v) => { const n = safeNum(v, null); return n !== null ? Math.max(0, Math.min(100, n)) : null; };
       const weeklyLimit = clampPct(metrics.weeklyLimitRemaining);
       const fiveHourLimit = clampPct(metrics.fiveHourLimitRemaining);
       const weeklyRef = metrics.weeklyRefresh || "--";
@@ -3437,8 +3506,7 @@
 
         const shelfItems = Array.isArray(mergedData.items) ? mergedData.items : [];
         const rankedItems = Array.isArray(mergedData.rankedItems) ? mergedData.rankedItems : [];
-        const rawTotalBooks = (mergedData.totalBooks !== undefined && mergedData.totalBooks !== null) ? Number(mergedData.totalBooks) : shelfItems.length;
-        const totalBooks = Number.isFinite(rawTotalBooks) ? rawTotalBooks : shelfItems.length;
+        const totalBooks = safeNum(mergedData.totalBooks, shelfItems.length);
         const inProgress = safeNum(mergedData.inProgressCount, 0);
 
         if (subEl) {
@@ -3602,18 +3670,29 @@
     }
     window.renderAudiobookshelfGrid = renderAudiobookshelfGrid;
 
+    let _absRankedInFlight = false;
     function sortAbsBooks(sortKey) {
       const key = sortKey || 'shelf';
       window._absSortKey = key;
       window._absShowAll = false;
       if (window._lastAbsData) {
         renderAudiobookshelfGrid(window._lastAbsData, key);
-        if (key !== 'shelf' && (!Array.isArray(window._lastAbsData.rankedItems) || window._lastAbsData.rankedItems.length === 0) && !window._absRankedFetched) {
-          window._absRankedFetched = true;
+        if (key !== 'shelf' && (!Array.isArray(window._lastAbsData.rankedItems) || window._lastAbsData.rankedItems.length === 0) && !window._absRankedFetched && !_absRankedInFlight) {
+          _absRankedInFlight = true;
           fetch(`${GATEWAY}/api/audiobooks`, { credentials: 'include', cache: 'no-store', signal: _fetchSig(5000) })
             .then(r => (r.ok ? r.json() : null))
-            .then(d => { if (d && d.online) renderAudiobookshelfGrid(d, window._absSortKey); })
-            .catch(() => {});
+            .then(d => {
+              if (d && d.online) {
+                if (Array.isArray(d.rankedItems) && d.rankedItems.length > 0) {
+                  window._absRankedFetched = true;
+                }
+                renderAudiobookshelfGrid(d, window._absSortKey);
+              }
+            })
+            .catch(() => {})
+            .finally(() => {
+              _absRankedInFlight = false;
+            });
         }
       }
     }
@@ -3660,13 +3739,14 @@
       }
       if ((data.status === 'success' || data.nuc) && data.nuc) {
         const nuc = data.nuc;
-        const nucOnline = isCached ? false : (nuc.online !== false);
+        const nucOnline = isCached ? false : Boolean(nuc.online);
+        if (!isCached) _statusUpdateSeq.nuc = (_statusUpdateSeq.nuc || 0) + 1;
         if (nucOnline && nuc.swarm) {
           window.LAST_SWARM = nuc.swarm;
         } else if (!nucOnline || nuc.swarm === null) {
           window.LAST_SWARM = null;
         }
-        updateStatusUI('nuc', isCached ? false : Boolean(nuc.online), isCached ? null : nuc.latencyMs, nuc.disk, isCached ? null : nuc.swarm, isCached ? null : nuc.vitals);
+        updateStatusUI('nuc', nucOnline, isCached ? null : nuc.latencyMs, nuc.disk, isCached ? null : nuc.swarm, isCached ? null : nuc.vitals);
         if (nucOnline && nuc.swarm) {
           const sw = nuc.swarm;
           if (typeof updateHealthRadarUI === 'function') {
@@ -3680,9 +3760,10 @@
           const throttleTag = document.getElementById('stat-throttle-tag');
           const swTag = document.getElementById('swarm-tag');
 
-          const safeActiveDl = (sw.activeDl !== null && sw.activeDl !== undefined && !isNaN(sw.activeDl)) ? Number(sw.activeDl) : 0;
-          const safeActiveUp = (sw.activeUp !== null && sw.activeUp !== undefined && !isNaN(sw.activeUp)) ? Number(sw.activeUp) : null;
-          const safeTotalTorrents = (sw.totalTorrents !== null && sw.totalTorrents !== undefined && !isNaN(sw.totalTorrents)) ? Number(sw.totalTorrents) : null;
+          const safeActiveDl = safeNum(sw.activeDl, 0);
+          const safeActiveUp = safeNum(sw.activeUp, null);
+          const safeTotalTorrents = safeNum(sw.totalTorrents, null);
+          const safeDhtNodes = safeNum(sw.dhtNodes, null);
           if (swAct) {
             swAct.textContent = safeActiveUp !== null
               ? `${safeActiveDl} DL | ${safeActiveUp} Seed`
@@ -3692,7 +3773,7 @@
             swTag.textContent = safeTotalTorrents !== null ? `${safeTotalTorrents} Managed` : '-- Managed';
             swTag.className = 'item-tag online';
           }
-          if (dht) dht.textContent = (sw.dhtNodes !== null && sw.dhtNodes !== undefined && !isNaN(sw.dhtNodes)) ? `DHT: ${sw.dhtNodes} Nodes` : 'DHT: --';
+          if (dht) dht.textContent = safeDhtNodes !== null ? `DHT: ${safeDhtNodes} Nodes` : 'DHT: --';
           if (vpnIp) vpnIp.textContent = sw.vpnExitIp ? `VPN: ${sw.vpnExitIp}` : 'VPN: --';
           document.querySelectorAll('#schematic-vpn-throughput').forEach(el => {
             el.textContent = sw.vpnExitIp ? `Exit: ${sw.vpnExitIp}` : 'WireGuard';
@@ -3752,11 +3833,15 @@
 
         const cpuVal = document.getElementById('stat-cpu-val');
         const ramSub = document.getElementById('stat-ram-sub');
-        const nucCpu = nucOnline ? safeNum(nuc.cpuLoad, null) : null;
+        const nucCpu = nucOnline ? safeNum(nuc.cpuLoad, safeNum(nuc.vitals && nuc.vitals.cpuLoad, null)) : null;
         if (cpuVal) cpuVal.innerHTML = nucCpu !== null ? `${nucCpu}% <span style="font-size: 0.9rem; color: #8b949e;">CPU</span>` : `-- <span style="font-size: 0.9rem; color: #8b949e;">CPU</span>`;
         if (ramSub) {
           if (nucOnline && nuc.vitals) {
-            ramSub.textContent = `Memory: ${safeNum(nuc.vitals.ramUsedGB, 0)} GB / ${safeNum(nuc.vitals.ramTotalGB, 0)} GB (${safeNum(nuc.vitals.ramPercent, 0)}%) | ${nuc.vitals.uptime || '--'} up`;
+            const nrUsed = safeNum(nuc.vitals.ramUsedGB, null);
+            const nrTot = safeNum(nuc.vitals.ramTotalGB, null);
+            const nrPct = safeNum(nuc.vitals.ramPercent, null);
+            const nUp = (nuc.vitals.uptime !== undefined && nuc.vitals.uptime !== null && String(nuc.vitals.uptime).trim() !== '') ? String(nuc.vitals.uptime) : '--';
+            ramSub.textContent = `Memory: ${nrUsed !== null ? nrUsed + ' GB' : '--'} / ${nrTot !== null ? nrTot + ' GB' : '--'} (${nrPct !== null ? nrPct + '%' : '--'}) | ${nUp} up`;
           } else if (!nucOnline || nuc.vitals === null) {
             ramSub.textContent = 'Memory: --';
           }
@@ -3764,18 +3849,23 @@
 
         const dFree = document.getElementById('stat-disk-free');
         const statDiskSub = document.getElementById('stat-disk-sub');
-        if (nuc.online !== false && nuc.disk) {
-          const ndFree = safeNum(nuc.disk.freeGB, 0);
-          const ndTot = safeNum(nuc.disk.totalGB, 0);
-          const ndPct = safeNum(nuc.disk.usedPercent, 0);
-          const ndUsed = safeNum(nuc.disk.usedGB, 0);
-          if (dFree) dFree.innerHTML = `${ndFree} GB <span style="font-size: 0.9rem; color: #8b949e;">Free</span>`;
+        if (nucOnline && nuc.disk) {
+          const ndFree = safeNum(nuc.disk.freeGB, null);
+          const ndTot = safeNum(nuc.disk.totalGB, null);
+          const ndPct = safeNum(nuc.disk.usedPercent, null);
+          const ndUsed = safeNum(nuc.disk.usedGB, null);
+          if (dFree) dFree.innerHTML = ndFree !== null ? `${ndFree} GB <span style="font-size: 0.9rem; color: #8b949e;">Free</span>` : '--';
           if (statDiskSub) {
-            statDiskSub.innerHTML = `<span>Total ${ndTot} GB (${ndPct}% Used &bull; ${ndUsed} GB)</span>`;
+            const hasTotals = ndTot !== null && ndPct !== null && ndUsed !== null;
+            statDiskSub.innerHTML = hasTotals
+              ? `<span>Total ${ndTot} GB (${ndPct}% Used &bull; ${ndUsed} GB)</span>`
+              : (ndTot !== null || ndPct !== null || ndUsed !== null)
+                ? `<span>Total ${ndTot !== null ? ndTot + ' GB' : '--'} (${ndPct !== null ? ndPct + '%' : '--'} Used &bull; ${ndUsed !== null ? ndUsed + ' GB' : '--'})</span>`
+                : `<span>Total -- (-- Used &bull; --)</span>`;
           }
-        } else if (nuc.online === false || nuc.disk === null) {
+        } else if (!nucOnline || nuc.disk === null) {
           if (dFree) dFree.textContent = '--';
-          if (statDiskSub) statDiskSub.textContent = nuc.online === false ? 'Node Offline' : '--';
+          if (statDiskSub) statDiskSub.textContent = !nucOnline ? 'Node Offline' : '--';
         }
 
         if (nuc.storage && Number(nuc.storage.totalGB) > 0) {
@@ -3826,8 +3916,9 @@
       }
       if (data.desktop) {
         const deskOnline = isCached ? false : Boolean(data.desktop.online);
+        if (!isCached) _statusUpdateSeq.desktop = (_statusUpdateSeq.desktop || 0) + 1;
         updateStatusUI('desktop', deskOnline, isCached ? null : data.desktop.latencyMs, data.desktop.disk, isCached ? null : data.desktop.torrent, isCached ? null : data.desktop.vitals);
-        const deskCpu = safeNum(data.desktop.cpuLoad, null);
+        const deskCpu = deskOnline ? safeNum(data.desktop.cpuLoad, safeNum(data.desktop.vitals && data.desktop.vitals.cpuLoad, null)) : null;
         const sDeskCpu = document.getElementById('stat-desktop-cpu-val');
         const fCpu = document.getElementById('fleet-cpu-desktop');
         if (deskOnline) {
@@ -3845,7 +3936,15 @@
         updateCamerasUI(data.cameras);
       }
       if (data.climate) {
-        updateClimateUI(isCached ? Object.assign({}, data.climate, { online: false, tempF: null, tempC: null, humidity: null, leakSensor: null }) : data.climate);
+        if (isCached) {
+          const hasRecentLiveClimate = Boolean(window._lastLiveClimateAt && (Date.now() - window._lastLiveClimateAt) < 10000);
+          if (!hasRecentLiveClimate) {
+            updateClimateUI(Object.assign({}, data.climate, { online: false, tempF: null, tempC: null, humidity: null, leakSensor: null }));
+          }
+        } else {
+          if (data.climate.online !== false) window._lastLiveClimateAt = Date.now();
+          updateClimateUI(data.climate);
+        }
       }
       if (data.audiobooks && typeof renderAudiobookshelfGrid === 'function') {
         renderAudiobookshelfGrid(data.audiobooks);
@@ -3935,7 +4034,8 @@
 
       const thTag = document.getElementById('iot-thermal-tag');
       if (thTag) {
-        const lowBat = (climate.battery !== undefined && climate.battery !== null && Number(climate.battery) <= 1);
+        const batLevel = safeNum(climate.battery, null);
+        const lowBat = (batLevel !== null && batLevel <= 1);
         if (!isOnline) {
           thTag.textContent = 'Offline';
           thTag.className = 'item-tag offline';
@@ -3977,6 +4077,7 @@
         .then(r => r.ok ? r.json() : null)
         .then(d => {
           if (d && d.climate && typeof updateClimateUI === 'function') {
+            if (d.climate.online !== false) window._lastLiveClimateAt = Date.now();
             updateClimateUI(d.climate);
           }
           return d;
@@ -4045,6 +4146,7 @@
     // Terminal Log Streamer
     // currentLogTab hoisted to global script top
     let _logReqSeq = 0;
+    let _loadLogInFlight = false;
     function loadLog(name, silent = false) {
       currentLogTab = name;
       ['agy', 'sentinel', 'power', 'report'].forEach(t => {
@@ -4065,6 +4167,7 @@
 
       const reqTab = currentLogTab;
       const reqSeq = ++_logReqSeq;
+      _loadLogInFlight = true;
       fetch(`${GATEWAY}/api/logs?name=${encodeURIComponent(reqTab)}`, {
         credentials: 'include',
         headers: getAdminAuthHeaders(),
@@ -4096,6 +4199,9 @@
         .catch(() => {
           if (reqTab !== currentLogTab || reqSeq !== _logReqSeq) return;
           if (body) body.textContent = `[Failed to fetch ${reqTab} log from ${GATEWAY}]`;
+        })
+        .finally(() => {
+          if (reqSeq === _logReqSeq) _loadLogInFlight = false;
         });
     }
 

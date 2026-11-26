@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-26T20:15:52Z",
-    "currentVersion":  "v2.9.47",
+    "updatedAt":  "2026-11-26T21:08:15Z",
+    "currentVersion":  "v2.9.48",
     "releases":  [
+                     {
+                         "version":  "v2.9.48",
+                         "date":  "November 26, 2026",
+                         "title":  "Telemetry Failover, Auth Session \u0026 Coercion Hardening",
+                         "changes":  [
+                                         {
+                                             "label":  "CPU Fallback \u0026 Rankings Retry",
+                                             "text":  "Preserved vitals.cpuLoad on /status failover and cleared _absRankedInFlight on transient audiobook fetch errors"
+                                         },
+                                         {
+                                             "label":  "Auth \u0026 Telemetry Race Guards",
+                                             "text":  "Coalesced syncCloudflareAccessSession with transient-glitch session preservation plus seq/in-flight guards on checkStatus, climate fallback, WoL/Sleep polls, and log streaming"
+                                         },
+                                         {
+                                             "label":  "Strict Null \u0026 Finite Coercions",
+                                             "text":  "Eliminated empty-string, null, and Infinity coercions across health score, climate battery, disk/torrent stats, tokens, and latency UI"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.47",
                          "date":  "November 26, 2026",
