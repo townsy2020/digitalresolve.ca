@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-26T10:07:09Z",
-    "currentVersion":  "v2.9.33",
+    "updatedAt":  "2026-11-26T10:20:37Z",
+    "currentVersion":  "v2.9.34",
     "releases":  [
+                     {
+                         "version":  "v2.9.34",
+                         "date":  "November 26, 2026",
+                         "title":  "Clear Stale Telemetry Inline Colors \u0026 Landscape Nav Stacking",
+                         "changes":  [
+                                         {
+                                             "label":  "Service Watchdog Color Reset",
+                                             "text":  "Cleared stale inline meta-watch-* style.color in updateStatusUI() on NUC online/offline transitions"
+                                         },
+                                         {
+                                             "label":  "Feeder Telemetry Color Recovery",
+                                             "text":  "Cleared/restored inline style.color on feeder-hopper-pct, feeder-nuc-hopper-pct, feeder-last-time, feeder-iot-last-time, and -sub spans in updateFeederUI()"
+                                         },
+                                         {
+                                             "label":  "Landscape Nav Stacking",
+                                             "text":  "Added .nav-pages-group and .nav-pages-group \u003e .btn-nav vertical column rules to mobile landscape media query in styles.css"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.33",
                          "date":  "November 26, 2026",

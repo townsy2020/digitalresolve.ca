@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.33';
+          const activeVer = match ? match[0] : 'v2.9.34';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 24835;
-      const baseCssLines = 7621;
-      const baseJsLines = 9446;
+      const baseHtmlLines = 24939;
+      const baseCssLines = 7623;
+      const baseJsLines = 9449;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -1423,17 +1423,17 @@
         const latS = safeNum(latencyMs, null);
         if (!isOnline || !window._hasLiveServicesHealth) {
           const mStream = document.getElementById('meta-watch-streamhub');
-          if (mStream) mStream.innerHTML = isOnline ? `${latS !== null ? latS + ' ms' : 'Online'} &bull; Sentinel Armed (3m)` : 'Unreachable &bull; Offline';
+          if (mStream) { mStream.style.color = ''; mStream.innerHTML = isOnline ? `${latS !== null ? latS + ' ms' : 'Online'} &bull; Sentinel Armed (3m)` : 'Unreachable &bull; Offline'; }
           const mFiles = document.getElementById('meta-watch-files');
-          if (mFiles) mFiles.innerHTML = isOnline ? `${latS !== null ? latS + ' ms' : 'Online'} &bull; Auto-Mount Active` : 'Unreachable &bull; Offline';
+          if (mFiles) { mFiles.style.color = ''; mFiles.innerHTML = isOnline ? `${latS !== null ? latS + ' ms' : 'Online'} &bull; Auto-Mount Active` : 'Unreachable &bull; Offline'; }
           const mCam = document.getElementById('meta-watch-cam');
-          if (mCam) mCam.innerHTML = isOnline ? '&lt;50ms Low-Latency WebRTC' : 'Unreachable &bull; Offline';
+          if (mCam) { mCam.style.color = ''; mCam.innerHTML = isOnline ? '&lt;50ms Low-Latency WebRTC' : 'Unreachable &bull; Offline'; }
           const mWol = document.getElementById('meta-watch-wol');
-          if (mWol) mWol.innerHTML = isOnline ? `${latS !== null ? latS + ' ms' : 'Online'} &bull; Fast-Path` : 'Unreachable &bull; Offline';
+          if (mWol) { mWol.style.color = ''; mWol.innerHTML = isOnline ? `${latS !== null ? latS + ' ms' : 'Online'} &bull; Fast-Path` : 'Unreachable &bull; Offline'; }
           const mTorrents2 = document.getElementById('meta-watch-torrents2');
-          if (mTorrents2) mTorrents2.innerHTML = isOnline ? `${latS !== null ? latS + ' ms' : 'Online'} &bull; Swarm Active` : 'Unreachable &bull; Offline';
+          if (mTorrents2) { mTorrents2.style.color = ''; mTorrents2.innerHTML = isOnline ? `${latS !== null ? latS + ' ms' : 'Online'} &bull; Swarm Active` : 'Unreachable &bull; Offline'; }
           const mCf = document.getElementById('meta-watch-cf');
-          if (mCf) mCf.innerHTML = isOnline ? 'Anycast OK &bull; Global Anycast Resilient' : 'Standby &bull; Ingress Suspended';
+          if (mCf) { mCf.style.color = ''; mCf.innerHTML = isOnline ? 'Anycast OK &bull; Global Anycast Resilient' : 'Standby &bull; Ingress Suspended'; }
         }
         if (vitals) {
           const fVitals = document.getElementById('fleet-vitals-nuc');
@@ -7672,8 +7672,8 @@
       const remText = rem !== null ? `${rem}g` : '--';
       const daysText = days !== null ? `~${days} Days` : '-- Days';
 
-      if (pctEl) pctEl.textContent = pct !== null ? `${pct}%` : '--';
-      if (subEl) subEl.textContent = pct === null ? "(Awaiting telemetry)" : (pct === 0 ? "(0g - EMPTY - Refill Needed)" : `(${remText} - ${daysText})`);
+      if (pctEl) { pctEl.textContent = pct !== null ? `${pct}%` : '--'; pctEl.style.color = ''; }
+      if (subEl) { subEl.textContent = pct === null ? "(Awaiting telemetry)" : (pct === 0 ? "(0g - EMPTY - Refill Needed)" : `(${remText} - ${daysText})`); subEl.style.color = '#94a3b8'; }
       const barPct = pct !== null ? clampPct(pct) : 0;
       if (barEl) {
         if (pct === null) {
@@ -7716,8 +7716,8 @@
       const nucBarEl = document.getElementById('feeder-nuc-hopper-bar');
       const nucWatchEl = document.getElementById('feeder-nuc-watchdog');
       const iotTimeEl = document.getElementById('feeder-iot-last-time');
-      if (nucPctEl) nucPctEl.textContent = pct !== null ? `${pct}%` : '--';
-      if (nucSubEl) nucSubEl.textContent = pct === null ? "(Awaiting telemetry)" : (pct === 0 ? "(0g - EMPTY - Refill Needed)" : `(${remText} - ${daysText})`);
+      if (nucPctEl) { nucPctEl.textContent = pct !== null ? `${pct}%` : '--'; nucPctEl.style.color = ''; }
+      if (nucSubEl) { nucSubEl.textContent = pct === null ? "(Awaiting telemetry)" : (pct === 0 ? "(0g - EMPTY - Refill Needed)" : `(${remText} - ${daysText})`); nucSubEl.style.color = '#94a3b8'; }
       if (nucBarEl) {
         nucBarEl.style.width = pct !== null ? `${barPct}%` : '0%';
         nucBarEl.style.background = pct === null ? 'linear-gradient(90deg, #475569, #64748b)' : (pct <= 15 ? 'linear-gradient(90deg, #ef4444, #f87171)' : (pct <= 30 ? 'linear-gradient(90deg, #f59e0b, #fbbf24)' : 'linear-gradient(90deg, #ec4899, #f472b6)'));
@@ -7808,14 +7808,17 @@
         const tStr = isNaN(d.getTime()) ? String(state.lastDispenseTime) : d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
         if (timeEl) {
           timeEl.textContent = `${tStr} (${state.lastDispenseLabel || "Dinner"}) - ${state.lastDispenseStatus || "Verified"}`;
+          timeEl.style.color = '#cbd5e1';
         }
         if (iotTimeEl) {
           iotTimeEl.textContent = `${tStr} (${state.lastDispenseLabel || 'Dinner'})`;
+          iotTimeEl.style.color = '#cbd5e1';
         }
       } else {
         const fallbackText = state.online === false ? 'Offline' : 'No recent dispense';
-        if (timeEl) timeEl.textContent = fallbackText;
-        if (iotTimeEl) iotTimeEl.textContent = fallbackText;
+        const fallbackColor = state.online === false ? '#94a3b8' : '#cbd5e1';
+        if (timeEl) { timeEl.textContent = fallbackText; timeEl.style.color = fallbackColor; }
+        if (iotTimeEl) { iotTimeEl.textContent = fallbackText; iotTimeEl.style.color = fallbackColor; }
       }
     }
     window.updateFeederUI = updateFeederUI;

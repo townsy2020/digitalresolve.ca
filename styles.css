@@ -7569,6 +7569,7 @@ html.mobile-layout .storage-matrix-grid {
   html:not(.desktop-forced) .nav-links > * {
     flex-shrink: 0 !important;
   }
+  html:not(.desktop-forced) .nav-pages-group,
   html:not(.desktop-forced) .nav-tools-group {
     display: flex !important;
     flex-direction: column !important;
@@ -7578,7 +7579,8 @@ html.mobile-layout .storage-matrix-grid {
   }
   html:not(.desktop-forced) .nav-links > .btn-nav,
   html:not(.desktop-forced) .nav-links > a.btn-nav,
-  html:not(.desktop-forced) .nav-links > button.btn-nav {
+  html:not(.desktop-forced) .nav-links > button.btn-nav,
+  html:not(.desktop-forced) .nav-pages-group > .btn-nav {
     width: 100% !important;
     min-height: 40px !important;
     display: flex !important;
