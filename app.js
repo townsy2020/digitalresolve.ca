@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.28';
+          const activeVer = match ? match[0] : 'v2.9.29';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 24330;
+      const baseHtmlLines = 24426;
       const baseCssLines = 7621;
-      const baseJsLines = 9303;
+      const baseJsLines = 9309;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -1166,7 +1166,13 @@
         tag.className = `item-tag ${isOnline ? 'online' : 'offline'}`;
       }
       if (target === 'nuc') {
-        if (latencyMs !== null && Number.isFinite(Number(latencyMs)) && (Number(latencyMs) > 0 || !(Number(window.LAST_NUC_LATENCY) > 0))) {
+        if (!isOnline) {
+          window.LAST_NUC_LATENCY = null;
+          document.querySelectorAll('#spark-leg-nuc').forEach(el => {
+            el.textContent = '--';
+          });
+          if (typeof initSparklineHeartbeat === 'function') initSparklineHeartbeat();
+        } else if (latencyMs !== null && Number.isFinite(Number(latencyMs)) && (Number(latencyMs) > 0 || !(Number(window.LAST_NUC_LATENCY) > 0))) {
           window.LAST_NUC_LATENCY = Number(latencyMs);
           document.querySelectorAll('#spark-leg-nuc').forEach(el => {
             el.textContent = `${Number(latencyMs).toFixed(1)} ms`;
@@ -2203,7 +2209,7 @@
         const isAgyNuc = (window.AGY_SESSION_HOST === 'nuc');
         const activeHostOnline = isAgyNuc ? (window.NUC_IS_ONLINE !== false) : (window.DESKTOP_IS_ONLINE !== undefined ? window.DESKTOP_IS_ONLINE : true);
         if (modalPulse) { modalPulse.style.background = activeHostOnline ? '#10b981' : '#6366f1'; modalPulse.style.boxShadow = activeHostOnline ? '0 0 8px #10b981' : '0 0 8px #6366f1'; }
-        if (modalStatus) { modalStatus.textContent = activeHostOnline ? (isAgyNuc ? 'ONLINE (NUC :8082)' : 'ONLINE (Desktop :8082)') : 'STANDBY (Desktop Sleeping • WoL Ready)'; modalStatus.className = `item-tag ${activeHostOnline ? 'online' : 'offline'}`; }
+        if (modalStatus) { modalStatus.textContent = activeHostOnline ? (isAgyNuc ? 'ONLINE (NUC :8082)' : 'ONLINE (Desktop :8082)') : (isAgyNuc ? 'OFFLINE (NUC Unreachable)' : 'STANDBY (Desktop Sleeping • WoL Ready)'); modalStatus.className = `item-tag ${activeHostOnline ? 'online' : 'offline'}`; }
 
         // External WAN IPv4 (Exposed only when MFA/SSO authenticated)
         const ispIpSub = document.getElementById('isp-ip-sub');
@@ -5041,7 +5047,7 @@
 
       // Tick markers and Y-axis scale labels (10 ms, 5 ms, 0 ms)
       const yZero = h - 14;  // 0 ms baseline (66px)
-      const nucLatVal = (window.LAST_NUC_LATENCY !== undefined && window.LAST_NUC_LATENCY !== null && isFinite(Number(window.LAST_NUC_LATENCY)))
+      const nucLatVal = (window.NUC_IS_ONLINE !== false && window.LAST_NUC_LATENCY !== undefined && window.LAST_NUC_LATENCY !== null && isFinite(Number(window.LAST_NUC_LATENCY)))
         ? Number(window.LAST_NUC_LATENCY)
         : 0;
       const bellLatVal = (window.ISP_LATEST && window.ISP_LATEST.pingAvgMs !== undefined && isFinite(Number(window.ISP_LATEST.pingAvgMs)))
@@ -5116,7 +5122,7 @@
       const histEdge = Array.isArray(window.ISP_EDGE_PINGS)
         ? window.ISP_EDGE_PINGS.filter(v => typeof v === 'number' && isFinite(v))
         : [];
-      const hasNucLat = (window.LAST_NUC_LATENCY !== undefined && window.LAST_NUC_LATENCY !== null && window.LAST_NUC_LATENCY !== '' && isFinite(Number(window.LAST_NUC_LATENCY)));
+      const hasNucLat = (window.NUC_IS_ONLINE !== false && window.LAST_NUC_LATENCY !== undefined && window.LAST_NUC_LATENCY !== null && window.LAST_NUC_LATENCY !== '' && isFinite(Number(window.LAST_NUC_LATENCY)));
       const nucLat = hasNucLat ? Number(window.LAST_NUC_LATENCY) : null;
       const graphW = Math.max(10, (w - 6) - axisX);
 

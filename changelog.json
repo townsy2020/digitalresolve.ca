@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-25T16:14:52Z",
-    "currentVersion":  "v2.9.28",
+    "updatedAt":  "2026-11-26T09:22:08Z",
+    "currentVersion":  "v2.9.29",
     "releases":  [
+                     {
+                         "version":  "v2.9.29",
+                         "date":  "November 26, 2026",
+                         "title":  "NUC Offline Latency Reset \u0026 AGY Host Status Consistency",
+                         "changes":  [
+                                         {
+                                             "label":  "Clear Stale NUC Latency",
+                                             "text":  "Cleared window.LAST_NUC_LATENCY and #spark-leg-nuc on NUC offline transition and guarded renderSparklineFrame() against drawing offline NUC latency"
+                                         },
+                                         {
+                                             "label":  "AGY Modal Host Status",
+                                             "text":  "Fixed updateSSOGateUI() showing Desktop Standby text when an active NUC AGY session is offline"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.28",
                          "date":  "November 25, 2026",
