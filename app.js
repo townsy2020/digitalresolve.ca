@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.51';
+          const activeVer = match ? match[0] : 'v2.9.52';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 26749;
+      const baseHtmlLines = 26845;
       const baseCssLines = 7764;
-      const baseJsLines = 9998;
+      const baseJsLines = 10008;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -4481,12 +4481,16 @@
                 const cachedRaw = localStorage.getItem('dr_isp_history');
                 if (cachedRaw) {
                   const cachedData = JSON.parse(cachedRaw);
-                  if (cachedData && cachedData.status === 'success') {
+                  if (!cachedData || typeof cachedData !== 'object' || Array.isArray(cachedData)) {
+                    try { localStorage.removeItem('dr_isp_history'); } catch (_) {}
+                  } else if (cachedData.status === 'success') {
                     cList = Array.isArray(cachedData.history) ? cachedData.history : [];
                     cLat = cachedData.latest || null;
                   }
                 }
-              } catch (e) {}
+              } catch (e) {
+                try { localStorage.removeItem('dr_isp_history'); } catch (_) {}
+              }
 
               if (cList && cList.length > 0) {
                 applyIspTelemetry(cList, cLat);
@@ -4926,16 +4930,15 @@
 
     function isNucMaintenanceActive() {
       try {
-        const stored = localStorage.getItem('dr_nuc_maintenance');
-        if (!stored) return false;
-        const data = JSON.parse(stored);
+        const data = getNucMaintenanceData();
         if (!data || !data.active) return false;
         if (data.expiresAt && Date.now() > data.expiresAt) {
           localStorage.removeItem('dr_nuc_maintenance');
           return false;
         }
         return true;
-      } catch(e) {
+      } catch (e) {
+        try { localStorage.removeItem('dr_nuc_maintenance'); } catch (_) {}
         return false;
       }
     }
@@ -4945,8 +4948,14 @@
       try {
         const stored = localStorage.getItem('dr_nuc_maintenance');
         if (!stored) return null;
-        return JSON.parse(stored);
-      } catch(e) {
+        const parsed = JSON.parse(stored);
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+          try { localStorage.removeItem('dr_nuc_maintenance'); } catch (_) {}
+          return null;
+        }
+        return parsed;
+      } catch (e) {
+        try { localStorage.removeItem('dr_nuc_maintenance'); } catch (_) {}
         return null;
       }
     }
@@ -7619,7 +7628,7 @@
         totalRequests: 'Tunnel Active',
         ingressSla: '--',
         hitRatio: null,
-        savedGB: '0.0 GB',
+        savedGB: '--',
         haConnections: null,
         uniqueVisitors: '--',
         topPop: '--',
@@ -7666,9 +7675,10 @@
       };
 
       const formatShortGB = (val) => {
-        if (val === undefined || val === null || val === '' || (typeof val === 'number' && !Number.isFinite(val))) return '0.0 GB';
+        if (val === undefined || val === null || val === '' || (typeof val === 'number' && !Number.isFinite(val))) return '--';
+        if (typeof val === 'number') return `${val === 0 ? '0.0' : val} GB`;
         const str = String(val).replace(/^(&bull;|•|\s)+/, '').replace(/(?:Saved.*|Tunnel Egress.*)$/i, '').trim();
-        if (!str || str === 'NaN') return '0.0 GB';
+        if (!str || str === 'NaN' || str === '--') return '--';
         return str.toLowerCase().includes('gb') ? str : `${str} GB`;
       };
 
@@ -7778,9 +7788,9 @@
       const edgeCache = document.getElementById('edge-cache-val');
       if (edgeCache) {
         if (!isZoneScope) {
-          edgeCache.textContent = `${cleanSaved} Egress`;
+          edgeCache.textContent = cleanSaved === '--' ? '--' : `${cleanSaved} Egress`;
         } else {
-          edgeCache.textContent = `${cur.hitRatio} (${cleanSaved})`;
+          edgeCache.textContent = cleanSaved === '--' ? `${cur.hitRatio}` : `${cur.hitRatio} (${cleanSaved})`;
         }
       }
       const edgeBar = document.getElementById('edge-cache-bar');

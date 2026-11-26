@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-26T21:44:38Z",
-    "currentVersion":  "v2.9.51",
+    "updatedAt":  "2026-11-26T22:11:55Z",
+    "currentVersion":  "v2.9.52",
     "releases":  [
+                     {
+                         "version":  "v2.9.52",
+                         "date":  "November 26, 2026",
+                         "title":  "Honest Edge Cache Fallback \u0026 Storage Self-Healing",
+                         "changes":  [
+                                         {
+                                             "label":  "Honest Edge Egress Fallback",
+                                             "text":  "Returned -- instead of fake 0.0 GB Egress when Cloudflare or NUC telemetry is unavailable"
+                                         },
+                                         {
+                                             "label":  "LocalStorage Self-Healing",
+                                             "text":  "Pruned corrupted or non-object dr_isp_history and dr_nuc_maintenance entries automatically on read"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.51",
                          "date":  "November 26, 2026",
