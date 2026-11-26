@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-26T10:44:46Z",
-    "currentVersion":  "v2.9.36",
+    "updatedAt":  "2026-11-26T10:53:10Z",
+    "currentVersion":  "v2.9.37",
     "releases":  [
+                     {
+                         "version":  "v2.9.37",
+                         "date":  "November 26, 2026",
+                         "title":  "localStorage Cache TTL \u0026 Modal Escape Guard",
+                         "changes":  [
+                                         {
+                                             "label":  "Cache TTL \u0026 Type Validation",
+                                             "text":  "Added plain-object validation, TTLs (15m telemetry/cluster, 60m ISP, 24h tokens), and self-healing cleanup for localStorage caches"
+                                         },
+                                         {
+                                             "label":  "Modal Escape \u0026 Background Guard",
+                                             "text":  "Prevented global Escape from clearing pendingSSOCallback when SSO modal is closed and gated visibilitychange maintenance countdown on open modal"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.36",
                          "date":  "November 26, 2026",

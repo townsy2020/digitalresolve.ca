@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.36';
+          const activeVer = match ? match[0] : 'v2.9.37';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 25190;
+      const baseHtmlLines = 25286;
       const baseCssLines = 7623;
-      const baseJsLines = 9478;
+      const baseJsLines = 9518;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -491,32 +491,54 @@
     }
     window.fetchTelemetryWithFallback = fetchTelemetryWithFallback;
 
+    function _parsePlainLSJson(key, ttlMs = 0, tsField = '_cachedAt') {
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+          localStorage.removeItem(key);
+          return null;
+        }
+        if (ttlMs > 0) {
+          const ts = Number(parsed[tsField]);
+          if (!Number.isFinite(ts) || (Date.now() - ts) > ttlMs) {
+            localStorage.removeItem(key);
+            return null;
+          }
+        }
+        return parsed;
+      } catch (e) {
+        try { localStorage.removeItem(key); } catch (_) {}
+        return null;
+      }
+    }
+
     function hydrateTelemetryFromCache() {
       try {
-        const raw = localStorage.getItem('dr_telemetry_cache');
-        const data = raw ? JSON.parse(raw) : null;
-        if (!data) return; // Zero hardcoding: wait for live telemetry stream
-        if (data.nuc) {
-          updateStatusUI('nuc', data.nuc.online !== false, data.nuc.latencyMs, data.nuc.disk, data.nuc.swarm || data.nuc.torrent, data.nuc.vitals);
-        }
-        if (data.desktop) {
-          updateStatusUI('desktop', data.desktop.online !== false, data.desktop.latencyMs, data.desktop.disk, data.desktop.torrent, data.desktop.vitals);
-        }
-        if (data.tokens && typeof updateTokenCounterUI === 'function') {
-          updateTokenCounterUI(data.tokens);
-      }
-      if (data.cameras) {
-        updateCamerasUI(data.cameras);
-        }
-        if (data.climate && typeof updateClimateUI === 'function') {
-          updateClimateUI(data.climate);
+        const data = _parsePlainLSJson('dr_telemetry_cache', 15 * 60 * 1000, 'ts');
+        if (data) {
+          if (data.nuc && typeof data.nuc === 'object' && !Array.isArray(data.nuc)) {
+            updateStatusUI('nuc', data.nuc.online !== false, data.nuc.latencyMs, data.nuc.disk, data.nuc.swarm || data.nuc.torrent, data.nuc.vitals);
+          }
+          if (data.desktop && typeof data.desktop === 'object' && !Array.isArray(data.desktop)) {
+            updateStatusUI('desktop', data.desktop.online !== false, data.desktop.latencyMs, data.desktop.disk, data.desktop.torrent, data.desktop.vitals);
+          }
+          if (data.tokens && typeof updateTokenCounterUI === 'function') {
+            updateTokenCounterUI(data.tokens);
+          }
+          if (data.cameras) {
+            updateCamerasUI(data.cameras);
+          }
+          if (data.climate && typeof updateClimateUI === 'function') {
+            updateClimateUI(data.climate);
+          }
         }
       } catch (e) {
         console.warn('Hydration cache error:', e);
       }
       try {
-        const rawClust = localStorage.getItem('dr_cluster_stats');
-        const cData = rawClust ? JSON.parse(rawClust) : null;
+        const cData = _parsePlainLSJson('dr_cluster_stats', 15 * 60 * 1000, '_cachedAt');
         if (cData && cData.climate && typeof updateClimateUI === 'function' && !window._hasLiveClimate) {
           updateClimateUI(cData.climate);
         }
@@ -882,10 +904,7 @@
         else if (text.includes('Bell Canada Gigabit Fiber')) {
           let isp = telemetry.isp || window.ISP_LATEST;
           if (!isp) {
-            try {
-              const rawIsp = localStorage.getItem('dr_isp_cache');
-              if (rawIsp) isp = JSON.parse(rawIsp);
-            } catch (e) {}
+            isp = _parsePlainLSJson('dr_isp_cache', 60 * 60 * 1000, '_cachedAt');
           }
           const ping = isp ? safeNum(isp.pingAvgMs, null) : null;
           if (ping !== null) {
@@ -921,13 +940,8 @@
         else if (text.includes('Media Storage Capacity')) {
           let disk = telemetry.nucDisk || window.LAST_NUC_DISK || (window.LAST_NUC && window.LAST_NUC.disk);
           if (!disk) {
-            try {
-              const rawTel = localStorage.getItem('dr_telemetry_cache');
-              if (rawTel) {
-                const parsedTel = JSON.parse(rawTel);
-                if (parsedTel && parsedTel.nuc && parsedTel.nuc.disk) disk = parsedTel.nuc.disk;
-              }
-            } catch (e) {}
+            const parsedTel = _parsePlainLSJson('dr_telemetry_cache', 15 * 60 * 1000, 'ts');
+            if (parsedTel && parsedTel.nuc && parsedTel.nuc.disk) disk = parsedTel.nuc.disk;
           }
           const rawFreeGB = disk ? safeNum(disk.freeGB, null) : null;
           if (rawFreeGB !== null) {
@@ -1226,6 +1240,7 @@
           const raw = localStorage.getItem('dr_telemetry_cache');
           const parsed = raw ? JSON.parse(raw) : null;
           const cache = (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) ? parsed : {};
+          cache.ts = Date.now();
           cache[target] = {
             online: true,
             latencyMs: (latencyMs !== null && latencyMs !== undefined && Number.isFinite(Number(latencyMs))) ? Number(latencyMs) : null,
@@ -1246,6 +1261,7 @@
           } else if (target === 'nuc' && !disk) {
             disk = window.LAST_NUC_DISK || prevTarget.disk || null;
           }
+          cache.ts = Date.now();
           cache[target] = {
             online: false,
             latencyMs: null,
@@ -2004,7 +2020,7 @@
           if (hasServicesDom()) fetchServicesHealth();
           if (hasFeederDom() && typeof fetchFeederStatus === 'function') fetchFeederStatus();
           if (hasTermDom() && currentLogTab && isSSOAuthenticated()) loadLog(currentLogTab, true);
-          if (typeof updateMaintenanceModalUI === 'function' && typeof isNucMaintenanceActive === 'function' && isNucMaintenanceActive()) updateMaintenanceModalUI();
+          if (document.getElementById('maintenance-modal-overlay')?.classList.contains('active') && typeof updateMaintenanceModalUI === 'function' && typeof isNucMaintenanceActive === 'function' && isNucMaintenanceActive()) updateMaintenanceModalUI();
         }
       });
 
@@ -2906,12 +2922,34 @@
     // AI TOKEN CONSUMPTION & EFFICIENCY TRACKER
     // ==========================================
     const TOKEN_METRICS_KEY = 'dr_token_metrics';
+    const TOKEN_METRICS_TTL_MS = 24 * 60 * 60 * 1000;
 
     function getLiveTokenMetrics() {
       try {
         const stored = localStorage.getItem(TOKEN_METRICS_KEY);
-        if (stored) return JSON.parse(stored);
-      } catch (e) {}
+        if (!stored) return null;
+        const parsed = JSON.parse(stored);
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+          localStorage.removeItem(TOKEN_METRICS_KEY);
+          return null;
+        }
+        if (parsed.ts !== undefined && parsed.ts !== null) {
+          const ts = Number(parsed.ts);
+          if (!Number.isFinite(ts) || (Date.now() - ts) > TOKEN_METRICS_TTL_MS) {
+            localStorage.removeItem(TOKEN_METRICS_KEY);
+            return null;
+          }
+        } else {
+          const hasValidNumeric = Number.isFinite(Number(parsed.inputTokens)) && Number.isFinite(Number(parsed.outputTokens));
+          if (!hasValidNumeric) {
+            localStorage.removeItem(TOKEN_METRICS_KEY);
+            return null;
+          }
+        }
+        return parsed;
+      } catch (e) {
+        try { localStorage.removeItem(TOKEN_METRICS_KEY); } catch (_) {}
+      }
       return null; // Zero hardcoding: return null until live stream arrives
     }
     function formatTokenNumber(num) {
@@ -2952,7 +2990,8 @@
           claudeFiveHourRemaining: metrics.claudeFiveHourRemaining != null ? metrics.claudeFiveHourRemaining : defMetrics.claudeFiveHourRemaining,
           claudeFiveHourResetTime: metrics.claudeFiveHourResetTime || defMetrics.claudeFiveHourResetTime,
           claudeLimitRemaining: metrics.claudeLimitRemaining != null ? metrics.claudeLimitRemaining : (metrics.claudeWeeklyRemaining != null ? metrics.claudeWeeklyRemaining : defMetrics.claudeLimitRemaining),
-          account: metrics.account || defMetrics.account
+          account: metrics.account || defMetrics.account,
+          ts: Date.now()
         };
         metrics = parsed;
         try { localStorage.setItem(TOKEN_METRICS_KEY, JSON.stringify(metrics)); } catch (e) {}
@@ -3324,9 +3363,8 @@
       const isCached = Boolean(opts && opts.isCachedFallback);
       if (!isCached) {
         try {
-          const prevRaw = localStorage.getItem('dr_cluster_stats');
-          const prev = prevRaw ? JSON.parse(prevRaw) : null;
-          const merged = (prev && typeof prev === 'object') ? Object.assign({}, prev, data) : data;
+          const prev = _parsePlainLSJson('dr_cluster_stats', 15 * 60 * 1000, '_cachedAt');
+          const merged = Object.assign({}, prev || {}, data, { _cachedAt: Date.now() });
           localStorage.setItem('dr_cluster_stats', JSON.stringify(merged));
         } catch (e) {}
       }
@@ -3696,8 +3734,8 @@
             .catch(() => {
               // Failover Method 2: Hydrate from persistent local storage cache
               try {
-                const cached = localStorage.getItem('dr_cluster_stats');
-                if (cached) return applyClusterStatsPayload(JSON.parse(cached), { isCachedFallback: true });
+                const cached = _parsePlainLSJson('dr_cluster_stats', 15 * 60 * 1000, '_cachedAt');
+                if (cached) return applyClusterStatsPayload(cached, { isCachedFallback: true });
               } catch (e) {}
               try { updateCloudflareStatsUI(); } catch (e) {}
               const swTag = document.getElementById('swarm-tag');
@@ -3871,8 +3909,8 @@
         window.ISP_EDGE_PINGS = list
           .map(h => (h && h.googleDnsMs !== null && h.googleDnsMs !== undefined && Number.isFinite(Number(h.googleDnsMs))) ? Number(h.googleDnsMs) : null);
         window.ISP_LATEST = latest;
-        if (latest) {
-          try { localStorage.setItem('dr_isp_cache', JSON.stringify(latest)); } catch (e) {}
+        if (latest && typeof latest === 'object' && !Array.isArray(latest)) {
+          try { localStorage.setItem('dr_isp_cache', JSON.stringify(Object.assign({}, latest, { _cachedAt: Date.now() }))); } catch (e) {}
         }
 
         if (latest && typeof updateHealthRadarUI === 'function') {
@@ -8123,7 +8161,9 @@
         return;
       }
       if (e.key === 'Escape') {
-        closeSpeedtestSSOModal();
+        if (document.getElementById('speedtest-sso-modal-overlay')?.classList.contains('active')) {
+          closeSpeedtestSSOModal();
+        }
         closeDisasterModal();
         closeChaosModal();
         closeHealthModal();
