@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.46';
+          const activeVer = match ? match[0] : 'v2.9.47';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 26193;
+      const baseHtmlLines = 26297;
       const baseCssLines = 7764;
-      const baseJsLines = 9858;
+      const baseJsLines = 9885;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -4195,10 +4195,10 @@
           : (list.length > 0 ? list[list.length - 1] : null);
 
         window.ISP_HISTORY_PINGS = list
-          .map(h => (h && h.pingAvgMs !== null && h.pingAvgMs !== undefined && Number.isFinite(Number(h.pingAvgMs))) ? Number(h.pingAvgMs) : null)
+          .map(h => (h ? safeNum(h.pingAvgMs, null) : null))
           .filter(v => v !== null);
         window.ISP_EDGE_PINGS = list
-          .map(h => (h && h.googleDnsMs !== null && h.googleDnsMs !== undefined && Number.isFinite(Number(h.googleDnsMs))) ? Number(h.googleDnsMs) : null);
+          .map(h => (h ? safeNum(h.googleDnsMs, null) : null));
         window.ISP_LATEST = latest;
         if (latest && typeof latest === 'object' && !Array.isArray(latest)) {
           try { localStorage.setItem('dr_isp_cache', JSON.stringify(Object.assign({}, latest, { _cachedAt: Date.now() }))); } catch (e) {}
@@ -4480,8 +4480,9 @@
         _ispPollTimeout = setTimeout(() => {
           if (gen !== _ispPollGen) return;
           clearIspSpeedtestPoll();
+          const timeoutGen = _ispPollGen;
           Promise.resolve(typeof fetchISPHistory === 'function' ? fetchISPHistory() : null).finally(() => {
-            if (gen !== _ispPollGen) return;
+            if (timeoutGen !== _ispPollGen) return;
             if (typeof opts.onTimeout === 'function') opts.onTimeout(window.ISP_LATEST || {});
           });
         }, 30000);
@@ -4501,7 +4502,8 @@
       pollIspSpeedtestUpdate({
         onComplete: (latest) => {
           setSpeedtestButtonsState(false);
-          const pingStr = (latest && latest.pingAvgMs != null && Number.isFinite(Number(latest.pingAvgMs))) ? Number(latest.pingAvgMs).toFixed(1) : '--';
+          const pingVal = latest ? safeNum(latest.pingAvgMs, null) : null;
+          const pingStr = pingVal !== null ? pingVal.toFixed(1) : '--';
           if (typeof showToast === 'function') showToast('success', 'Probe Complete', `Ping: ${pingStr} ms`);
         },
         onTimeout: () => {
@@ -4613,17 +4615,20 @@
     function closeMagnetModalOnBackdrop(e) {
       if (e.target && e.target.id === 'magnet-modal-overlay') closeMagnetModal();
     }
+    let _magnetInFlight = false;
     function submitMagnet() {
       if (!isSSOAuthenticated()) {
         openGlobalSSOModal('Remote Torrent Magnet Ingestion', submitMagnet);
         return;
       }
+      if (_magnetInFlight) return;
       const input = document.getElementById('magnet-input');
       const val = input ? input.value.trim() : '';
       if (!val || !/^(magnet:\?|https?:\/\/.+)/i.test(val)) {
         showToast('error', 'Invalid URL', 'Please paste a valid magnet:? link or http(s):// .torrent URL.');
         return;
       }
+      _magnetInFlight = true;
       const targetRadios = document.getElementsByName('magnet-target');
       let target = 'nuc';
       for (const r of targetRadios) { if (r.checked) { target = r.value; break; } }
@@ -4643,12 +4648,14 @@
         if (!data || data.status !== 'success') throw new Error((data && data.message) || 'Gateway rejected request');
         closeMagnetModal();
         if (input) input.value = '';
-        if (btn) { btn.disabled = false; btn.textContent = 'Start Remote Download'; }
         showToast('success', 'Download Started!', data.message || `Torrent sent to ${target.toUpperCase()}!`);
       })
       .catch(err => {
-        if (btn) { btn.disabled = false; btn.textContent = 'Start Remote Download'; }
         showToast('error', 'Dispatch Failed', (err && err.message) || `Could not reach ${GATEWAY} to inject torrent.`);
+      })
+      .finally(() => {
+        _magnetInFlight = false;
+        if (btn) { btn.disabled = false; btn.textContent = 'Start Remote Download'; }
       });
     }
 
@@ -5119,7 +5126,6 @@
     let _uptimeReqSeq = 0;
     let _uptimeMatrixInFlight = null;
     function renderUptimeMatrix() {
-      const reqSeq = ++_uptimeReqSeq;
       const nodes = [
         { id: 'bars-nuc', type: 'nuc', title: 'NUC 24/7 Core Server' },
         { id: 'bars-isp', type: 'isp', title: 'Bell Canada Gigabit Fiber' },
@@ -5405,6 +5411,8 @@
 
       // Dynamic SLA and uptime metrics from gateway (with LAN fallback)
       if (typeof fetch === 'function') {
+        if (_uptimeMatrixInFlight) return _uptimeMatrixInFlight;
+        const reqSeq = ++_uptimeReqSeq;
         const handleUptimePayload = (data) => {
           if (reqSeq !== _uptimeReqSeq) return null;
           if (data && data.status === 'success') {
@@ -5455,7 +5463,6 @@
           setEl('#uptime-desktop-sla-val', 'Sign in for SLA');
           return null;
         };
-        if (_uptimeMatrixInFlight) return _uptimeMatrixInFlight;
         _uptimeMatrixInFlight = fetch(`${GATEWAY}/uptime`, { credentials: 'include', signal: _fetchSig(10000) })
           .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
           .then(handleUptimePayload)
@@ -6314,23 +6321,41 @@
         body: JSON.stringify(payload),
         signal: _fetchSig(15000)
       })
-      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(r => {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const ct = (r.headers && typeof r.headers.get === 'function' ? (r.headers.get('content-type') || '') : '').toLowerCase();
+        if (ct && !ct.includes('application/json')) {
+          const redirectErr = new Error('CF Access HTML Redirect');
+          redirectErr.status = 401;
+          throw redirectErr;
+        }
+        return r.json();
+      })
       .then(data => {
-        if (data.status === 'success') {
+        if (data && data.status === 'success') {
           showToast('success', 'Prompt Delivered to AGY', 'Autonomous agent processing instruction...');
           setTimeout(() => refreshAgyConsole(true), 1200);
           setTimeout(() => refreshAgyConsole(true), 3000);
         } else {
-          const msg = data.message || 'Could not queue prompt.';
+          const msg = (data && data.message) || 'Could not queue prompt.';
           handleConsoleErr(msg);
           showToast('error', 'Transmission Failed', msg);
         }
       })
       .catch(err => {
-        const isAuthErr = Boolean(err && /\bHTTP (401|403)\b/.test(err.message || ''));
-        const msg = isAuthErr ? 'Authentication Required (HTTP 401/403) — Unlock M365 SSO' : `Could not reach ${GATEWAY}`;
-        handleConsoleErr(isAuthErr ? err.message : 'Gateway Offline');
-        showToast('error', isAuthErr ? 'Authentication Required' : 'Gateway Offline', msg);
+        const errMsg = (err && err.message) ? String(err.message) : '';
+        const isAuthErr = Boolean(err && (err.status === 401 || err.status === 403 || err.name === 'SyntaxError' || /\bHTTP (401|403)\b/.test(errMsg) || /CF Access HTML Redirect/i.test(errMsg)));
+        const isHttpErr = !isAuthErr && /\bHTTP [45]\d{2}\b/.test(errMsg);
+        if (isAuthErr) {
+          handleConsoleErr(errMsg || 'Authentication Required');
+          showToast('error', 'Authentication Required', 'Authentication Required (HTTP 401/403 or SSO redirect) — Unlock M365 SSO');
+        } else if (isHttpErr) {
+          handleConsoleErr(errMsg);
+          showToast('error', 'Gateway Request Rejected', `${errMsg} — Server rejected prompt dispatch.`);
+        } else {
+          handleConsoleErr('Gateway Offline');
+          showToast('error', 'Gateway Offline', `Could not reach ${GATEWAY}`);
+        }
       })
       .finally(() => {
         _consolePromptInFlight = false;
@@ -6972,7 +6997,8 @@
           btn.innerHTML = 'Fill Disk to 99.8%';
           btn.className = 'chaos-card-trigger';
           nodeStorage.className = 'chaos-node node-ok';
-          nodeStorage.querySelector('.chaos-node-status').textContent = (window.LAST_NUC_DISK && Number.isFinite(Number(window.LAST_NUC_DISK.usedPercent))) ? `Healthy (${Math.round(Number(window.LAST_NUC_DISK.usedPercent))}% Pool)` : 'Healthy (Pool Online)';
+          const diskPct = window.LAST_NUC_DISK ? safeNum(window.LAST_NUC_DISK.usedPercent, null) : null;
+          nodeStorage.querySelector('.chaos-node-status').textContent = diskPct !== null ? `Healthy (${Math.round(diskPct)}% Pool)` : 'Healthy (Pool Online)';
           nodeStorage.querySelector('.chaos-node-status').className = 'chaos-node-status ok';
           card.classList.remove('active-fault');
 
@@ -7000,13 +7026,14 @@
       chaosState.faults.ddosFlood = false;
       chaosState.faults.diskFull = false;
 
+      const restoredDiskPct = window.LAST_NUC_DISK ? safeNum(window.LAST_NUC_DISK.usedPercent, null) : null;
       const nodes = [
         { id: 'c-node-bell', status: '1.5 Gbps (Optimal)' },
         { id: 'c-node-vpn', status: 'Encrypted (WireGuard)' },
         { id: 'c-node-nuc', status: 'Online (24/7 Node)' },
         { id: 'c-node-desktop', status: window.DESKTOP_IS_ONLINE ? 'Online (2.5 GbE)' : 'Standby (Eco Mode)' },
         { id: 'c-node-cf', status: 'Active (Zero Trust)' },
-        { id: 'c-node-storage', status: (window.LAST_NUC_DISK && Number.isFinite(Number(window.LAST_NUC_DISK.usedPercent))) ? `Healthy (${Math.round(Number(window.LAST_NUC_DISK.usedPercent))}% Pool)` : 'Healthy (Pool Online)' }
+        { id: 'c-node-storage', status: restoredDiskPct !== null ? `Healthy (${Math.round(restoredDiskPct)}% Pool)` : 'Healthy (Pool Online)' }
       ];
 
       nodes.forEach(n => {
@@ -7426,10 +7453,10 @@
       playChaosTone(440, 880, 'sine', 0.15);
 
       const renderSpeedtestResult = (latest, timedOut) => {
-        const rawPing = (latest.pingAvgMs !== undefined && latest.pingAvgMs !== null && latest.pingAvgMs !== '') ? Number(latest.pingAvgMs) : NaN;
+        const rawPing = latest ? safeNum(latest.pingAvgMs, NaN) : NaN;
         const pingStr = Number.isFinite(rawPing) ? rawPing.toFixed(1) : '--';
-        const rawDown = (latest.downloadMbps !== undefined && latest.downloadMbps !== null) ? Number(latest.downloadMbps) : ((latest.downMbps !== undefined && latest.downMbps !== null) ? Number(latest.downMbps) : null);
-        const rawUp = (latest.uploadMbps !== undefined && latest.uploadMbps !== null) ? Number(latest.uploadMbps) : ((latest.upMbps !== undefined && latest.upMbps !== null) ? Number(latest.upMbps) : null);
+        const rawDown = latest ? safeNum(latest.downloadMbps, safeNum(latest.downMbps, null)) : null;
+        const rawUp = latest ? safeNum(latest.uploadMbps, safeNum(latest.upMbps, null)) : null;
         const downStr = (rawDown !== null && Number.isFinite(rawDown)) ? String(rawDown) : '--';
         const upStr = (rawUp !== null && Number.isFinite(rawUp)) ? String(rawUp) : '--';
         const realCarrier = latest.isp || carrier;
