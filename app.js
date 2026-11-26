@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.53';
+          const activeVer = match ? match[0] : 'v2.9.54';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 26933;
-      const baseCssLines = 7815;
-      const baseJsLines = 10008;
+      const baseHtmlLines = 27037;
+      const baseCssLines = 7854;
+      const baseJsLines = 10012;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -319,11 +319,15 @@
     }
 
     function initLayoutMode() {
-      const stored = getStoredLayoutMode();
+      let stored = getStoredLayoutMode();
       let mode;
       if (stored === 'mobile' || stored === 'desktop') {
         mode = stored;
       } else {
+        if (stored !== null && stored !== undefined) {
+          try { localStorage.removeItem('dr_layout_mode'); } catch (e) {}
+        }
+        stored = null;
         mode = detectMobileDevice() ? 'mobile' : 'desktop';
       }
       setLayoutMode(mode, false);
