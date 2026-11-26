@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.35';
+          const activeVer = match ? match[0] : 'v2.9.36';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 25062;
+      const baseHtmlLines = 25190;
       const baseCssLines = 7623;
-      const baseJsLines = 9449;
+      const baseJsLines = 9478;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -2004,6 +2004,7 @@
           if (hasServicesDom()) fetchServicesHealth();
           if (hasFeederDom() && typeof fetchFeederStatus === 'function') fetchFeederStatus();
           if (hasTermDom() && currentLogTab && isSSOAuthenticated()) loadLog(currentLogTab, true);
+          if (typeof updateMaintenanceModalUI === 'function' && typeof isNucMaintenanceActive === 'function' && isNucMaintenanceActive()) updateMaintenanceModalUI();
         }
       });
 
@@ -2607,8 +2608,12 @@
       });
     }
 
+    let _agySessionInFlight = null;
     function fetchAgySessionInfo(callback) {
-      return fetch(`${GATEWAY}/api/agy/session`, { credentials: 'include', signal: _fetchSig(6000) })
+      if (_agySessionInFlight) {
+        return callback ? _agySessionInFlight.then(d => { callback(d); return d; }) : _agySessionInFlight;
+      }
+      _agySessionInFlight = fetch(`${GATEWAY}/api/agy/session`, { credentials: 'include', signal: _fetchSig(6000) })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(data => {
           if (data) {
@@ -2633,7 +2638,11 @@
           updateAgySessionDisplay(window.AGY_SESSION_ID || '', window.AGY_SESSION_ID ? window.AGY_SESSION_NAME : 'Unavailable (Gateway Offline)', window.AGY_SESSION_HOST || null);
           if (callback) callback(null);
           return null;
+        })
+        .finally(() => {
+          _agySessionInFlight = null;
         });
+      return _agySessionInFlight;
     }
 
     let _agyLaunchInFlight = false;
@@ -3632,8 +3641,10 @@
     }
     window.updateClimateUI = updateClimateUI;
 
+    let _climateInFlight = null;
     function fetchClimateData() {
-      return fetch(`${GATEWAY}/climate`, { credentials: 'include', cache: 'no-store', signal: _fetchSig(5000) })
+      if (_climateInFlight) return _climateInFlight;
+      _climateInFlight = fetch(`${GATEWAY}/climate`, { credentials: 'include', cache: 'no-store', signal: _fetchSig(5000) })
         .then(r => r.ok ? r.json() : null)
         .then(d => {
           if (d && d.climate && typeof updateClimateUI === 'function') {
@@ -3641,7 +3652,11 @@
           }
           return d;
         })
-        .catch(() => null);
+        .catch(() => null)
+        .finally(() => {
+          _climateInFlight = null;
+        });
+      return _climateInFlight;
     }
     window.fetchClimateData = fetchClimateData;
 
@@ -3800,7 +3815,9 @@
 
     // ISP Diagnostics & History Poller
     let _ispHistorySeq = 0;
-    function fetchISPHistory() {
+    let _ispHistoryInFlight = null;
+    function fetchISPHistory(force = false) {
+      if (_ispHistoryInFlight && !force) return _ispHistoryInFlight;
       const reqSeq = ++_ispHistorySeq;
       const numField = (v, fb) => (v !== null && v !== undefined && v !== '' && Number.isFinite(Number(v))) ? Number(v) : fb;
       const fmtVal = (v, suffix = '') => (v !== null && v !== undefined && Number.isFinite(Number(v))) ? `${Number(v)}${suffix}` : '--';
@@ -3981,7 +3998,7 @@
         if (typeof initSparklineHeartbeat === 'function') initSparklineHeartbeat();
       };
 
-      return fetch(`${GATEWAY}/api/isp-health`, { credentials: 'include', signal: _fetchSig(6000) })
+      _ispHistoryInFlight = fetch(`${GATEWAY}/api/isp-health`, { credentials: 'include', signal: _fetchSig(6000) })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(data => {
           if (reqSeq !== _ispHistorySeq) return null;
@@ -4042,7 +4059,11 @@
               }
               return null;
             });
+        })
+        .finally(() => {
+          if (reqSeq === _ispHistorySeq) _ispHistoryInFlight = null;
         });
+      return _ispHistoryInFlight;
     }
 
     let _ispPollInterval = null;
@@ -4575,7 +4596,9 @@
           }
         };
         renderMaintBanner();
-        maintCountdownInterval = setInterval(renderMaintBanner, 1000);
+        maintCountdownInterval = setInterval(() => {
+          if (!document.hidden) renderMaintBanner();
+        }, 1000);
       } else {
         if (banner) { banner.style.background = 'rgba(16, 185, 129, 0.1)'; banner.style.borderColor = 'rgba(16, 185, 129, 0.3)'; }
         if (dot) { dot.style.background = '#10b981'; dot.style.boxShadow = '0 0 8px #10b981'; }
@@ -4765,6 +4788,7 @@
     window.updateMaintenanceVisualStates = updateMaintenanceVisualStates;
     // 90-Day Uptime Matrix & Sparkline Controller
     let _uptimeReqSeq = 0;
+    let _uptimeMatrixInFlight = null;
     function renderUptimeMatrix() {
       const reqSeq = ++_uptimeReqSeq;
       const nodes = [
@@ -5102,7 +5126,8 @@
           setEl('#uptime-desktop-sla-val', 'Sign in for SLA');
           return null;
         };
-        return fetch(`${GATEWAY}/uptime`, { credentials: 'include', signal: _fetchSig(10000) })
+        if (_uptimeMatrixInFlight) return _uptimeMatrixInFlight;
+        _uptimeMatrixInFlight = fetch(`${GATEWAY}/uptime`, { credentials: 'include', signal: _fetchSig(10000) })
           .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
           .then(handleUptimePayload)
           .catch(() => {
@@ -5114,7 +5139,11 @@
                 .catch(applyUptimeSsoFallback);
             }
             return applyUptimeSsoFallback();
+          })
+          .finally(() => {
+            _uptimeMatrixInFlight = null;
           });
+        return _uptimeMatrixInFlight;
       }
       return Promise.resolve(null);
     }

@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-26T10:35:31Z",
-    "currentVersion":  "v2.9.35",
+    "updatedAt":  "2026-11-26T10:44:46Z",
+    "currentVersion":  "v2.9.36",
     "releases":  [
+                     {
+                         "version":  "v2.9.36",
+                         "date":  "November 26, 2026",
+                         "title":  "Background-Tab Efficiency \u0026 In-Flight Poll Guards",
+                         "changes":  [
+                                         {
+                                             "label":  "Background-Tab Pause",
+                                             "text":  "Paused AI detection rAF loop (ai.html), WebRTC UTC clock mutations (webrtc.html), and maintenance countdown ticks (app.js) when document.hidden is true with automatic visibilitychange resume"
+                                         },
+                                         {
+                                             "label":  "In-Flight Poll Guards",
+                                             "text":  "Added _climateInFlight, _ispHistoryInFlight, _uptimeMatrixInFlight, and _agySessionInFlight deduplication guards in app.js to prevent overlapping slow async poll fetches"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.35",
                          "date":  "November 26, 2026",

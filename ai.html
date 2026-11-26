@@ -1127,21 +1127,32 @@
 
     // 4. Memory-Safe Real-Time Detection Inference Loop
     function startDetectionLoop() {
-      if (!aiModel || isDetecting) return;
+      if (!aiModel || isDetecting || document.hidden) return;
       isDetecting = true;
 
       async function detectFrame() {
         detectionRafId = null;
-        if (!isDetecting) return;
+        if (!isDetecting || document.hidden) {
+          isDetecting = false;
+          return;
+        }
         if (!aiModel || video.readyState < 2 || video.paused || video.ended || video.videoWidth === 0) {
-          detectionRafId = requestAnimationFrame(detectFrame);
+          if (isDetecting && !document.hidden) {
+            detectionRafId = requestAnimationFrame(detectFrame);
+          } else {
+            isDetecting = false;
+          }
           return;
         }
 
         const now = performance.now();
         // ~10 FPS loop maintains instantaneous responsiveness with 0% CPU strain
         if (now - lastInferenceTimestamp < 95) {
-          detectionRafId = requestAnimationFrame(detectFrame);
+          if (isDetecting && !document.hidden) {
+            detectionRafId = requestAnimationFrame(detectFrame);
+          } else {
+            isDetecting = false;
+          }
           return;
         }
         lastInferenceTimestamp = now;
@@ -1149,7 +1160,10 @@
         const startTime = performance.now();
         try {
           const predictions = await aiModel.detect(video, 12, detectionThreshold);
-          if (!isDetecting) return;
+          if (!isDetecting || document.hidden) {
+            isDetecting = false;
+            return;
+          }
           const duration = Math.round(performance.now() - startTime);
           inferenceTimeEl.textContent = `${duration} ms`;
 
@@ -1158,13 +1172,27 @@
           console.warn("Inference error:", e);
         }
 
-        if (isDetecting) {
+        if (isDetecting && !document.hidden) {
           detectionRafId = requestAnimationFrame(detectFrame);
+        } else {
+          isDetecting = false;
         }
       }
 
       detectionRafId = requestAnimationFrame(detectFrame);
     }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        isDetecting = false;
+        if (detectionRafId) {
+          cancelAnimationFrame(detectionRafId);
+          detectionRafId = null;
+        }
+      } else if (aiModel && video.readyState >= 2) {
+        startDetectionLoop();
+      }
+    });
 
     // Optical Feeder Food Level Red Beacon Detector state (module scope)
     const hopperBeaconBadge = document.getElementById('hopper-beacon-badge');
