@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.43';
+          const activeVer = match ? match[0] : 'v2.9.44';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 25905;
+      const baseHtmlLines = 26001;
       const baseCssLines = 7752;
-      const baseJsLines = 9790;
+      const baseJsLines = 9803;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -2124,6 +2124,12 @@
           httpErr.status = res.status;
           throw httpErr;
         }
+        const contentType = (res.headers && typeof res.headers.get === 'function' ? (res.headers.get('content-type') || '') : '').toLowerCase();
+        if (contentType && !contentType.includes('application/json')) {
+          const redirectErr = new Error('CF Access HTML Redirect');
+          redirectErr.status = 401;
+          throw redirectErr;
+        }
         const data = await res.json();
         if (!data || data.status !== 'authorized') {
           const authErr = new Error('Unauthorized');
@@ -2145,7 +2151,8 @@
         const isHttpsWan = window.location.protocol === 'https:' && /(^|\.)digitalresolve\.ca$/i.test(window.location.hostname);
         const isCorsAuthBlock = isHttpsWan && err && err.name === 'TypeError' && !status;
         const isTransient = !isCorsAuthBlock && ((err && (err.name === 'AbortError' || err.name === 'TimeoutError' || err.name === 'TypeError')) || [502, 503, 504, 530].includes(status));
-        const isAuthFailure = !isTransient && (status === 401 || status === 403 || isCorsAuthBlock);
+        const isSyntaxAuthRedirect = Boolean(err && err.name === 'SyntaxError');
+        const isAuthFailure = !isTransient && (status === 401 || status === 403 || isCorsAuthBlock || isSyntaxAuthRedirect);
         let syncAttempted = false;
         try { syncAttempted = Boolean(sessionStorage.getItem('dr_sso_sync_attempted')); } catch(e) {}
         if (autoRedirect && isAuthFailure && /(^|\.)digitalresolve\.ca$/i.test(window.location.hostname) && !syncAttempted) {
@@ -5842,6 +5849,7 @@
           if (_servicesHealthCtrl === controller) _servicesHealthCtrl = null;
           if (reqSeq !== _servicesHealthSeq) return null;
           if (data && (data.services || data.status === 'success')) {
+            window._servicesHealthFailCount = 0;
             window._servicesHealthFailed = false;
             window.LAST_SERVICES_HEALTH = data;
             updateServiceDashboardUI(data);
@@ -5855,6 +5863,11 @@
           if (timeoutId) clearTimeout(timeoutId);
           if (_servicesHealthCtrl === controller) _servicesHealthCtrl = null;
           if (reqSeq !== _servicesHealthSeq) return null;
+          const failCount = (window._servicesHealthFailCount || 0) + 1;
+          window._servicesHealthFailCount = failCount;
+          if (failCount < 2 && window.LAST_SERVICES_HEALTH) {
+            return window.LAST_SERVICES_HEALTH;
+          }
           window.LAST_SERVICES_HEALTH = null;
           window._hasLiveServicesHealth = false;
           window._servicesHealthFailed = true;

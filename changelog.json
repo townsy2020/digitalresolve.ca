@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-26T16:26:49Z",
-    "currentVersion":  "v2.9.43",
+    "updatedAt":  "2026-11-26T17:52:30Z",
+    "currentVersion":  "v2.9.44",
     "releases":  [
+                     {
+                         "version":  "v2.9.44",
+                         "date":  "November 26, 2026",
+                         "title":  "Cloudflare SSO \u0026 Services Telemetry Resilience",
+                         "changes":  [
+                                         {
+                                             "label":  "CF Access HTML Redirect Detection",
+                                             "text":  "Detected HTTP 200 text/html SSO login redirects in syncCloudflareAccessSession so re-authentication triggers cleanly"
+                                         },
+                                         {
+                                             "label":  "Transient Telemetry Glitch Protection",
+                                             "text":  "Preserved last-known Services Health across single transient 502/503 blips before falling back to Telemetry Unavailable"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.43",
                          "date":  "November 26, 2026",
