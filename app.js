@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.42';
+          const activeVer = match ? match[0] : 'v2.9.43';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 25817;
+      const baseHtmlLines = 25905;
       const baseCssLines = 7752;
-      const baseJsLines = 9785;
+      const baseJsLines = 9790;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -3537,7 +3537,7 @@
         let toggleHtml = '';
         if (isRankedMode && totalMatched > 12) {
           const btnLabel = window._absShowAll ? 'Show Top 12' : `Show All (${totalMatched})`;
-          toggleHtml = `<div class="abs-show-all-wrap"><button type="button" id="abs-show-all-btn" class="btn btn-secondary abs-show-all-btn" onclick="toggleAbsShowAll()">${escapeHtml(btnLabel)}</button></div>`;
+          toggleHtml = `<div class="abs-show-all-wrap"><button type="button" id="abs-show-all-btn" class="btn btn-secondary abs-show-all-btn" aria-expanded="${window._absShowAll ? 'true' : 'false'}" onclick="toggleAbsShowAll()">${escapeHtml(btnLabel)}</button></div>`;
         }
 
         grid.innerHTML = cardsHtml + toggleHtml;
@@ -3568,9 +3568,14 @@
     window.sortAbsBooks = sortAbsBooks;
 
     function toggleAbsShowAll() {
+      const hadFocus = Boolean(document.activeElement && document.activeElement.id === 'abs-show-all-btn');
       window._absShowAll = !window._absShowAll;
       if (window._lastAbsData) {
         renderAudiobookshelfGrid(window._lastAbsData, window._absSortKey || 'score');
+      }
+      if (hadFocus) {
+        const nextBtn = document.getElementById('abs-show-all-btn');
+        if (nextBtn) nextBtn.focus();
       }
     }
     window.toggleAbsShowAll = toggleAbsShowAll;
