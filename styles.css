@@ -540,6 +540,7 @@ button.dropdown-item:active,
   backdrop-filter: blur(12px);
   z-index: 99999;
   max-width: 360px;
+  overflow-wrap: anywhere;
   transform: translateY(80px);
   opacity: 0;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -4057,6 +4058,10 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
     max-width: calc(100vw - 24px);
   }
 
+  .wol-toast {
+    right: 12px;
+  }
+
   html:not(.desktop-layout) .nav-menu-toggle,
   html.mobile-layout .nav-menu-toggle {
     display: inline-flex !important;
@@ -5761,6 +5766,7 @@ html.mobile-layout .penny-hub-grid {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
@@ -5768,6 +5774,7 @@ html.mobile-layout .penny-hub-grid {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
 }
 
 .dash-card-icon {
