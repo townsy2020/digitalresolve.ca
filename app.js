@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.41';
+          const activeVer = match ? match[0] : 'v2.9.42';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 25721;
+      const baseHtmlLines = 25817;
       const baseCssLines = 7752;
-      const baseJsLines = 9784;
+      const baseJsLines = 9785;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -3603,13 +3603,14 @@
       }
       if ((data.status === 'success' || data.nuc) && data.nuc) {
         const nuc = data.nuc;
-        if (!isCached && nuc.swarm && nuc.online !== false) {
+        const nucOnline = isCached ? false : (nuc.online !== false);
+        if (nucOnline && nuc.swarm) {
           window.LAST_SWARM = nuc.swarm;
-        } else if (nuc.online === false || nuc.swarm === null) {
+        } else if (!nucOnline || nuc.swarm === null) {
           window.LAST_SWARM = null;
         }
         updateStatusUI('nuc', isCached ? false : Boolean(nuc.online), isCached ? null : nuc.latencyMs, nuc.disk, isCached ? null : nuc.swarm, isCached ? null : nuc.vitals);
-        if (nuc.swarm && nuc.online !== false) {
+        if (nucOnline && nuc.swarm) {
           const sw = nuc.swarm;
           if (typeof updateHealthRadarUI === 'function') {
             updateHealthRadarUI({ vpnExitIp: sw.vpnExitIp });
@@ -3663,13 +3664,13 @@
             }
           }
         } else {
-          if (nuc.online === false || nuc.swarm === null) window.LAST_SWARM = null;
+          if (!nucOnline || nuc.swarm === null) window.LAST_SWARM = null;
           const swTag = document.getElementById('swarm-tag');
-          if (swTag && (swTag.textContent === 'Checking...' || !nuc.online || nuc.swarm === null)) {
+          if (swTag && (swTag.textContent === 'Checking...' || !nucOnline || nuc.swarm === null)) {
             swTag.textContent = 'Offline';
             swTag.className = 'item-tag offline';
           }
-          if (!nuc.online || nuc.swarm === null) {
+          if (!nucOnline || nuc.swarm === null) {
             const swAct = document.getElementById('stat-swarm-active');
             const dht = document.getElementById('stat-dht');
             const vpnIp = document.getElementById('stat-vpn-ip');
@@ -3694,12 +3695,12 @@
 
         const cpuVal = document.getElementById('stat-cpu-val');
         const ramSub = document.getElementById('stat-ram-sub');
-        const nucCpu = safeNum(nuc.cpuLoad, null);
+        const nucCpu = nucOnline ? safeNum(nuc.cpuLoad, null) : null;
         if (cpuVal) cpuVal.innerHTML = nucCpu !== null ? `${nucCpu}% <span style="font-size: 0.9rem; color: #8b949e;">CPU</span>` : `-- <span style="font-size: 0.9rem; color: #8b949e;">CPU</span>`;
         if (ramSub) {
-          if (nuc.online !== false && nuc.vitals) {
+          if (nucOnline && nuc.vitals) {
             ramSub.textContent = `Memory: ${safeNum(nuc.vitals.ramUsedGB, 0)} GB / ${safeNum(nuc.vitals.ramTotalGB, 0)} GB (${safeNum(nuc.vitals.ramPercent, 0)}%) | ${nuc.vitals.uptime || '--'} up`;
-          } else if (nuc.online === false || nuc.vitals === null) {
+          } else if (!nucOnline || nuc.vitals === null) {
             ramSub.textContent = 'Memory: --';
           }
         }
@@ -3787,7 +3788,7 @@
         updateCamerasUI(data.cameras);
       }
       if (data.climate) {
-        updateClimateUI(data.climate);
+        updateClimateUI(isCached ? Object.assign({}, data.climate, { online: false, tempF: null, tempC: null, humidity: null, leakSensor: null }) : data.climate);
       }
       if (data.audiobooks && typeof renderAudiobookshelfGrid === 'function') {
         renderAudiobookshelfGrid(data.audiobooks);
