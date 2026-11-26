@@ -667,6 +667,12 @@
     }
     window.cleanupStream = cleanupStream;
     window.addEventListener('pagehide', cleanupStream);
+    window.addEventListener('pageshow', (e) => {
+      if (e.persisted) {
+        showSpinner('Connecting Live Stream...');
+        initStream();
+      }
+    });
     window.addEventListener('beforeunload', cleanupStream);
 
     function reconnect() {
@@ -702,6 +708,10 @@
     function markStreamOnline(modeLabel) {
       if (streamConnected) return;
       streamConnected = true;
+      if (reconnectTimeout) {
+        clearTimeout(reconnectTimeout);
+        reconnectTimeout = null;
+      }
       if (frameTimeout) {
         clearTimeout(frameTimeout);
         frameTimeout = null;
@@ -1040,6 +1050,7 @@
         if (handled || ws !== sock) return;
         handled = true;
         clearTimeout(timeout);
+        if (reconnectTimeout) { clearTimeout(reconnectTimeout); reconnectTimeout = null; }
         if (frameTimeout) { clearTimeout(frameTimeout); frameTimeout = null; }
         try { sock.close(); } catch (e) {}
         if (pc) {

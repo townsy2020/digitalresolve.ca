@@ -441,6 +441,9 @@
     let temporalTrackingEnabled = true;
     let isDetecting = false;
     let detectionRafId = null;
+    let detectionBackoffTimer = null;
+    let detectionLoopGen = 0;
+    let detectionErrorBackoffMs = 0;
     let lastInferenceTimestamp = 0;
     let reconnectTimeout = null;
     let reconnectAttempts = 0;
@@ -566,12 +569,22 @@
     let streamConnected = false;
     let currentObjectUrl = null;
 
-    function cleanupStream() {
+    function stopDetectionLoop() {
+      detectionLoopGen++;
       isDetecting = false;
       if (detectionRafId !== null) {
         cancelAnimationFrame(detectionRafId);
         detectionRafId = null;
       }
+      if (detectionBackoffTimer !== null) {
+        clearTimeout(detectionBackoffTimer);
+        detectionBackoffTimer = null;
+      }
+      detectionErrorBackoffMs = 0;
+    }
+
+    function cleanupStream() {
+      stopDetectionLoop();
       if (reconnectTimeout) {
         clearTimeout(reconnectTimeout);
         reconnectTimeout = null;
@@ -637,6 +650,9 @@
     }
     window.cleanupStream = cleanupStream;
     window.addEventListener('pagehide', cleanupStream);
+    window.addEventListener('pageshow', (e) => {
+      if (e.persisted) initStream();
+    });
     window.addEventListener('beforeunload', cleanupStream);
 
     function getStreamEndpoints(src) {
@@ -986,6 +1002,7 @@
         if (handled || ws !== sock) return;
         handled = true;
         clearTimeout(timeout);
+        if (reconnectTimeout) { clearTimeout(reconnectTimeout); reconnectTimeout = null; }
         if (frameTimeout) { clearTimeout(frameTimeout); frameTimeout = null; }
         try { sock.close(); } catch (e) {}
         if (pc) {
@@ -1072,6 +1089,10 @@
       if (streamConnected) return;
       streamConnected = true;
       reconnectAttempts = 0;
+      if (reconnectTimeout) {
+        clearTimeout(reconnectTimeout);
+        reconnectTimeout = null;
+      }
       if (frameTimeout) {
         clearTimeout(frameTimeout);
         frameTimeout = null;
@@ -1135,18 +1156,30 @@
     // 4. Memory-Safe Real-Time Detection Inference Loop
     function startDetectionLoop() {
       if (!aiModel || isDetecting || document.hidden) return;
+      if (detectionRafId !== null) {
+        cancelAnimationFrame(detectionRafId);
+        detectionRafId = null;
+      }
+      if (detectionBackoffTimer !== null) {
+        clearTimeout(detectionBackoffTimer);
+        detectionBackoffTimer = null;
+      }
+      detectionLoopGen++;
+      const myGen = detectionLoopGen;
       isDetecting = true;
+      detectionErrorBackoffMs = 0;
 
       async function detectFrame() {
+        if (myGen !== detectionLoopGen) return;
         detectionRafId = null;
         if (!isDetecting || document.hidden) {
           isDetecting = false;
           return;
         }
         if (!aiModel || video.readyState < 2 || video.paused || video.ended || video.videoWidth === 0) {
-          if (isDetecting && !document.hidden) {
+          if (myGen === detectionLoopGen && isDetecting && !document.hidden) {
             detectionRafId = requestAnimationFrame(detectFrame);
-          } else {
+          } else if (myGen === detectionLoopGen) {
             isDetecting = false;
           }
           return;
@@ -1155,9 +1188,9 @@
         const now = performance.now();
         // ~10 FPS loop maintains instantaneous responsiveness with 0% CPU strain
         if (now - lastInferenceTimestamp < 95) {
-          if (isDetecting && !document.hidden) {
+          if (myGen === detectionLoopGen && isDetecting && !document.hidden) {
             detectionRafId = requestAnimationFrame(detectFrame);
-          } else {
+          } else if (myGen === detectionLoopGen) {
             isDetecting = false;
           }
           return;
@@ -1167,22 +1200,34 @@
         const startTime = performance.now();
         try {
           const predictions = await aiModel.detect(video, 12, detectionThreshold);
-          if (!isDetecting || document.hidden) {
-            isDetecting = false;
+          if (myGen !== detectionLoopGen || !isDetecting || document.hidden) {
+            if (myGen === detectionLoopGen) isDetecting = false;
             return;
           }
+          detectionErrorBackoffMs = 0;
           const duration = Math.round(performance.now() - startTime);
           inferenceTimeEl.textContent = `${duration} ms`;
 
           processDetections(predictions);
         } catch (e) {
+          if (myGen !== detectionLoopGen) return;
           console.warn("Inference error:", e);
+          detectionErrorBackoffMs = detectionErrorBackoffMs < 250 ? 250 : (detectionErrorBackoffMs < 1000 ? 1000 : 2000);
         }
 
-        if (isDetecting && !document.hidden) {
-          detectionRafId = requestAnimationFrame(detectFrame);
+        if (myGen !== detectionLoopGen || !isDetecting || document.hidden) {
+          if (myGen === detectionLoopGen) isDetecting = false;
+          return;
+        }
+        if (detectionErrorBackoffMs > 0) {
+          detectionBackoffTimer = setTimeout(() => {
+            detectionBackoffTimer = null;
+            if (myGen === detectionLoopGen && isDetecting && !document.hidden) {
+              detectionRafId = requestAnimationFrame(detectFrame);
+            }
+          }, detectionErrorBackoffMs);
         } else {
-          isDetecting = false;
+          detectionRafId = requestAnimationFrame(detectFrame);
         }
       }
 
@@ -1191,11 +1236,7 @@
 
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
-        isDetecting = false;
-        if (detectionRafId) {
-          cancelAnimationFrame(detectionRafId);
-          detectionRafId = null;
-        }
+        stopDetectionLoop();
       } else if (aiModel && video.readyState >= 2) {
         startDetectionLoop();
       }
