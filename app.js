@@ -166,14 +166,14 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.34';
+          const activeVer = match ? match[0] : 'v2.9.35';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 24939;
+      const baseHtmlLines = 25062;
       const baseCssLines = 7623;
       const baseJsLines = 9449;
       const baseCnameLines = 1;
@@ -7523,7 +7523,7 @@
             <div style="font-weight: 700; color: #f8fafc; font-size: 0.9rem;">Android &amp; Android TV / Fire OS</div>
             <div style="display: flex; gap: 6px;">
               <a href="https://play.google.com/store/apps/details?id=com.tailscale.ipn" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="font-size: 0.78rem; padding: 6px 12px; background: linear-gradient(135deg, #06b6d4, #0284c7); border-color: #06b6d4; color: #fff !important; text-decoration: none;">Google Play</a>
-              <a href="https://pkgs.tailscale.com/stable/tailscale-latest-arm64.apk" class="btn btn-secondary" style="font-size: 0.78rem; padding: 6px 12px; text-decoration: none;">Direct APK</a>
+              <a href="https://tailscale.com/download/android" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.78rem; padding: 6px 12px; text-decoration: none;">Direct Download</a>
             </div>
           </div>
           <p style="font-size: 0.8rem; color: #94a3b8; margin: 0; line-height: 1.4;">Compatible with phones, tablets, and TV boxes. Sideloadable direct APK or Google Play install.</p>

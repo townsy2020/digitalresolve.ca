@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DigitalResolve &bull; Real-Time AI Vision</title>
+  <meta name="description" content="Digital Resolve Real-Time AI Vision - Client-side TensorFlow.js COCO-SSD pet detection and live camera telemetry.">
+  <link rel="canonical" href="https://digitalresolve.ca/ai.html" />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b0f17'/%3E%3Cpath d='M8 22V10h7a6 6 0 0 1 0 12H8zm4-3.5h3a2.5 2.5 0 0 0 0-5h-3v5z' fill='%2338bdf8'/%3E%3C/svg%3E">
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js" integrity="sha384-R4iglwC8w7UAyfRq7VUmXEPjrvYnoXIqhsbTUN07o6o8yKYeiTY0/Z6DzbsKgWZ3" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js" integrity="sha384-7qLdgfEQyO9ZQi9ArRHigK+IBto4XPk468jAqc+fnsXaZIcMAhQeLwzggRK7aESl" crossorigin="anonymous"></script>
@@ -504,6 +506,8 @@
         spinnerHideTimer = null;
       }
       if (loadingOverlay) {
+        const spinnerEl = loadingOverlay.querySelector('.spinner');
+        if (spinnerEl) spinnerEl.style.display = '';
         if (text) {
           const msgEl = loadingOverlay.querySelector('div:nth-child(2)');
           if (msgEl) msgEl.textContent = text;
@@ -680,12 +684,25 @@
 
     function connectEndpoint(endpoints, idx) {
       if (idx >= endpoints.length) {
-        hideSpinner();
-        if (window.location.protocol === 'https:' && !streamConnected && loadingOverlay) {
+        if (!streamConnected && loadingOverlay) {
+          if (spinnerHideTimer) {
+            clearTimeout(spinnerHideTimer);
+            spinnerHideTimer = null;
+          }
+          const spinnerEl = loadingOverlay.querySelector('.spinner');
+          if (spinnerEl) spinnerEl.style.display = 'none';
+          loadingOverlay.style.display = 'flex';
+          loadingOverlay.style.opacity = '1';
           const msgEl = loadingOverlay.querySelector('div:nth-child(2)');
           if (msgEl) {
-            msgEl.innerHTML = 'Stream requires <a href="https://cam.digitalresolve.ca/" target="_blank" rel="noopener noreferrer" style="color:#38bdf8;text-decoration:underline;">CF Access SSO</a> &bull; Retrying...';
+            if (window.location.protocol === 'https:') {
+              msgEl.innerHTML = 'Stream requires <a href="https://cam.digitalresolve.ca/" target="_blank" rel="noopener noreferrer" style="color:#38bdf8;text-decoration:underline;">CF Access SSO</a> &bull; Retrying...';
+            } else {
+              msgEl.textContent = 'Stream Offline \u2022 Retrying...';
+            }
           }
+        } else {
+          hideSpinner();
         }
         scheduleReconnect();
         return;
