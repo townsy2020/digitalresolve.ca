@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.29';
+          const activeVer = match ? match[0] : 'v2.9.30';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 24426;
+      const baseHtmlLines = 24522;
       const baseCssLines = 7621;
-      const baseJsLines = 9309;
+      const baseJsLines = 9340;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -1172,7 +1172,7 @@
             el.textContent = '--';
           });
           if (typeof initSparklineHeartbeat === 'function') initSparklineHeartbeat();
-        } else if (latencyMs !== null && Number.isFinite(Number(latencyMs)) && (Number(latencyMs) > 0 || !(Number(window.LAST_NUC_LATENCY) > 0))) {
+        } else if (latencyMs !== null && latencyMs !== undefined && latencyMs !== '' && Number.isFinite(Number(latencyMs))) {
           window.LAST_NUC_LATENCY = Number(latencyMs);
           document.querySelectorAll('#spark-leg-nuc').forEach(el => {
             el.textContent = `${Number(latencyMs).toFixed(1)} ms`;
@@ -2207,9 +2207,19 @@
         if (modalInput) modalInput.style.display = 'flex';
         if (modalTitle) modalTitle.innerHTML = 'Antigravity (AGY) Live Terminal | <span class="mono" style="color: #60a5fa;">' + escapeHtml(window.AGY_SESSION_NAME || (window.AGY_SESSION_ID ? ('Session (' + window.AGY_SESSION_ID.substring(0,8) + ')') : 'Detecting active session...')) + '</span>';
         const isAgyNuc = (window.AGY_SESSION_HOST === 'nuc');
-        const activeHostOnline = isAgyNuc ? (window.NUC_IS_ONLINE !== false) : (window.DESKTOP_IS_ONLINE !== undefined ? window.DESKTOP_IS_ONLINE : true);
+        const isAgyDesk = (window.AGY_SESSION_HOST === 'desktop');
+        const activeHostOnline = isAgyNuc
+          ? (window.NUC_IS_ONLINE !== false)
+          : (isAgyDesk ? (window.DESKTOP_IS_ONLINE !== false) : (window.NUC_IS_ONLINE === true || window.DESKTOP_IS_ONLINE === true));
         if (modalPulse) { modalPulse.style.background = activeHostOnline ? '#10b981' : '#6366f1'; modalPulse.style.boxShadow = activeHostOnline ? '0 0 8px #10b981' : '0 0 8px #6366f1'; }
-        if (modalStatus) { modalStatus.textContent = activeHostOnline ? (isAgyNuc ? 'ONLINE (NUC :8082)' : 'ONLINE (Desktop :8082)') : (isAgyNuc ? 'OFFLINE (NUC Unreachable)' : 'STANDBY (Desktop Sleeping • WoL Ready)'); modalStatus.className = `item-tag ${activeHostOnline ? 'online' : 'offline'}`; }
+        if (modalStatus) {
+          modalStatus.textContent = isAgyNuc
+            ? (activeHostOnline ? 'ONLINE (NUC :8082)' : 'OFFLINE (NUC Unreachable)')
+            : (isAgyDesk
+              ? (activeHostOnline ? 'ONLINE (Desktop :8082)' : 'STANDBY (Desktop Sleeping • WoL Ready)')
+              : (activeHostOnline ? 'ONLINE (Auto-Detect)' : 'STANDBY (Awaiting Host)'));
+          modalStatus.className = `item-tag ${activeHostOnline ? 'online' : 'offline'}`;
+        }
 
         // External WAN IPv4 (Exposed only when MFA/SSO authenticated)
         const ispIpSub = document.getElementById('isp-ip-sub');
@@ -2504,7 +2514,11 @@
       }
       window.AGY_SESSION_NAME = name;
       const sName = window.AGY_SESSION_NAME;
-      const isOnline = activeHost === 'nuc' ? (window.NUC_IS_ONLINE !== false) : (window.DESKTOP_IS_ONLINE !== undefined ? window.DESKTOP_IS_ONLINE : true);
+      const isOnline = activeHost === 'nuc'
+        ? (window.NUC_IS_ONLINE !== false)
+        : (activeHost === 'desktop'
+          ? (window.DESKTOP_IS_ONLINE === true)
+          : (window.NUC_IS_ONLINE === true || window.DESKTOP_IS_ONLINE === true));
       const hostLabel = activeHost === 'nuc' ? 'NUC Core Server (24/7)' : (activeHost === 'desktop' ? 'Desktop Workstation' : 'Auto-Detect (NUC / Desktop)');
 
       const tab = document.getElementById('tab-agy');
@@ -2540,8 +2554,11 @@
         } else if (activeHost === 'nuc') {
           modalStatus.textContent = (window.NUC_IS_ONLINE !== false) ? 'ONLINE (NUC :8082)' : 'OFFLINE (NUC Unreachable)';
           modalStatus.className = `item-tag ${(window.NUC_IS_ONLINE !== false) ? 'online' : 'offline'}`;
-        } else {
+        } else if (activeHost === 'desktop') {
           modalStatus.textContent = isOnline ? 'ONLINE (Desktop :8082)' : 'STANDBY (Desktop Sleeping • WoL Ready)';
+          modalStatus.className = `item-tag ${isOnline ? 'online' : 'offline'}`;
+        } else {
+          modalStatus.textContent = isOnline ? 'ONLINE (Auto-Detect)' : 'STANDBY (Awaiting Host)';
           modalStatus.className = `item-tag ${isOnline ? 'online' : 'offline'}`;
         }
       }
@@ -2886,9 +2903,9 @@
         metrics = getLiveTokenMetrics();
       } else {
         const defMetrics = getLiveTokenMetrics() || {};
-        const inResolved = Number(metrics.input !== undefined ? metrics.input : (metrics.inputTokens || defMetrics.inputTokens)) || 0;
-        const outResolved = Number(metrics.output !== undefined ? metrics.output : (metrics.outputTokens || defMetrics.outputTokens)) || 0;
-        const cacheResolved = Number(metrics.cache !== undefined ? metrics.cache : (metrics.cacheTokens || defMetrics.cacheTokens)) || 0;
+        const inResolved = Number(metrics.input !== undefined ? metrics.input : (metrics.inputTokens ?? defMetrics.inputTokens)) || 0;
+        const outResolved = Number(metrics.output !== undefined ? metrics.output : (metrics.outputTokens ?? defMetrics.outputTokens)) || 0;
+        const cacheResolved = Number(metrics.cache !== undefined ? metrics.cache : (metrics.cacheTokens ?? defMetrics.cacheTokens)) || 0;
         const parsed = {
           inputTokens: inResolved,
           outputTokens: outResolved,
@@ -3276,20 +3293,23 @@
     }
     window.fetchAudiobookshelfFallback = fetchAudiobookshelfFallback;
 
-    function applyClusterStatsPayload(data) {
+    function applyClusterStatsPayload(data, opts = {}) {
       if (!data) return null;
-      try {
-        const prevRaw = localStorage.getItem('dr_cluster_stats');
-        const prev = prevRaw ? JSON.parse(prevRaw) : null;
-        const merged = (prev && typeof prev === 'object') ? Object.assign({}, prev, data) : data;
-        localStorage.setItem('dr_cluster_stats', JSON.stringify(merged));
-      } catch (e) {}
+      const isCached = Boolean(opts && opts.isCachedFallback);
+      if (!isCached) {
+        try {
+          const prevRaw = localStorage.getItem('dr_cluster_stats');
+          const prev = prevRaw ? JSON.parse(prevRaw) : null;
+          const merged = (prev && typeof prev === 'object') ? Object.assign({}, prev, data) : data;
+          localStorage.setItem('dr_cluster_stats', JSON.stringify(merged));
+        } catch (e) {}
+      }
       if ((data.status === 'success' || data.nuc) && data.nuc) {
         const nuc = data.nuc;
-        if (nuc.swarm) {
+        if (!isCached && nuc.swarm) {
           window.LAST_SWARM = nuc.swarm;
         }
-        updateStatusUI('nuc', Boolean(nuc.online), nuc.latencyMs, nuc.disk, nuc.swarm, nuc.vitals);
+        updateStatusUI('nuc', isCached ? false : Boolean(nuc.online), isCached ? null : nuc.latencyMs, nuc.disk, isCached ? null : nuc.swarm, isCached ? null : nuc.vitals);
         if (nuc.swarm) {
           const sw = nuc.swarm;
           if (typeof updateHealthRadarUI === 'function') {
@@ -3419,11 +3439,12 @@
         updateCloudflareStatsUI(data.cloudflare);
       }
       if (data.desktop) {
-        updateStatusUI('desktop', data.desktop.online, data.desktop.latencyMs, data.desktop.disk, data.desktop.torrent, data.desktop.vitals);
+        const deskOnline = isCached ? false : Boolean(data.desktop.online);
+        updateStatusUI('desktop', deskOnline, isCached ? null : data.desktop.latencyMs, data.desktop.disk, isCached ? null : data.desktop.torrent, isCached ? null : data.desktop.vitals);
         const deskCpu = safeNum(data.desktop.cpuLoad, null);
         const sDeskCpu = document.getElementById('stat-desktop-cpu-val');
         const fCpu = document.getElementById('fleet-cpu-desktop');
-        if (data.desktop.online) {
+        if (deskOnline) {
           if (sDeskCpu) sDeskCpu.innerHTML = deskCpu !== null ? `${deskCpu}% <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>` : `-- <span style="font-size: 0.9rem; color: #8b949e; margin-left: 4px;">CPU</span>`;
           if (fCpu) fCpu.textContent = deskCpu !== null ? `AMD Ryzen 7 | ${deskCpu}% Load (8C / 16T)` : 'AMD Ryzen 7 | Online (8C / 16T)';
         } else {
@@ -3583,7 +3604,7 @@
               // Failover Method 2: Hydrate from persistent local storage cache
               try {
                 const cached = localStorage.getItem('dr_cluster_stats');
-                if (cached) return applyClusterStatsPayload(JSON.parse(cached));
+                if (cached) return applyClusterStatsPayload(JSON.parse(cached), { isCachedFallback: true });
               } catch (e) {}
               try { updateCloudflareStatsUI(); } catch (e) {}
               const swTag = document.getElementById('swarm-tag');
@@ -5711,9 +5732,19 @@
               }
             }
             if (statusTag) {
-              const activeHost = (data && data.hostNode) || window.AGY_SESSION_HOST || 'desktop';
-              statusTag.textContent = activeHost === 'nuc' ? 'ONLINE (NUC :8082)' : 'ONLINE (Desktop :8082)';
-              statusTag.className = 'item-tag online';
+              const activeHost = (data && data.hostNode) || window.AGY_SESSION_HOST || null;
+              if (activeHost === 'nuc') {
+                const nucOk = window.NUC_IS_ONLINE !== false;
+                statusTag.textContent = nucOk ? 'ONLINE (NUC :8082)' : 'OFFLINE (NUC Unreachable)';
+                statusTag.className = `item-tag ${nucOk ? 'online' : 'offline'}`;
+              } else if (activeHost === 'desktop') {
+                const deskOk = window.DESKTOP_IS_ONLINE !== false;
+                statusTag.textContent = deskOk ? 'ONLINE (Desktop :8082)' : 'STANDBY (Desktop Sleeping • WoL Ready)';
+                statusTag.className = `item-tag ${deskOk ? 'online' : 'offline'}`;
+              } else {
+                statusTag.textContent = 'ONLINE (Gateway :8082)';
+                statusTag.className = 'item-tag online';
+              }
             }
             if (typeof updateQuotaHistorySparkline === 'function') {
               updateQuotaHistorySparkline();

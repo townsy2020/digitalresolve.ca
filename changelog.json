@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-26T09:22:08Z",
-    "currentVersion":  "v2.9.29",
+    "updatedAt":  "2026-11-26T09:32:43Z",
+    "currentVersion":  "v2.9.30",
     "releases":  [
+                     {
+                         "version":  "v2.9.30",
+                         "date":  "November 26, 2026",
+                         "title":  "Web State \u0026 Telemetry Edge-Case Hardening",
+                         "changes":  [
+                                         {
+                                             "label":  "Zero-Value Telemetry Fidelity",
+                                             "text":  "Fixed falsy-zero token cache fallback in updateTokenCounterUI() and zero-millisecond NUC RTT handling in updateStatusUI()"
+                                         },
+                                         {
+                                             "label":  "Offline Cache \u0026 Host State Accuracy",
+                                             "text":  "Prevented dr_cluster_stats fallback hydration from flipping offline nodes back to online and aligned AGY console host status labels when hostNode is auto-detected or standby"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.29",
                          "date":  "November 26, 2026",
