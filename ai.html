@@ -666,11 +666,18 @@
       showSpinner('Connecting Live Feed...');
 
       const params = new URLSearchParams(window.location.search);
-      let src = (params.get('src') || 'pennys_feeder').toLowerCase();
-      if (src.includes('bedroom') || src.includes('cam2')) {
-        src = src.includes('sd') ? 'bedroom_sd' : 'bedroom';
-      } else {
-        src = src.includes('sd') ? 'pennys_feeder_sd' : 'pennys_feeder';
+      const rawSrc = params.get('src');
+      const norm = (rawSrc || params.get('cam') || 'pennys_feeder').trim().toLowerCase();
+      const q = (!rawSrc && params.get('quality')) ? params.get('quality').trim().toLowerCase() : '';
+      let src = 'pennys_feeder';
+      if (norm === 'bedroom_sd' || norm === 'cam2_sd') {
+        src = 'bedroom_sd';
+      } else if (norm === 'bedroom' || norm === 'cam2') {
+        src = q === 'sd' ? 'bedroom_sd' : 'bedroom';
+      } else if (norm === 'pennys_feeder_sd' || norm === 'cam1_sd') {
+        src = 'pennys_feeder_sd';
+      } else if (norm === 'pennys_feeder' || norm === 'cam1' || norm === '') {
+        src = q === 'sd' ? 'pennys_feeder_sd' : 'pennys_feeder';
       }
       window.ACTIVE_CAM_STREAM = src;
       const resEl = document.getElementById('stream-res');

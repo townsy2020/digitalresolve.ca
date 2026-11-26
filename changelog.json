@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-26T11:01:54Z",
-    "currentVersion":  "v2.9.38",
+    "updatedAt":  "2026-11-26T11:13:35Z",
+    "currentVersion":  "v2.9.39",
     "releases":  [
+                     {
+                         "version":  "v2.9.39",
+                         "date":  "November 26, 2026",
+                         "title":  "Camera Query Allowlist \u0026 URL Parameter Encoding Hardening",
+                         "changes":  [
+                                         {
+                                             "label":  "Strict Camera Query Allowlist",
+                                             "text":  "Replaced substring includes(\u0027sd\u0027) matching in webrtc.html and ai.html with exact camera/stream allowlist normalization and added ?cam=/?quality= fallback when ?src= is omitted"
+                                         },
+                                         {
+                                             "label":  "URL Query Parameter Encoding",
+                                             "text":  "Added encodeURIComponent() to dynamic src and target query parameters in updateCamFeed() and fetchTelemetryWithFallback() in app.js"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.38",
                          "date":  "November 26, 2026",

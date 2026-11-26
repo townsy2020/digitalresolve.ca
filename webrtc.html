@@ -496,13 +496,23 @@
     let frameTimeout = null;
     let streamConnected = false;
 
-    function getCamMeta(targetSrc) {
-      const p = (targetSrc || 'pennys_feeder').toLowerCase();
-      const isCam2 = p.includes('bedroom') || p.includes('cam2');
-      const isSd = p.includes('sd');
+    function getCamMeta(targetSrc, fallbackQuality = '') {
+      const p = (targetSrc || '').trim().toLowerCase();
+      const q = (fallbackQuality || '').trim().toLowerCase();
+      let stream = 'pennys_feeder';
+      if (p === 'bedroom_sd' || p === 'cam2_sd') {
+        stream = 'bedroom_sd';
+      } else if (p === 'bedroom' || p === 'cam2') {
+        stream = q === 'sd' ? 'bedroom_sd' : 'bedroom';
+      } else if (p === 'pennys_feeder_sd' || p === 'cam1_sd') {
+        stream = 'pennys_feeder_sd';
+      } else if (p === 'pennys_feeder' || p === 'cam1' || p === '') {
+        stream = q === 'sd' ? 'pennys_feeder_sd' : 'pennys_feeder';
+      }
+      const isCam2 = stream.startsWith('bedroom');
       return {
         id: isCam2 ? 'cam2' : 'cam1',
-        stream: isCam2 ? (isSd ? 'bedroom_sd' : 'bedroom') : (isSd ? 'pennys_feeder_sd' : 'pennys_feeder'),
+        stream: stream,
         title: isCam2 ? "Bedroom &bull; Cat Cam 2" : "Penny's Feeder &bull; Cat Cam 1",
         targetText: isCam2 ? "CAM 2: BEDROOM / PERCH" : "CAM 1: LIVING ROOM TOWER",
         ip: isCam2 ? '192.168.2.25' : '192.168.2.24'
@@ -511,7 +521,8 @@
 
     // Detect target camera from URL
     const params = new URLSearchParams(window.location.search);
-    const activeCam = getCamMeta(params.get('src') || 'pennys_feeder');
+    const rawSrc = params.get('src');
+    const activeCam = getCamMeta(rawSrc || params.get('cam') || 'pennys_feeder', rawSrc ? '' : (params.get('quality') || ''));
 
     function applyActiveCamUI() {
       camTitle.innerHTML = activeCam.title;
@@ -1109,8 +1120,8 @@
     }
 
     // Dynamic Camera Switcher API
-    function selectCam(targetSrc) {
-      Object.assign(activeCam, getCamMeta(targetSrc));
+    function selectCam(targetSrc, fallbackQuality = '') {
+      Object.assign(activeCam, getCamMeta(targetSrc, fallbackQuality));
       applyActiveCamUI();
       if (valLatency) valLatency.textContent = '--';
       if (valState) {
@@ -1124,7 +1135,8 @@
 
     window.addEventListener('popstate', () => {
       const p = new URLSearchParams(window.location.search);
-      selectCam(p.get('src'));
+      const rawSrc = p.get('src');
+      selectCam(rawSrc || p.get('cam') || 'pennys_feeder', rawSrc ? '' : (p.get('quality') || ''));
     });
 
     // Active Camera Ping Telemetry

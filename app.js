@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.38';
+          const activeVer = match ? match[0] : 'v2.9.39';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 25382;
+      const baseHtmlLines = 25497;
       const baseCssLines = 7623;
-      const baseJsLines = 9611;
+      const baseJsLines = 9612;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -412,9 +412,10 @@
       const tid = ctrl ? setTimeout(() => ctrl.abort(), timeoutMs) : null;
 
       const isHttps = typeof window !== 'undefined' && window.location && window.location.protocol === 'https:';
-      const primaryUrl = `${GATEWAY}/status?target=${target}`;
+      const encodedTarget = encodeURIComponent(target);
+      const primaryUrl = `${GATEWAY}/status?target=${encodedTarget}`;
       const altUrl1 = `${GATEWAY}/stats`;
-      const altUrl2 = isHttps ? `${GATEWAY}/uptime` : `http://192.168.2.35:8082/status?target=${target}`;
+      const altUrl2 = isHttps ? `${GATEWAY}/uptime` : `http://192.168.2.35:8082/status?target=${encodedTarget}`;
 
       return fetch(primaryUrl, ctrl ? { credentials: 'include', signal: ctrl.signal } : { credentials: 'include' })
         .then(r => {
@@ -4490,7 +4491,7 @@
       const playerPage = currentCamAi ? 'ai.html' : 'webrtc.html';
       const frame = document.getElementById('camera-live-frame');
       const title = document.getElementById('cam-header-active-name');
-      const targetUrl = `${playerPage}?src=${src}`;
+      const targetUrl = `${playerPage}?src=${encodeURIComponent(src)}`;
       if (frame && camFeedLoaded) {
         const curActiveUrl = frame.dataset.activeUrl || frame.getAttribute('src') || '';
         if (curActiveUrl !== targetUrl) {
