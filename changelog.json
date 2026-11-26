@@ -1,7 +1,18 @@
 {
-    "updatedAt":  "2026-11-26T22:11:55Z",
-    "currentVersion":  "v2.9.52",
+    "updatedAt":  "2026-11-26T22:44:07Z",
+    "currentVersion":  "v2.9.53",
     "releases":  [
+                     {
+                         "version":  "v2.9.53",
+                         "date":  "November 26, 2026",
+                         "title":  "Tablet Navigation Wrapping \u0026 Zero-Overflow Layout",
+                         "changes":  [
+                                         {
+                                             "label":  "Tablet Breakpoint Overflow Fix",
+                                             "text":  "Enabled clean header/navigation wrapping across 769px-1024px viewports eliminating +210px horizontal overflow and clipped action buttons on iPad and tablet screens"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.52",
                          "date":  "November 26, 2026",

@@ -3945,6 +3945,57 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
 }
 
 /* ==========================================================================
+   Tablet Breakpoint Header & Navigation Wrapping (769px - 1024px)
+   Prevents horizontal overflow and clipped action buttons on iPad/tablet widths
+   while keeping desktop (>= 1025px) and mobile (<= 768px) layouts unchanged.
+   ========================================================================== */
+@media (min-width: 769px) and (max-width: 1024px) {
+  html:not(.mobile-layout) .header {
+    padding: 10px 0;
+  }
+
+  html:not(.mobile-layout) .nav-container {
+    flex-wrap: wrap;
+    row-gap: 8px;
+    column-gap: 10px;
+  }
+
+  html:not(.mobile-layout) .logo {
+    order: 1;
+  }
+
+  html:not(.mobile-layout) .nav-mobile-actions {
+    order: 2;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+    max-width: 100%;
+  }
+
+  html:not(.mobile-layout) .nav-links {
+    order: 3;
+    flex: 1 0 100%;
+    max-width: 100%;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  html:not(.mobile-layout) .nav-pages-group,
+  html:not(.mobile-layout) .nav-tools-group {
+    flex-wrap: wrap;
+    max-width: 100%;
+    gap: 4px;
+  }
+
+  html:not(.mobile-layout) .nav-pages-group .btn-nav,
+  html:not(.mobile-layout) .nav-tools-group .dropdown > .btn-nav {
+    padding: 5px 8px;
+    font-size: 0.78rem;
+    height: 32px;
+  }
+}
+
+/* ==========================================================================
    Unified Mobile Breakpoints & Touch-Optimized Layout
    Applies when screen width <= 768px (unless forced desktop) OR when mobile-layout is active
    ========================================================================== */
