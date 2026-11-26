@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.50';
+          const activeVer = match ? match[0] : 'v2.9.51';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 26653;
+      const baseHtmlLines = 26749;
       const baseCssLines = 7764;
-      const baseJsLines = 9991;
+      const baseJsLines = 9998;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -417,6 +417,7 @@
       const altUrl1 = `${GATEWAY}/stats`;
       const altUrl2 = isHttps ? `${GATEWAY}/uptime` : `http://192.168.2.35:8082/status?target=${encodedTarget}`;
 
+      const enrichSeq = target === 'desktop' ? _statusUpdateSeq.desktop : 0;
       return fetch(primaryUrl, ctrl ? { credentials: 'include', signal: ctrl.signal } : { credentials: 'include' })
         .then(r => {
           if (!r.ok) throw new Error('HTTP ' + r.status);
@@ -424,10 +425,11 @@
         })
         .then(data => {
           if (tid) clearTimeout(tid);
-          if (target === 'desktop' && data.online && (!data.disk || !data.vitals)) {
+          if (target === 'desktop' && data.online && (!data.disk || !data.vitals) && enrichSeq === _statusUpdateSeq.desktop) {
             fetch(altUrl1, { credentials: 'include', signal: (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(3000) : undefined })
               .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
               .then(stats => {
+                if (enrichSeq !== _statusUpdateSeq.desktop) return;
                 if (stats && stats.desktop && stats.desktop.online !== false) {
                   if (stats.desktop.disk) data.disk = stats.desktop.disk;
                   if (stats.desktop.vitals) data.vitals = stats.desktop.vitals;
@@ -550,6 +552,7 @@
 
     const _checkStatusInFlight = {};
     const _statusUpdateSeq = { nuc: 0, desktop: 0 };
+    const _checkStatusToastSeq = { nuc: 0, desktop: 0 };
     function checkStatus(target) {
       if (target === 'both') {
         return Promise.allSettled([checkStatus('nuc'), checkStatus('desktop')]);
@@ -561,24 +564,28 @@
       showToast('loading', `Pinging ${dev.name}...`, `${ip} | ${dns}`, 0);
 
       const reqSeq = (_statusUpdateSeq[target] = (_statusUpdateSeq[target] || 0) + 1);
+      const myToastSeq = (_checkStatusToastSeq[target] = (_checkStatusToastSeq[target] || 0) + 1);
       const p = fetchTelemetryWithFallback(target)
         .then(data => {
-          if (reqSeq !== _statusUpdateSeq[target]) return;
+          const isCurrentStatus = reqSeq === _statusUpdateSeq[target];
+          const isCurrentToast = myToastSeq === _checkStatusToastSeq[target];
+          if (!isCurrentStatus && !isCurrentToast) return;
           if (data && data.online !== false) {
             const diskSub = (data.disk && data.disk.drive) ? ` | ${data.disk.drive} ${data.disk.freeGB} GB free (${data.disk.usedPercent}% used)` : '';
             const latVal = safeNum(data.latencyMs, null);
             const latPart = latVal !== null ? `${latVal} ms latency` : 'Online';
-            showToast('success', `${dev.name} is Online`, `${latPart}${diskSub}`, 5000);
-            updateStatusUI(target, true, latVal, data.disk, data.torrent, data.vitals);
+            if (isCurrentToast) showToast('success', `${dev.name} is Online`, `${latPart}${diskSub}`, 5000);
+            if (isCurrentStatus) updateStatusUI(target, true, latVal, data.disk, data.torrent, data.vitals);
           } else {
-            showToast('error', `${dev.name} is Offline`, `No ping response from ${ip}`, 5000);
-            updateStatusUI(target, false, null, data && data.disk);
+            if (isCurrentToast) showToast('error', `${dev.name} is Offline`, `No ping response from ${ip}`, 5000);
+            if (isCurrentStatus) updateStatusUI(target, false, null, data && data.disk);
           }
         })
         .catch(() => {
-          if (reqSeq !== _statusUpdateSeq[target]) return;
-          showToast('error', `${dev.name} Unreachable`, `Could not reach ${GATEWAY} or verify node status.`, 5000);
-          updateStatusUI(target, false);
+          const isCurrentStatus = reqSeq === _statusUpdateSeq[target];
+          const isCurrentToast = myToastSeq === _checkStatusToastSeq[target];
+          if (isCurrentToast) showToast('error', `${dev.name} Unreachable`, `Could not reach ${GATEWAY} or verify node status.`, 5000);
+          if (isCurrentStatus) updateStatusUI(target, false);
         })
         .finally(() => {
           if (_checkStatusInFlight[target] === p) delete _checkStatusInFlight[target];
