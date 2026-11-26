@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.31';
+          const activeVer = match ? match[0] : 'v2.9.32';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 24635;
+      const baseHtmlLines = 24739;
       const baseCssLines = 7621;
-      const baseJsLines = 9360;
+      const baseJsLines = 9389;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -2952,7 +2952,7 @@
       const inFmt = formatTokenNumber(inTok);
       const outFmt = formatTokenNumber(outTok);
       const cacheFmt = formatTokenNumber(cacheTok);
-      const fullTotalStr = (Number.isFinite(grandTotalTok) && grandTotalTok > 0) ? grandTotalTok.toLocaleString() : '--';
+      const fullTotalStr = (Number.isFinite(grandTotalTok) && grandTotalTok >= 0) ? grandTotalTok.toLocaleString() : '--';
       const breakdownTip = `Total Processed: ${fullTotalStr} = ${uncachedFmt} Fresh (${inFmt} New In + ${outFmt} Out) + ${cacheFmt} Cached`;
 
       const flashPctNum = (uncachedTok > 0) ? ((inTok / uncachedTok) * 100) : 0;
@@ -3228,7 +3228,8 @@
 
       if (absData && absData.online && Array.isArray(absData.items) && absData.items.length > 0) {
         window._absHydrated = true;
-        const totalBooks = Number(absData.totalBooks !== undefined && absData.totalBooks !== null ? absData.totalBooks : absData.items.length) || absData.items.length;
+        const rawTotalBooks = (absData.totalBooks !== undefined && absData.totalBooks !== null) ? Number(absData.totalBooks) : absData.items.length;
+        const totalBooks = Number.isFinite(rawTotalBooks) ? rawTotalBooks : absData.items.length;
         const inProgress = safeNum(absData.inProgressCount, 0);
         if (subEl) {
           subEl.innerHTML = `${escapeHtml(totalBooks.toLocaleString())} real audiobooks on NUC &bull; ${escapeHtml(String(inProgress))} in progress`;
@@ -3747,7 +3748,11 @@
       const numField = (v, fb) => (v !== null && v !== undefined && v !== '' && Number.isFinite(Number(v))) ? Number(v) : fb;
       const fmtVal = (v, suffix = '') => (v !== null && v !== undefined && Number.isFinite(Number(v))) ? `${Number(v)}${suffix}` : '--';
       const renderIspRows = (tbody, list) => {
-        if (!tbody || !Array.isArray(list) || list.length === 0) return;
+        if (!tbody) return;
+        if (!Array.isArray(list) || list.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" style="padding: 12px 8px; text-align: center; color: #94a3b8;">Awaiting live ISP telemetry...</td></tr>';
+          return;
+        }
         tbody.innerHTML = list.slice(-10).reverse().map(r => {
           const avg = numField(r && r.pingAvgMs, null);
           const min = numField(r && r.pingMinMs, null);
@@ -4763,6 +4768,8 @@
             el.textContent = `${outCnt} ${outCnt === 1 ? 'outage gap' : 'outage gaps'} logged${durLabel ? ' (' + durLabel + ' downtime)' : ''}`;
           } else if (outCnt === 0) {
             el.textContent = 'Zero lost heartbeat cycles';
+          } else {
+            el.textContent = '--';
           }
         });
         document.querySelectorAll('#uptime-outages-val').forEach(el => {
@@ -4785,6 +4792,8 @@
           } else {
             tag.textContent = '--';
             tag.className = 'item-tag';
+            tag.style.background = '';
+            tag.style.color = '';
           }
         });
         document.querySelectorAll('#uptime-outages-sub').forEach(el => {
@@ -4795,6 +4804,8 @@
             }
           } else if (outCnt === 0) {
             el.textContent = 'Autonomous self-healing active';
+          } else {
+            el.textContent = '--';
           }
         });
         document.querySelectorAll('#uptime-mttr-val').forEach(el => {
@@ -4824,6 +4835,10 @@
               tag.style.background = 'rgba(245, 158, 11, 0.2)';
               tag.style.color = '#fbbf24';
             }
+          } else {
+            tag.textContent = '--';
+            tag.style.background = '';
+            tag.style.color = '';
           }
         });
         document.querySelectorAll('.nav-sla-tag').forEach(tag => {
@@ -5324,6 +5339,9 @@
         const isOnline = !!svc.online;
         if (tagEl) {
           tagEl.className = isOnline ? 'item-tag online' : 'item-tag offline';
+          tagEl.style.background = '';
+          tagEl.style.color = '';
+          tagEl.style.borderColor = '';
           tagEl.textContent = isOnline ? (svc.statusText || defaultActiveText || 'Operational') : 'Offline';
         }
         if (metaEl) {
@@ -5527,6 +5545,9 @@
             : null;
 
           document.querySelectorAll('#dash-global-status').forEach(globalStatus => {
+            globalStatus.style.color = '';
+            globalStatus.style.background = '';
+            globalStatus.style.borderColor = '';
             if (liveCount === null) {
               globalStatus.textContent = '--/8 Services';
               globalStatus.className = 'item-tag';
@@ -7806,6 +7827,14 @@
             setOfflineText('feeder-iot-last-time', 'Offline');
             const warnEl = document.getElementById('feeder-low-warning');
             if (warnEl) warnEl.style.display = 'none';
+            window._feederLowHopperAlert = false;
+            ['feeder-hopper-bar', 'feeder-nuc-hopper-bar'].forEach(barId => {
+              const b = document.getElementById(barId);
+              if (b) {
+                b.style.width = '0%';
+                b.style.background = '';
+              }
+            });
             const stagFeeder = document.getElementById('stag-feeder');
             if (stagFeeder) {
               stagFeeder.className = 'item-tag offline';
