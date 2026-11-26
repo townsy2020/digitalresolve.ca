@@ -166,14 +166,14 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.44';
+          const activeVer = match ? match[0] : 'v2.9.45';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 26001;
+      const baseHtmlLines = 26089;
       const baseCssLines = 7752;
       const baseJsLines = 9803;
       const baseCnameLines = 1;
@@ -455,7 +455,7 @@
               throw err;
             })
             .catch(err2 => {
-              return fetch(altUrl2, { credentials: 'include', signal: (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(3000) : undefined })
+              return fetch(altUrl2, { credentials: 'include', signal: (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(6000) : undefined })
                 .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
                 .then(data2 => {
                   if (data2) {
@@ -8275,7 +8275,7 @@
           }
 
           // Alternative Method: Try direct LAN gateway or surface cached/offline state
-          return fetch('http://192.168.2.35:8082/api/feeder/status', { signal: (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(2000) : undefined })
+          return fetch('http://192.168.2.35:8082/api/feeder/status', { signal: (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(5000) : undefined })
             .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(d => {
               if (d && d.feeder) {
