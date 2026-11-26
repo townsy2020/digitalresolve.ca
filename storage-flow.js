@@ -163,13 +163,13 @@
   }
 
   function safeNum(val, fallback = 0) {
-    if (val === null || val === undefined || (typeof val === 'string' && val.trim() === '')) return fallback;
+    if (val === null || val === undefined || typeof val === 'boolean' || (typeof val === 'string' && val.trim() === '')) return fallback;
     const n = Number(val);
     return Number.isFinite(n) ? n : fallback;
   }
 
   function isValidNum(val) {
-    return val !== null && val !== undefined && !(typeof val === 'string' && val.trim() === '') && Number.isFinite(Number(val));
+    return val !== null && val !== undefined && typeof val !== 'boolean' && !(typeof val === 'string' && val.trim() === '') && Number.isFinite(Number(val));
   }
 
   function fmtGB(gb) {
@@ -470,10 +470,10 @@
 
   function getMaxNvmeTemp(tier) {
     if (!tier) return null;
-    if (tier.nvmeMaxTempC !== undefined && tier.nvmeMaxTempC !== null && Number.isFinite(Number(tier.nvmeMaxTempC))) {
+    if (isValidNum(tier.nvmeMaxTempC)) {
       return Number(tier.nvmeMaxTempC);
     }
-    if (tier.nvme && !Array.isArray(tier.nvme) && tier.nvme.maxTempC !== undefined && tier.nvme.maxTempC !== null && Number.isFinite(Number(tier.nvme.maxTempC))) {
+    if (tier.nvme && !Array.isArray(tier.nvme) && isValidNum(tier.nvme.maxTempC)) {
       return Number(tier.nvme.maxTempC);
     }
     if (Array.isArray(tier.nvme)) {
@@ -481,11 +481,11 @@
       tier.nvme.forEach(item => {
         if (Array.isArray(item)) {
           item.forEach(sub => {
-            if (sub && sub.temperature !== undefined && sub.temperature !== null && Number.isFinite(Number(sub.temperature))) {
+            if (sub && isValidNum(sub.temperature)) {
               best = best === null ? Number(sub.temperature) : Math.max(best, Number(sub.temperature));
             }
           });
-        } else if (item && item.temperature !== undefined && item.temperature !== null && Number.isFinite(Number(item.temperature))) {
+        } else if (item && isValidNum(item.temperature)) {
           best = best === null ? Number(item.temperature) : Math.max(best, Number(item.temperature));
         }
       });
@@ -1050,7 +1050,7 @@
         <article class="storage-script-card" data-pipeline-card="${escapeHtml(p.id)}">
           <div>
             <div class="storage-node-top">
-              <span class="storage-node-name">${escapeHtml(p.name)}</span>
+              <span class="storage-node-name">${escapeHtml(safeStr(p.name, safeStr(p.id, 'Pipeline')))}</span>
               <span class="storage-node-tag ${tagClass}">${escapeHtml(st === 'success' ? 'Healthy' : st)}</span>
             </div>
             <div class="storage-script-path">${escapeHtml(safeStr(p.scriptPath, ''))}</div>
@@ -1115,7 +1115,7 @@
           <td class="mono" style="font-size:0.76rem;color:#94a3b8;">${escapeHtml(ts)}</td>
           <td><strong>${escapeHtml(safeStr(p.name, safeStr(ev.pipelineId, 'Pipeline')))}</strong></td>
           <td class="mono" style="font-size:0.75rem;">${escapeHtml(safeStr(ev.host, 'NUC'))}</td>
-          <td class="mono" style="font-size:0.76rem;">${ev.bytesFormatted ? escapeHtml(ev.bytesFormatted) : '--'}</td>
+          <td class="mono" style="font-size:0.76rem;">${escapeHtml(safeStr(ev.bytesFormatted, '--'))}</td>
           <td class="mono" style="font-size:0.76rem;">${isValidNum(ev.rateMBps) ? Math.max(0, safeNum(ev.rateMBps, 0)).toFixed(1) + ' MB/s' : '--'}</td>
           <td><span class="storage-node-tag ${tagCls}">${escapeHtml(safeStr(ev.level, 'INFO').toUpperCase())}</span> <span style="font-size:0.76rem;color:#cbd5e1;margin-left:6px;">${escapeHtml(safeStr(ev.message, ''))}</span></td>
         </tr>`;
@@ -1161,16 +1161,16 @@
       });
     };
     state.triggerInFlight.add(actionKey);
-    setMatrixBtnDisabled(true);
-    updateInspector();
-
-    const base = isHttps ? GATEWAY : LAN_BASE;
-    const url = `${base}/api/storage-flow/trigger`;
-    const headers = typeof window.getAdminAuthHeaders === 'function'
-      ? window.getAdminAuthHeaders({ 'Content-Type': 'application/json' })
-      : { 'Content-Type': 'application/json' };
-
     try {
+      setMatrixBtnDisabled(true);
+      updateInspector();
+
+      const base = isHttps ? GATEWAY : LAN_BASE;
+      const url = `${base}/api/storage-flow/trigger`;
+      const headers = typeof window.getAdminAuthHeaders === 'function'
+        ? window.getAdminAuthHeaders({ 'Content-Type': 'application/json' })
+        : { 'Content-Type': 'application/json' };
+
       const res = await fetch(url, {
         method: 'POST',
         credentials: 'include',

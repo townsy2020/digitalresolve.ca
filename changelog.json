@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-26T21:16:31Z",
-    "currentVersion":  "v2.9.49",
+    "updatedAt":  "2026-11-26T21:27:43Z",
+    "currentVersion":  "v2.9.50",
     "releases":  [
+                     {
+                         "version":  "v2.9.50",
+                         "date":  "November 26, 2026",
+                         "title":  "Floating Back-to-Top Z-Index Fix \u0026 Storage Flow Edge-Case Hardening",
+                         "changes":  [
+                                         {
+                                             "label":  "Floating Button Stacking Fix",
+                                             "text":  "Lowered .btn-floating-top z-index from 999 to 90 so sticky header dropdowns and the expanded mobile nav drawer (z-index 100/500) are never overlapped while staying above page content and control bars."
+                                         },
+                                         {
+                                             "label":  "Storage Flow Coercion \u0026 Trigger Guards",
+                                             "text":  "Switched getMaxNvmeTemp() to isValidNum() and rejected booleans in safeNum()/isValidNum() so empty strings or booleans never coerce to fake 0C/numeric readings, hardened matrix/activity fallbacks with safeStr(), and wrapped executePipelineTrigger() setup inside try/finally."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.49",
                          "date":  "November 26, 2026",
