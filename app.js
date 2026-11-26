@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.37';
+          const activeVer = match ? match[0] : 'v2.9.38';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 25286;
+      const baseHtmlLines = 25382;
       const baseCssLines = 7623;
-      const baseJsLines = 9518;
+      const baseJsLines = 9611;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -665,12 +665,17 @@
         sendSleep(target);
       } else if (action === 'reboot') {
         if (feedbackEl) feedbackEl.textContent = `Awaiting confirmation to reboot ${targetName}...`;
+        let confirmed = false;
         if (target === 'nuc' && typeof confirmRebootNuc === 'function') {
-          confirmRebootNuc();
+          confirmed = Boolean(confirmRebootNuc());
         } else if (target === 'desktop' && typeof confirmRebootDesktop === 'function') {
-          confirmRebootDesktop();
+          confirmed = Boolean(confirmRebootDesktop());
         } else if (confirm(`Are you sure you want to gracefully reboot ${targetName}?`)) {
           sendControl('reboot', target);
+          confirmed = true;
+        }
+        if (!confirmed && feedbackEl) {
+          feedbackEl.textContent = 'Action cancelled.';
         }
       }
     }
@@ -685,7 +690,9 @@
     let _powerPollSeq = 0;
     const _powerCmdInFlight = new Set();
     function sendWol(target) {
+      const feedbackEl = document.getElementById('pwr-feedback-text');
       if (!isSSOAuthenticated()) {
+        if (feedbackEl) feedbackEl.textContent = 'Authentication required (M365 SSO).';
         openGlobalSSOModal(`Wake-on-LAN: ${target.toUpperCase()}`, () => sendWol(target));
         return;
       }
@@ -702,6 +709,7 @@
         .then(resData => {
           if (pollToken !== _powerPollSeq) return;
           if (!resData || resData.status !== 'success') throw new Error((resData && resData.message) || 'Gateway rejected request');
+          if (feedbackEl) feedbackEl.textContent = `WoL Magic Packet broadcasted to ${dev.name}. Waiting for boot...`;
           showToast('loading', `Magic Packet Broadcasted`, `Waiting for ${dev.name} to boot...`, 0);
 
           if (target === 'both') {
@@ -729,11 +737,13 @@
                   const latPart = (data.latencyMs !== null && data.latencyMs !== undefined && Number.isFinite(Number(data.latencyMs))) ? `${data.latencyMs} ms latency` : '';
                   const diskPart = (data.disk && data.disk.drive) ? `${data.disk.drive} ${data.disk.freeGB} GB free` : '';
                   const toastBody = [latPart, diskPart].filter(Boolean).join(' | ') || 'Online';
+                  if (feedbackEl) feedbackEl.textContent = `${dev.name} is Awake & Online (${toastBody}).`;
                   showToast('success', `${dev.name} is Awake & Online!`, toastBody, 6000);
                   updateStatusUI(target, true, data.latencyMs, data.disk);
                 } else if (attempts >= maxAttempts) {
                   settled = true;
                   clearInterval(pollInterval);
+                  if (feedbackEl) feedbackEl.textContent = `${dev.name} not responding after WoL (may still be booting).`;
                   showToast('error', `${dev.name} Not Responding`, 'Machine may still be booting POST.', 6000);
                 }
               })
@@ -742,14 +752,18 @@
                 if (attempts >= maxAttempts) {
                   settled = true;
                   clearInterval(pollInterval);
+                  if (feedbackEl) feedbackEl.textContent = `${dev.name} not responding after WoL (may still be booting).`;
                   showToast('error', `${dev.name} Not Responding`, 'Machine may still be booting POST.', 6000);
                 }
               });
           }, 3000);
         })
-        .catch(() => {
+        .catch(err => {
           if (pollToken !== _powerPollSeq) return;
-          showToast('error', 'Transmit Failed', `Could not reach ${GATEWAY}`, 5000);
+          const isAuthErr = Boolean(err && /\bHTTP (401|403)\b/.test(err.message || ''));
+          const msg = isAuthErr ? 'Authentication Required (HTTP 401/403) — Unlock M365 SSO' : `Could not reach ${GATEWAY}`;
+          if (feedbackEl) feedbackEl.textContent = isAuthErr ? msg : `WoL failed: ${msg}`;
+          showToast('error', isAuthErr ? 'Authentication Required' : 'Transmit Failed', msg, 5000);
         })
         .finally(() => {
           _powerCmdInFlight.delete(cmdKey);
@@ -757,7 +771,9 @@
     }
 
     function sendSleep(target) {
+      const feedbackEl = document.getElementById('pwr-feedback-text');
       if (!isSSOAuthenticated()) {
+        if (feedbackEl) feedbackEl.textContent = 'Authentication required (M365 SSO).';
         openGlobalSSOModal(`Sleep Standby: ${target.toUpperCase()}`, () => sendSleep(target));
         return;
       }
@@ -774,6 +790,7 @@
         .then(resData => {
           if (pollToken !== _powerPollSeq) return;
           if (!resData || resData.status !== 'success') throw new Error((resData && resData.message) || 'Gateway rejected request');
+          if (feedbackEl) feedbackEl.textContent = `Sleep signal dispatched to ${dev.name}. Waiting for standby...`;
           showToast('loading', `Sleep Signal Dispatched`, `Waiting for ${dev.name} to enter standby...`, 0);
 
           let attempts = 0;
@@ -795,11 +812,13 @@
                 if (!data.online) {
                   settled = true;
                   clearInterval(pollInterval);
+                  if (feedbackEl) feedbackEl.textContent = `${dev.name} is now Asleep (standby mode).`;
                   showToast('success', `${dev.name} is now Asleep`, 'System in low-power standby mode.', 6000);
                   updateStatusUI(target, false);
                 } else if (attempts >= maxAttempts) {
                   settled = true;
                   clearInterval(pollInterval);
+                  if (feedbackEl) feedbackEl.textContent = `Sleep signal dispatched to ${dev.name} (finalizing).`;
                   showToast('error', `Sleep Signal Dispatched`, `${dev.name} may still be finalizing background tasks.`, 5000);
                 }
               })
@@ -809,19 +828,24 @@
                 if (target === 'nuc' && consecutiveErrors >= 3) {
                   settled = true;
                   clearInterval(pollInterval);
+                  if (feedbackEl) feedbackEl.textContent = `${dev.name} is now Asleep (standby mode).`;
                   showToast('success', `${dev.name} is now Asleep`, 'Gateway offline / in standby.', 6000);
                   updateStatusUI(target, false);
                 } else if (attempts >= maxAttempts) {
                   settled = true;
                   clearInterval(pollInterval);
+                  if (feedbackEl) feedbackEl.textContent = `Could not confirm ${dev.name} sleep state.`;
                   showToast('error', 'Status Check Interrupted', `Could not confirm ${dev.name} sleep state via gateway.`, 5000);
                 }
               });
           }, 2500);
         })
-        .catch(() => {
+        .catch(err => {
           if (pollToken !== _powerPollSeq) return;
-          showToast('error', 'Sleep Command Failed', `Unable to reach ${GATEWAY}`, 5000);
+          const isAuthErr = Boolean(err && /\bHTTP (401|403)\b/.test(err.message || ''));
+          const msg = isAuthErr ? 'Authentication Required (HTTP 401/403) — Unlock M365 SSO' : `Unable to reach ${GATEWAY}`;
+          if (feedbackEl) feedbackEl.textContent = isAuthErr ? msg : `Sleep failed: ${msg}`;
+          showToast('error', isAuthErr ? 'Authentication Required' : 'Sleep Command Failed', msg, 5000);
         })
         .finally(() => {
           _powerCmdInFlight.delete(cmdKey);
@@ -2041,8 +2065,8 @@
             .then(data => {
               if (reqTab !== currentLogTab || reqSeq !== _logReqSeq) return;
               const body = document.getElementById('terminal-content');
-              if (body && data && data.lines) {
-                const nextText = data.lines.join('\n');
+              if (body && data && Array.isArray(data.lines)) {
+                const nextText = data.lines.length > 0 ? data.lines.join('\n') : '[No log entries available]';
                 const sel = typeof window.getSelection === 'function' ? window.getSelection() : null;
                 const hasSelectionInBody = Boolean(sel && !sel.isCollapsed && sel.anchorNode && body.contains(sel.anchorNode));
                 if (!hasSelectionInBody && body.textContent !== nextText) {
@@ -2458,6 +2482,7 @@
     }
 
     // Send remote instruction / prompt to active AGY session
+    let _agyPromptInFlight = false;
     function sendAgyPrompt() {
       const input = document.getElementById('agy-prompt-input');
       const promptText = input ? input.value.trim() : '';
@@ -2467,6 +2492,8 @@
         openGlobalSSOModal('Autonomous AGY Instruction Dispatch', sendAgyPrompt);
         return;
       }
+      if (_agyPromptInFlight) return;
+      _agyPromptInFlight = true;
 
       const termBody = document.getElementById('terminal-content');
       if (termBody) {
@@ -2477,6 +2504,15 @@
       if (input) input.value = '';
       const cid = window.AGY_SESSION_ID || '';
       showToast('loading', 'Dispatching Prompt to AGY Session...', `Session: ${cid ? cid.substring(0,8) : 'active'}`, 1500);
+
+      const handlePromptErr = (errMsg) => {
+        if (input && !input.value) input.value = promptText;
+        if (termBody) {
+          const now = new Date().toLocaleTimeString('en-US', { hour12: false });
+          termBody.textContent += `\n[${now}] [ERROR] Failed to deliver prompt (${errMsg}).`;
+          termBody.scrollTop = termBody.scrollHeight;
+        }
+      };
 
       const payload = { prompt: promptText };
       if (cid) payload.conversationId = cid;
@@ -2493,11 +2529,19 @@
           showToast('success', 'Prompt Delivered', 'Instruction queued for autonomous agent execution.');
           setTimeout(() => loadLog('agy'), 1200);
         } else {
-          showToast('error', 'Transmission Failed', data.message || 'Could not queue prompt.');
+          const msg = data.message || 'Could not queue prompt.';
+          handlePromptErr(msg);
+          showToast('error', 'Transmission Failed', msg);
         }
       })
       .catch(err => {
-        showToast('error', 'Gateway Offline', `Could not reach ${GATEWAY}`);
+        const isAuthErr = Boolean(err && /\bHTTP (401|403)\b/.test(err.message || ''));
+        const msg = isAuthErr ? 'Authentication Required (HTTP 401/403) — Unlock M365 SSO' : `Could not reach ${GATEWAY}`;
+        handlePromptErr(isAuthErr ? err.message : 'Gateway Offline');
+        showToast('error', isAuthErr ? 'Authentication Required' : 'Gateway Offline', msg);
+      })
+      .finally(() => {
+        _agyPromptInFlight = false;
       });
     }
 
@@ -2764,12 +2808,27 @@
 
           showToast('success', `New Session Created (${target.toUpperCase()})`, data.message || `Session ${newName} active.`);
         } else {
-          showToast('error', 'Launch Failed', data.message || 'Could not start new AGY session.');
+          const msg = data.message || 'Could not start new AGY session.';
+          if (screen) {
+            screen.innerHTML = `<div class="agy-line system" style="color: #f87171; font-weight: 700;">[ERROR] Session launch failed: ${escapeHtml(msg)}</div>`;
+          }
+          if (termBody) {
+            termBody.textContent = `[ERROR] Session launch failed: ${msg}`;
+          }
+          showToast('error', 'Launch Failed', msg);
           startConsoleAutoPoll();
         }
       })
       .catch(err => {
-        showToast('error', 'Gateway Offline', `Could not reach ${GATEWAY}`);
+        const isAuthErr = Boolean(err && /\bHTTP (401|403)\b/.test(err.message || ''));
+        const msg = isAuthErr ? 'Authentication Required (HTTP 401/403) — Unlock M365 SSO' : `Could not reach ${GATEWAY}`;
+        if (screen) {
+          screen.innerHTML = `<div class="agy-line system" style="color: #f87171; font-weight: 700;">[ERROR] Session launch failed: ${escapeHtml(msg)}</div>`;
+        }
+        if (termBody) {
+          termBody.textContent = `[ERROR] Session launch failed: ${msg}`;
+        }
+        showToast('error', isAuthErr ? 'Authentication Required' : 'Gateway Offline', msg);
         startConsoleAutoPoll();
       })
       .finally(() => {
@@ -2837,7 +2896,8 @@
           }
         })
         .catch(err => {
-          showToast('error', 'Gateway Offline', `Could not reach ${GATEWAY}`);
+          const isAuthErr = Boolean(err && /\bHTTP (401|403)\b/.test(err.message || ''));
+          showToast('error', isAuthErr ? 'Authentication Required' : 'Gateway Offline', isAuthErr ? 'Authentication Required (HTTP 401/403) — Unlock M365 SSO' : `Could not reach ${GATEWAY}`);
           if (opts && typeof opts.onError === 'function') opts.onError(err);
         })
         .finally(() => {
@@ -3786,7 +3846,7 @@
             updateAgySessionDisplay(data.conversationId || '', data.sessionName || null, data.hostNode || null);
           }
           if (body && data && Array.isArray(data.lines)) {
-            const nextText = data.lines.join('\n');
+            const nextText = data.lines.length > 0 ? data.lines.join('\n') : '[No log entries available]';
             const sel = typeof window.getSelection === 'function' ? window.getSelection() : null;
             const hasSelectionInBody = Boolean(silent && sel && !sel.isCollapsed && sel.anchorNode && body.contains(sel.anchorNode));
             if (!hasSelectionInBody) {
@@ -5731,13 +5791,17 @@
     function confirmRebootNuc() {
       if (confirm("Are you sure you want to gracefully reboot the NUC Core Server?\n\nAll active torrents and daemons will be suspended cleanly and restarted automatically.\nRequires Microsoft 365 Entra ID SSO / Passkey verification.")) {
         sendControl('reboot', 'nuc');
+        return true;
       }
+      return false;
     }
 
     function confirmRebootDesktop() {
       if (confirm("Are you sure you want to gracefully reboot the Desktop PC?\n\nRequires Microsoft 365 Entra ID SSO / Passkey verification.")) {
         sendControl('reboot', 'desktop');
+        return true;
       }
+      return false;
     }
 
       // ==========================================
@@ -5860,7 +5924,7 @@
           if (data && (data.conversationId || data.hostNode || data.sessionName)) {
             updateAgySessionDisplay(data.conversationId || '', data.sessionName || null, data.hostNode || null);
           }
-          if (data && Array.isArray(data.lines) && screen) {
+          if (data && Array.isArray(data.lines) && data.lines.length > 0 && screen) {
             const nextText = data.lines.join('\n');
             const sel = typeof window.getSelection === 'function' ? window.getSelection() : null;
             const hasSelectionInScreen = Boolean(isSilent && sel && !sel.isCollapsed && sel.anchorNode && screen.contains(sel.anchorNode));
@@ -5914,9 +5978,15 @@
             if (typeof updateQuotaHistorySparkline === 'function') {
               updateQuotaHistorySparkline();
             }
-          } else if (statusTag) {
-            statusTag.textContent = 'NO LOG DATA';
-            statusTag.className = 'item-tag';
+          } else {
+            if (screen && (!isSilent || _lastAgyConsoleText !== '')) {
+              screen.innerHTML = '<div class="agy-line system" style="color:#94a3b8;">[No log entries available]</div>';
+              _lastAgyConsoleText = '';
+            }
+            if (statusTag) {
+              statusTag.textContent = 'NO LOG DATA';
+              statusTag.className = 'item-tag';
+            }
           }
         })
         .catch(err => {
@@ -5958,6 +6028,7 @@
       }, 2500);
     }
 
+    let _consolePromptInFlight = false;
     function sendConsolePrompt() {
       const input = document.getElementById('agy-modal-input');
       const text = input ? input.value.trim() : '';
@@ -5967,12 +6038,13 @@
         openGlobalSSOModal('Autonomous Console Dispatch', sendConsolePrompt);
         return;
       }
+      if (_consolePromptInFlight) return;
+      _consolePromptInFlight = true;
 
       const screen = document.getElementById('agy-console-screen');
       if (screen) {
         const userLine = document.createElement('div');
         userLine.className = 'agy-line user';
-        const now = new Date().toLocaleTimeString('en-US', { hour12: false });
         userLine.innerHTML = `<span style="color:#38bdf8; font-weight:700;">[USER]</span> ${escapeHtml(text)}`;
         screen.appendChild(userLine);
         screen.scrollTop = screen.scrollHeight;
@@ -5982,6 +6054,19 @@
       if (input) input.value = '';
       const cid = window.AGY_SESSION_ID || '';
       showToast('loading', 'Dispatching Prompt to AGY Session...', `Session: ${cid ? cid.substring(0,8) : 'active'}`, 1500);
+
+      const handleConsoleErr = (errMsg) => {
+        if (input && !input.value) input.value = text;
+        if (screen) {
+          const errLine = document.createElement('div');
+          errLine.className = 'agy-line system';
+          errLine.style.color = '#f87171';
+          errLine.textContent = `[ERROR] Failed to deliver prompt (${errMsg}).`;
+          screen.appendChild(errLine);
+          screen.scrollTop = screen.scrollHeight;
+          _lastAgyConsoleText = '';
+        }
+      };
 
       const payload = { prompt: text };
       if (cid) payload.conversationId = cid;
@@ -5999,11 +6084,19 @@
           setTimeout(() => refreshAgyConsole(true), 1200);
           setTimeout(() => refreshAgyConsole(true), 3000);
         } else {
-          showToast('error', 'Transmission Failed', data.message || 'Could not queue prompt.');
+          const msg = data.message || 'Could not queue prompt.';
+          handleConsoleErr(msg);
+          showToast('error', 'Transmission Failed', msg);
         }
       })
       .catch(err => {
-        showToast('error', 'Gateway Offline', `Could not reach ${GATEWAY}`);
+        const isAuthErr = Boolean(err && /\bHTTP (401|403)\b/.test(err.message || ''));
+        const msg = isAuthErr ? 'Authentication Required (HTTP 401/403) — Unlock M365 SSO' : `Could not reach ${GATEWAY}`;
+        handleConsoleErr(isAuthErr ? err.message : 'Gateway Offline');
+        showToast('error', isAuthErr ? 'Authentication Required' : 'Gateway Offline', msg);
+      })
+      .finally(() => {
+        _consolePromptInFlight = false;
       });
     }
 
