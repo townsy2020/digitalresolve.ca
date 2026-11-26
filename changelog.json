@@ -1,7 +1,30 @@
 {
-    "updatedAt":  "2026-11-26T09:32:43Z",
-    "currentVersion":  "v2.9.30",
+    "updatedAt":  "2026-11-26T09:52:36Z",
+    "currentVersion":  "v2.9.31",
     "releases":  [
+                     {
+                         "version":  "v2.9.31",
+                         "date":  "November 26, 2026",
+                         "title":  "Frontend Telemetry \u0026 Stream Spinner Polish",
+                         "changes":  [
+                                         {
+                                             "label":  "AI CatCam Spinner",
+                                             "text":  "Hide loading overlay when all stream endpoints fail or require SSO so reconnect retries never trap the viewport"
+                                         },
+                                         {
+                                             "label":  "Health Radar Storage Bar",
+                                             "text":  "Clear stale offline gray background on disk meter bar when live storage telemetry recovers"
+                                         },
+                                         {
+                                             "label":  "Climate Offline State",
+                                             "text":  "Clear stale green-dot ribbon, fleet, and ambient climate readings when YoLink sensor goes offline with null telemetry"
+                                         },
+                                         {
+                                             "label":  "Control In-Flight Guard",
+                                             "text":  "Invoke opts.onError when sendControl skips duplicate in-flight requests so speedtest probes never hang for 30s"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.30",
                          "date":  "November 26, 2026",

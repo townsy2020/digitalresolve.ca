@@ -680,6 +680,7 @@
 
     function connectEndpoint(endpoints, idx) {
       if (idx >= endpoints.length) {
+        hideSpinner();
         if (window.location.protocol === 'https:' && !streamConnected && loadingOverlay) {
           const msgEl = loadingOverlay.querySelector('div:nth-child(2)');
           if (msgEl) {

@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.30';
+          const activeVer = match ? match[0] : 'v2.9.31';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 24522;
+      const baseHtmlLines = 24635;
       const baseCssLines = 7621;
-      const baseJsLines = 9340;
+      const baseJsLines = 9360;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -945,6 +945,7 @@
             }
             if (fillBar) {
               fillBar.style.width = computedPct !== null ? `${clampPct(computedPct)}%` : '0%';
+              fillBar.style.background = '';
             }
             if (subText) {
               subText.textContent = totalG !== null
@@ -2772,7 +2773,10 @@
         return;
       }
       const ctrlKey = `${action}:${target}`;
-      if (_controlInFlight.has(ctrlKey)) return;
+      if (_controlInFlight.has(ctrlKey)) {
+        if (opts && typeof opts.onError === 'function') opts.onError(new Error('Request already in progress'));
+        return;
+      }
       _controlInFlight.add(ctrlKey);
 
       const targetLabel = (target === 'desktop') ? 'Desktop PC' : 'NUC Server';
@@ -3500,29 +3504,45 @@
 
       // 1. Ribbon Climate Indicator
       const ribbonClim = document.getElementById('ribbon-climate');
-      if (ribbonClim && tempF !== null && hum !== null) {
-        ribbonClim.innerHTML = '<span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 6px #10b981;"></span> ' + tempF + '&deg;F &bull; ' + hum + '% RH';
+      if (ribbonClim) {
+        if (tempF !== null && hum !== null) {
+          ribbonClim.innerHTML = '<span class="dropdown-dot" style="background-color: #10b981; box-shadow: 0 0 6px #10b981;"></span> ' + tempF + '&deg;F &bull; ' + hum + '% RH';
+        } else if (!isOnline) {
+          ribbonClim.innerHTML = '<span class="dropdown-dot" style="background-color: #64748b; box-shadow: none;"></span> Offline';
+        }
       }
 
       // 2. NUC Fleet Node Card
       const fleetClim = document.getElementById('fleet-climate-nuc');
-      if (fleetClim && tempF !== null && hum !== null) {
-        fleetClim.textContent = tempC !== null
-          ? (tempF + '\u00B0F (' + tempC + '\u00B0C) \u2022 ' + hum + '% RH \u2022 ' + stateStr)
-          : (tempF + '\u00B0F \u2022 ' + hum + '% RH \u2022 ' + stateStr);
+      if (fleetClim) {
+        if (tempF !== null && hum !== null) {
+          fleetClim.textContent = tempC !== null
+            ? (tempF + '\u00B0F (' + tempC + '\u00B0C) \u2022 ' + hum + '% RH \u2022 ' + stateStr)
+            : (tempF + '\u00B0F \u2022 ' + hum + '% RH \u2022 ' + stateStr);
+        } else if (!isOnline) {
+          fleetClim.textContent = 'Offline';
+        }
       }
 
       // 3. IoT Ambient Temp & Thermals Card
       const ambTemp = document.getElementById('iot-ambient-temp');
-      if (ambTemp && tempC !== null && hum !== null) {
-        ambTemp.innerHTML = tempF !== null
-          ? (tempC + '&deg;C <span style="font-size: 0.9rem; color: #94a3b8;">/ ' + hum + '% RH (' + tempF + '&deg;F)</span>')
-          : (tempC + '&deg;C <span style="font-size: 0.9rem; color: #94a3b8;">/ ' + hum + '% RH</span>');
+      if (ambTemp) {
+        if (tempC !== null && hum !== null) {
+          ambTemp.innerHTML = tempF !== null
+            ? (tempC + '&deg;C <span style="font-size: 0.9rem; color: #94a3b8;">/ ' + hum + '% RH (' + tempF + '&deg;F)</span>')
+            : (tempC + '&deg;C <span style="font-size: 0.9rem; color: #94a3b8;">/ ' + hum + '% RH</span>');
+        } else if (!isOnline) {
+          ambTemp.innerHTML = '-- <span style="font-size: 0.9rem; color: #94a3b8;">/ --</span>';
+        }
       }
 
       const roomThermo = document.getElementById('iot-room-thermostat');
-      if (roomThermo && tempF !== null && tempC !== null) {
-        roomThermo.innerHTML = tempF + '&deg;F (' + tempC + '&deg;C)';
+      if (roomThermo) {
+        if (tempF !== null && tempC !== null) {
+          roomThermo.innerHTML = tempF + '&deg;F (' + tempC + '&deg;C)';
+        } else if (!isOnline) {
+          roomThermo.textContent = 'Offline';
+        }
       }
 
       const thTag = document.getElementById('iot-thermal-tag');
