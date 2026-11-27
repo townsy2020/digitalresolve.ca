@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-27T03:55:31Z",
-    "currentVersion":  "v2.9.59",
+    "updatedAt":  "2026-11-27T04:29:18Z",
+    "currentVersion":  "v2.9.60",
     "releases":  [
+                     {
+                         "version":  "v2.9.60",
+                         "date":  "November 26, 2026",
+                         "title":  "Harden power/climate/bookshelf races, CF SSO auth detection \u0026 honest telemetry",
+                         "changes":  [
+                                         {
+                                             "label":  "Control \u0026 Poll Races",
+                                             "text":  "Sequence sendWol/sendSleep, live climate updates, Bookshelf fallback, and inline AGY quick chips so stale polls never overwrite fresh UI state."
+                                         },
+                                         {
+                                             "label":  "CF Access \u0026 UI State",
+                                             "text":  "Detect expired CF Access HTML redirects across all 5 control endpoints, clear stuck reboot feedback, fix offline latency pill recovery, and fix audiobooks.digitalresolve.ca label."
+                                         },
+                                         {
+                                             "label":  "Honest Telemetry",
+                                             "text":  "Eliminate false 0 GB/100% free Desktop disk, ±0ms ISP jitter, unknown-as-online NUC health, and NaN%/Infinity token \u0026 swarm coercions."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.59",
                          "date":  "November 26, 2026",
