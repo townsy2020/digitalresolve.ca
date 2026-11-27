@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-27T00:43:46Z",
-    "currentVersion":  "v2.9.57",
+    "updatedAt":  "2026-11-27T02:19:35Z",
+    "currentVersion":  "v2.9.58",
     "releases":  [
+                     {
+                         "version":  "v2.9.58",
+                         "date":  "November 26, 2026",
+                         "title":  "Fix header button clipping (1025–1272px) \u0026 Ops dropdown alignment",
+                         "changes":  [
+                                         {
+                                             "label":  "Header Wrapping",
+                                             "text":  "Extend responsive header nav wrapping through 1320px so Update and Mobile View buttons never clip off-screen when authenticated."
+                                         },
+                                         {
+                                             "label":  "Ops Dropdown Alignment",
+                                             "text":  "Right-align the rightmost Ops \u0026 Tools dropdown above 768px so badges and quota items stay fully visible on iPad Landscape (980–1024px)."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.57",
                          "date":  "November 26, 2026",
