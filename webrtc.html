@@ -705,9 +705,12 @@
       return endpoints;
     }
 
+    let pollSeq = 0;
+
     function markStreamOnline(modeLabel) {
       if (streamConnected) return;
       streamConnected = true;
+      pollSeq++;
       if (reconnectTimeout) {
         clearTimeout(reconnectTimeout);
         reconnectTimeout = null;
@@ -823,9 +826,12 @@
         };
 
         const connTimeout = setTimeout(() => {
-          if (ws !== sock) return;
+          if (ws !== sock || handled) return;
           if (!hasOpened && sock.readyState !== WebSocket.OPEN) {
-            fallbackToWebRTC('MSE WebSocket connect timeout, falling back to WebRTC');
+            handled = true;
+            if (frameTimeout) { clearTimeout(frameTimeout); frameTimeout = null; }
+            try { sock.close(); } catch (e) {}
+            connectEndpoint(endpoints, idx + 1);
           }
         }, 4000);
 
@@ -963,7 +969,7 @@
             if (handled) return;
             handled = true;
             if (reconnectTimeout) clearTimeout(reconnectTimeout);
-            reconnectTimeout = setTimeout(initStream, 4000);
+            reconnectTimeout = setTimeout(() => { showSpinner('Reconnecting Live Stream...'); initStream(); }, 4000);
           }
         });
       }, { once: true });
@@ -1032,7 +1038,7 @@
             return;
           }
           if (reconnectTimeout) clearTimeout(reconnectTimeout);
-          reconnectTimeout = setTimeout(initStream, 4000);
+          reconnectTimeout = setTimeout(() => { showSpinner('Reconnecting Live Stream...'); initStream(); }, 4000);
         }
       });
 
@@ -1092,6 +1098,7 @@
           }
         }).catch(err => {
           console.warn('Offer creation failed:', err);
+          advanceEndpoint();
         });
       });
 
@@ -1113,6 +1120,8 @@
                 activePc.addIceCandidate({ candidate: c, sdpMid: '0' }).catch(() => {});
               }
             }).catch(() => {});
+          } else if (msg.type === 'error') {
+            advanceEndpoint();
           }
         } catch (e) {}
       });
@@ -1132,6 +1141,7 @@
 
     // Dynamic Camera Switcher API
     function selectCam(targetSrc, fallbackQuality = '') {
+      pollSeq++;
       Object.assign(activeCam, getCamMeta(targetSrc, fallbackQuality));
       applyActiveCamUI();
       if (valLatency) valLatency.textContent = '--';
@@ -1155,22 +1165,29 @@
       if (document.hidden || streamConnected) return;
       const hostname = window.location.hostname;
       if (hostname === 'cam.digitalresolve.ca') return;
+      const mySeq = ++pollSeq;
       const isHttps = (window.location.protocol === 'https:');
       const endpoints = isHttps
-        ? ['https://wake.digitalresolve.ca/api/cam/status']
+        ? [
+            { url: 'https://wake-lan.digitalresolve.ca/api/cam/status', credentials: 'omit' },
+            { url: 'https://wake.digitalresolve.ca/api/cam/status', credentials: 'include' }
+          ]
         : [
-            'http://192.168.2.35:8082/api/cam/status',
-            'https://wake.digitalresolve.ca/api/cam/status'
+            { url: 'http://192.168.2.35:8082/api/cam/status', credentials: 'include' },
+            { url: 'https://wake.digitalresolve.ca/api/cam/status', credentials: 'include' }
           ];
       for (const ep of endpoints) {
+        if (mySeq !== pollSeq || streamConnected) return;
         const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
         const tid = ctrl ? setTimeout(() => ctrl.abort(), 2000) : null;
         try {
-          const fetchOpts = { credentials: 'include' };
+          const fetchOpts = { credentials: ep.credentials };
           if (ctrl) fetchOpts.signal = ctrl.signal;
-          const res = await fetch(ep, fetchOpts);
+          const res = await fetch(ep.url, fetchOpts);
+          if (mySeq !== pollSeq || streamConnected) return;
           if (res.ok) {
             const data = await res.json();
+            if (mySeq !== pollSeq || streamConnected) return;
             const list = Array.isArray(data) ? data : (data.cameras && data.cameras.value ? data.cameras.value : (data.cameras || []));
             const c = list.find(item => item.id === activeCam.id) || list[activeCam.id === 'cam2' ? 1 : 0];
             if (c) {

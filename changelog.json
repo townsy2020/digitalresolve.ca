@@ -1,7 +1,30 @@
 {
-    "updatedAt":  "2026-11-27T04:47:40Z",
-    "currentVersion":  "v2.9.61",
+    "updatedAt":  "2026-11-27T06:10:47Z",
+    "currentVersion":  "v2.9.62",
     "releases":  [
+                     {
+                         "version":  "v2.9.62",
+                         "date":  "November 27, 2026",
+                         "title":  "Camera Reconnect, Signaling Fast-Fail \u0026 Pre-Paint Layout Polish",
+                         "changes":  [
+                                         {
+                                             "label":  "Camera Reconnect",
+                                             "text":  "Restored reconnecting overlay on live stream drops in webrtc.html and added HTTPS wake-lan status fallback with stale-poll sequencing"
+                                         },
+                                         {
+                                             "label":  "Signaling Fast-Fail",
+                                             "text":  "Eliminated 3s-10s dead-endpoint and signaling-error hangs across MSE and WebRTC in ai.html and webrtc.html"
+                                         },
+                                         {
+                                             "label":  "Pre-Paint Layout",
+                                             "text":  "Synced desktop-forced class and coarse-pointer landscape detection in pre-paint inline script across all 8 pages to eliminate mobile FOUC"
+                                         },
+                                         {
+                                             "label":  "AI HUD Polish",
+                                             "text":  "Preserved AI Standby state across reconnects on offline model load and cleared stale object-detection tooltips"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.61",
                          "date":  "November 26, 2026",

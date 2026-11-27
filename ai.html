@@ -437,6 +437,7 @@
     const btnSensitivity = document.getElementById('btn-sensitivity');
 
     let aiModel = null;
+    let aiModelFailed = false;
     let showBoundingBoxes = true;
     let temporalTrackingEnabled = true;
     let isDetecting = false;
@@ -638,7 +639,7 @@
         catPulse.style.background = '#38bdf8';
         catPulse.style.boxShadow = '0 0 8px #38bdf8';
       }
-      if (catStatusText) catStatusText.textContent = aiModel ? 'Cat: 0% (Scanning)' : 'AI Initializing...';
+      if (catStatusText) catStatusText.textContent = aiModel ? 'Cat: 0% (Scanning)' : (aiModelFailed ? 'AI Standby' : 'AI Initializing...');
       if (personBadge) personBadge.style.display = 'none';
       if (hopperBeaconBadge) hopperBeaconBadge.style.display = 'none';
       if (inferenceTimeEl) inferenceTimeEl.textContent = '-- ms';
@@ -793,9 +794,12 @@
         };
 
         const connTimeout = setTimeout(() => {
-          if (ws !== sock) return;
+          if (ws !== sock || handled) return;
           if (!hasOpened && sock.readyState !== WebSocket.OPEN) {
-            fallbackToWebRTC('MSE WebSocket connect timeout, falling back to WebRTC');
+            handled = true;
+            if (frameTimeout) { clearTimeout(frameTimeout); frameTimeout = null; }
+            try { sock.close(); } catch (e) {}
+            connectEndpoint(endpoints, idx + 1);
           }
         }, 3500);
 
@@ -1063,6 +1067,8 @@
                 activePc.addIceCandidate({ candidate: c, sdpMid: '0' }).catch(() => {});
               }
             }).catch(() => {});
+          } else if (msg.type === 'error') {
+            advanceEndpoint();
           }
         } catch (e) {
           console.warn('WS parse error:', e);
@@ -1148,6 +1154,7 @@
           catStatusText.textContent = "Cat: 0% (Scanning)";
           if (video.readyState >= 2) startDetectionLoop();
         } catch (e2) {
+          aiModelFailed = true;
           catStatusText.textContent = "AI Standby";
         }
       }
@@ -1283,6 +1290,7 @@
         detectedFeedEl.title = detectedClasses.join('\n');
       } else {
         detectedFeedEl.textContent = 'Scanning';
+        detectedFeedEl.title = '';
       }
 
       // Live continuous pet confidence percentage
