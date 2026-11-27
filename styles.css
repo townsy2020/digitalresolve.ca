@@ -1085,7 +1085,7 @@ button.dropdown-item:active,
 }
 
 @media (max-width: 900px) {
-  .schematic-zones-grid {
+  html:not(.desktop-forced) .schematic-zones-grid {
     grid-template-columns: 1fr;
     gap: 14px;
   }
@@ -1451,20 +1451,20 @@ button.dropdown-item:active,
 }
 
 @media (max-width: 768px) {
-  .header {
+  html:not(.desktop-forced) .header {
     padding: 12px 0;
   }
-  .nav-container {
+  html:not(.desktop-forced) .nav-container {
     flex-wrap: wrap;
     gap: 10px;
   }
-  .hero-title {
+  html:not(.desktop-forced) .hero-title {
     font-size: 2.2rem;
   }
-  .about-card {
+  html:not(.desktop-forced) .about-card {
     padding: 32px 20px;
   }
-  .footer-container {
+  html:not(.desktop-forced) .footer-container {
     flex-direction: column;
     gap: 12px;
     text-align: center;
@@ -2425,7 +2425,7 @@ button.dropdown-item:active,
 }
 
 @media (max-width: 640px) {
-  .stats-grid-row {
+  html:not(.desktop-forced) .stats-grid-row {
     grid-template-columns: minmax(0, 1fr);
   }
 }
@@ -3654,13 +3654,13 @@ button:disabled, .btn:disabled, .btn-secondary:disabled, .btn-control:disabled {
 }
 
 @media (max-width: 600px) {
-  .token-counter-btn .token-breakdown-tags .tag-pro {
+  html:not(.desktop-forced) .token-counter-btn .token-breakdown-tags .tag-pro {
     display: none;
   }
 }
 
 @media (max-width: 480px) {
-  .token-counter-btn .token-breakdown-tags .tag-argon {
+  html:not(.desktop-forced) .token-counter-btn .token-breakdown-tags .tag-argon {
     display: none;
   }
 }
@@ -6098,7 +6098,7 @@ a.btn-schematic-chip {
 }
 
 @media (max-width: 768px) {
-  .dash-service-grid {
+  html:not(.desktop-forced) .dash-service-grid {
     grid-template-columns: 1fr;
   }
 }

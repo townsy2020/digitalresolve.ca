@@ -1,7 +1,18 @@
 {
-    "updatedAt":  "2026-11-27T06:10:47Z",
-    "currentVersion":  "v2.9.62",
+    "updatedAt":  "2026-11-27T06:42:25Z",
+    "currentVersion":  "v2.9.63",
     "releases":  [
+                     {
+                         "version":  "v2.9.63",
+                         "date":  "November 27, 2026",
+                         "title":  "Forced Desktop Mode Responsive Guard",
+                         "changes":  [
+                                         {
+                                             "label":  "Desktop View CSS",
+                                             "text":  "Guarded 5 remaining max-width media query blocks with html:not(.desktop-forced) so mobile Desktop View keeps full multi-column grids, row nav/footer, and token breakdown tags"
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.62",
                          "date":  "November 27, 2026",
