@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-27T00:22:22Z",
-    "currentVersion":  "v2.9.56",
+    "updatedAt":  "2026-11-27T00:43:46Z",
+    "currentVersion":  "v2.9.57",
     "releases":  [
+                     {
+                         "version":  "v2.9.57",
+                         "date":  "November 26, 2026",
+                         "title":  "Fix polling races, LAN health failover, SSO re-auth \u0026 telemetry coercion",
+                         "changes":  [
+                                         {
+                                             "label":  "Polling \u0026 Feeder Races",
+                                             "text":  "Add monotonic sequence guards to pollRealData, refreshServiceDashboard, and fetchFeederStatus so stale polls never clobber fresh state or styles."
+                                         },
+                                         {
+                                             "label":  "Failover \u0026 SSO Re-Auth",
+                                             "text":  "Give fetchServicesHealth a fresh LAN fallback timeout signal, guard cross-origin updateCamFeed, and detect expired CF Access SSO in storage-flow.js."
+                                         },
+                                         {
+                                             "label":  "Console \u0026 Telemetry",
+                                             "text":  "Sync triggerQuickChip with in-flight console prompts and eliminate false 0% packet-loss and blank latency coercions."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.56",
                          "date":  "November 26, 2026",

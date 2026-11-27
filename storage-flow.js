@@ -237,6 +237,36 @@
       .replace(/'/g, '&#39;');
   }
 
+  function isCfHtmlRedirectResponse(res) {
+    if (!res) return false;
+    const ct = (res.headers && typeof res.headers.get === 'function' ? (res.headers.get('content-type') || '') : '').toLowerCase();
+    if (ct && !ct.includes('application/json') && (ct.includes('text/html') || ct.includes('application/xhtml'))) {
+      return true;
+    }
+    const url = typeof res.url === 'string' ? res.url : '';
+    if (url && /cloudflareaccess\.com|\/cdn-cgi\/access\/login/i.test(url)) {
+      return true;
+    }
+    return false;
+  }
+
+  async function checkSsoExpiredOnHttps() {
+    if (!isHttps) return false;
+    let isAuthed = typeof window.isSSOAuthenticated === 'function' && window.isSSOAuthenticated();
+    if (!isAuthed) return true;
+    if (typeof window.syncCloudflareAccessSession === 'function') {
+      try {
+        const verified = await window.syncCloudflareAccessSession(false);
+        if (!verified) return true;
+        isAuthed = typeof window.isSSOAuthenticated === 'function' ? window.isSSOAuthenticated() : Boolean(verified);
+        return !isAuthed;
+      } catch (_e) {
+        return !(typeof window.isSSOAuthenticated === 'function' && window.isSSOAuthenticated());
+      }
+    }
+    return false;
+  }
+
   async function fetchStorageFlow() {
     if (state.inFlight) return;
     state.inFlight = true;
@@ -259,9 +289,14 @@
             renderOfflineFallback();
             return;
           }
-        } else if (isHttps && err && err.name === 'TypeError' && !(typeof window.isSSOAuthenticated === 'function' && window.isSSOAuthenticated())) {
-          state.unauthenticated = true;
-          renderAuthFallback();
+        } else if (isHttps && err && err.name === 'TypeError') {
+          const ssoExpired = await checkSsoExpiredOnHttps();
+          if (ssoExpired) {
+            state.unauthenticated = true;
+            renderAuthFallback();
+            return;
+          }
+          renderOfflineFallback();
           return;
         } else {
           renderOfflineFallback();
@@ -270,7 +305,10 @@
       }
 
       if (!res || !res.ok) {
-        if (res && (res.status === 401 || res.status === 403)) {
+        if (res && (res.status === 401 || res.status === 403 || isCfHtmlRedirectResponse(res))) {
+          if (typeof window.syncCloudflareAccessSession === 'function') {
+            try { await window.syncCloudflareAccessSession(false); } catch (_e) {}
+          }
           state.unauthenticated = true;
           renderAuthFallback();
         } else {
@@ -279,10 +317,24 @@
         return;
       }
 
+      if (isCfHtmlRedirectResponse(res)) {
+        if (typeof window.syncCloudflareAccessSession === 'function') {
+          try { await window.syncCloudflareAccessSession(false); } catch (_e) {}
+        }
+        state.unauthenticated = true;
+        renderAuthFallback();
+        return;
+      }
+
       let json;
       try {
         json = await res.json();
       } catch (_parseErr) {
+        if (isHttps && await checkSsoExpiredOnHttps()) {
+          state.unauthenticated = true;
+          renderAuthFallback();
+          return;
+        }
         renderOfflineFallback();
         return;
       }
@@ -1178,11 +1230,16 @@
         body: JSON.stringify({ action: pipeline.triggerAction }),
         signal: (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(15000) : undefined
       });
-      if (res.status === 401 || res.status === 403) {
+      const isCfRedirect = isCfHtmlRedirectResponse(res);
+      if (res.status === 401 || res.status === 403 || isCfRedirect) {
+        if (isCfRedirect && typeof window.syncCloudflareAccessSession === 'function') {
+          try { await window.syncCloudflareAccessSession(false); } catch (_e) {}
+        }
+        state.unauthenticated = true;
         if (!retried && typeof window.openGlobalSSOModal === 'function') {
           window.openGlobalSSOModal(`Authorize Pipeline: ${pipeline.name}`, () => executePipelineTrigger(pipeline, true));
         } else if (typeof window.showToast === 'function') {
-          window.showToast('error', 'Authorization Required', `Pipeline trigger returned HTTP ${res.status}.`, 4500);
+          window.showToast('error', 'Authorization Required', isCfRedirect ? 'Cloudflare Access SSO session expired. Please re-authenticate.' : `Pipeline trigger returned HTTP ${res.status}.`, 4500);
         }
         return;
       }
@@ -1201,6 +1258,18 @@
       }
       setTimeout(fetchStorageFlow, 1500);
     } catch (err) {
+      if (isHttps && err && err.name === 'TypeError') {
+        const ssoExpired = await checkSsoExpiredOnHttps();
+        if (ssoExpired) {
+          state.unauthenticated = true;
+          if (!retried && typeof window.openGlobalSSOModal === 'function') {
+            window.openGlobalSSOModal(`Authorize Pipeline: ${pipeline.name}`, () => executePipelineTrigger(pipeline, true));
+          } else if (typeof window.showToast === 'function') {
+            window.showToast('error', 'Authorization Required', 'Cloudflare Access SSO session expired. Please re-authenticate.', 4500);
+          }
+          return;
+        }
+      }
       if (typeof window.showToast === 'function') {
         window.showToast('error', 'Trigger Error', err.message || 'Gateway unreachable', 4500);
       }

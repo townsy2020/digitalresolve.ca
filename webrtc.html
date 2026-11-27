@@ -1177,7 +1177,8 @@
               valState.textContent = c.online ? 'ONLINE' : 'UNREACHABLE';
               valState.style.color = c.online ? '#10b981' : '#f87171';
               valIp.textContent = c.ip;
-              const lat = (c.latencyMs !== null && c.latencyMs !== undefined && Number.isFinite(Number(c.latencyMs))) ? c.latencyMs + ' ms' : '--';
+              const latNum = (c.latencyMs !== null && c.latencyMs !== undefined && typeof c.latencyMs !== 'boolean' && !(typeof c.latencyMs === 'string' && c.latencyMs.trim() === '') && Number.isFinite(Number(c.latencyMs))) ? Number(c.latencyMs) : null;
+              const lat = latNum !== null ? `${latNum} ms` : '--';
               valLatency.textContent = lat;
               const isSsoStandby = statusBadge && statusBadge.classList.contains('standby') && statusText && statusText.textContent.includes('SSO');
               if (!streamConnected && !isSsoStandby) {

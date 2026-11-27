@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.56';
+          const activeVer = match ? match[0] : 'v2.9.57';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 27229;
+      const baseHtmlLines = 27334;
       const baseCssLines = 7854;
-      const baseJsLines = 10013;
+      const baseJsLines = 10159;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -4265,7 +4265,7 @@
     function fetchISPHistory(force = false) {
       if (_ispHistoryInFlight && !force) return _ispHistoryInFlight;
       const reqSeq = ++_ispHistorySeq;
-      const numField = (v, fb) => (v !== null && v !== undefined && v !== '' && Number.isFinite(Number(v))) ? Number(v) : fb;
+      const numField = (v, fb) => (v !== null && v !== undefined && typeof v !== 'boolean' && !(typeof v === 'string' && v.trim() === '') && Number.isFinite(Number(v))) ? Number(v) : fb;
       const fmtVal = (v, suffix = '') => (v !== null && v !== undefined && Number.isFinite(Number(v))) ? `${Number(v)}${suffix}` : '--';
       const renderIspRows = (tbody, list) => {
         if (!tbody) return;
@@ -4278,7 +4278,7 @@
           const min = numField(r && r.pingMinMs, null);
           const max = numField(r && r.pingMaxMs, null);
           const jit = numField(r && r.jitterMs, null);
-          const loss = numField(r && r.packetLoss, 0);
+          const loss = numField(r && r.packetLoss, null);
           const rowMeta = evaluateIspGrade(avg, jit, loss, r && r.grade);
           return `
                 <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
@@ -4853,10 +4853,19 @@
       if (frame && camFeedLoaded) {
         const curActiveUrl = frame.dataset.activeUrl || frame.getAttribute('src') || '';
         if (curActiveUrl !== targetUrl) {
-          if (playerPage === 'webrtc.html' && curActiveUrl.startsWith('webrtc.html') && frame.contentWindow && typeof frame.contentWindow.selectCamera === 'function') {
-            frame.contentWindow.selectCamera(src);
-            try { frame.contentWindow.history.replaceState(null, '', targetUrl); } catch (e) {}
-          } else {
+          let switchedInline = false;
+          if (playerPage === 'webrtc.html' && curActiveUrl.startsWith('webrtc.html') && frame.contentWindow) {
+            try {
+              if (typeof frame.contentWindow.selectCamera === 'function') {
+                frame.contentWindow.selectCamera(src);
+                switchedInline = true;
+                try { frame.contentWindow.history.replaceState(null, '', targetUrl); } catch (e) {}
+              }
+            } catch (e) {
+              switchedInline = false;
+            }
+          }
+          if (!switchedInline) {
             try { frame.contentWindow && frame.contentWindow.cleanupStream && frame.contentWindow.cleanupStream(); } catch (e) {}
             frame.src = targetUrl;
           }
@@ -6017,8 +6026,9 @@
       return fetch(`${GATEWAY}/services-health`, { credentials: 'include', signal: sig })
         .then(parseHealth)
         .catch(gwErr => {
-          if (!isHttps && (!sig || !sig.aborted)) {
-            return fetch('http://192.168.2.35:8082/services-health', { signal: sig }).then(parseHealth);
+          if (timeoutId) clearTimeout(timeoutId);
+          if (!isHttps && reqSeq === _servicesHealthSeq) {
+            return fetch('http://192.168.2.35:8082/services-health', { signal: _fetchSig(4000) }).then(parseHealth);
           }
           throw gwErr;
         })
@@ -6064,7 +6074,24 @@
     }
     window.fetchServicesHealth = fetchServicesHealth;
 
+    function _getLiveServicesCount() {
+      const h = window.LAST_SERVICES_HEALTH;
+      if (!h) return null;
+      if (typeof h.onlineCount === 'number' && Number.isFinite(h.onlineCount)) return h.onlineCount;
+      if (h.services && typeof h.services === 'object') {
+        return Object.values(h.services).filter(item => item && item.online).length;
+      }
+      return null;
+    }
+
+    let _pollRealDataSeq = 0;
+    let _pollResetTimer = null;
     function pollRealData(btn) {
+      const reqSeq = ++_pollRealDataSeq;
+      if (_pollResetTimer) {
+        clearTimeout(_pollResetTimer);
+        _pollResetTimer = null;
+      }
       const pollIcons = document.querySelectorAll('#poll-data-icon svg, #dash-refresh-icon');
       pollIcons.forEach(icon => {
         icon.style.transition = 'transform 0.8s ease';
@@ -6090,26 +6117,47 @@
       }
 
       return Promise.allSettled(pollTasks).then(() => {
-        setTimeout(() => {
+        if (reqSeq !== _pollRealDataSeq) return;
+        if (_pollResetTimer) clearTimeout(_pollResetTimer);
+        _pollResetTimer = setTimeout(() => {
+          _pollResetTimer = null;
+          if (reqSeq !== _pollRealDataSeq) return;
           pollIcons.forEach(icon => icon.style.transform = 'none');
           document.querySelectorAll('#poll-data-text').forEach(el => el.textContent = 'Update');
 
-          let liveCount = (window.LAST_SERVICES_HEALTH && typeof window.LAST_SERVICES_HEALTH.onlineCount === 'number')
-            ? window.LAST_SERVICES_HEALTH.onlineCount
-            : null;
+          const liveCount = _getLiveServicesCount();
 
-          document.querySelectorAll('#dash-global-status').forEach(globalStatus => {
-            globalStatus.style.color = '';
-            globalStatus.style.background = '';
-            globalStatus.style.borderColor = '';
-            if (liveCount === null) {
-              globalStatus.textContent = '--/8 Services';
-              globalStatus.className = 'item-tag';
-            } else {
+          if (liveCount !== null) {
+            document.querySelectorAll('#dash-global-status').forEach(globalStatus => {
               globalStatus.textContent = `${liveCount}/8 Services Online`;
-              globalStatus.className = liveCount === 8 ? 'item-tag online' : (liveCount >= 5 ? 'item-tag warn' : 'item-tag offline');
-            }
-          });
+              if (liveCount === 8) {
+                globalStatus.className = 'item-tag online';
+                globalStatus.style.color = '#4ade80';
+                globalStatus.style.background = 'rgba(34, 197, 94, 0.12)';
+                globalStatus.style.borderColor = 'rgba(34, 197, 94, 0.25)';
+              } else if (liveCount >= 5) {
+                globalStatus.className = 'item-tag warn';
+                globalStatus.style.color = '#fbbf24';
+                globalStatus.style.background = 'rgba(245, 158, 11, 0.12)';
+                globalStatus.style.borderColor = 'rgba(245, 158, 11, 0.25)';
+              } else {
+                globalStatus.className = 'item-tag offline';
+                globalStatus.style.color = '#f87171';
+                globalStatus.style.background = 'rgba(239, 68, 68, 0.12)';
+                globalStatus.style.borderColor = 'rgba(239, 68, 68, 0.25)';
+              }
+            });
+          } else if (!window._servicesHealthFailed) {
+            document.querySelectorAll('#dash-global-status').forEach(globalStatus => {
+              if (globalStatus.textContent !== 'Telemetry Unavailable') {
+                globalStatus.style.color = '';
+                globalStatus.style.background = '';
+                globalStatus.style.borderColor = '';
+                globalStatus.textContent = '--/8 Services';
+                globalStatus.className = 'item-tag';
+              }
+            });
+          }
           document.querySelectorAll('#hero-service-status-pill').forEach(heroPill => {
             heroPill.textContent = liveCount === null ? 'Service Status (--/8 Verified)' : `Service Status (${liveCount}/8 Online)`;
           });
@@ -6126,7 +6174,14 @@
     }
     window.pollRealData = pollRealData;
 
+    let _svcRefreshSeq = 0;
+    let _svcRefreshResetTimer = null;
     function refreshServiceDashboard(btn) {
+      const reqSeq = ++_svcRefreshSeq;
+      if (_svcRefreshResetTimer) {
+        clearTimeout(_svcRefreshResetTimer);
+        _svcRefreshResetTimer = null;
+      }
       const icon = document.getElementById('dash-refresh-icon');
       if (icon) {
         icon.style.transition = 'transform 0.8s ease';
@@ -6140,11 +6195,13 @@
       if (typeof renderUptimeMatrix === 'function') tasks.push(renderUptimeMatrix());
 
       return Promise.allSettled(tasks).then(() => {
-        setTimeout(() => {
+        if (reqSeq !== _svcRefreshSeq) return;
+        if (_svcRefreshResetTimer) clearTimeout(_svcRefreshResetTimer);
+        _svcRefreshResetTimer = setTimeout(() => {
+          _svcRefreshResetTimer = null;
+          if (reqSeq !== _svcRefreshSeq) return;
           if (icon) icon.style.transform = 'none';
-          const count = (window.LAST_SERVICES_HEALTH && typeof window.LAST_SERVICES_HEALTH.onlineCount === 'number')
-            ? window.LAST_SERVICES_HEALTH.onlineCount
-            : null;
+          const count = _getLiveServicesCount();
           if (typeof showToast === 'function') {
             if (count === null) {
               showToast('warning', 'Service Probe Incomplete', 'Could not verify all 8 microservice ports.', 3500);
@@ -6370,14 +6427,21 @@
         });
     }
 
-    function triggerQuickChip(btn, text) {
+    let _consolePromptInFlight = false;
+    async function triggerQuickChip(btn, text) {
       if (!isSSOAuthenticated()) {
         openGlobalSSOModal('AGY Interactive Quick Prompt', () => triggerQuickChip(btn, text));
         return;
       }
+      if (_consolePromptInFlight) {
+        if (typeof showToast === 'function') {
+          showToast('info', 'Prompt In Flight', 'Please wait for the active console prompt to finish dispatching.', 2000);
+        }
+        return;
+      }
       const input = document.getElementById('agy-modal-input');
       if (input) input.value = text;
-      
+
       const origHtml = btn ? btn.innerHTML : '';
       if (btn) {
         btn.innerHTML = '<span style="display:inline-block;animation:spin 1s linear infinite;">&#8635;</span> Executing...';
@@ -6386,29 +6450,28 @@
         btn.disabled = true;
       }
 
-      sendConsolePrompt();
-
-      setTimeout(() => {
+      try {
+        await sendConsolePrompt();
+      } finally {
         if (btn) {
           btn.innerHTML = origHtml;
           btn.style.borderColor = '';
           btn.style.background = '';
           btn.disabled = false;
         }
-      }, 2500);
+      }
     }
 
-    let _consolePromptInFlight = false;
     function sendConsolePrompt() {
       const input = document.getElementById('agy-modal-input');
       const text = input ? input.value.trim() : '';
-      if (!text) return;
+      if (!text) return Promise.resolve();
 
       if (!isSSOAuthenticated()) {
         openGlobalSSOModal('Autonomous Console Dispatch', sendConsolePrompt);
-        return;
+        return Promise.resolve();
       }
-      if (_consolePromptInFlight) return;
+      if (_consolePromptInFlight) return Promise.resolve();
       _consolePromptInFlight = true;
 
       const screen = document.getElementById('agy-console-screen');
@@ -6440,7 +6503,7 @@
 
       const payload = { prompt: text };
       if (cid) payload.conversationId = cid;
-      fetch(`${GATEWAY}/api/agy/send`, {
+      return fetch(`${GATEWAY}/api/agy/send`, {
         method: 'POST',
         credentials: 'include',
         headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }),
@@ -7586,9 +7649,10 @@
         const rawUp = latest ? safeNum(latest.uploadMbps, safeNum(latest.upMbps, null)) : null;
         const downStr = (rawDown !== null && Number.isFinite(rawDown)) ? String(rawDown) : '--';
         const upStr = (rawUp !== null && Number.isFinite(rawUp)) ? String(rawUp) : '--';
-        const realCarrier = latest.isp || carrier;
-        const realLoss = (latest.packetLoss !== undefined && latest.packetLoss !== null) ? latest.packetLoss : 0;
-        const realGrade = evaluateIspGrade(rawPing, latest.jitterMs, realLoss, latest.grade).grade;
+        const realCarrier = (latest && latest.isp) || carrier;
+        const rawLoss = latest ? safeNum(latest.packetLoss, null) : null;
+        const lossStr = (rawLoss !== null && Number.isFinite(rawLoss)) ? `${rawLoss}%` : '--';
+        const realGrade = evaluateIspGrade(rawPing, latest ? latest.jitterMs : null, rawLoss, latest ? latest.grade : null).grade;
 
         if (pingEl) pingEl.innerHTML = `${pingStr} <span style="font-size: 0.85rem; color: #94a3b8;">ms</span>`;
         if (downEl) downEl.innerHTML = downStr === '--' ? `--` : `${downStr} <span style="font-size: 0.85rem; color: #94a3b8;">Mbps</span>`;
@@ -7602,13 +7666,13 @@
         setSpeedtestButtonsState(false);
         const statusLabel = timedOut ? 'Probe Timed Out — Showing Latest' : 'Probe Complete';
         if (stageText) {
-          stageText.textContent = `${statusLabel}: ${pingStr} ms Ping  -  Packet Loss ${realLoss}%  -  Grade ${realGrade} (${realCarrier})`;
+          stageText.textContent = `${statusLabel}: ${pingStr} ms Ping  -  Packet Loss ${lossStr}  -  Grade ${realGrade} (${realCarrier})`;
         }
         if (!timedOut) {
           playChaosTone(523, 1046, 'triangle', 0.35);
-          showToast('success', `${realCarrier} Probe Complete`, `Ping: ${pingStr} ms  -  Loss: ${realLoss}%  -  Grade: ${realGrade}`);
+          showToast('success', `${realCarrier} Probe Complete`, `Ping: ${pingStr} ms  -  Loss: ${lossStr}  -  Grade: ${realGrade}`);
         } else {
-          showToast('warning', 'Probe Timed Out — Showing Latest', `Ping: ${pingStr} ms  -  Loss: ${realLoss}%  -  Grade: ${realGrade}`);
+          showToast('warning', 'Probe Timed Out — Showing Latest', `Ping: ${pingStr} ms  -  Loss: ${lossStr}  -  Grade: ${realGrade}`);
         }
       };
 
@@ -8394,18 +8458,21 @@
       return null;
     }
 
+    let _feederSeq = 0;
     let _feederFetchInFlight = null;
-    function fetchFeederStatus() {
-      if (_feederFetchInFlight) return _feederFetchInFlight;
+    function fetchFeederStatus(force = false) {
+      if (_feederFetchInFlight && !force) return _feederFetchInFlight;
       if (!_feederWarmHydrated) {
         _feederWarmHydrated = true;
         const warmFeeder = _readValidFeederCache();
         if (warmFeeder) updateFeederUI(warmFeeder);
       }
+      const reqSeq = ++_feederSeq;
       const ctrl = (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(4000) : undefined;
-      _feederFetchInFlight = fetch(`${GATEWAY}/api/feeder/status`, { credentials: 'include', signal: ctrl })
+      const reqPromise = fetch(`${GATEWAY}/api/feeder/status`, { credentials: 'include', signal: ctrl })
         .then(r => r.ok ? r.json() : null)
         .then(data => {
+          if (reqSeq !== _feederSeq) return null;
           if (data && data.status === 'success' && data.feeder) {
             try { localStorage.setItem('dr_feeder_cache', JSON.stringify({ ts: Date.now(), feeder: data.feeder })); } catch(e) {}
             updateFeederUI(data.feeder);
@@ -8415,8 +8482,10 @@
           }
         })
         .catch(() => {
+          if (reqSeq !== _feederSeq) return null;
           const isHttps = typeof window !== 'undefined' && window.location && window.location.protocol === 'https:';
           const applyCachedOrOffline = () => {
+            if (reqSeq !== _feederSeq) return;
             const cachedFeeder = _readValidFeederCache();
             if (cachedFeeder) {
               updateFeederUI(cachedFeeder);
@@ -8478,6 +8547,7 @@
           return fetch('http://192.168.2.35:8082/api/feeder/status', { signal: (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(5000) : undefined })
             .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(d => {
+              if (reqSeq !== _feederSeq) return null;
               if (d && d.feeder) {
                 try { localStorage.setItem('dr_feeder_cache', JSON.stringify({ ts: Date.now(), feeder: d.feeder })); } catch (e) {}
                 updateFeederUI(d.feeder);
@@ -8488,14 +8558,16 @@
               }
             })
             .catch(() => {
+              if (reqSeq !== _feederSeq) return null;
               applyCachedOrOffline();
               return null;
             });
         })
         .finally(() => {
-          _feederFetchInFlight = null;
+          if (_feederFetchInFlight === reqPromise) _feederFetchInFlight = null;
         });
-      return _feederFetchInFlight;
+      _feederFetchInFlight = reqPromise;
+      return reqPromise;
     }
     window.fetchFeederStatus = fetchFeederStatus;
 
@@ -8507,6 +8579,7 @@
       }
       if (_feederActionInFlight) return;
       _feederActionInFlight = true;
+      ++_feederSeq;
       fetch(`${GATEWAY}/api/feeder/refill`, { method: 'POST', credentials: 'include', headers: getAdminAuthHeaders({ 'Content-Type': 'application/json' }), body: '{}', signal: _fetchSig(10000) })
         .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
         .then(data => {
@@ -8514,6 +8587,7 @@
             throw new Error((data && data.message) || 'Gateway rejected request');
           }
           if (data.feeder) {
+            ++_feederSeq;
             try { localStorage.setItem('dr_feeder_cache', JSON.stringify({ ts: Date.now(), feeder: data.feeder })); } catch (e) {}
             updateFeederUI(data.feeder);
           }
@@ -8535,6 +8609,7 @@
       }
       if (_feederActionInFlight) return;
       _feederActionInFlight = true;
+      ++_feederSeq;
       const timeEl = document.getElementById('feeder-last-time');
       const iotTimeEl = document.getElementById('feeder-iot-last-time');
       const logEl = document.getElementById('feeder-log-list');
@@ -8564,14 +8639,16 @@
             }
             showToast('success', "Penny's Smart Feeder Actuated", `192.168.2.22 dispensed ${portionLabel}. Optical Watchdog: Kibble verified.`);
             if (data.feeder) {
+              ++_feederSeq;
               try { localStorage.setItem('dr_feeder_cache', JSON.stringify({ ts: Date.now(), feeder: data.feeder })); } catch (e) {}
               updateFeederUI(data.feeder);
             } else {
-              fetchFeederStatus();
+              fetchFeederStatus(true);
             }
           } else {
             showToast('warning', "Penny's Smart Feeder", (data && data.message) || `Dispense rejected.`);
             if (data && data.feeder) {
+              ++_feederSeq;
               updateFeederUI(data.feeder);
             } else if (window.LAST_FEEDER_STATE) {
               updateFeederUI(window.LAST_FEEDER_STATE);
