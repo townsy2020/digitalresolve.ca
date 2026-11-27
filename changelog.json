@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-27T00:03:13Z",
-    "currentVersion":  "v2.9.55",
+    "updatedAt":  "2026-11-27T00:22:22Z",
+    "currentVersion":  "v2.9.56",
     "releases":  [
+                     {
+                         "version":  "v2.9.56",
+                         "date":  "November 26, 2026",
+                         "title":  "Harden AdGuard deploy scripts \u0026 repo hygiene",
+                         "changes":  [
+                                         {
+                                             "label":  "AdGuard Deploy",
+                                             "text":  "Add try/finally temp cleanup, guarded Test-Path checks, Compose v2 cleanup, and parameterized server IP in deploy/adguard."
+                                         },
+                                         {
+                                             "label":  "Repo Hygiene",
+                                             "text":  "Ignore scratch/ directory in .gitignore to prevent accidental commits of scratch artifacts."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.55",
                          "date":  "November 26, 2026",

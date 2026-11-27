@@ -1,4 +1,5 @@
 .agents/
+scratch/
 *.ps1
 !/deploy/adguard/deploy.ps1
 *.tmp
