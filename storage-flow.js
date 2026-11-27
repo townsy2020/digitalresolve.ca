@@ -18,6 +18,8 @@
     waveformHistory: [],
     maxWaveformPoints: 40,
     pollTimer: null,
+    inFlight: false,
+    pendingRefresh: false,
     unauthenticated: false,
     triggerInFlight: new Set()
   };
@@ -172,6 +174,20 @@
     return val !== null && val !== undefined && typeof val !== 'boolean' && !(typeof val === 'string' && val.trim() === '') && Number.isFinite(Number(val));
   }
 
+  function validNonNegNum(val) {
+    const n = safeNum(val, null);
+    return (n !== null && n >= 0) ? n : null;
+  }
+
+  function resolveUsedGB(usedVal, totalVal, freeVal) {
+    const used = validNonNegNum(usedVal);
+    if (used !== null) return used;
+    const total = validNonNegNum(totalVal);
+    const free = validNonNegNum(freeVal);
+    if (total !== null && free !== null) return Math.max(0, total - free);
+    return null;
+  }
+
   function fmtGB(gb) {
     if (!isValidNum(gb)) return '--';
     const n = Number(gb);
@@ -239,12 +255,15 @@
 
   function isCfHtmlRedirectResponse(res) {
     if (!res) return false;
-    const ct = (res.headers && typeof res.headers.get === 'function' ? (res.headers.get('content-type') || '') : '').toLowerCase();
-    if (ct && !ct.includes('application/json') && (ct.includes('text/html') || ct.includes('application/xhtml'))) {
-      return true;
-    }
     const url = typeof res.url === 'string' ? res.url : '';
     if (url && /cloudflareaccess\.com|\/cdn-cgi\/access\/login/i.test(url)) {
+      return true;
+    }
+    const status = typeof res.status === 'number' ? res.status : 0;
+    const isAuthOrRedirectStatus = Boolean(res.ok) || (status >= 200 && status < 400) || status === 401 || status === 403;
+    if (!isAuthOrRedirectStatus) return false;
+    const ct = (res.headers && typeof res.headers.get === 'function' ? (res.headers.get('content-type') || '') : '').toLowerCase();
+    if (ct && !ct.includes('application/json') && (ct.includes('text/html') || ct.includes('application/xhtml'))) {
       return true;
     }
     return false;
@@ -267,9 +286,13 @@
     return false;
   }
 
-  async function fetchStorageFlow() {
-    if (state.inFlight) return;
+  async function fetchStorageFlow(isManualOrPostTrigger = false) {
+    if (state.inFlight) {
+      if (isManualOrPostTrigger) state.pendingRefresh = true;
+      return;
+    }
     state.inFlight = true;
+    state.pendingRefresh = false;
     try {
       const gatewayUrl = `${GATEWAY}/api/storage-flow`;
       const lanUrl = `${LAN_BASE}/api/storage-flow`;
@@ -351,6 +374,10 @@
       renderAll(json);
     } finally {
       state.inFlight = false;
+      if (state.pendingRefresh) {
+        state.pendingRefresh = false;
+        fetchStorageFlow(false);
+      }
     }
   }
 
@@ -413,6 +440,8 @@
     if (tbodyEl) {
       tbodyEl.innerHTML = `<tr><td colspan="6" style="color:#94a3b8;text-align:center;">${escapeHtml(fallbackMessage || 'Telemetry standby — awaiting live gateway connection.')}</td></tr>`;
     }
+    state.waveformHistory = [];
+    renderWaveform();
     renderPipesSVG(null);
     updateInspector();
   }
@@ -448,9 +477,9 @@
 
   function pushWaveformSample(data) {
     const lf = (data && data.liveFlow) || {};
-    const nucIO = safeNum(lf.nucDiskReadMBps) + safeNum(lf.nucDiskWriteMBps);
-    const qnapIO = Math.max(safeNum(lf.nucIscsiWriteMBps), safeNum(lf.nucNetMBps));
-    const deskIO = Math.max(safeNum(lf.desktopDiskMBps), safeNum(lf.desktopNetMBps));
+    const nucIO = Math.max(0, safeNum(lf.nucDiskReadMBps, 0)) + Math.max(0, safeNum(lf.nucDiskWriteMBps, 0));
+    const qnapIO = Math.max(0, safeNum(lf.nucIscsiWriteMBps, 0), safeNum(lf.nucNetMBps, 0));
+    const deskIO = Math.max(0, safeNum(lf.desktopDiskMBps, 0), safeNum(lf.desktopNetMBps, 0));
     state.waveformHistory.push({ nuc: nucIO, qnap: qnapIO, desk: deskIO, t: Date.now() });
     if (state.waveformHistory.length > state.maxWaveformPoints) {
       state.waveformHistory.shift();
@@ -481,8 +510,11 @@
     setText('kpi-total-capacity-sub', 'Desktop + NUC + QNAP SMB & Dual iSCSI (+ Offsite Cloud)');
 
     const qOnline = Boolean(data.qnapOnline);
-    const lat = Math.max(0, safeNum(data.qnapLatencyMs, 0));
-    setText('kpi-qnap-link', qOnline ? `Online (${lat.toFixed(1)} ms)` : 'Standby');
+    const latRaw = safeNum(data.qnapLatencyMs, null);
+    const qLinkText = !qOnline
+      ? 'Standby'
+      : (latRaw !== null && latRaw > 0 ? `Online (${latRaw.toFixed(1)} ms)` : 'Online');
+    setText('kpi-qnap-link', qLinkText);
     setText('kpi-qnap-sub', `SMB :445 ${data.qnapSmbOnline ? 'OK' : 'Offline'} • iSCSI :3260 ${data.qnapIscsiOnline ? 'OK' : 'Offline'}`);
 
     const lf = data.liveFlow || {};
@@ -505,7 +537,7 @@
       setText('kpi-last-sync-sub', 'All pipelines armed');
     }
 
-    const totalBytesMoved = pipelines.reduce((sum, p) => sum + safeNum(p.bytesCopied, 0), 0);
+    const totalBytesMoved = pipelines.reduce((sum, p) => sum + Math.max(0, safeNum(p.bytesCopied, 0)), 0);
     setText('kpi-data-moved', fmtBytes(totalBytesMoved));
     setText('kpi-data-moved-sub', `${pipelines.length} tracked automation pipelines`);
 
@@ -522,10 +554,10 @@
 
   function getMaxNvmeTemp(tier) {
     if (!tier) return null;
-    if (isValidNum(tier.nvmeMaxTempC)) {
+    if (isValidNum(tier.nvmeMaxTempC) && Number(tier.nvmeMaxTempC) > 0) {
       return Number(tier.nvmeMaxTempC);
     }
-    if (tier.nvme && !Array.isArray(tier.nvme) && isValidNum(tier.nvme.maxTempC)) {
+    if (tier.nvme && !Array.isArray(tier.nvme) && isValidNum(tier.nvme.maxTempC) && Number(tier.nvme.maxTempC) > 0) {
       return Number(tier.nvme.maxTempC);
     }
     if (Array.isArray(tier.nvme)) {
@@ -534,11 +566,13 @@
         if (Array.isArray(item)) {
           item.forEach(sub => {
             if (sub && isValidNum(sub.temperature)) {
-              best = best === null ? Number(sub.temperature) : Math.max(best, Number(sub.temperature));
+              const t = Number(sub.temperature);
+              if (t > 0) best = best === null ? t : Math.max(best, t);
             }
           });
         } else if (item && isValidNum(item.temperature)) {
-          best = best === null ? Number(item.temperature) : Math.max(best, Number(item.temperature));
+          const t = Number(item.temperature);
+          if (t > 0) best = best === null ? t : Math.max(best, t);
         }
       });
       return best;
@@ -554,57 +588,96 @@
     if (deskTagEl) deskTagEl.className = 'storage-node-tag ' + (desk.online ? 'ok' : 'info');
     const deskTempVal = getMaxNvmeTemp(desk);
     const deskTemp = deskTempVal !== null ? ` • NVMe ${deskTempVal}°C` : '';
-    const deskCapMeta = isValidNum(desk.totalGB) && Number(desk.totalGB) > 0
-      ? `${fmtGB(desk.freeGB)} Free / ${fmtGB(desk.totalGB)}`
+    const deskTotalGB = validNonNegNum(desk.totalGB);
+    const deskUsedRaw = validNonNegNum(desk.usedGB);
+    const deskFreeRaw = validNonNegNum(desk.freeGB);
+    const deskFreeGB = deskFreeRaw !== null
+      ? deskFreeRaw
+      : (deskTotalGB !== null && deskUsedRaw !== null ? Math.max(0, deskTotalGB - deskUsedRaw) : null);
+    const deskCapMeta = (deskTotalGB !== null && deskTotalGB > 0 && deskFreeGB !== null)
+      ? `${fmtGB(deskFreeGB)} Free / ${fmtGB(deskTotalGB)}`
       : '--';
     setText('node-meta-desktop-drives', `${deskCapMeta}${deskTemp}`);
 
     const nuc = t.nuc_hot || {};
-    const dFreeGB = safeNum(nuc.dDriveFreeGB, 0);
-    const dTotalGB = safeNum(nuc.dDriveTotalGB, 0);
-    const dUsedPct = dTotalGB > 0 ? Math.min(100, Math.max(0, (safeNum(nuc.dDriveUsedGB, Math.max(0, dTotalGB - dFreeGB)) / dTotalGB) * 100)) : 0;
-    setText('node-tag-nuc-d', dTotalGB > 0 ? `${Math.round(dFreeGB)} GB Free` : '--');
+    const dTotalGB = validNonNegNum(nuc.dDriveTotalGB);
+    const dFreeRaw = validNonNegNum(nuc.dDriveFreeGB);
+    const dUsedRaw = validNonNegNum(nuc.dDriveUsedGB);
+    const dUsedGB = resolveUsedGB(dUsedRaw, dTotalGB, dFreeRaw);
+    const dFreeGB = dFreeRaw !== null
+      ? dFreeRaw
+      : (dTotalGB !== null && dUsedRaw !== null ? Math.max(0, dTotalGB - dUsedRaw) : null);
+    const hasDUsage = dTotalGB !== null && dTotalGB > 0 && dUsedGB !== null;
+    const dUsedPct = hasDUsage ? Math.min(100, Math.max(0, (dUsedGB / dTotalGB) * 100)) : null;
+    setText('node-tag-nuc-d', (dTotalGB !== null && dTotalGB > 0 && dFreeGB !== null) ? `${Math.round(dFreeGB)} GB Free` : '--');
     const nucDTagEl = document.getElementById('node-tag-nuc-d');
-    if (nucDTagEl) nucDTagEl.className = 'storage-node-tag ' + (dTotalGB > 0 ? (dUsedPct >= 70 ? 'warn' : 'ok') : 'info');
-    setText('node-meta-nuc-d', dTotalGB > 0 ? `${fmtGB(dFreeGB)} Free / ${fmtGB(dTotalGB)} • 30% Offload Guardrail` : 'Awaiting telemetry...');
+    if (nucDTagEl) nucDTagEl.className = 'storage-node-tag ' + (dUsedPct !== null ? (dUsedPct >= 70 ? 'warn' : 'ok') : 'info');
+    setText('node-meta-nuc-d', (dTotalGB !== null && dTotalGB > 0 && dFreeGB !== null) ? `${fmtGB(dFreeGB)} Free / ${fmtGB(dTotalGB)} • 30% Offload Guardrail` : 'Awaiting telemetry...');
     const fillEl = document.getElementById('nuc-d-threshold-fill');
-    if (fillEl) fillEl.style.width = dUsedPct.toFixed(1) + '%';
-    setText('nuc-d-used-lbl', dTotalGB > 0 ? `${dUsedPct.toFixed(0)}% Used` : '--');
+    if (fillEl) fillEl.style.width = (dUsedPct !== null ? dUsedPct.toFixed(1) : '0') + '%';
+    setText('nuc-d-used-lbl', dUsedPct !== null ? `${dUsedPct.toFixed(0)}% Used` : '--');
 
     const cVol = Array.isArray(nuc.volumes) ? nuc.volumes.find(v => v && v.drive === 'C:') : null;
-    const cTotalGB = cVol ? safeNum(cVol.totalGB, 0) : Math.max(0, safeNum(nuc.totalGB, 0) - dTotalGB);
-    const cFreeGB = cVol ? safeNum(cVol.freeGB, 0) : Math.max(0, safeNum(nuc.freeGB, 0) - dFreeGB);
+    const nucTotalAll = validNonNegNum(nuc.totalGB);
+    const nucFreeAll = validNonNegNum(nuc.freeGB);
+    const cTotalGB = cVol
+      ? validNonNegNum(cVol.totalGB)
+      : (nucTotalAll !== null && dTotalGB !== null ? Math.max(0, nucTotalAll - dTotalGB) : null);
+    const cUsedRaw = cVol ? validNonNegNum(cVol.usedGB) : null;
+    const cFreeRaw = cVol
+      ? validNonNegNum(cVol.freeGB)
+      : (nucFreeAll !== null && dFreeGB !== null ? Math.max(0, nucFreeAll - dFreeGB) : null);
+    const cFreeGB = cFreeRaw !== null
+      ? cFreeRaw
+      : (cTotalGB !== null && cUsedRaw !== null ? Math.max(0, cTotalGB - cUsedRaw) : null);
     const nucTempVal = getMaxNvmeTemp(nuc);
     const nucTemp = nucTempVal !== null ? ` • NVMe ${nucTempVal}°C` : '';
     setText('node-tag-nuc-c', nuc.online ? 'Online' : 'Standby');
     const nucTagEl = document.getElementById('node-tag-nuc-c');
     if (nucTagEl) nucTagEl.className = 'storage-node-tag ' + (nuc.online ? 'ok' : 'info');
-    const cCapMeta = cTotalGB > 0 ? `${fmtGB(cFreeGB)} Free / ${fmtGB(cTotalGB)}` : '--';
+    const cCapMeta = (cTotalGB !== null && cTotalGB > 0 && cFreeGB !== null)
+      ? `${fmtGB(cFreeGB)} Free / ${fmtGB(cTotalGB)}`
+      : '--';
     setText('node-meta-nuc-c', `NUC Core • ${cCapMeta}${nucTemp}`);
 
     const smb = t.qnap_smb || {};
-    setText('node-tag-qnap-smb', safeNum(smb.totalGB, 0) > 0 ? fmtGB(smb.totalGB) : '--');
+    const smbTotalGB = validNonNegNum(smb.totalGB);
+    const smbFreeGB = validNonNegNum(smb.freeGB);
+    setText('node-tag-qnap-smb', smbTotalGB !== null && smbTotalGB > 0 ? fmtGB(smbTotalGB) : '--');
     const smbTagEl = document.getElementById('node-tag-qnap-smb');
-    if (smbTagEl) smbTagEl.className = 'storage-node-tag ' + (smb.online && safeNum(smb.totalGB, 0) > 0 ? 'ok' : 'info');
-    setText('node-meta-qnap-smb', `${safeStr(smb.shareName ? ('SMB Share (' + smb.shareName + ')') : null, 'SMB Share (Q:)')} • ${isValidNum(smb.freeGB) ? fmtGB(smb.freeGB) + ' Free' : '--'}`);
+    if (smbTagEl) smbTagEl.className = 'storage-node-tag ' + (smb.online && smbTotalGB !== null && smbTotalGB > 0 ? 'ok' : 'info');
+    setText('node-meta-qnap-smb', `${safeStr(smb.shareName ? ('SMB Share (' + smb.shareName + ')') : null, 'SMB Share (Q:)')} • ${smbFreeGB !== null ? fmtGB(smbFreeGB) + ' Free' : '--'}`);
 
     const iNuc = t.qnap_iscsi_nuc || {};
-    setText('node-tag-qnap-iscsi-nuc', safeNum(iNuc.totalGB, 0) > 0 ? fmtGB(iNuc.totalGB) : '--');
+    const iNucTotalGB = validNonNegNum(iNuc.totalGB);
+    const iNucFreeGB = validNonNegNum(iNuc.freeGB);
+    setText('node-tag-qnap-iscsi-nuc', iNucTotalGB !== null && iNucTotalGB > 0 ? fmtGB(iNucTotalGB) : '--');
     const iNucTagEl = document.getElementById('node-tag-qnap-iscsi-nuc');
-    if (iNucTagEl) iNucTagEl.className = 'storage-node-tag ' + (iNuc.online && safeNum(iNuc.totalGB, 0) > 0 ? 'ok' : 'info');
-    setText('node-meta-qnap-iscsi-nuc', `${safeStr(iNuc.drive, 'E:')} • ${isValidNum(iNuc.freeGB) ? fmtGB(iNuc.freeGB) + ' Free' : '--'} • ${iNuc.sessionConnected ? 'iSCSI Connected' : 'Standby'}`);
+    if (iNucTagEl) iNucTagEl.className = 'storage-node-tag ' + (iNuc.online && iNucTotalGB !== null && iNucTotalGB > 0 ? 'ok' : 'info');
+    setText('node-meta-qnap-iscsi-nuc', `${safeStr(iNuc.drive, 'E:')} • ${iNucFreeGB !== null ? fmtGB(iNucFreeGB) + ' Free' : '--'} • ${iNuc.sessionConnected ? 'iSCSI Connected' : 'Standby'}`);
 
     const iDesk = t.qnap_iscsi_desktop || {};
-    setText('node-tag-qnap-iscsi-desktop', safeNum(iDesk.totalGB, 0) > 0 ? fmtGB(iDesk.totalGB) : '--');
+    const iDeskTotalGB = validNonNegNum(iDesk.totalGB);
+    const iDeskFreeGB = validNonNegNum(iDesk.freeGB);
+    setText('node-tag-qnap-iscsi-desktop', iDeskTotalGB !== null && iDeskTotalGB > 0 ? fmtGB(iDeskTotalGB) : '--');
     const iDeskTagEl = document.getElementById('node-tag-qnap-iscsi-desktop');
-    if (iDeskTagEl) iDeskTagEl.className = 'storage-node-tag ' + (iDesk.online && safeNum(iDesk.totalGB, 0) > 0 ? 'ok' : 'info');
-    setText('node-meta-qnap-iscsi-desktop', `${safeStr(iDesk.drive, 'E:')} • ${isValidNum(iDesk.freeGB) ? fmtGB(iDesk.freeGB) + ' Free' : '--'} • Mirrored Snapshots`);
+    if (iDeskTagEl) iDeskTagEl.className = 'storage-node-tag ' + (iDesk.online && iDeskTotalGB !== null && iDeskTotalGB > 0 ? 'ok' : 'info');
+    setText('node-meta-qnap-iscsi-desktop', `${safeStr(iDesk.drive, 'E:')} • ${iDeskFreeGB !== null ? fmtGB(iDeskFreeGB) + ' Free' : '--'} • Mirrored Snapshots`);
 
     const od = t.cloud_onedrive || {};
-    setText('node-tag-onedrive-vault', od.online ? fmtGB(od.totalGB) : '--');
+    const odTotalGB = validNonNegNum(od.totalGB);
+    const odFiles = validNonNegNum(od.fileCount);
+    const odSnaps = validNonNegNum(od.snapshotCount);
+    setText('node-tag-onedrive-vault', od.online && odTotalGB !== null ? fmtGB(odTotalGB) : '--');
     const odTagEl = document.getElementById('node-tag-onedrive-vault');
     if (odTagEl) odTagEl.className = 'storage-node-tag ' + (od.online ? 'ok' : 'info');
-    setText('node-meta-onedrive-vault', `${safeNum(od.fileCount, 0).toLocaleString()} files • ${safeNum(od.snapshotCount, 0)} snapshots`);
+    if (!od.online || (odFiles === null && odSnaps === null)) {
+      setText('node-meta-onedrive-vault', '--');
+    } else {
+      const filesPart = odFiles !== null ? `${Math.round(odFiles).toLocaleString()} files` : '--';
+      const snapsPart = odSnaps !== null ? `${Math.round(odSnaps)} snapshots` : '--';
+      setText('node-meta-onedrive-vault', `${filesPart} • ${snapsPart}`);
+    }
 
     applyNodeCategoryFilter();
   }
@@ -635,8 +708,8 @@
       const pName = safeStr(p.name, safeStr(p.id, 'Pipeline'));
       const cfg = PIPE_NODE_MAP[p.id] || { color: '#38bdf8', shortLabel: pName };
       const isSel = p.id === activePipeId;
-      const rate = safeNum(p.rateMBps, 0);
-      const hasBytes = safeNum(p.bytesCopied, 0) > 0;
+      const rate = Math.max(0, safeNum(p.rateMBps, 0));
+      const hasBytes = Math.max(0, safeNum(p.bytesCopied, 0)) > 0;
       const metricTxt = hasLive
         ? (rate > 0 ? `${rate.toFixed(1)} MB/s` : (hasBytes ? safeStr(p.bytesCopiedFormatted, 'Ready') : safeStr(p.schedule, 'Ready')))
         : safeStr(p.schedule, 'Scheduled');
@@ -784,13 +857,13 @@
       const showFlowAnim = isVisible && (isHighlighted || isCategoryFiltered);
       const opacity = !isVisible ? 0.06 : (isHighlighted ? 0.98 : (isCategoryFiltered ? 0.72 : 0.28));
       const strokeW = isHighlighted ? 3.2 : (isCategoryFiltered ? 2.2 : 1.6);
-      const rate = safeNum(p.rateMBps, 0);
+      const rate = Math.max(0, safeNum(p.rateMBps, 0));
       const animDur = rate > 50 ? '0.9s' : rate > 10 ? '1.4s' : rate > 1 ? '2.0s' : '2.8s';
 
       const pipeName = safeStr(p.name, safeStr(p.id, 'Pipeline'));
       html += `
         <g opacity="${opacity}" ${isVisible ? `data-pipe-id="${escapeHtml(p.id)}" role="button" tabindex="0" aria-label="${escapeHtml(pipeName)}"` : 'style="pointer-events:none;"'}>
-          <title>${escapeHtml(pipeName)} (${escapeHtml(safeStr(p.bytesCopiedFormatted, fmtBytes(p.bytesCopied)))} • ${rate.toFixed(1)} MB/s)</title>
+          <title>${escapeHtml(pipeName)} (${escapeHtml(safeStr(p.bytesCopiedFormatted, fmtBytes(Math.max(0, safeNum(p.bytesCopied, 0)))))} • ${rate.toFixed(1)} MB/s)</title>
           <path d="${dStr}" class="storage-pipe-path" stroke="${cfg.color}" stroke-width="${strokeW}" ${isHighlighted ? 'filter="url(#pipe-glow)"' : ''} />
           ${showFlowAnim ? `<path d="${dStr}" class="storage-pipe-dashed" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.75" style="animation-duration: ${animDur};" />` : ''}
           ${hasLive && showFlowAnim && !state.animPaused && !prefersReducedMotion() ? `
@@ -824,12 +897,18 @@
     const canvas = document.getElementById('storage-waveform-canvas');
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
-    if (rect.width < 10 || rect.height < 10) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    if (rect.width < 10 || rect.height < 10) {
+      if (state.waveformHistory.length === 0 && canvas.width > 0 && canvas.height > 0) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      return;
+    }
 
     const dpr = Math.min(window.devicePixelRatio || 1, 3);
     canvas.width = Math.round(rect.width * dpr);
     canvas.height = Math.round(rect.height * dpr);
-    const ctx = canvas.getContext('2d');
     ctx.scale(dpr, dpr);
 
     const w = rect.width;
@@ -847,17 +926,21 @@
       ctx.stroke();
     }
 
+    if (state.waveformHistory.length === 0) {
+      return;
+    }
+
     const pts = state.waveformHistory.length > 1
       ? state.waveformHistory
       : [{ nuc: 0, qnap: 0, desk: 0 }, state.waveformHistory[0] || { nuc: 0, qnap: 0, desk: 0 }];
 
-    const maxVal = Math.max(10, ...pts.map(p => Math.max(p.nuc, p.qnap, p.desk)));
+    const maxVal = Math.max(10, ...pts.map(p => Math.max(0, safeNum(p.nuc, 0), safeNum(p.qnap, 0), safeNum(p.desk, 0))));
 
     function drawSeries(key, color, fillAlpha) {
       ctx.beginPath();
       pts.forEach((p, idx) => {
         const x = (idx / Math.max(1, pts.length - 1)) * (w - 16) + 8;
-        const y = h - 14 - (safeNum(p[key]) / maxVal) * (h - 28);
+        const y = h - 14 - (Math.max(0, safeNum(p[key], 0)) / maxVal) * (h - 28);
         if (idx === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
       });
@@ -885,53 +968,62 @@
   function renderCapacityBars(data) {
     const t = data.tiers || {};
     const nucHot = t.nuc_hot || {};
-    const nucDTotal = safeNum(nucHot.dDriveTotalGB, 0);
-    const nucDFree = safeNum(nucHot.dDriveFreeGB, 0);
+    const nucDTotal = validNonNegNum(nucHot.dDriveTotalGB);
+    const nucDFree = validNonNegNum(nucHot.dDriveFreeGB);
+    const nucDUsed = resolveUsedGB(nucHot.dDriveUsedGB, nucDTotal, nucDFree);
     const nucCVol = Array.isArray(nucHot.volumes) ? nucHot.volumes.find(v => v && v.drive === 'C:') : null;
-    const nucCTotal = nucCVol ? safeNum(nucCVol.totalGB, 0) : Math.max(0, safeNum(nucHot.totalGB, 0) - nucDTotal);
-    const nucCFree = nucCVol ? safeNum(nucCVol.freeGB, 0) : Math.max(0, safeNum(nucHot.freeGB, 0) - nucDFree);
-    const nucCUsed = nucCVol ? safeNum(nucCVol.usedGB, Math.max(0, nucCTotal - nucCFree)) : Math.max(0, nucCTotal - nucCFree);
+    const nucTotalAll = validNonNegNum(nucHot.totalGB);
+    const nucFreeAll = validNonNegNum(nucHot.freeGB);
+    const nucCTotal = nucCVol
+      ? validNonNegNum(nucCVol.totalGB)
+      : (nucTotalAll !== null && nucDTotal !== null ? Math.max(0, nucTotalAll - nucDTotal) : null);
+    const nucCFree = nucCVol
+      ? validNonNegNum(nucCVol.freeGB)
+      : (nucFreeAll !== null && nucDFree !== null ? Math.max(0, nucFreeAll - nucDFree) : null);
+    const nucCUsed = nucCVol
+      ? resolveUsedGB(nucCVol.usedGB, nucCTotal, nucCFree)
+      : resolveUsedGB(null, nucCTotal, nucCFree);
     const rows = [
       {
         label: 'QNAP SMB Cold Archive (Q:)',
-        used: Math.max(0, safeNum(t.qnap_smb && t.qnap_smb.usedGB)),
-        total: Math.max(0, safeNum(t.qnap_smb && t.qnap_smb.totalGB, 0)),
+        used: resolveUsedGB(t.qnap_smb && t.qnap_smb.usedGB, t.qnap_smb && t.qnap_smb.totalGB, t.qnap_smb && t.qnap_smb.freeGB),
+        total: validNonNegNum(t.qnap_smb && t.qnap_smb.totalGB),
         color: '#10b981'
       },
       {
         label: 'Desktop NVMe (C:/F:) + 6 TB HDD (D:)',
-        used: Math.max(0, safeNum(t.desktop_hot && t.desktop_hot.usedGB)),
-        total: Math.max(0, safeNum(t.desktop_hot && t.desktop_hot.totalGB, 0)),
+        used: resolveUsedGB(t.desktop_hot && t.desktop_hot.usedGB, t.desktop_hot && t.desktop_hot.totalGB, t.desktop_hot && t.desktop_hot.freeGB),
+        total: validNonNegNum(t.desktop_hot && t.desktop_hot.totalGB),
         color: '#3b82f6'
       },
       {
         label: 'NUC C: 1 TB NVMe SSD (OS)',
-        used: Math.max(0, nucCUsed),
-        total: Math.max(0, nucCTotal),
+        used: nucCUsed,
+        total: nucCTotal,
         color: '#ec4899'
       },
       {
         label: 'NUC D: 2 TB SATA Hybrid HDD (30% Marker)',
-        used: Math.max(0, safeNum(nucHot.dDriveUsedGB, Math.max(0, nucDTotal - nucDFree))),
-        total: Math.max(0, nucDTotal),
+        used: nucDUsed,
+        total: nucDTotal,
         color: '#a855f7',
         marker70: true
       },
       {
         label: 'NUC iSCSI LUN (E:)',
-        used: Math.max(0, safeNum(t.qnap_iscsi_nuc && t.qnap_iscsi_nuc.usedGB)),
-        total: Math.max(0, safeNum(t.qnap_iscsi_nuc && t.qnap_iscsi_nuc.totalGB, 0)),
+        used: resolveUsedGB(t.qnap_iscsi_nuc && t.qnap_iscsi_nuc.usedGB, t.qnap_iscsi_nuc && t.qnap_iscsi_nuc.totalGB, t.qnap_iscsi_nuc && t.qnap_iscsi_nuc.freeGB),
+        total: validNonNegNum(t.qnap_iscsi_nuc && t.qnap_iscsi_nuc.totalGB),
         color: '#38bdf8'
       },
       {
         label: 'Desktop iSCSI LUN (E:)',
-        used: Math.max(0, safeNum(t.qnap_iscsi_desktop && t.qnap_iscsi_desktop.usedGB)),
-        total: Math.max(0, safeNum(t.qnap_iscsi_desktop && t.qnap_iscsi_desktop.totalGB, 0)),
+        used: resolveUsedGB(t.qnap_iscsi_desktop && t.qnap_iscsi_desktop.usedGB, t.qnap_iscsi_desktop && t.qnap_iscsi_desktop.totalGB, t.qnap_iscsi_desktop && t.qnap_iscsi_desktop.freeGB),
+        total: validNonNegNum(t.qnap_iscsi_desktop && t.qnap_iscsi_desktop.totalGB),
         color: '#60a5fa'
       },
       {
         label: 'OneDrive Cloud Vault (Offsite)',
-        used: Math.max(0, safeNum(t.cloud_onedrive && t.cloud_onedrive.totalGB)),
+        used: (t.cloud_onedrive && t.cloud_onedrive.online) ? validNonNegNum(t.cloud_onedrive.totalGB) : null,
         total: 0,
         color: '#f59e0b',
         isCloud: true
@@ -939,22 +1031,28 @@
     ];
 
     const physicalRows = rows.filter(r => !r.isCloud);
-    const totalCluster = physicalRows.reduce((s, r) => s + r.total, 0) || 1;
+    const totalCluster = physicalRows.reduce((s, r) => s + (r.total !== null && r.total > 0 ? r.total : 0), 0) || 1;
     setText('capacity-summary-badge', `${physicalRows.length} Drives • 4 Tiers`);
     const stackedEl = document.getElementById('storage-capacity-stacked');
     if (stackedEl) {
       stackedEl.innerHTML = physicalRows
-        .map(r => `<div class="storage-cap-seg" style="width:${((r.total / totalCluster) * 100).toFixed(2)}%;background:${r.color};" title="${escapeHtml(r.label)}: ${r.total > 0 ? fmtGB(r.total) : '--'}"></div>`)
+        .map(r => {
+          const tVal = r.total !== null && r.total > 0 ? r.total : 0;
+          return `<div class="storage-cap-seg" style="width:${((tVal / totalCluster) * 100).toFixed(2)}%;background:${r.color};" title="${escapeHtml(r.label)}: ${tVal > 0 ? fmtGB(tVal) : '--'}"></div>`;
+        })
         .join('');
     }
 
     const barsEl = document.getElementById('storage-capacity-bars');
     if (barsEl) {
       barsEl.innerHTML = rows.map(r => {
-        const pct = r.isCloud ? Math.min(100, Math.max(0, (r.used / 1024) * 100)) : Math.min(100, Math.max(0, r.total > 0 ? (r.used / r.total) * 100 : 0));
+        const hasPhysicalUsage = !r.isCloud && r.total !== null && r.total > 0 && r.used !== null;
+        const pct = r.isCloud
+          ? (r.used !== null && r.used > 0 ? Math.min(100, Math.max(0, (r.used / 1024) * 100)) : 0)
+          : (hasPhysicalUsage ? Math.min(100, Math.max(0, (r.used / r.total) * 100)) : 0);
         const rightLbl = r.isCloud
-          ? (r.used > 0 ? `${fmtGB(r.used)} Offsite Synced` : '--')
-          : (r.total > 0 ? `${fmtGB(r.used)} / ${fmtGB(r.total)} (${pct.toFixed(0)}%)` : '--');
+          ? (r.used !== null && r.used > 0 ? `${fmtGB(r.used)} Offsite Synced` : '--')
+          : (hasPhysicalUsage ? `${fmtGB(r.used)} / ${fmtGB(r.total)} (${pct.toFixed(0)}%)` : '--');
         return `
           <div class="storage-cap-row">
             <div class="storage-cap-row-top">
@@ -1056,8 +1154,12 @@
     const lastRunDate = p.lastRunAt ? new Date(p.lastRunAt) : null;
     const lastRunValid = Boolean(lastRunDate && Number.isFinite(lastRunDate.getTime()));
     setText('insp-last-sync', hasLiveData ? (lastRunValid ? `${fmtRelativeTime(p.lastRunAt)} (${lastRunDate.toLocaleTimeString()})` : 'Scheduled') : '--');
-    setText('insp-bytes', hasLiveData ? `${safeStr(p.bytesCopiedFormatted, fmtBytes(p.bytesCopied))} (${safeNum(p.filesMoved, 0)} files)` : '--');
-    setText('insp-rate', hasLiveData ? `${safeNum(p.durationSec, 0)}s • ${safeNum(p.rateMBps, 0).toFixed(2)} MB/s` : '--');
+    const safeBytes = Math.max(0, safeNum(p.bytesCopied, 0));
+    const safeFiles = Math.max(0, safeNum(p.filesMoved, 0));
+    const safeDur = Math.max(0, safeNum(p.durationSec, 0));
+    const safeRate = Math.max(0, safeNum(p.rateMBps, 0));
+    setText('insp-bytes', hasLiveData ? `${safeStr(p.bytesCopiedFormatted, fmtBytes(safeBytes))} (${safeFiles} files)` : '--');
+    setText('insp-rate', hasLiveData ? `${safeDur}s • ${safeRate.toFixed(2)} MB/s` : '--');
     setText('insp-exit', hasLiveData ? safeStr(p.summary, safeStr(p.status, 'Healthy')) : offlineStatusLabel);
 
     const badge = document.getElementById('insp-health-badge');
@@ -1091,10 +1193,10 @@
     if (!grid) return;
     const pipelines = Array.isArray(data && data.pipelines) ? data.pipelines.filter(p => p && typeof p === 'object') : [];
     const filtered = pipelines.filter(p => matchesFilter(p.category, state.filter));
-    const maxRate = Math.max(10, ...pipelines.map(p => safeNum(p.rateMBps, 0)));
+    const maxRate = Math.max(10, ...pipelines.map(p => Math.max(0, safeNum(p.rateMBps, 0))));
 
     grid.innerHTML = filtered.map(p => {
-      const rate = safeNum(p.rateMBps, 0);
+      const rate = Math.max(0, safeNum(p.rateMBps, 0));
       const pct = Math.min(100, Math.max(4, (rate / maxRate) * 100));
       const st = String(p.status || 'success').toLowerCase();
       const tagClass = st === 'error' || st === 'warning' ? 'warn' : 'ok';
@@ -1111,7 +1213,7 @@
           <div>
             <div class="storage-cap-row-top" style="margin-bottom: 4px;">
               <span>Last: ${escapeHtml(fmtRelativeTime(p.lastRunAt))}</span>
-              <span>${escapeHtml(safeStr(p.bytesCopiedFormatted, fmtBytes(p.bytesCopied)))} &bull; ${rate.toFixed(1)} MB/s</span>
+              <span>${escapeHtml(safeStr(p.bytesCopiedFormatted, fmtBytes(Math.max(0, safeNum(p.bytesCopied, 0)))))} &bull; ${rate.toFixed(1)} MB/s</span>
             </div>
             <div class="storage-rate-bar-bg" style="margin-bottom: 10px;">
               <div class="storage-rate-bar-fill" style="width: ${pct.toFixed(1)}%;"></div>
@@ -1256,7 +1358,7 @@
       if (typeof window.showToast === 'function') {
         window.showToast('success', 'Pipeline Triggered', `${pipeline.name} dispatched on cluster.`, 4500);
       }
-      setTimeout(fetchStorageFlow, 1500);
+      setTimeout(() => fetchStorageFlow(true), 1500);
     } catch (err) {
       if (isHttps && err && err.name === 'TypeError') {
         const ssoExpired = await checkSsoExpiredOnHttps();
@@ -1353,7 +1455,7 @@
     // Wire Refresh button
     const refBtn = document.getElementById('btn-refresh-storage-flow');
     if (refBtn) {
-      refBtn.addEventListener('click', () => fetchStorageFlow());
+      refBtn.addEventListener('click', () => fetchStorageFlow(true));
     }
 
     window.addEventListener('resize', () => {

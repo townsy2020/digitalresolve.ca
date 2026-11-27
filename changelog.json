@@ -1,7 +1,26 @@
 {
-    "updatedAt":  "2026-11-27T04:29:18Z",
-    "currentVersion":  "v2.9.60",
+    "updatedAt":  "2026-11-27T04:47:40Z",
+    "currentVersion":  "v2.9.61",
     "releases":  [
+                     {
+                         "version":  "v2.9.61",
+                         "date":  "November 26, 2026",
+                         "title":  "Fix storage-flow outage/SSO classification, refresh queue \u0026 honest capacity fallbacks",
+                         "changes":  [
+                                         {
+                                             "label":  "Outage vs SSO",
+                                             "text":  "Stop misclassifying Cloudflare HTTP 5xx HTML error pages as expired M365 SSO sessions in fetchStorageFlow and executePipelineTrigger."
+                                         },
+                                         {
+                                             "label":  "Refresh \u0026 Canvas",
+                                             "text":  "Queue manual/post-trigger storage refreshes instead of dropping them while in flight, and clear stale waveform canvas traces on SSO/offline fallback."
+                                         },
+                                         {
+                                             "label":  "Honest Storage Metrics",
+                                             "text":  "Eliminate false 0 GB/100% Used, NVMe 0C, QNAP 0.0 ms, and unclamped negative throughput coercions in storage-flow.js."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.60",
                          "date":  "November 26, 2026",
