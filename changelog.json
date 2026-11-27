@@ -1,7 +1,22 @@
 {
-    "updatedAt":  "2026-11-26T23:01:05Z",
-    "currentVersion":  "v2.9.54",
+    "updatedAt":  "2026-11-27T00:03:13Z",
+    "currentVersion":  "v2.9.55",
     "releases":  [
+                     {
+                         "version":  "v2.9.55",
+                         "date":  "November 26, 2026",
+                         "title":  "Fix Tailscale qBittorrent route \u0026 AdGuard split-DNS rewrites",
+                         "changes":  [
+                                         {
+                                             "label":  "Tailscale qBit Route",
+                                             "text":  "Stop rewriting torrents2.digitalresolve.ca to closed port 100.68.136.76:8081 in Tailscale mode so NUC qBittorrent stays reachable via HTTPS."
+                                         },
+                                         {
+                                             "label":  "AdGuard Split-DNS",
+                                             "text":  "Remove 4 broken split-DNS rewrites without matching HTTPS proxies and resolve conflicting upstream DNS flags in AdGuardHome.yaml."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.54",
                          "date":  "November 26, 2026",
