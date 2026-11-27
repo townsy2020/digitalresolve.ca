@@ -1,7 +1,18 @@
 {
-    "updatedAt":  "2026-11-27T02:19:35Z",
-    "currentVersion":  "v2.9.58",
+    "updatedAt":  "2026-11-27T03:55:31Z",
+    "currentVersion":  "v2.9.59",
     "releases":  [
+                     {
+                         "version":  "v2.9.59",
+                         "date":  "November 26, 2026",
+                         "title":  "Remove dead Tailscale :5252 Web Client link",
+                         "changes":  [
+                                         {
+                                             "label":  "Tailscale Modal",
+                                             "text":  "Remove the broken http://100.68.136.76:5252 Web Client link (Tailscale Web Client is intentionally disabled on NUC) so every Tailscale modal action resolves cleanly."
+                                         }
+                                     ]
+                     },
                      {
                          "version":  "v2.9.58",
                          "date":  "November 26, 2026",

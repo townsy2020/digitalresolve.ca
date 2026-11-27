@@ -166,16 +166,16 @@
         if (currentVerEl) {
           const rawText = currentVerEl.textContent || '';
           const match = rawText.match(/v\d+\.\d+\.\d+/);
-          const activeVer = match ? match[0] : 'v2.9.58';
+          const activeVer = match ? match[0] : 'v2.9.59';
           const fVer = document.getElementById('footer-version-tag');
           if (fVer) fVer.textContent = activeVer;
           const mVer = document.getElementById('menu-changelog-ver');
           if (mVer) mVer.textContent = activeVer;
         }
 
-      const baseHtmlLines = 27430;
+      const baseHtmlLines = 27518;
       const baseCssLines = 7863;
-      const baseJsLines = 10159;
+      const baseJsLines = 10158;
       const baseCnameLines = 1;
       const defaultTotal = baseHtmlLines + baseJsLines + baseCssLines + baseCnameLines;
       const totalFormatted = defaultTotal.toLocaleString();
@@ -8212,8 +8212,7 @@
       <div style="border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
         <button type="button" class="btn btn-secondary" onclick="closeTailscaleModal()" style="font-size: 0.8rem; padding: 6px 14px;">Close</button>
         <div style="display: flex; gap: 8px;">
-          <a href="https://login.tailscale.com/admin" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; text-decoration: none; color: #94a3b8 !important;">Tailscale Admin &rarr;</a>
-          <a href="http://100.68.136.76:5252" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; text-decoration: none; color: #22d3ee !important; border-color: rgba(6, 182, 212, 0.4);">NUC Web Client &rarr;</a>
+          <a href="https://login.tailscale.com/admin" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.8rem; padding: 6px 12px; text-decoration: none; color: #22d3ee !important; border-color: rgba(6, 182, 212, 0.4);">Tailscale Admin &rarr;</a>
         </div>
       </div>
     </div>
